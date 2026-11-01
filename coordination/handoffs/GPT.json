@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "1a9befc",
-  "state": "wp03_public_data_v2_shared_publication_complete_client_acceptance_pending",
+  "head_sha": "cb046cb91ef25e669acabeb0fd09ec9a4339b7a0",
+  "state": "mandatory_3d_decision_loop_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -934,6 +934,34 @@
       "18 targeted backend tests after the final increment",
       "validated 10-slide PowerPoint package and 60.000-second 1920x1080 H.264/AAC video",
       "earlier full backend regression: 308 passed"
+    ]
+  },
+  "mandatory_3d_decision_loop_20261102": {
+    "implementation_sha": "cb046cb91ef25e669acabeb0fd09ec9a4339b7a0",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Project placements render and drag in the existing Three/MapLibre editor with stable placement ids",
+      "New or moved placements are checked against exact frozen published building versions and return typed placement_building_conflict field errors",
+      "One explicit save-and-recalculate action creates an immutable revision and then enqueues the full durable server calculation",
+      "Parent and current revisions render side by side with mirrored center, zoom, pitch and bearing"
+    ],
+    "live_result": {
+      "scenario_id": "501255a4-582f-4127-ad61-86653fdf42e5",
+      "revision_id": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674",
+      "calculation_snapshot_id": "367ec1b8-e255-45d5-91e3-d7abc8c76b90"
+    },
+    "verification": [
+      "Targeted backend placement validation test passed",
+      "Canonical contract 1.13.0 passed 398 checks",
+      "Frontend typecheck and production build passed",
+      "Authenticated building-conflict check preserved the revision and highlighted the rejected placement",
+      "Authenticated 3D compare check proved numerically identical cameras and no API 5xx"
+    ],
+    "evidence": "docs/evidence/jury-placement-3d",
+    "limits": [
+      "Underground networks are not available and are not claimed as checked",
+      "Unknown plant dimensions remain schematic and no authoritative growth curve is invented"
     ]
   }
 }
