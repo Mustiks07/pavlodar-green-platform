@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "61c3b7e",
-  "state": "priority_what_if_verified",
+  "head_sha": "dc3a45a",
+  "state": "jury_job_status_polished",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
