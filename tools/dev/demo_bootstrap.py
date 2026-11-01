@@ -1348,15 +1348,20 @@ def bootstrap(clients, city, license_name):
     program_resource_limits = [
         {
             "period": f"year:{year}",
-            "water_m3": 12000.0,
-            "crew_minutes": 240000,
-            "max_visits": 720,
-            "care_budget": "30000000.00",
+            "water_m3": 12.0,
+            "crew_minutes": 1800,
+            "max_visits": 18,
+            "care_budget": "1000000.00",
         }
         for year in range(3)
     ]
     target_program_budget = "150000000.00"
     baseline_program_budget = "1000000.00"
+    drought_water_m3 = 7.0
+    drought_resource_limits = [
+        {**limit, "water_m3": drought_water_m3}
+        for limit in program_resource_limits
+    ]
 
     def program_body(value, *, budget=None):
         return {
@@ -1381,6 +1386,17 @@ def bootstrap(clients, city, license_name):
             "PUT",
             f"/v1/programs/{value['id']}",
             program_body(fresh, budget=budget),
+            etag=tag,
+        )
+
+    def replace_program_limits(value, limits):
+        fresh, tag = sp.etag(f"/v1/programs/{value['id']}")
+        body = program_body(fresh)
+        body["resource_limits"] = limits
+        return sp.send(
+            "PUT",
+            f"/v1/programs/{value['id']}",
+            body,
             etag=tag,
         )
 
@@ -1455,6 +1471,7 @@ def bootstrap(clients, city, license_name):
     )
     has_target = any(
         item.get("input_snapshot", {}).get("capital_budget") == target_program_budget
+        and item.get("input_snapshot", {}).get("resource_limits") == program_resource_limits
         for item in revisions
     )
     if not (has_baseline and has_target):
@@ -1463,6 +1480,21 @@ def bootstrap(clients, city, license_name):
         program = replace_program_budget(program, baseline_program_budget)
         optimize_program(program)
         program = replace_program_budget(program, target_program_budget)
+        optimize_program(program)
+    revisions = sp.pages(f"/v1/programs/{program['id']}/revisions")
+    has_drought = any(
+        item.get("input_snapshot", {}).get("capital_budget") == target_program_budget
+        and item.get("input_snapshot", {}).get("resource_limits") == drought_resource_limits
+        for item in revisions
+    )
+    if not has_drought:
+        # A second real what-if required by the product brief: water, not only money, changes
+        # the selected portfolio. The active input is restored after the immutable drought run.
+        program = replace_program_limits(program, drought_resource_limits)
+        drought_revision = optimize_program(program)
+        if len(drought_revision["selected_scenario_revision_ids"]) >= len(program_zone_ids):
+            raise SystemExit("Демо-лимит воды не изменил портфель программы")
+        program = replace_program_limits(program, program_resource_limits)
         optimize_program(program)
     count("mvp_roadmaps", True)
     return report

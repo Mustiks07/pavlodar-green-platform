@@ -3106,12 +3106,26 @@
 .program-whatif__budgets article { display: grid; gap: 0.15rem; padding: var(--pg-space-3); border-radius: var(--pg-radius); background: var(--pg-accent-soft); }
 .program-whatif__budgets small { color: var(--pg-text-muted); }
 .program-whatif__budgets strong { font-size: var(--pg-fs-lg); }
+.program-whatif__water {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) minmax(14rem, 1.3fr);
+  align-items: center;
+  gap: var(--pg-space-3);
+  padding: var(--pg-space-3);
+  border-radius: var(--pg-radius);
+  background: linear-gradient(100deg, var(--pg-accent-soft), var(--pg-surface-2));
+}
+.program-whatif__water > span { display: grid; }
+.program-whatif__water small { color: var(--pg-text-muted); }
+.program-whatif__water strong { font-size: var(--pg-fs-lg); color: var(--pg-accent-text); }
+.program-whatif__water em { color: var(--pg-text-muted); font-size: var(--pg-fs-sm); font-style: normal; }
 .program-whatif__changes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pg-space-3); }
 .program-whatif__changes article { padding: var(--pg-space-3); border-radius: var(--pg-radius); background: var(--pg-surface-2); }
 .program-whatif__changes article.is-added { border-left: 4px solid var(--pg-positive); }
 .program-whatif__changes article.is-removed { border-left: 4px solid var(--pg-warning); }
 .program-whatif__changes ul { margin: var(--pg-space-2) 0 0; padding-left: 1.1rem; }
-.program-whatif__changes span, .program-whatif > p { color: var(--pg-text-muted); font-size: var(--pg-fs-sm); }
+.program-whatif__changes span { display: block; margin-top: var(--pg-space-2); color: var(--pg-text-muted); font-size: var(--pg-fs-sm); }
+.program-whatif > p { color: var(--pg-text-muted); font-size: var(--pg-fs-sm); }
 .program-factor-list,
 .program-candidate-list {
   padding: var(--pg-space-3);
@@ -3160,6 +3174,8 @@
   .program-summary__metrics { grid-template-columns: 1fr; }
   .program-whatif__changes { grid-template-columns: 1fr; }
   .program-whatif__budgets { grid-template-columns: 1fr; }
+  .program-whatif__water { grid-template-columns: 1fr; }
+  .program-whatif__water > .pg-icon { transform: rotate(90deg); }
   .program-whatif > header { align-items: stretch; flex-direction: column; }
   .program-whatif__delta { justify-items: start; }
   .program-resource-grid,

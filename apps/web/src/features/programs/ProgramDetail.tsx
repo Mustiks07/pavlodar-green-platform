@@ -15,7 +15,7 @@ import {
   type ScenarioRevision,
   type Zone,
 } from '@pg/api-client';
-import { Badge, Button, Card, Dialog, Field, formatDateTime, Input, JobStatus, MoneyText, Notice, Skeleton, StateView } from '@pg/ui';
+import { Badge, Button, Card, Dialog, Field, formatDateTime, formatNumber, Icon, Input, JobStatus, MoneyText, Notice, Skeleton, StateView } from '@pg/ui';
 import { api, useOperationAvailable } from '../../api';
 import { t, type AppKey } from '../../i18n';
 import { ApiErrorView } from '../../shell/ApiErrorView';
@@ -145,9 +145,14 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
   useEffect(() => {
     if (items.length < 2) return;
     const target = items.find((item) => item.id === current.current_revision_id) ?? items[0]!;
-    // Repeated optimization with unchanged inputs can create adjacent equivalent results. For
-    // the decision view, prefer the latest real input change so the default comparison is useful.
+    const targetWater = target.input_snapshot.resource_limits[0]?.water_m3 ?? null;
+    // Prefer the mandatory resource scenario: same investment budget, different available water.
+    // Repeated equivalent runs are skipped, and the budget what-if remains available in selectors.
     const base = items.find((item) => (
+      item.id !== target.id
+      && item.input_snapshot.capital_budget === target.input_snapshot.capital_budget
+      && (item.input_snapshot.resource_limits[0]?.water_m3 ?? null) !== targetWater
+    )) ?? items.find((item) => (
       item.id !== target.id
       && item.input_snapshot.capital_budget !== target.input_snapshot.capital_budget
     )) ?? items.find((item) => item.id !== target.id)!;
@@ -306,6 +311,10 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
     const zone = priorityZoneNames.get(scenario.zone_id);
     return zone ? `${zone} · ${scenario.name}` : scenario.name;
   };
+  const baseProgramRevision = items.find((item) => item.id === baseRevisionId) ?? null;
+  const targetProgramRevision = items.find((item) => item.id === targetRevisionId) ?? null;
+  const baseWater = baseProgramRevision?.input_snapshot.resource_limits[0]?.water_m3 ?? null;
+  const targetWater = targetProgramRevision?.input_snapshot.resource_limits[0]?.water_m3 ?? null;
 
   return (
     <Card title={current.name} actions={<Button variant="ghost" size="sm" icon="x" iconOnly aria-label={t('program.close')} onClick={onClose} />}>
@@ -342,9 +351,17 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
             {diff.data.capital_delta !== null ? <span className="program-whatif__delta"><small>Изменение капитальных затрат</small><strong><MoneyText value={diff.data.capital_delta} /></strong></span> : null}
           </header>
           <div className="program-whatif__budgets">
-            <article><small>Предыдущий результат</small><strong>{items.find((item) => item.id === baseRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === baseRevisionId)!.capital_total!} /> : '—'}</strong></article>
-            <article><small>Новый результат</small><strong>{items.find((item) => item.id === targetRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === targetRevisionId)!.capital_total!} /> : '—'}</strong></article>
+            <article><small>Предыдущий результат</small><strong>{baseProgramRevision?.capital_total ? <MoneyText value={baseProgramRevision.capital_total} /> : '—'}</strong></article>
+            <article><small>Новый результат</small><strong>{targetProgramRevision?.capital_total ? <MoneyText value={targetProgramRevision.capital_total} /> : '—'}</strong></article>
           </div>
+          {baseWater !== targetWater ? (
+            <div className="program-whatif__water">
+              <span><small>Доступная вода в год</small><strong>{baseWater === null ? 'не ограничена' : `${formatNumber(baseWater, 1)} м³`}</strong></span>
+              <Icon name="chevronRight" size={24} />
+              <span><small>Новый лимит</small><strong>{targetWater === null ? 'не ограничен' : `${formatNumber(targetWater, 1)} м³`}</strong></span>
+              <em>Сервер заново выбрал допустимый портфель при изменении ресурса.</em>
+            </div>
+          ) : null}
           <div className="program-whatif__changes">
             <article className="is-added">
               <strong>Вошли в программу</strong>
@@ -356,7 +373,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
             </article>
           </div>
           <p>Измените лимиты программы и запустите оптимизацию — сервер сохранит новый результат, а здесь покажет точную разницу.</p>
-          {current.status === 'draft' ? <Button variant="primary" icon="target" disabled={Boolean(activeJob)} onClick={() => openEditor(true)}>Рассчитать при другом бюджете</Button> : null}
+          {current.status === 'draft' ? <Button variant="primary" icon="target" disabled={Boolean(activeJob)} onClick={() => openEditor(true)}>Изменить бюджет или ресурсы</Button> : null}
         </section>
       ) : null}
       {selected && selected.selected_scenario_revision_ids.length > 0 ? (
