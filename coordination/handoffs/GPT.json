@@ -1212,5 +1212,25 @@
     "decision": "ADR-067",
     "evidence": "docs/evidence/wp09-execution-ui/execution-outcome.png",
     "limit": "The public Pavlodar city remains free of invented factual execution; the full outcome route is evidenced in the disposable acceptance environment"
+  },
+  "placement_geometry_20261102": {
+    "implementation_sha": "pending",
+    "contract_version": "1.14.1",
+    "migration": "none",
+    "implemented": [
+      "Recorded known crown footprints cannot overlap in a saved revision",
+      "Exact tangency passes and unknown dimensions remain non-blocking",
+      "Both conflicting placement paths are returned and highlighted in the preserved local draft",
+      "The editor supports modifier/checkbox multi-selection and group lock, unlock and delete",
+      "Locked placements cannot be moved or deleted; group changes remain undoable"
+    ],
+    "verification": [
+      "Canonical 1.14.1 validation passed 398 checks",
+      "Focused backend crown-clearance tests passed 2/2",
+      "Frontend placement helpers passed 8/8",
+      "Frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-068",
+    "limit": "This is recorded crown geometry, not a species spacing norm or underground-network clearance; rotation remains absent until the canonical model supports orientation"
   }
 }

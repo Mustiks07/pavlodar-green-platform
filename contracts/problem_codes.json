@@ -1,5 +1,5 @@
 {
-  "version": "1.14.0",
+  "version": "1.14.1",
   "codes": [
     {
       "code": "account_not_provisioned",
@@ -480,6 +480,11 @@
       "code": "placement_building_conflict",
       "status": 422,
       "title_ru": "Посадка пересекает здание"
+    },
+    {
+      "code": "placement_spacing_conflict",
+      "status": 422,
+      "title_ru": "Известные контуры крон пересекаются"
     },
     {
       "code": "placement_outside_zone",

@@ -383,8 +383,9 @@ function RevisionEditor({
 
   const conflict = save.error instanceof ApiError && save.error.category === 'revision_conflict';
   const buildingConflictIds = useMemo(() => {
-    if (!(save.error instanceof ApiError) || save.error.problem?.code !== 'placement_building_conflict') return EMPTY_PLACEMENT_IDS;
-    return new Set(save.error.problem.field_errors.flatMap((item) => {
+    const problem = save.error instanceof ApiError ? save.error.problem : null;
+    if (!problem || !['placement_building_conflict', 'placement_spacing_conflict'].includes(problem.code)) return EMPTY_PLACEMENT_IDS;
+    return new Set(problem.field_errors.flatMap((item) => {
       const match = item.path.match(/^\/placements\/(\d+)\/position$/);
       const placement = match ? edits.placements[Number(match[1])] : null;
       return placement ? [placement.id] : [];

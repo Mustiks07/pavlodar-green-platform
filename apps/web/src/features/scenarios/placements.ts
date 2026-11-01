@@ -60,7 +60,13 @@ export function same(a: Placement[], b: Placement[]): boolean {
 }
 
 /** Local problems the user can fix before sending; the server stays the authority. */
-export type PlacementIssue = 'no_date' | 'bad_quantity' | 'dimension_without_basis' | 'duplicate_id';
+export type PlacementIssue = 'no_date' | 'bad_quantity' | 'dimension_without_basis' | 'duplicate_id' | 'crown_overlap';
+const metersBetween = (a: LngLat, b: LngLat): number => {
+  const lat = ((a[1] + b[1]) / 2) * Math.PI / 180;
+  const dx = (a[0] - b[0]) * 111_320 * Math.cos(lat);
+  const dy = (a[1] - b[1]) * 110_540;
+  return Math.hypot(dx, dy);
+};
 export function issuesOf(list: Placement[]): Map<string, PlacementIssue[]> {
   const out = new Map<string, PlacementIssue[]>();
   const seen = new Set<string>();
@@ -72,6 +78,15 @@ export function issuesOf(list: Placement[]): Map<string, PlacementIssue[]> {
     if (seen.has(p.id)) issues.push('duplicate_id');
     seen.add(p.id);
     if (issues.length) out.set(p.id, [...(out.get(p.id) ?? []), ...issues]);
+  }
+  const known = list.filter((placement) => placement.dimension_basis !== 'unknown' && (placement.initial_crown_radius_m ?? 0) > 0);
+  for (let left = 0; left < known.length; left += 1) {
+    for (let right = left + 1; right < known.length; right += 1) {
+      const a = known[left]!;
+      const b = known[right]!;
+      if (metersBetween(a.position.coordinates as LngLat, b.position.coordinates as LngLat) + 1e-6 >= a.initial_crown_radius_m! + b.initial_crown_radius_m!) continue;
+      for (const placement of [a, b]) out.set(placement.id, [...new Set([...(out.get(placement.id) ?? []), 'crown_overlap' as const])]);
+    }
   }
   return out;
 }

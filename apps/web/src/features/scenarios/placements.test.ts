@@ -36,6 +36,13 @@ describe('placement history', () => {
     expect(issues.get('b')).toEqual(['bad_quantity']);
     expect(issues.get('c')).toEqual(['dimension_without_basis', 'duplicate_id']);
   });
+  it('previews known crown overlap but does not invent an unknown footprint', () => {
+    const known = (id: string, x: number) => ({ ...P(id, x), initial_crown_radius_m: 2, dimension_basis: 'measured' as const });
+    const issues = issuesOf([known('a', 77), known('b', 77.00001), P('unknown', 77)]);
+    expect(issues.get('a')).toContain('crown_overlap');
+    expect(issues.get('b')).toContain('crown_overlap');
+    expect(issues.get('unknown')).toBeUndefined();
+  });
 });
 
 describe('three-way merge after 412', () => {

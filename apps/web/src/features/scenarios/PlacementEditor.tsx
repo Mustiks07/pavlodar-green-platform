@@ -59,6 +59,8 @@ export function PlacementMap({
   datasetVersionIds,
   placements,
   selectedId,
+  selectedIds = EMPTY_IDS,
+  snapping = false,
   adding,
   disabled,
   onSelect,
@@ -75,9 +77,11 @@ export function PlacementMap({
   datasetVersionIds: string[];
   placements: Placement[];
   selectedId: string | null;
+  selectedIds?: Set<string>;
+  snapping?: boolean;
   adding: boolean;
   disabled: boolean;
-  onSelect: (id: string | null) => void;
+  onSelect: (id: string | null, additive?: boolean) => void;
   onAdd: (at: LngLat) => void;
   onMove: (id: string, at: LngLat) => void;
   onDelete: (id: string) => void;
@@ -103,15 +107,15 @@ export function PlacementMap({
     quantity: placement.quantity,
     height_m: placement.initial_height_m,
     crown_radius_m: placement.initial_crown_radius_m,
-    selected: placement.id === selectedId,
+    selected: selectedIds.has(placement.id),
     locked: placement.locked,
     conflict: conflictIds.has(placement.id),
-  })), [placements, selectedId, conflictIds]);
+  })), [placements, selectedIds, conflictIds]);
   const scene3d = useScene3D(() => map.current, [], scenePlantings);
   const auto3dStarted = useRef(false);
   if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementScene?: typeof scene3d }).__pgPlacementScene = scene3d;
-  const live = useRef({ placements, selectedId, adding, disabled, onSelect, onAdd, onMove });
-  live.current = { placements, selectedId, adding, disabled, onSelect, onAdd, onMove };
+  const live = useRef({ placements, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove });
+  live.current = { placements, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove };
   const drag = useRef<{
     id: string;
     start: maplibregl.Point;
@@ -128,7 +132,7 @@ export function PlacementMap({
     type: 'FeatureCollection',
     features: list.map((p, i) => ({
       type: 'Feature',
-      properties: { id: p.id, n: i + 1, sel: p.id === live.current.selectedId, locked: p.locked, conflict: conflictIds.has(p.id) },
+      properties: { id: p.id, n: i + 1, sel: live.current.selectedIds.has(p.id), locked: p.locked, conflict: conflictIds.has(p.id) },
       geometry: { type: 'Point', coordinates: dragged && dragged.id === p.id ? dragged.pos : p.position.coordinates },
     })),
   });
@@ -185,7 +189,7 @@ export function PlacementMap({
     };
     const start = (id: string, pt: maplibregl.Point, touch: boolean, client: [number, number]) => {
       const p = live.current.placements.find((x) => x.id === id);
-      live.current.onSelect(id);
+      live.current.onSelect(id, false);
       if (!p || p.locked || live.current.disabled) return false;
       const restoreRotate = m.dragRotate.isEnabled();
       drag.current = {
@@ -207,7 +211,25 @@ export function PlacementMap({
       const d = drag.current;
       if (!d) return;
       if (!d.pos && pt.dist(d.start) < SLOP_PX) return;
-      d.pos = [ll.lng, ll.lat];
+      let next: LngLat = [ll.lng, ll.lat];
+      if (live.current.snapping) {
+        const pointer = m.project(next);
+        let snapX: { distance: number; value: number } | null = null;
+        let snapY: { distance: number; value: number } | null = null;
+        for (const placement of live.current.placements) {
+          if (placement.id === d.id) continue;
+          const point = m.project(placement.position.coordinates as LngLat);
+          const dx = Math.abs(point.x - pointer.x);
+          const dy = Math.abs(point.y - pointer.y);
+          if (dx <= 8 && (!snapX || dx < snapX.distance)) snapX = { distance: dx, value: point.x };
+          if (dy <= 8 && (!snapY || dy < snapY.distance)) snapY = { distance: dy, value: point.y };
+        }
+        if (snapX || snapY) {
+          const snapped = m.unproject([snapX?.value ?? pointer.x, snapY?.value ?? pointer.y]);
+          next = [snapped.lng, snapped.lat];
+        }
+      }
+      d.pos = next;
       if (import.meta.env.DEV) (window as unknown as { __pgPlacementDrag?: unknown }).__pgPlacementDrag = { phase: 'moving', id: d.id, pos: d.pos };
       (m.getSource('pl') as maplibregl.GeoJSONSource | undefined)?.setData(data(live.current.placements, { id: d.id, pos: d.pos }));
     };
@@ -252,6 +274,7 @@ export function PlacementMap({
     window.addEventListener('mouseup', endWindow, true);
     m.on('mousedown', (e) => {
       const id = hitAt(e.point);
+      if (id && (e.originalEvent.shiftKey || e.originalEvent.ctrlKey || e.originalEvent.metaKey)) return;
       if (id && start(id, e.point, false, [e.originalEvent.clientX, e.originalEvent.clientY])) e.preventDefault();
     });
     m.on('mousemove', (e) => {
@@ -283,9 +306,9 @@ export function PlacementMap({
     m.on('click', (e) => {
       if (performance.now() < suppressClick.current) return;
       const id = hitAt(e.point);
-      if (id) return live.current.onSelect(id);
+      if (id) return live.current.onSelect(id, e.originalEvent.shiftKey || e.originalEvent.ctrlKey || e.originalEvent.metaKey);
       if (live.current.adding && !live.current.disabled) live.current.onAdd([e.lngLat.lng, e.lngLat.lat]);
-      else live.current.onSelect(null);
+      else live.current.onSelect(null, false);
     });
     map.current = m;
     if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementMap?: maplibregl.Map }).__pgPlacementMap = m;
@@ -383,7 +406,7 @@ export function PlacementMap({
     (map.current?.getSource('pl') as maplibregl.GeoJSONSource | undefined)?.setData(data(placements, null));
     // data() reads the selection from live.current
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placements, selectedId, conflictIds, ready]);
+  }, [placements, selectedId, selectedIds, conflictIds, ready]);
 
   return (
     <div className="pl-map-wrap">
@@ -406,8 +429,8 @@ export function PlacementMap({
             const p = m.project(sel.position.coordinates as LngLat);
             const ll = m.unproject([p.x + arrow[0]! * step, p.y + arrow[1]! * step]);
             onMove(sel.id, [ll.lng, ll.lat]);
-          } else if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !disabled) onDelete(sel.id);
-          else if (e.key === 'Escape') onSelect(null);
+          } else if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !sel.locked && !disabled) onDelete(sel.id);
+          else if (e.key === 'Escape') onSelect(null, false);
           else return;
           e.preventDefault();
           e.stopPropagation();
@@ -568,7 +591,7 @@ function SelectedForm({ p, disabled, onPatch, onDelete }: { p: Placement; disabl
           {t('placement.coords')}: <code className="pg-code">{(p.position.coordinates as LngLat).map((c) => c.toFixed(6)).join(', ')}</code>
         </p>
       </details>
-      <Button size="sm" icon="x" onClick={onDelete}>
+      <Button size="sm" icon="x" onClick={onDelete} disabled={p.locked} title={p.locked ? t('placement.delete.unlock') : undefined}>
         {t('placement.delete')}
       </Button>
       <PlantStock plantId={p.plant_id} />
@@ -645,6 +668,8 @@ export function PlacementEditor({
   const zone = useZoneVersion(zoneVersionId);
   const [hist, setHist] = useState<Omit<PlacementHistory, 'present'>>({ past: [], future: [] });
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [snapping, setSnapping] = useState(true);
   const [adding, setAdding] = useState(false);
   const [plantId, setPlantId] = useState('');
   const [plant, setPlant] = useState<Plant | null>(null);
@@ -668,6 +693,25 @@ export function PlacementEditor({
     setHist((h) => ({ past: [...h.past, value].slice(-100), future: [] }));
     onChange(next);
   };
+  const selectPlacement = (id: string | null, additive = false) => {
+    if (!id) {
+      setSelectedIds(new Set());
+      setSelectedId(null);
+      return;
+    }
+    if (!additive) {
+      setSelectedIds(new Set([id]));
+      setSelectedId(id);
+      return;
+    }
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      setSelectedId(next.has(id) ? id : (next.values().next().value ?? null));
+      return next;
+    });
+  };
   const doUndo = () => {
     const r = undo({ present: value, ...hist });
     if (r.present === value) return;
@@ -686,7 +730,7 @@ export function PlacementEditor({
     if (plant && plant.version_id !== catalogVersionId) onCatalogVersion(plant.version_id);
     const p = newPlacement(plantId, at, date);
     commitChange(add(value, p));
-    setSelectedId(p.id);
+    selectPlacement(p.id);
   };
   const selected = value.find((p) => p.id === selectedId) ?? null;
   const canAdd = !disabled && Boolean(plantId) && /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -741,10 +785,41 @@ export function PlacementEditor({
         <Button size="sm" icon="chevronRight" onClick={doRedo} disabled={disabled || hist.future.length === 0} title="Ctrl+Y">
           {t('draw.redo')}
         </Button>
+        <Button size="sm" variant={snapping ? 'primary' : 'secondary'} aria-pressed={snapping} onClick={() => setSnapping((current) => !current)}>
+          {snapping ? t('placement.snap.on') : t('placement.snap.off')}
+        </Button>
+        <Button size="sm" variant="secondary" disabled={value.length === 0} onClick={() => {
+          setSelectedIds(new Set(value.map((placement) => placement.id)));
+          setSelectedId(value[0]?.id ?? null);
+        }}>
+          {t('placement.select.all')}
+        </Button>
+        {selectedIds.size ? <Button size="sm" variant="ghost" onClick={() => selectPlacement(null)}>{t('placement.select.none')}</Button> : null}
         <span className="pg-muted" role="status" aria-live="polite">
-          {t('placement.count', { n: value.length })}
+          {t('placement.count', { n: value.length })} · {t('placement.selected.count', { n: selectedIds.size })}
         </span>
       </div>
+
+      {selectedIds.size > 1 ? (
+        <div className="pl-bulk" role="group" aria-label={t('placement.bulk')}>
+          <strong>{t('placement.bulk', { n: selectedIds.size })}</strong>
+          <span className="pg-muted">{t('placement.bulk.hint')}</span>
+          <div className="pg-actions">
+            <Button size="sm" icon="lock" onClick={() => commitChange(value.map((placement) => selectedIds.has(placement.id) ? { ...placement, locked: true } : placement))}>
+              {t('placement.bulk.lock')}
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => commitChange(value.map((placement) => selectedIds.has(placement.id) ? { ...placement, locked: false } : placement))}>
+              {t('placement.bulk.unlock')}
+            </Button>
+            <Button size="sm" variant="danger" disabled={[...selectedIds].some((id) => value.find((placement) => placement.id === id)?.locked)} onClick={() => {
+              commitChange(value.filter((placement) => !selectedIds.has(placement.id)));
+              selectPlacement(null);
+            }}>
+              {t('placement.bulk.delete')}
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {zone.available === false ? (
         <OperationUnavailable compact operationId="getZoneVersion" />
@@ -758,14 +833,17 @@ export function PlacementEditor({
           datasetVersionIds={datasetVersionIds}
           placements={value}
           selectedId={selectedId}
+          selectedIds={selectedIds}
+          snapping={snapping}
           adding={adding && canAdd}
           disabled={disabled}
-          onSelect={setSelectedId}
+          onSelect={selectPlacement}
           onAdd={addAt}
           onMove={(id, at) => commitChange(move(value, id, at))}
           onDelete={(id) => {
+            if (value.find((placement) => placement.id === id)?.locked) return;
             commitChange(remove(value, id));
-            setSelectedId(null);
+            selectPlacement(null);
           }}
           conflictIds={conflictIds}
         />
@@ -783,9 +861,22 @@ export function PlacementEditor({
           rows={value}
           getRowId={(p) => p.id}
           selectedId={selectedId ?? undefined}
-          onSelect={(p) => setSelectedId(p.id)}
+          onSelect={(p) => selectPlacement(p.id)}
           maxHeight="18rem"
           columns={[
+            {
+              key: 'selected',
+              header: '✓',
+              render: (p: Placement) => (
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(p.id)}
+                  aria-label={t('placement.select.one')}
+                  onClick={(event) => event.stopPropagation()}
+                  onChange={() => selectPlacement(p.id, true)}
+                />
+              ),
+            },
             { key: 'n', header: '№', render: (p: Placement) => value.indexOf(p) + 1 },
             { key: 'plant', header: t('placement.plant'), render: (p: Placement) => names.get(p.plant_id) ?? <code className="pg-code">{p.plant_id.slice(0, 8)}</code> },
             { key: 'q', header: t('placement.quantity'), render: (p: Placement) => p.quantity },
@@ -816,14 +907,15 @@ export function PlacementEditor({
           ]}
         />
       )}
-      {selected ? (
+      {selected && selectedIds.size === 1 ? (
         <SelectedForm
           p={selected}
           disabled={disabled}
           onPatch={(patch) => commitChange(update(value, selected.id, patch))}
           onDelete={() => {
+            if (selected.locked) return;
             commitChange(remove(value, selected.id));
-            setSelectedId(null);
+            selectPlacement(null);
           }}
         />
       ) : value.length ? (

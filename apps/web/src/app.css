@@ -2311,6 +2311,15 @@
   flex-wrap: wrap;
   gap: var(--pg-space-1);
 }
+.pl-bulk {
+  display: grid;
+  gap: var(--pg-space-2);
+  margin: var(--pg-space-2) 0;
+  padding: var(--pg-space-3);
+  border: 1px solid color-mix(in srgb, var(--pg-primary) 30%, var(--pg-border));
+  border-radius: var(--pg-radius-lg);
+  background: color-mix(in srgb, var(--pg-primary) 7%, var(--pg-surface));
+}
 .draw-help {
   margin: var(--pg-space-2) 0 0;
   padding-left: var(--pg-space-4);

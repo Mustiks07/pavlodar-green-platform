@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.14.0",
-    "description": "Canonical API contract 1.14.0. Forecast-versus-observed results separate the original cohort from replacement cohorts; all 1.13.0 operations remain compatible."
+    "version": "1.14.1",
+    "description": "Canonical API contract 1.14.1. Known crown footprints cannot overlap; unknown dimensions remain non-blocking. All 1.14.0 operations remain compatible."
   },
   "servers": [
     {

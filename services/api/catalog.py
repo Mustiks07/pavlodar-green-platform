@@ -5,10 +5,12 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 
 from jsonschema import ValidationError
 from shapely.geometry import Point, shape
+from shapely.ops import transform
 from sqlalchemy import func, select
 
 from packages.domain.contracts import validate
 from packages.domain.errors import DomainError
+from packages.geo.geometry import PROJECT
 from services.api.models import (
     CatalogState,
     CatalogVersion,
@@ -784,6 +786,41 @@ def _validate_building_conflicts(db, body, previous_placements):
             )
 
 
+def _validate_crown_clearance(body):
+    """Reject overlap only when both saved crown radii are known.
+
+    This is a geometric footprint check, not a species-specific planting norm. Unknown dimensions
+    remain unknown and never block saving. Coordinates are measured in Pavlodar's metric UTM zone;
+    exact tangency is valid and a tiny tolerance avoids floating-point false positives.
+    """
+    known = []
+    for index, placement in enumerate(body["placements"]):
+        radius = placement["initial_crown_radius_m"]
+        if placement["dimension_basis"] == "unknown" or radius is None or radius <= 0:
+            continue
+        point = transform(PROJECT, Point(placement["position"]["coordinates"][:2]))
+        known.append((index, point, float(radius)))
+    conflicts = set()
+    for offset, (left_index, left_point, left_radius) in enumerate(known):
+        for right_index, right_point, right_radius in known[offset + 1 :]:
+            if left_point.distance(right_point) + 1e-6 < left_radius + right_radius:
+                conflicts.update((left_index, right_index))
+    if conflicts:
+        raise DomainError(
+            422,
+            "placement_spacing_conflict",
+            "Контуры известных крон пересекаются",
+            field_errors=[
+                {
+                    "path": f"/placements/{index}/position",
+                    "code": "crown_overlap",
+                    "message": "Известная крона пересекается с другой посадкой",
+                }
+                for index in sorted(conflicts)
+            ],
+        )
+
+
 def validate_scenario_registry(
     db, access, scenario, zone_version, body, previous_placements=None
 ):
@@ -845,6 +882,7 @@ def validate_scenario_registry(
             raise DomainError(
                 422, "plant_input_invalid", "Unknown dimension basis cannot carry dimensions"
             )
+    _validate_crown_clearance(body)
     _validate_building_conflicts(db, body, previous_placements)
     for patch in body["area_patches"]:
         plant = plants.get(patch["plant_id"])

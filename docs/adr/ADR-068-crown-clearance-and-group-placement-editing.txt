@@ -1,0 +1,28 @@
+ADR-068: Known crown footprints are authoritative placement geometry
+Status: accepted
+Date: 2026-11-02
+
+Context
+The scenario editor could add, move, delete and lock individual plantings, but a dense plan required
+repeating every action. More importantly, two placements with saved crown dimensions could occupy the
+same footprint. The client could warn, but a client-only rule would not protect API callers or reloads.
+
+Decision
+Contract 1.14.1 registers placement_spacing_conflict. Before a revision is stored, the server projects
+placements with a positive saved initial_crown_radius_m and a non-unknown dimension basis into
+EPSG:32643. The center distance must be at least the sum of the two radii. Exact tangency passes; both
+position paths are returned when crowns overlap. Unknown radii remain unknown and never block saving.
+
+The check is only the geometry of recorded crown footprints. It is not an agronomic spacing norm and
+does not imply underground-network clearance. Building conflicts remain a separate frozen-dataset check.
+
+The editor adds modifier/checkbox multi-selection, group lock/unlock/delete, protected deletion of locked
+placements, undo/redo for group changes and optional visual axis snapping. It previews known crown
+overlap, preserves the local draft after the authoritative 422, and highlights every rejected placement.
+No rotation control is added: the current canonical Placement and schematic 3D model have no orientation,
+so such a control would claim a state the server cannot store or render meaningfully.
+
+Consequences
+Dense plans can be edited as a group without weakening immutable revision semantics. A saved plan cannot
+contain overlapping known crown footprints through any client. Plans with missing dimensions remain
+editable without invented defaults and can be completed when measured or catalog-backed dimensions exist.
