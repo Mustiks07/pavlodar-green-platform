@@ -9,7 +9,7 @@ from services.api.chat import (
     snapshot_facts,
 )
 from services.api.db import engine, session
-from services.api.llm import LLMReply, LLMRequest, Message, ToolCall, Usage
+from services.api.llm import LLMReply, LLMRequest, Message, ToolCall, ToolSpec, Usage
 from services.api.models import ChatMessageRecord
 from services.worker.main import run_job
 from tests.test_catalog import (
@@ -372,6 +372,23 @@ def test_tool_reply_keeps_validated_quantity_but_removes_unbacked_metric():
     assert "ещё не применено" in cleaned.text
 
 
+def test_grounded_fallback_routes_explicit_plant_selection_to_server_tool():
+    request = LLMRequest(
+        messages=(Message("system", "rules"), Message("user", "Подбери растения для участка")),
+        tools=(
+            ToolSpec(
+                name="recommend_plants",
+                description="server recommendation",
+                parameters={"type": "object"},
+            ),
+        ),
+    )
+    reply = grounded_fallback_reply(request)
+    assert reply.provider == "grounded-fallback"
+    assert reply.tool_calls[0].name == "recommend_plants"
+    assert reply.tool_calls[0].arguments == {"top_n": 5}
+
+
 class FakeGateway:
     def complete(self, request):
         assert "AUTHORIZED_CONTEXT=" in request.messages[1].content
@@ -564,9 +581,42 @@ def test_chat_proposal_requires_human_apply_and_current_revision(clients, monkey
     revision_id = saved.json()["id"]
     created_chat = chat_session(specialist, zone["id"], revision_id)
 
+    class RecommendationGateway:
+        def complete(self, request):
+            assert [tool.name for tool in request.tools] == [
+                "recommend_plants",
+                "propose_placement_quantity",
+            ]
+            return LLMReply(
+                provider="test-provider",
+                model="test-model",
+                text="Подбираю растения.",
+                tool_calls=(ToolCall("call-r", "recommend_plants", {"top_n": 2}),),
+                usage=Usage(input_tokens=40, output_tokens=8),
+            )
+
+    monkeypatch.setattr("services.api.llm.gateway", lambda: RecommendationGateway())
+    recommendation_job = send(
+        specialist,
+        created_chat["id"],
+        "Подбери два подходящих растения для этого участка",
+        revision_id,
+    )
+    run_job.run(recommendation_job["id"])
+    recommendation_message = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    assert recommendation_message["proposal_id"] is None
+    assert "Подбор выполнен по версии каталога и правилам текущего участка" in recommendation_message["text"]
+    assert "Проект не изменён" in recommendation_message["text"]
+    assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()["current_revision_id"] == revision_id
+
     class ProposalGateway:
         def complete(self, request):
-            assert [tool.name for tool in request.tools] == ["propose_placement_quantity"]
+            assert [tool.name for tool in request.tools] == [
+                "recommend_plants",
+                "propose_placement_quantity",
+            ]
             return LLMReply(
                 provider="test-provider",
                 model="test-model",

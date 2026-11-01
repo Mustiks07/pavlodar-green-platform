@@ -1,0 +1,33 @@
+ADR-063: Server-owned plant recommendations remain available without an external LLM
+Status: accepted
+Date: 2026-11-02
+
+Context
+The assistant could explain authorized context and prepare one reviewable quantity proposal, but it
+could not perform the platform's existing plant-selection operation. A provider outage also made a
+configured chat job fail even though the server already had enough frozen inputs to answer bounded
+questions and run deterministic catalog/rule selection. This weakened the required route from a user
+question to an actionable, traceable decision.
+
+Decision
+Expose a typed read-only recommend_plants tool only when the bound ScenarioRevision freezes both a
+catalog version and rule version. The model may choose only top_n from 1 through 10. The server ignores
+all model-authored domain inputs and reconstructs zone, catalog, rule, exclusions, locked plants and the
+five documented weights from the authorized revision before calling the existing recommendation use
+case. The server owns the Russian result text and Fact cards; the model cannot insert plants or change a
+revision through this tool.
+
+When every external provider is unavailable or not configured, keep the bounded authorized-context
+summary active. An explicit Russian request to select/recommend plants routes to the same typed server
+tool. This is deterministic product functionality, not a simulated LLM answer. Quantity changes continue
+to use the separate pending Proposal and require human apply.
+
+Consequences
+The hero project can answer "Подбери растения для этого участка" with catalog/rule-backed candidates,
+scores and lineage even during a provider outage. The original project remains unchanged and the reply
+states the required next human step. Authorization, exact frozen versions, exclusions and locked plants
+are rechecked at execution. No contract or migration changes are required because ChatMessage already
+supports server Facts and a recommendation does not create a new public resource.
+
+This increment does not let the assistant launch calculations, optimization or exports. Those mutating or
+cost-bearing actions still require a separate typed confirmation surface rather than free-text execution.

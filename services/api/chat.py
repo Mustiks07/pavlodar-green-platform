@@ -14,7 +14,7 @@ from sqlalchemy import select
 from packages.domain.errors import DomainError
 from packages.domain.generated import AppendRevisionInput
 from packages.geo.geometry import zone_area
-from services.api.llm import LLMReply, LLMRequest, Message, ToolSpec, Usage
+from services.api.llm import LLMReply, LLMRequest, Message, ToolCall, ToolSpec, Usage
 from services.api.models import (
     CalculationSnapshotRecord,
     ChatMessageRecord,
@@ -35,6 +35,14 @@ from services.api.use_cases import authorized_revision, canonical_hash, found, n
 from services.worker.jobs import QUEUES, event
 
 PROPOSAL_ARGUMENT_KEYS = {"summary", "placement_id", "quantity"}
+RECOMMEND_ARGUMENT_KEYS = {"top_n"}
+RECOMMENDATION_WEIGHTS = (
+    {"factor": "hardiness_fit", "weight": 3},
+    {"factor": "moisture_fit", "weight": 3},
+    {"factor": "salt_fit", "weight": 2},
+    {"factor": "wind_fit", "weight": 2},
+    {"factor": "light_fit", "weight": 1},
+)
 UUID_IN_TEXT = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b", re.IGNORECASE)
 RAW_CONTEXT_MARKERS = (
     "AUTHORIZED_CONTEXT",
@@ -70,6 +78,20 @@ def grounded_fallback_reply(request):
         (message.content.lower() for message in reversed(request.messages) if message.role == "user"),
         "",
     )
+    recommend_tool = next(
+        (tool for tool in request.tools if tool.name == "recommend_plants"),
+        None,
+    )
+    if recommend_tool and any(
+        word in question for word in ("подбери", "подобрать", "рекомендуй", "растени", "виды")
+    ):
+        return LLMReply(
+            provider="grounded-fallback",
+            model="authorized-context-summary-v1",
+            text="Подбираю растения по закреплённому каталогу и правилам участка.",
+            tool_calls=(ToolCall("grounded-recommendation", "recommend_plants", {"top_n": 5}),),
+            usage=Usage(input_tokens=None, output_tokens=None),
+        )
     asks_area = any(word in question for word in ("площад", "размер", "участ"))
     asks_cost = any(word in question for word in ("стоим", "смет", "бюджет", "цен"))
     asks_survival = any(word in question for word in ("прижив", "выжив", "сохранност"))
@@ -287,7 +309,11 @@ def presentable_reply(request, reply, facts=()):
         return LLMReply(
             provider=reply.provider,
             model=reply.model,
-            text="Подготовлено предложение для проверки. Изменение ещё не применено.",
+            text=(
+                "Выполняю серверный подбор растений для текущего участка."
+                if reply.tool_calls[0].name == "recommend_plants"
+                else "Подготовлено предложение для проверки. Изменение ещё не применено."
+            ),
             tool_calls=reply.tool_calls,
             usage=reply.usage,
         )
@@ -784,6 +810,8 @@ def _facts_and_context(db, access, chat_session, revision_id):
             "status": scenario.status,
             "placement_count": len(revision.payload.get("placements", [])),
             "synthetic_inputs": bool(revision.payload.get("synthetic_inputs")),
+            "catalog_version_id": revision.payload.get("catalog_version_id"),
+            "rule_version_id": revision.payload.get("rule_version_id"),
             "placements": [
                 {
                     "id": item["id"],
@@ -882,6 +910,15 @@ def validate_quantity_proposal_arguments(arguments):
     return summary.strip(), placement_id, quantity
 
 
+def validate_recommendation_arguments(arguments):
+    if not isinstance(arguments, dict) or set(arguments) != RECOMMEND_ARGUMENT_KEYS:
+        raise ValueError("shape")
+    top_n = arguments["top_n"]
+    if not isinstance(top_n, int) or isinstance(top_n, bool) or not 1 <= top_n <= 10:
+        raise ValueError("top_n")
+    return top_n
+
+
 def prepare_chat_request(db, job):
     if not job.request_payload:
         raise DomainError(500, "job_input_invalid", "Chat request is missing")
@@ -898,8 +935,32 @@ def prepare_chat_request(db, job):
     can_propose = proposal_tool_available(
         job.request_payload.get("scenario_revision_id"), scenario_context
     )
-    tools = (
-        (
+    tools = []
+    if (
+        job.request_payload.get("scenario_revision_id")
+        and scenario_context.get("catalog_version_id")
+        and scenario_context.get("rule_version_id")
+    ):
+        tools.append(
+            ToolSpec(
+                name="recommend_plants",
+                description=(
+                    "Run the server-owned plant recommendation for the bound scenario and its "
+                    "current zone, catalog and rule versions. Use only when the user explicitly "
+                    "asks to select or recommend plants. This is read-only."
+                ),
+                parameters={
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        "top_n": {"type": "integer", "minimum": 1, "maximum": 10},
+                    },
+                    "required": ["top_n"],
+                },
+            )
+        )
+    if can_propose:
+        tools.append(
             ToolSpec(
                 name="propose_placement_quantity",
                 description=(
@@ -918,14 +979,13 @@ def prepare_chat_request(db, job):
                 },
             ),
         )
-        if can_propose
-        else ()
-    )
     system = (
         "Ты помощник платформы озеленения Павлодара. Отвечай по-русски и только по "
         "AUTHORIZED_CONTEXT. Не придумывай числа, официальность, выполненные действия или "
         "отсутствующие данные. Если значения нет, прямо скажи, что оно недоступно. "
-        "Не предлагай обход прав и не выполняй изменения. Если доступен инструмент предложения, "
+        "Не предлагай обход прав и не выполняй изменения. Для явной просьбы подобрать растения "
+        "используй recommend_plants: результат считает сервер по закреплённым версиям. "
+        "Если доступен инструмент предложения, "
         "используй его только по явной просьбе пользователя изменить количество существующего "
         "незаблокированного размещения. Инструмент создаёт только черновик для проверки человеком. "
         "Никогда не показывай JSON, имена полей, UUID или внутренние идентификаторы. Пиши кратко "
@@ -943,16 +1003,118 @@ def prepare_chat_request(db, job):
                 ),
                 Message("user", user_message.text),
             ),
-            tools=tools,
+            tools=tuple(tools),
         ),
         facts,
     )
 
 
-def _proposed_revision(db, access, job, reply, message):
+def _recommend_plants(db, access, job, arguments, facts):
+    try:
+        top_n = validate_recommendation_arguments(arguments)
+    except ValueError as error:
+        raise DomainError(
+            422, "invalid_body", f"Assistant recommendation arguments are invalid: {error}"
+        ) from None
+    revision_id = job.request_payload.get("scenario_revision_id")
+    if not revision_id:
+        raise DomainError(422, "invalid_body", "Recommendation requires a bound scenario revision")
+    revision = authorized_revision(db, access, revision_id)
+    payload = revision.payload
+    catalog_id = payload.get("catalog_version_id")
+    rule_id = payload.get("rule_version_id")
+    if not catalog_id or not rule_id:
+        raise DomainError(422, "invalid_body", "Recommendation inputs are not frozen")
+
+    from services.api.catalog import recommend
+    from services.api.models import PlantVersion
+    from services.api.use_cases import get_zone_version
+
+    zone_version = get_zone_version(db, access, payload["zone_version_id"])
+    excluded = list(dict.fromkeys(payload.get("excluded_plant_ids", [])))
+    locked = list(
+        dict.fromkeys(
+            item["plant_id"]
+            for item in payload.get("placements", [])
+            if item.get("locked") is True and item["plant_id"] not in excluded
+        )
+    )
+    result = recommend(
+        db,
+        access,
+        {
+            "zone_version_id": zone_version.id,
+            "catalog_version_id": catalog_id,
+            "rule_version_id": rule_id,
+            "top_n": max(top_n, len(locked)),
+            "excluded_plant_ids": excluded,
+            "locked_plant_ids": locked,
+            "weights": list(RECOMMENDATION_WEIGHTS),
+        },
+        zone_version,
+    )
+    candidate_ids = [item["plant_id"] for item in result["candidates"]]
+    plant_rows = list(
+        db.scalars(
+            select(PlantVersion).where(
+                PlantVersion.catalog_version_id == catalog_id,
+                PlantVersion.plant_id.in_(candidate_ids),
+            )
+        )
+    )
+    plant_names = {row.plant_id: row.payload["russian_name"] for row in plant_rows}
+    labels = {
+        "eligible": "подходит",
+        "requires_review": "нужна проверка специалиста",
+        "excluded": "исключено правилами",
+    }
+    lines = ["Подбор выполнен по версии каталога и правилам текущего участка:"]
+    for item in result["candidates"][:top_n]:
+        name = plant_names.get(item["plant_id"], "Растение каталога")
+        score = item.get("score")
+        score_text = f" — {score:g}/100" if score is not None else ""
+        lines.append(f"• {name}{score_text} · {labels[item['eligibility']]}")
+        if score is None:
+            continue
+        refs = {}
+        for contribution in item.get("contributions", []):
+            for ref in contribution.get("source_refs", []):
+                refs[(ref["dataset_version_id"], ref.get("source_record_id"))] = ref
+        facts.append(
+            {
+                "id": uid(),
+                "label": f"Подбор растений: {name}",
+                "metric": {
+                    "key": "plant_recommendation_score",
+                    "value": score,
+                    "unit": "score_100",
+                    "horizon_year": None,
+                    "status": "estimated",
+                    "lower": None,
+                    "upper": None,
+                    "qualitative_confidence": "medium",
+                    "method_version": "catalog-rule-recommendation-v1",
+                    "source_refs": list(refs.values()),
+                    "missing_reason": None,
+                },
+                "calculation_id": None,
+                "scenario_revision_id": revision.id,
+            }
+        )
+    lines.append(
+        "Проект не изменён: выбранный вид можно разместить в редакторе после проверки специалистом."
+    )
+    return "\n".join(lines)
+
+
+def _proposed_revision(db, access, job, reply, message, facts):
     if not reply.tool_calls:
         return None, reply.text
-    if len(reply.tool_calls) != 1 or reply.tool_calls[0].name != "propose_placement_quantity":
+    if len(reply.tool_calls) != 1:
+        raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
+    if reply.tool_calls[0].name == "recommend_plants":
+        return None, _recommend_plants(db, access, job, reply.tool_calls[0].arguments, facts)
+    if reply.tool_calls[0].name != "propose_placement_quantity":
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
     try:
         _summary, placement_id, quantity = validate_quantity_proposal_arguments(
@@ -1012,7 +1174,7 @@ def persist_chat_reply(db, job, reply, facts):
     message = found(db.get(ChatMessageRecord, job.request_payload["assistant_message_id"]))
     if message.session_id != chat_session.id or message.job_id != job.id:
         raise DomainError(500, "job_input_invalid", "Assistant message does not match the job")
-    proposal, text = _proposed_revision(db, access, job, reply, message)
+    proposal, text = _proposed_revision(db, access, job, reply, message, facts)
     message.text = text[:20_000]
     message.state = "completed"
     message.facts = facts

@@ -57,15 +57,10 @@ def run_job(job_id):
                 request, facts = prepare_chat_request(db, leased(db, job_id, token))
             try:
                 reply = gateway().complete(request)
-            except ProviderUnavailable as error:
-                if error.code != "llm_not_configured":
-                    reply = grounded_fallback_reply(request)
-                else:
-                    with session() as db, db.begin():
-                        job = db.get(Job, job_id)
-                        if job and job.state in {"running", "cancel_requested"}:
-                            failure(db, job, "operation_not_implemented")
-                    return
+            except ProviderUnavailable:
+                # The bounded server context and read-only typed tools remain useful when every
+                # external provider is unavailable. They never invent or mutate domain data.
+                reply = grounded_fallback_reply(request)
             except LLMError:
                 code = (
                     "operation_not_implemented"
