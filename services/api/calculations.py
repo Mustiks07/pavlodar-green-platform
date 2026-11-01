@@ -182,7 +182,7 @@ def validate_care_calendar(db, access, scenario, body, rate_ids):
             if rate.payload["unit"] != operation["unit"]:
                 raise DomainError(422, "care_calendar_invalid", "Care rate unit mismatch")
     limits = {}
-    for limit in body["resource_limits"]:
+    for index, limit in enumerate(body["resource_limits"]):
         period = limit["period"]
         if not period.startswith("year:"):
             raise DomainError(422, "care_calendar_invalid", "Care limit period must be year:N")
@@ -192,8 +192,8 @@ def validate_care_calendar(db, access, scenario, body, rate_ids):
             raise DomainError(422, "care_calendar_invalid", "Care limit period is invalid") from None
         if year < 0 or year >= body["care_horizon_years"] or year in limits:
             raise DomainError(422, "care_calendar_invalid", "Care limit year is invalid")
-        limits[year] = limit
-    for year, limit in limits.items():
+        limits[year] = (index, limit)
+    for year, (index, limit) in limits.items():
         selected = [item for item in operations if item["year_offset"] == year]
         totals = {
             "water_m3": sum(item["water_m3"] for item in selected),
@@ -202,10 +202,24 @@ def validate_care_calendar(db, access, scenario, body, rate_ids):
         }
         for key, used in totals.items():
             if limit[key] is not None and used > limit[key]:
+                label, unit = {
+                    "water_m3": ("воды", "м³"),
+                    "crew_minutes": ("работы бригады", "мин"),
+                    "max_visits": ("выездов", ""),
+                }[key]
+                planned = f"{used:g} {unit}".strip()
+                allowed = f"{limit[key]:g} {unit}".strip()
                 raise DomainError(
                     422,
                     "care_resource_exceeded",
-                    f"Care {key} exceeds year {year} limit",
+                    f"План превышает лимит {label} для {year + 1}-го года",
+                    field_errors=[
+                        {
+                            "path": f"/resource_limits/{index}/{key}",
+                            "code": "care_resource_exceeded",
+                            "message": f"По плану {planned}, доступно {allowed}.",
+                        }
+                    ],
                 )
 
 

@@ -7,6 +7,7 @@ import {
   unwrap,
   type AppendRevisionInput,
   type Coefficient,
+  type CareOperation,
   type Dataset,
   type FastCalculationResponse,
   type Job,
@@ -15,6 +16,7 @@ import {
   type Scenario,
   type ScenarioRevision,
   type ScenarioRevisionInput,
+  type ResourceLimit,
 } from '@pg/api-client';
 import {
   Badge,
@@ -47,6 +49,7 @@ import { PlacementEditor } from './PlacementEditor';
 import { Revision3DCompare } from './Revision3DCompare';
 import { RecommendationPanel } from './RecommendationPanel';
 import { RuleVersionField } from './RuleVersionField';
+import { CarePlanEditor } from './CarePlanEditor';
 import { ShadowSection } from '../shadow/ShadowPanel';
 import { ThermalSection } from '../thermal/ThermalPanel';
 import { CALC_JOB, CALC_RESULT, FullCalculation } from '../calculations/FullCalculation';
@@ -61,6 +64,8 @@ interface Edits {
   comment: string;
   care_horizon_years: number;
   care_strategy: ScenarioRevisionInput['care_strategy'];
+  custom_care_operations: CareOperation[];
+  resource_limits: ResourceLimit[];
   capital_budget: string;
   /** Point placements of the next revision; ids are stable across revisions. */
   placements: Placement[];
@@ -112,6 +117,8 @@ function editsFrom(r: ScenarioRevision): Edits {
     comment: '',
     care_horizon_years: r.care_horizon_years,
     care_strategy: r.care_strategy,
+    custom_care_operations: r.custom_care_operations,
+    resource_limits: r.resource_limits,
     capital_budget: r.capital_budget ?? '',
     placements: r.placements,
     catalog_version_id: r.catalog_version_id,
@@ -127,6 +134,8 @@ function isDirty(base: ScenarioRevision, e: Edits): boolean {
     e.comment.trim() !== '' ||
     e.care_horizon_years !== base.care_horizon_years ||
     e.care_strategy !== base.care_strategy ||
+    JSON.stringify(e.custom_care_operations) !== JSON.stringify(base.custom_care_operations) ||
+    JSON.stringify(e.resource_limits) !== JSON.stringify(base.resource_limits) ||
     (e.capital_budget || null) !== base.capital_budget ||
     !same(e.placements, base.placements) ||
     e.catalog_version_id !== base.catalog_version_id ||
@@ -186,6 +195,8 @@ function RevisionEditor({
           placements: stored.edits.placements ?? base.placements,
           catalog_version_id: stored.edits.catalog_version_id ?? base.catalog_version_id,
           rule_version_id: stored.edits.rule_version_id ?? base.rule_version_id,
+          custom_care_operations: stored.edits.custom_care_operations ?? base.custom_care_operations,
+          resource_limits: stored.edits.resource_limits ?? base.resource_limits,
           coefficient_version_id: stored.edits.coefficient_version_id ?? base.coefficient_version_id,
           weather_dataset_version_id: stored.edits.weather_dataset_version_id ?? null,
         }
@@ -251,6 +262,7 @@ function RevisionEditor({
   const budgetError = edits.capital_budget && !MONEY_RE.test(edits.capital_budget) ? t('scenario.budget.invalid') : null;
   const commentError = dirty && edits.comment.trim() === '' ? t('scenario.comment.required') : null;
   const placementIssues = issuesOf(edits.placements).size > 0;
+  const careHorizonIssue = edits.custom_care_operations.some((item) => item.year_offset >= edits.care_horizon_years);
   const [ruleOk, setRuleOk] = useState<boolean | null>(null);
   // The server refuses placements without both registry versions; say so before sending.
   const needsRule = edits.placements.length > 0 && (!edits.rule_version_id || ruleOk === false);
@@ -264,6 +276,8 @@ function RevisionEditor({
       body.comment = edits.comment.trim();
       body.care_horizon_years = edits.care_horizon_years;
       body.care_strategy = edits.care_strategy;
+      body.custom_care_operations = edits.custom_care_operations;
+      body.resource_limits = edits.resource_limits;
       body.capital_budget = edits.capital_budget || null;
       body.placements = edits.placements;
       body.catalog_version_id = edits.catalog_version_id;
@@ -525,6 +539,26 @@ function RevisionEditor({
             </Select>
           )}
         </Field>
+        {careHorizonIssue ? (
+          <Notice tone="warning" title="Есть операции за пределами выбранного срока">
+            Перенесите операции в доступные годы или восстановите горизонт ухода. Сервер не позволит потерять их молча.
+          </Notice>
+        ) : null}
+        {edits.care_strategy === 'custom' && edits.custom_care_operations.length ? (
+          <CarePlanEditor
+            operations={edits.custom_care_operations}
+            limits={edits.resource_limits}
+            horizon={edits.care_horizon_years}
+            disabled={!canEdit || save.isPending}
+            error={save.error instanceof ApiError && save.error.problem?.code === 'care_resource_exceeded' ? save.error : null}
+            onOperationsChange={(custom_care_operations) => setEdits((value) => ({ ...value, custom_care_operations }))}
+            onLimitsChange={(resource_limits) => setEdits((value) => ({ ...value, resource_limits }))}
+          />
+        ) : edits.care_strategy === 'custom' ? (
+          <Notice tone="warning" title="Календарь ухода пока не задан">
+            Для индивидуального плана нужны существующие операции с закреплёнными правилами и ставками.
+          </Notice>
+        ) : null}
         <Field label={t('scenario.field.budget')} hint={t('scenario.field.budget.hint')} error={budgetError}>
           {({ id, describedBy, invalid }) => (
             <Input
@@ -630,7 +664,7 @@ function RevisionEditor({
           variant="primary"
           icon="check"
           busy={save.isPending}
-          disabled={!canEdit || !dirty || Boolean(budgetError) || Boolean(commentError) || placementIssues || needsRule || conflict || onOtherBase}
+          disabled={!canEdit || !dirty || Boolean(budgetError) || Boolean(commentError) || placementIssues || careHorizonIssue || needsRule || conflict || onOtherBase}
           onClick={() => {
             calculateAfterSave.current = false;
             save.mutate();
@@ -641,7 +675,7 @@ function RevisionEditor({
         <Button
           icon="refresh"
           busy={save.isPending || fullAfterSave.isPending}
-          disabled={!canEdit || !dirty || Boolean(budgetError) || Boolean(commentError) || placementIssues || needsRule || conflict || onOtherBase}
+          disabled={!canEdit || !dirty || Boolean(budgetError) || Boolean(commentError) || placementIssues || careHorizonIssue || needsRule || conflict || onOtherBase}
           onClick={() => {
             calculateAfterSave.current = true;
             save.mutate();
@@ -883,6 +917,14 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
       {current.data ? <ProjectOverview revision={current.data} /> : null}
       <Card title="Результат проекта · стоимость, приживаемость, уход и эффект">
         {calculationRevisionId ? <FullCalculation key={calculationRevisionId} revisionId={calculationRevisionId} timeZone={timeZone} /> : <Skeleton lines={1} />}
+        {s.status === 'draft' && current.data?.care_strategy === 'custom' && current.data.custom_care_operations.length ? (
+          <div className="scn-care-action">
+            <span><strong>Нужно проверить доступные ресурсы?</strong><small>Измените воду, труд или выезды и сохраните новую версию с пересчётом.</small></span>
+            <Button size="sm" variant="secondary" icon="calendar" onClick={() => document.getElementById('scenario-care-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+              Изменить план ухода
+            </Button>
+          </div>
+        ) : null}
       </Card>
       <div className="scn-grid">
         <div className="scn-main">

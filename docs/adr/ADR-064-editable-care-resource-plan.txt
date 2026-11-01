@@ -1,0 +1,29 @@
+ADR-064: Editable care-resource plan uses immutable scenario revisions
+Status: accepted
+Date: 2026-11-02
+
+Context
+The calculated calendar was visible in the project result, but a specialist could not answer the
+operational question "what if this much water, crew time or visits is unavailable?" without editing raw
+API payloads. Care therefore looked like a report rather than a working planning loop.
+
+Decision
+For an existing custom calendar, expose its frozen operations inside the ordinary ScenarioRevision editor.
+Allow changes only to month, planned quantity, water, crew minutes and visits. Keep operation identity,
+placement links, names, units, rule versions and rate versions immutable in this editor. Expose annual
+water, crew and visit limits using the existing ResourceLimit structure; an empty field remains null and
+zero remains an explicit zero limit.
+
+Saving uses the existing append-revision operation and the existing save-and-full-calculation path. The
+browser may preview totals, but the server remains authoritative. On care_resource_exceeded the API now
+returns a localized field error bound to the exact year and resource input. The previous revision and local
+draft remain intact. Operations beyond a shortened horizon block saving rather than being deleted.
+
+Consequences
+A jury user can move from a saved calculation to "Изменить план ухода", lower an available resource, see
+the server reject the infeasible plan, adjust the operation and save a new immutable revision for a new
+calculation. The UI explicitly says that changing water does not by itself change survival unless the
+frozen model calculates that relationship.
+
+The editor does not invent new care operations or agronomic norms, and it does not edit care_budget because
+the current server validator does not enforce that field against operation totals.

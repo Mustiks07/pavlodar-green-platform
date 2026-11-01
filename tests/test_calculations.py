@@ -666,6 +666,14 @@ def test_custom_care_calendar_enforces_resources_and_adds_cost_line(clients):
     )
     assert exceeded.status_code == 422
     assert exceeded.json()["code"] == "care_resource_exceeded"
+    assert exceeded.json()["detail"] == "План превышает лимит воды для 1-го года"
+    assert exceeded.json()["field_errors"] == [
+        {
+            "path": "/resource_limits/0/water_m3",
+            "code": "care_resource_exceeded",
+            "message": "По плану 1 м³, доступно 0.5 м³.",
+        }
+    ]
     valid = mutation(
         clients["specialist"],
         "POST",

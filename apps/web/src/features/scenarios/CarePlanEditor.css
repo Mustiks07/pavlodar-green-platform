@@ -1,0 +1,25 @@
+.care-plan-editor { display: grid; gap: 1rem; padding: 1rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius-lg); background: var(--pg-surface-2); }
+.care-plan-editor > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.care-plan-editor > header small { color: var(--pg-accent); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.care-plan-editor > header h3 { margin: .2rem 0 0; }
+.care-plan-editor > p { margin: 0; color: var(--pg-text-muted); }
+.care-plan-editor__years { display: flex; flex-wrap: wrap; gap: .45rem; }
+.care-plan-editor__years button { padding: .5rem .75rem; border: 1px solid var(--pg-border); border-radius: 999px; background: var(--pg-surface); color: var(--pg-text); font: inherit; cursor: pointer; }
+.care-plan-editor__years button[aria-selected="true"] { border-color: var(--pg-accent); background: var(--pg-accent-soft); color: var(--pg-accent-text); font-weight: 700; }
+.care-plan-editor__limits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.care-plan-editor__operations { display: grid; gap: .75rem; }
+.care-plan-editor__operations article { padding: .85rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: var(--pg-surface); }
+.care-plan-editor__operations article > header { display: flex; justify-content: space-between; gap: .75rem; margin-bottom: .75rem; }
+.care-plan-editor__operations article > header span { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.care-plan-editor__operations article > div { display: grid; grid-template-columns: repeat(5, minmax(7rem, 1fr)); gap: .65rem; align-items: end; }
+@media (max-width: 900px) {
+  .care-plan-editor__limits, .care-plan-editor__operations article > div { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .care-plan-editor > header { display: grid; }
+  .care-plan-editor__limits, .care-plan-editor__operations article > div { grid-template-columns: 1fr; }
+}
+.scn-care-action { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .85rem; padding: .8rem; border-radius: var(--pg-radius); background: var(--pg-accent-soft); }
+.scn-care-action span { display: grid; gap: .15rem; }
+.scn-care-action small { color: var(--pg-text-muted); }
+@media (max-width: 700px) { .scn-care-action { align-items: stretch; flex-direction: column; } }
