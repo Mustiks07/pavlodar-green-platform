@@ -35,6 +35,7 @@ from services.api.use_cases import authorized_revision, canonical_hash, found, n
 from services.worker.jobs import QUEUES, event
 
 PROPOSAL_ARGUMENT_KEYS = {"summary", "placement_id", "quantity"}
+PLANT_PROPOSAL_ARGUMENT_KEYS = {"selection_mode"}
 RECOMMEND_ARGUMENT_KEYS = {"top_n"}
 RECOMMENDATION_WEIGHTS = (
     {"factor": "hardiness_fit", "weight": 3},
@@ -68,6 +69,10 @@ def server_owned_tool_reply(request):
         (tool for tool in request.tools if tool.name == "recommend_plants"),
         None,
     )
+    plant_proposal_tool = next(
+        (tool for tool in request.tools if tool.name == "propose_placement_plant"),
+        None,
+    )
     asks_recommendation = any(
         phrase in question
         for phrase in (
@@ -79,6 +84,30 @@ def server_owned_tool_reply(request):
             "какие виды посад",
         )
     )
+    asks_plant_proposal = any(
+        phrase in question
+        for phrase in (
+            "подготовь замену растения",
+            "замени растение на лучший",
+            "примени лучший вид",
+            "лучший вид в проект",
+            "лучшее растение в проект",
+        )
+    )
+    if plant_proposal_tool and asks_plant_proposal:
+        return LLMReply(
+            provider="server-tools",
+            model="catalog-rule-recommendation-v1",
+            text="Готовлю проверяемую замену вида. Проект изменится только после вашего подтверждения.",
+            tool_calls=(
+                ToolCall(
+                    "server-plant-proposal",
+                    "propose_placement_plant",
+                    {"selection_mode": "best_for_first_unlocked"},
+                ),
+            ),
+            usage=Usage(input_tokens=None, output_tokens=None),
+        )
     if not recommend_tool or not asks_recommendation:
         return None
     return LLMReply(
@@ -940,6 +969,14 @@ def validate_recommendation_arguments(arguments):
     return top_n
 
 
+def validate_plant_proposal_arguments(arguments):
+    if not isinstance(arguments, dict) or set(arguments) != PLANT_PROPOSAL_ARGUMENT_KEYS:
+        raise ValueError("shape")
+    if arguments["selection_mode"] != "best_for_first_unlocked":
+        raise ValueError("selection_mode")
+    return arguments["selection_mode"]
+
+
 def prepare_chat_request(db, job):
     if not job.request_payload:
         raise DomainError(500, "job_input_invalid", "Chat request is missing")
@@ -981,6 +1018,28 @@ def prepare_chat_request(db, job):
             )
         )
     if can_propose:
+        if scenario_context.get("catalog_version_id") and scenario_context.get("rule_version_id"):
+            tools.append(
+                ToolSpec(
+                    name="propose_placement_plant",
+                    description=(
+                        "Prepare, but never apply, a reviewable replacement of the plant in the "
+                        "first unlocked placement with the best eligible server-owned catalog "
+                        "recommendation that differs from the current plant."
+                    ),
+                    parameters={
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "selection_mode": {
+                                "type": "string",
+                                "enum": ["best_for_first_unlocked"],
+                            },
+                        },
+                        "required": ["selection_mode"],
+                    },
+                ),
+            )
         tools.append(
             ToolSpec(
                 name="propose_placement_quantity",
@@ -1007,8 +1066,9 @@ def prepare_chat_request(db, job):
         "Не предлагай обход прав и не выполняй изменения. Для явной просьбы подобрать растения "
         "используй recommend_plants: результат считает сервер по закреплённым версиям. "
         "Если доступен инструмент предложения, "
-        "используй его только по явной просьбе пользователя изменить количество существующего "
-        "незаблокированного размещения. Инструмент создаёт только черновик для проверки человеком. "
+        "используй propose_placement_quantity только по явной просьбе изменить количество. "
+        "По явной просьбе подготовить лучший рекомендованный вид в проекте используй "
+        "propose_placement_plant. Оба инструмента создают только черновик для проверки человеком. "
         "Никогда не показывай JSON, имена полей, UUID или внутренние идентификаторы. Пиши кратко "
         "и понятно специалисту: вывод, 2–5 пунктов объяснения и следующий шаг. Источник каждого "
         "числа интерфейс покажет отдельной серверной карточкой под ответом."
@@ -1030,13 +1090,7 @@ def prepare_chat_request(db, job):
     )
 
 
-def _recommend_plants(db, access, job, arguments, facts):
-    try:
-        top_n = validate_recommendation_arguments(arguments)
-    except ValueError as error:
-        raise DomainError(
-            422, "invalid_body", f"Assistant recommendation arguments are invalid: {error}"
-        ) from None
+def _plant_recommendation(db, access, job, top_n):
     revision_id = job.request_payload.get("scenario_revision_id")
     if not revision_id:
         raise DomainError(422, "invalid_body", "Recommendation requires a bound scenario revision")
@@ -1095,6 +1149,23 @@ def _recommend_plants(db, access, job, arguments, facts):
         score = item.get("score")
         score_text = f" — {round(score)}/100" if score is not None else ""
         lines.append(f"• {name}{score_text} · {labels[item['eligibility']]}")
+    lines.append(
+        "Проект не изменён. Попросите подготовить замену растения на лучший вариант — "
+        "ассистент покажет изменение для вашего подтверждения."
+    )
+    return revision, result, plant_names, "\n".join(lines)
+
+
+def _recommend_plants(db, access, job, arguments, facts):
+    try:
+        top_n = validate_recommendation_arguments(arguments)
+    except ValueError as error:
+        raise DomainError(
+            422, "invalid_body", f"Assistant recommendation arguments are invalid: {error}"
+        ) from None
+    revision, result, plant_names, text = _plant_recommendation(db, access, job, top_n)
+    for item in result["candidates"][:top_n]:
+        score = item.get("score")
         if score is None:
             continue
         refs = {}
@@ -1104,7 +1175,7 @@ def _recommend_plants(db, access, job, arguments, facts):
         facts.append(
             {
                 "id": uid(),
-                "label": f"Подбор растений: {name}",
+                "label": f"Подбор растений: {plant_names.get(item['plant_id'], 'Растение каталога')}",
                 "metric": {
                     "key": "plant_recommendation_score",
                     "value": score,
@@ -1122,10 +1193,7 @@ def _recommend_plants(db, access, job, arguments, facts):
                 "scenario_revision_id": revision.id,
             }
         )
-    lines.append(
-        "Проект не изменён: выбранный вид можно разместить в редакторе после проверки специалистом."
-    )
-    return "\n".join(lines)
+    return text
 
 
 def _proposed_revision(db, access, job, reply, message, facts):
@@ -1135,16 +1203,9 @@ def _proposed_revision(db, access, job, reply, message, facts):
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
     if reply.tool_calls[0].name == "recommend_plants":
         return None, _recommend_plants(db, access, job, reply.tool_calls[0].arguments, facts)
-    if reply.tool_calls[0].name != "propose_placement_quantity":
+    tool_name = reply.tool_calls[0].name
+    if tool_name not in {"propose_placement_quantity", "propose_placement_plant"}:
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
-    try:
-        _summary, placement_id, quantity = validate_quantity_proposal_arguments(
-            reply.tool_calls[0].arguments
-        )
-    except ValueError as error:
-        raise DomainError(
-            422, "invalid_body", f"Assistant proposal arguments are invalid: {error}"
-        ) from None
     revision_id = job.request_payload.get("scenario_revision_id")
     if not revision_id:
         raise DomainError(422, "invalid_body", "Proposal requires a bound scenario revision")
@@ -1156,11 +1217,69 @@ def _proposed_revision(db, access, job, reply, message, facts):
         return None, "Сценарий изменился во время подготовки предложения. Перечитайте актуальную версию."
     proposed = copy.deepcopy(revision.payload)
     placements = proposed.get("placements", [])
-    selected = next((item for item in placements if item.get("id") == placement_id), None)
-    if selected is None or selected.get("locked") is not False:
-        raise DomainError(422, "invalid_body", "Placement is unavailable for this proposal")
-    summary = f"Изменить количество в выбранном размещении: {selected['quantity']} → {quantity}"
-    selected["quantity"] = quantity
+    if tool_name == "propose_placement_quantity":
+        try:
+            _summary, placement_id, quantity = validate_quantity_proposal_arguments(
+                reply.tool_calls[0].arguments
+            )
+        except ValueError as error:
+            raise DomainError(
+                422, "invalid_body", f"Assistant proposal arguments are invalid: {error}"
+            ) from None
+        selected = next((item for item in placements if item.get("id") == placement_id), None)
+        if selected is None or selected.get("locked") is not False:
+            raise DomainError(422, "invalid_body", "Placement is unavailable for this proposal")
+        summary = (
+            f"Изменить количество в выбранном размещении: {selected['quantity']} → {quantity}"
+        )
+        selected["quantity"] = quantity
+    else:
+        try:
+            validate_plant_proposal_arguments(reply.tool_calls[0].arguments)
+        except ValueError as error:
+            raise DomainError(
+                422, "invalid_body", f"Assistant plant proposal arguments are invalid: {error}"
+            ) from None
+        selected = next(
+            (item for item in placements if item.get("locked") is False),
+            None,
+        )
+        if selected is None:
+            raise DomainError(422, "invalid_body", "No unlocked placement is available")
+        _revision, result, plant_names, _text = _plant_recommendation(
+            db, access, job, 10
+        )
+        candidate = next(
+            (
+                item
+                for item in result["candidates"]
+                if item.get("eligibility") in {"eligible", "requires_review"}
+                and item.get("plant_id") != selected.get("plant_id")
+            ),
+            None,
+        )
+        if candidate is None:
+            raise DomainError(
+                422,
+                "invalid_body",
+                "No different eligible plant is available for this placement",
+            )
+        from services.api.models import PlantVersion
+
+        current_row = db.scalar(
+            select(PlantVersion).where(
+                PlantVersion.catalog_version_id == proposed["catalog_version_id"],
+                PlantVersion.plant_id == selected["plant_id"],
+            )
+        )
+        before_name = (
+            current_row.payload.get("russian_name", "Текущее растение")
+            if current_row
+            else "Текущее растение"
+        )
+        after_name = plant_names.get(candidate["plant_id"], "Рекомендованное растение")
+        summary = f"Заменить вид в выбранном размещении: {before_name} → {after_name}"
+        selected["plant_id"] = candidate["plant_id"]
     proposed["parent_revision_id"] = revision.id
     for key in ("id", "scenario_id", "created_at", "input_hash", "synthetic_inputs"):
         proposed.pop(key, None)
@@ -1185,7 +1304,7 @@ def _proposed_revision(db, access, job, reply, message, facts):
     )
     db.add(value)
     db.flush()
-    return value, reply.text or summary
+    return value, summary if tool_name == "propose_placement_plant" else (reply.text or summary)
 
 
 def persist_chat_reply(db, job, reply, facts):

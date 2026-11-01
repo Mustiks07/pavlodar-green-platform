@@ -208,13 +208,16 @@ function useChatMessages(sessionId: string, polling: boolean) {
   });
 }
 
-/** Proposed placement quantities next to the base revision's, both as the server stored them. */
+/** Proposed placement changes next to the base revision, both exactly as the server stored them. */
 function ProposalChanges({ proposal }: { proposal: Proposal }) {
   const base = useRevision(proposal.base_revision_id);
   if (base.isPending) return <Skeleton lines={1} />;
   if (base.isError) return <ApiErrorView compact error={base.error} onRetry={() => void base.refetch()} />;
-  const before = new Map(base.data.placements.map((p) => [p.id, p.quantity]));
-  const changed = proposal.proposed_revision.placements.filter((p) => before.get(p.id) !== p.quantity);
+  const before = new Map(base.data.placements.map((p) => [p.id, p]));
+  const changed = proposal.proposed_revision.placements.filter((p) => {
+    const original = before.get(p.id);
+    return original?.quantity !== p.quantity || original?.plant_id !== p.plant_id;
+  });
   if (!changed.length) return <p className="pg-muted">{t('assistant.proposal.noChange')}</p>;
   return (
     <ul className="asst-changes">
@@ -230,21 +233,31 @@ function ProposalChange({
   before,
 }: {
   placement: Proposal['proposed_revision']['placements'][number];
-  before: number | undefined;
+  before: Proposal['proposed_revision']['placements'][number] | undefined;
 }) {
   const plant = useQuery({
     queryKey: ['plant', placement.plant_id],
     queryFn: async ({ signal }) =>
       (await unwrap<Plant>(api.GET('/v1/plants/{plant_id}', { params: { path: { plant_id: placement.plant_id } }, signal }))).data,
   });
+  const beforePlant = useQuery({
+    queryKey: ['plant', before?.plant_id ?? ''],
+    enabled: Boolean(before?.plant_id),
+    queryFn: async ({ signal }) =>
+      (await unwrap<Plant>(api.GET('/v1/plants/{plant_id}', { params: { path: { plant_id: before!.plant_id } }, signal }))).data,
+  });
   const plantName = plant.data?.russian_name ?? t('assistant.proposal.selectedPlant');
+  const beforePlantName = beforePlant.data?.russian_name ?? t('assistant.proposal.selectedPlant');
+  const plantChanged = before?.plant_id !== placement.plant_id;
   return (
-    <li data-placement-id={placement.id} data-before={before ?? ''} data-after={placement.quantity}>
-      {t('assistant.proposal.change', {
-        plant: plantName,
-        before: before === undefined ? t('none') : (formatNumber(before) ?? String(before)),
-        after: formatNumber(placement.quantity) ?? String(placement.quantity),
-      })}
+    <li data-placement-id={placement.id} data-before={before?.quantity ?? ''} data-after={placement.quantity}>
+      {plantChanged
+        ? t('assistant.proposal.plantChange', { before: beforePlantName, after: plantName })
+        : t('assistant.proposal.change', {
+            plant: plantName,
+            before: before === undefined ? t('none') : (formatNumber(before.quantity) ?? String(before.quantity)),
+            after: formatNumber(placement.quantity) ?? String(placement.quantity),
+          })}
     </li>
   );
 }

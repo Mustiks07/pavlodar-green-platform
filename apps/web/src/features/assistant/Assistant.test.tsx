@@ -8,8 +8,10 @@ const SCENARIO = '22222222-2222-4222-8222-222222222222';
 const BASE = '33333333-3333-4333-8333-333333333333';
 const OTHER = '44444444-4444-4444-8444-444444444444';
 const PLACEMENT = '55555555-5555-4555-8555-555555555555';
+const PLANT_BEFORE = '66666666-6666-4666-8666-666666666666';
+const PLANT_AFTER = '77777777-7777-4777-8777-777777777777';
 
-const placement = (quantity: number) => ({ id: PLACEMENT, plant_id: PLACEMENT, quantity, locked: false });
+const placement = (quantity: number, plantId = PLANT_BEFORE) => ({ id: PLACEMENT, plant_id: plantId, quantity, locked: false });
 const proposal = {
   id: PROPOSAL,
   scenario_id: SCENARIO,
@@ -19,10 +21,18 @@ const proposal = {
   proposed_revision: { placements: [placement(5)] },
   expires_at: '2026-11-01T10:00:00Z',
 };
+let proposalValue = proposal;
 let scenarioEtag = '"v1"';
 let currentRevision = BASE;
 let applyStatus = 201;
-const calls: { method: string; path: string; init: { params?: { header?: Record<string, string> }; body?: unknown } }[] = [];
+type CallInit = {
+  params?: {
+    header?: Record<string, string>;
+    path?: { plant_id?: string };
+  };
+  body?: unknown;
+};
+const calls: { method: string; path: string; init: CallInit }[] = [];
 
 const json = (body: unknown, status = 200, headers: Record<string, string> = {}) => ({
   data: status < 400 ? body : undefined,
@@ -32,11 +42,17 @@ const json = (body: unknown, status = 200, headers: Record<string, string> = {})
 
 vi.mock('../../api', () => ({
   api: {
-    GET: async (path: string, init: never) => {
+    GET: async (path: string, init: CallInit) => {
       calls.push({ method: 'GET', path, init });
-      if (path === '/v1/proposals/{proposal_id}') return json(proposal);
+      if (path === '/v1/proposals/{proposal_id}') return json(proposalValue);
       if (path === '/v1/scenarios/{scenario_id}') return json({ id: SCENARIO, current_revision_id: currentRevision, status: 'draft' }, 200, { ETag: scenarioEtag });
       if (path === '/v1/scenario-revisions/{revision_id}') return json({ id: BASE, placements: [placement(4)] });
+      if (path === '/v1/plants/{plant_id}') {
+        return json({
+          id: init.params?.path?.plant_id,
+          russian_name: init.params?.path?.plant_id === PLANT_AFTER ? 'Липа мелколистная' : 'Берёза повислая',
+        });
+      }
       throw new Error(`unexpected GET ${path}`);
     },
     POST: async (path: string, init: never) => {
@@ -75,6 +91,7 @@ beforeEach(() => {
   scenarioEtag = '"v1"';
   currentRevision = BASE;
   applyStatus = 201;
+  proposalValue = proposal;
 });
 
 describe('ProposalCard', () => {
@@ -85,6 +102,17 @@ describe('ProposalCard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Применить…' }));
     expect(calls.some((c) => c.method === 'POST')).toBe(false);
     expect(screen.getByRole('button', { name: 'Подтвердить применение' })).toBeTruthy();
+  });
+
+  it('shows a plant replacement as a readable before and after decision', async () => {
+    proposalValue = {
+      ...proposal,
+      summary: 'Заменить вид в выбранном размещении',
+      proposed_revision: { placements: [placement(4, PLANT_AFTER)] },
+    };
+    renderCard();
+    expect(await screen.findByText('Растение в размещении: «Берёза повислая» → «Липа мелколистная»')).toBeTruthy();
+    expect(calls.some((c) => c.method === 'POST')).toBe(false);
   });
 
   it('applies with a freshly read If-Match and the proposal base revision', async () => {

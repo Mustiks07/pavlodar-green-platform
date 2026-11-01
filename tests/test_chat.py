@@ -601,10 +601,40 @@ def test_chat_proposal_requires_human_apply_and_current_revision(clients, monkey
     assert "Проект не изменён" in recommendation_message["text"]
     assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()["current_revision_id"] == revision_id
 
+    plant_proposal_job = send(
+        specialist,
+        created_chat["id"],
+        "Подготовь замену растения на лучший вариант",
+        revision_id,
+    )
+    run_job.run(plant_proposal_job["id"])
+    plant_message = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    plant_proposal_id = plant_message["proposal_id"]
+    assert plant_proposal_id
+    plant_proposal = specialist.get(f"/v1/proposals/{plant_proposal_id}").json()
+    assert plant_proposal["status"] == "pending"
+    proposed_placement = plant_proposal["proposed_revision"]["placements"][0]
+    assert proposed_placement["plant_id"] != plant_id
+    assert proposed_placement["quantity"] == placement["quantity"]
+    assert "Заменить вид" in plant_proposal["summary"]
+    assert "Заменить вид" in plant_message["text"]
+    assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()["current_revision_id"] == revision_id
+    plant_rejected = mutation(
+        specialist,
+        "POST",
+        f"/v1/proposals/{plant_proposal_id}/reject",
+        {"reason": "Проверено в тесте перед проверкой количества"},
+        key="plant-proposal-reject-once",
+    )
+    assert plant_rejected.status_code == 200, plant_rejected.text
+
     class ProposalGateway:
         def complete(self, request):
             assert [tool.name for tool in request.tools] == [
                 "recommend_plants",
+                "propose_placement_plant",
                 "propose_placement_quantity",
             ]
             return LLMReply(

@@ -9,7 +9,7 @@
     {
       "name": "assistant returns the server-owned catalog and rule selection",
       "pass": true,
-      "detail": "Подбор выполнен по версии каталога и правилам текущего участка:\n\nТополь белый — 81/100 · нужна проверка специалиста\nСосна обыкновенная — 77/100 · нужна проверка специалиста\nИва, вид не указан — 76/100 · нужна проверка специалиста\nСирень обыкновенная — 75/100 · нужна проверка специалиста\nЯсень, вид не указан — 70/100 · нужна проверка специалиста\n\nПроект не изменён: выбранный вид можно разместить в редакторе после проверки специалистом."
+      "detail": "Подбор выполнен по версии каталога и правилам текущего участка:\n\nТополь белый — 81/100 · нужна проверка специалиста\nСосна обыкновенная — 77/100 · нужна проверка специалиста\nИва, вид не указан — 76/100 · нужна проверка специалиста\nСирень обыкновенная — 75/100 · нужна проверка специалиста\nЯсень, вид не указан — 70/100 · нужна проверка специалиста\n\nПроект не изменён. Попросите подготовить замену растения на лучший вариант — ассистент покажет изменение для вашего подтверждения."
     },
     {
       "name": "answer is actionable and states that the project remains unchanged",
@@ -28,11 +28,35 @@
       }
     },
     {
+      "name": "assistant prepares a readable plant replacement decision",
+      "pass": true,
+      "detail": "Предложение изменения\nожидает решения\n\nЗаменить вид в выбранном размещении: Сосна обыкновенная → Тополь белый\n\nРастение в размещении: «Сосна обыкновенная» → «Тополь белый»\nОсновано на\nтекущей версии сценария\nДействует до\n03.11.2026, 04:16\nПрименить…\nОтклонить…"
+    },
+    {
+      "name": "proposal waits for a human decision",
+      "pass": true
+    },
+    {
+      "name": "pending plant replacement did not mutate the project",
+      "pass": true,
+      "detail": {
+        "initialRevision": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674",
+        "revisionWithPendingProposal": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674"
+      }
+    },
+    {
+      "name": "proposal can be explicitly rejected without changing the project",
+      "pass": true
+    },
+    {
       "name": "no API 5xx occurred",
       "pass": true,
       "detail": []
     }
   ],
   "passed": true,
-  "screenshot": "docs/evidence/jury-assistant-recommendation/assistant-plant-selection.png"
+  "screenshots": [
+    "docs/evidence/jury-assistant-recommendation/assistant-plant-selection.png",
+    "docs/evidence/jury-assistant-recommendation/assistant-plant-proposal.png"
+  ]
 }

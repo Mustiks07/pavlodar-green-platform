@@ -75,6 +75,25 @@ try {
 
   const currentRevision = await page.evaluate(async (scenarioId) => (await (await fetch(`/v1/scenarios/${scenarioId}`)).json()).current_revision_id, hero.id);
   check('read-only recommendation did not mutate the project', currentRevision === initialRevision, { initialRevision, currentRevision });
+
+  await panel.getByLabel(/^Вопрос/).fill('Подготовь замену растения на лучший вариант');
+  await panel.getByRole('button', { name: 'Отправить' }).click();
+  const proposalAnswer = panel.locator('.asst-msg[data-role="assistant"][data-state="completed"]').last();
+  await proposalAnswer.waitFor({ timeout: 60_000 });
+  const proposal = proposalAnswer.locator('.asst-proposal');
+  await proposal.waitFor({ timeout: 20_000 });
+  const proposalText = await proposal.innerText();
+  check('assistant prepares a readable plant replacement decision', /Растение в размещении: «.+» → «.+»/.test(proposalText), proposalText);
+  check('proposal waits for a human decision', proposalText.includes('ожидает решения') && proposalText.includes('Применить'));
+  const revisionWithPendingProposal = await page.evaluate(async (scenarioId) => (await (await fetch(`/v1/scenarios/${scenarioId}`)).json()).current_revision_id, hero.id);
+  check('pending plant replacement did not mutate the project', revisionWithPendingProposal === initialRevision, { initialRevision, revisionWithPendingProposal });
+  await proposal.screenshot({ path: resolve(output, 'assistant-plant-proposal.png') });
+
+  await proposal.getByRole('button', { name: 'Отклонить…' }).click();
+  await proposal.getByLabel('Причина').fill('Проверено в живом приёмочном сценарии');
+  await proposal.getByRole('button', { name: 'Отклонить предложение' }).click();
+  await proposal.getByText('отклонено', { exact: true }).waitFor({ timeout: 20_000 });
+  check('proposal can be explicitly rejected without changing the project', true);
   check('no API 5xx occurred', serverErrors.length === 0, serverErrors);
   await page.screenshot({ path: resolve(output, 'assistant-plant-selection.png') });
 } finally {
@@ -82,7 +101,16 @@ try {
   await browser.close();
 }
 
-const report = { base: BASE, city: resolvedCity, checks, passed: checks.every((item) => item.pass), screenshot: 'docs/evidence/jury-assistant-recommendation/assistant-plant-selection.png' };
+const report = {
+  base: BASE,
+  city: resolvedCity,
+  checks,
+  passed: checks.every((item) => item.pass),
+  screenshots: [
+    'docs/evidence/jury-assistant-recommendation/assistant-plant-selection.png',
+    'docs/evidence/jury-assistant-recommendation/assistant-plant-proposal.png',
+  ],
+};
 writeFileSync(resolve(output, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
 console.log(`${checks.filter((item) => item.pass).length}/${checks.length} checks passed`);
 process.exit(report.passed ? 0 : 1);
