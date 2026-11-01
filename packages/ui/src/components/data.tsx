@@ -331,10 +331,13 @@ export function JobStatus({ job, onCancel, timeZone }: { job: Job; onCancel?: ()
     <div className={`pg-job pg-job--${tone}`}>
       <div className="pg-job__head">
         <strong>{tUi(`job.${job.state}`)}</strong>
-        <span className="pg-muted">
-          {job.phase ? tUi('job.phase', { phase: job.phase }) : tUi('job.phaseUnknown')}
-          {job.attempt > 1 ? ` · ${tUi('job.attempt', { n: job.attempt })}` : null}
-        </span>
+        {job.phase || job.attempt > 1 ? (
+          <span className="pg-muted">
+            {job.phase ? tUi('job.phase', { phase: job.phase }) : null}
+            {job.phase && job.attempt > 1 ? ' · ' : null}
+            {job.attempt > 1 ? tUi('job.attempt', { n: job.attempt }) : null}
+          </span>
+        ) : null}
       </div>
       {active ? (
         <div
