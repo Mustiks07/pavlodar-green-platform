@@ -244,7 +244,7 @@ def handle_sync(request, operation, body):
         with session() as db:
             db.execute(text("SELECT postgis_version()"))
             version = db.scalar(text("SELECT version_num FROM alembic_version"))
-            if version != "0032_problem_decisions":
+            if version != "0034_work_calendar_artifacts":
                 raise DomainError(503, "migration_required", "Database schema is not ready")
         return JSONResponse({"status": "ok", "release": config.release})
     definition = OPENAPI["paths"][operation["path"]][operation["method"].lower()]

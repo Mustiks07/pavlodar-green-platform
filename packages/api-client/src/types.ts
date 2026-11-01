@@ -1,4 +1,4 @@
-// Generated from contracts/openapi.json 1.16.0 by apps/web/scripts/gen-types.mjs. Do not edit.
+// Generated from contracts/openapi.json 1.17.0 by apps/web/scripts/gen-types.mjs. Do not edit.
 import type { components } from './generated/schema';
 
 export type AddressResult = components['schemas']['AddressResult'];
@@ -139,6 +139,7 @@ export type User = components['schemas']['User'];
 export type UserSummary = components['schemas']['UserSummary'];
 export type UserSummaryPage = components['schemas']['UserSummaryPage'];
 export type Weight = components['schemas']['Weight'];
+export type WorkCalendarFilters = components['schemas']['WorkCalendarFilters'];
 export type WorkCompletion = components['schemas']['WorkCompletion'];
 export type WorkCompletionCreate = components['schemas']['WorkCompletionCreate'];
 export type WorkCompletionPage = components['schemas']['WorkCompletionPage'];

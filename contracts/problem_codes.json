@@ -1,5 +1,5 @@
 {
-  "version": "1.16.0",
+  "version": "1.17.0",
   "codes": [
     {
       "code": "account_not_provisioned",
@@ -255,6 +255,11 @@
       "code": "export_generation_failed",
       "status": 503,
       "title_ru": "Не удалось сформировать отчёт"
+    },
+    {
+      "code": "export_format_invalid",
+      "status": 422,
+      "title_ru": "Формат экспорта не поддерживается"
     },
     {
       "code": "export_target_invalid",
@@ -995,6 +1000,11 @@
       "code": "work_calendar_mismatch",
       "status": 422,
       "title_ru": "Дата выполнения не совпадает с календарём ухода"
+    },
+    {
+      "code": "work_calendar_export_limit",
+      "status": 422,
+      "title_ru": "Слишком много строк для экспорта календаря"
     },
     {
       "code": "work_care_operation_invalid",

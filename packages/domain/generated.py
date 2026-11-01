@@ -1732,9 +1732,30 @@ class ProposalApply(BaseModel):
     base_revision_id: UUID
 
 
+class Status13(StrEnum):
+    planned = 'planned'
+    assigned = 'assigned'
+    in_progress = 'in_progress'
+    completed = 'completed'
+    cancelled = 'cancelled'
+
+
+class WorkCalendarFilters(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    zone_id: UUID | None = None
+    status: Status13 | None = None
+    operation: Annotated[str | None, Field(min_length=1)] = None
+    assignee_group: Annotated[str | None, Field(min_length=1)] = None
+    planned_from: date_aliased | None = None
+    planned_to: date_aliased | None = None
+
+
 class TargetKind(StrEnum):
     calculation = 'calculation'
     program_revision = 'program_revision'
+    work_calendar = 'work_calendar'
 
 
 class Format1(StrEnum):
@@ -1750,6 +1771,7 @@ class ExportRequest(BaseModel):
     target_id: UUID
     format: Format1
     language: Literal['ru']
+    filters: WorkCalendarFilters | None = None
 
 
 class MediaType(StrEnum):

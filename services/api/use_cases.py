@@ -1658,45 +1658,10 @@ def execute(operation, db, access, params, body, request):
         result = get_work_order(db, access, params["work_order_id"]).payload
         headers["ETag"] = etag(result)
     elif operation == "listWorkOrders":
-        from services.api.work_orders import work_order_access
+        from services.api.work_orders import work_order_access, work_order_statement
 
         access.city(params["city_id"])
-        if params.get("planned_from") and params.get("planned_to") and params["planned_from"] > params["planned_to"]:
-            raise DomainError(
-                422,
-                "invalid_parameter",
-                "planned_from must not be after planned_to",
-                field_errors=[
-                    {
-                        "path": "/planned_to",
-                        "code": "date_range_invalid",
-                        "message": "Конец периода не может быть раньше начала",
-                    }
-                ],
-            )
-        statement = select(WorkOrderRecord).where(WorkOrderRecord.city_id == params["city_id"])
-        if params.get("zone_id"):
-            statement = statement.where(WorkOrderRecord.zone_id == params["zone_id"])
-        if params.get("status"):
-            statement = statement.where(WorkOrderRecord.status == params["status"])
-        if params.get("operation"):
-            statement = statement.where(
-                WorkOrderRecord.payload["operation"].astext.ilike(f"%{params['operation'].strip()}%")
-            )
-        if params.get("assignee_group"):
-            statement = statement.where(
-                WorkOrderRecord.payload["assignee_group"].astext.ilike(
-                    f"%{params['assignee_group'].strip()}%"
-                )
-            )
-        if params.get("planned_from"):
-            statement = statement.where(
-                WorkOrderRecord.payload["planned_end"].astext >= params["planned_from"]
-            )
-        if params.get("planned_to"):
-            statement = statement.where(
-                WorkOrderRecord.payload["planned_start"].astext <= params["planned_to"]
-            )
+        statement = work_order_statement(params["city_id"], params)
         result = page(
             db,
             WorkOrderRecord,

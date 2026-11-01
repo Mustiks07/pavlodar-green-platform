@@ -12,20 +12,25 @@ from sqlalchemy.exc import DBAPIError
 from packages.domain.contracts import validate
 from packages.domain.errors import DomainError
 from services.api.config import settings
-from services.api.db import engine
+from services.api.db import engine, session
 from services.api.exports import (
     PDF_TYPE,
     XLSX_TYPE,
     _token,
     render_pdf,
+    render_work_calendar_xlsx,
     render_xlsx,
     validate_download_token,
 )
+from services.api.models import Principal, WorkOrderRecord
+from services.api.security import Access
+from services.api.work_orders import freeze_work_calendar
 from services.worker.main import run_job
 from tests.test_calculations import setup_revision
-from tests.test_foundation import mutation
+from tests.test_foundation import create_scenario, mutation
 from tests.test_program_optimization_api import add_priority_and_calculations
 from tests.test_programs import program_body
+from tools.dev.seed import CITY_ID
 
 pytestmark = pytest.mark.integration
 
@@ -266,6 +271,75 @@ def test_export_rejects_unknown_target(clients):
         },
     )
     assert response.status_code == 404
+
+
+def test_work_calendar_export_freezes_filtered_rows_and_requires_specialist(
+    clients, tmp_path, monkeypatch
+):
+    monkeypatch.setattr(settings(), "export_root", str(tmp_path))
+    zone, _, scenario_response = create_scenario(clients["specialist"])
+    scenario = scenario_response.json()
+
+    def create(operation, crew):
+        response = mutation(
+            clients["specialist"],
+            "POST",
+            "/v1/work-orders",
+            {
+                "city_id": CITY_ID,
+                "scenario_revision_id": scenario["current_revision_id"],
+                "zone_id": zone["id"],
+                "operation": operation,
+                "planned_start": "2027-05-01",
+                "planned_end": "2027-05-05",
+                "quantity": 3,
+                "unit": "piece",
+                "assignee_group": crew,
+            },
+        )
+        assert response.status_code == 201, response.text
+        return response.json()["id"]
+
+    selected_id = create("SYNTHETIC TEST frozen watering", "SYNTHETIC North")
+    create("SYNTHETIC TEST pruning excluded", "SYNTHETIC South")
+    body = {
+        "target_kind": "work_calendar",
+        "target_id": CITY_ID,
+        "format": "xlsx",
+        "language": "ru",
+        "filters": {"operation": "watering", "assignee_group": "North"},
+    }
+    with session() as db:
+        specialist = db.get(Principal, "00000000-0000-4000-8000-000000000002")
+        frozen = freeze_work_calendar(
+            db, Access(db, specialist, None), CITY_ID, body["filters"], "2026-11-02T00:00:00Z"
+        )
+    assert [row["id"] for row in frozen["orders"]] == [selected_id]
+    assert render_work_calendar_xlsx(frozen).startswith(b"PK")
+    assert mutation(clients["viewer"], "POST", "/v1/exports", body).status_code == 403
+    started = mutation(clients["specialist"], "POST", "/v1/exports", body)
+    assert started.status_code == 202, started.text
+
+    # The worker must render the queue-time snapshot, not the later mutable row.
+    with session() as db, db.begin():
+        row = db.get(WorkOrderRecord, selected_id)
+        row.payload = {**row.payload, "operation": "SYNTHETIC TEST changed after queue"}
+
+    run_job.run(started.json()["id"])
+    job = clients["specialist"].get(f"/v1/jobs/{started.json()['id']}").json()
+    assert job["state"] == "succeeded", job
+    metadata = clients["specialist"].get(f"/v1/exports/{job['result_ref_id']}")
+    assert metadata.status_code == 200, metadata.text
+    assert clients["viewer"].get(f"/v1/exports/{job['result_ref_id']}").status_code == 403
+    workbook = clients["specialist"].get(metadata.json()["download_url"]).content
+    with zipfile.ZipFile(io.BytesIO(workbook)) as archive:
+        definition = archive.read("xl/workbook.xml").decode()
+        shared = archive.read("xl/sharedStrings.xml").decode()
+    for name in ("Календарь", "Выполнение", "История", "Параметры"):
+        assert f'name="{name}"' in definition
+    assert "SYNTHETIC TEST frozen watering" in shared
+    assert "SYNTHETIC TEST pruning excluded" not in shared
+    assert "SYNTHETIC TEST changed after queue" not in shared
 
 
 def test_program_export_contains_only_selected_scenarios(clients, tmp_path, monkeypatch):

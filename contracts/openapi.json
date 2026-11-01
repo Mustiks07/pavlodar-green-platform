@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.16.0",
-    "description": "Canonical API contract 1.16.0. Work-order calendars support server-side zone, operation, assignee, status and inclusive overlapping-date filters. All 1.15.0 operations remain compatible."
+    "version": "1.17.0",
+    "description": "Canonical API contract 1.17.0. Specialists can export an immutable filtered work calendar XLSX with execution evidence and status history. All 1.16.0 operations remain compatible."
   },
   "servers": [
     {
@@ -12294,6 +12294,18 @@
         ],
         "additionalProperties": false
       },
+      "WorkCalendarFilters": {
+        "type": "object",
+        "properties": {
+          "zone_id": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["planned", "assigned", "in_progress", "completed", "cancelled"] },
+          "operation": { "type": "string", "minLength": 1 },
+          "assignee_group": { "type": "string", "minLength": 1 },
+          "planned_from": { "type": "string", "format": "date" },
+          "planned_to": { "type": "string", "format": "date" }
+        },
+        "additionalProperties": false
+      },
       "ExportRequest": {
         "type": "object",
         "properties": {
@@ -12301,7 +12313,8 @@
             "type": "string",
             "enum": [
               "calculation",
-              "program_revision"
+              "program_revision",
+              "work_calendar"
             ]
           },
           "target_id": {
@@ -12317,6 +12330,9 @@
           },
           "language": {
             "const": "ru"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/WorkCalendarFilters"
           }
         },
         "required": [
@@ -12338,7 +12354,8 @@
             "type": "string",
             "enum": [
               "calculation",
-              "program_revision"
+              "program_revision",
+              "work_calendar"
             ]
           },
           "target_id": {

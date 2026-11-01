@@ -2601,21 +2601,34 @@ export interface components {
             /** Format: uuid */
             base_revision_id: string;
         };
+        WorkCalendarFilters: {
+            /** Format: uuid */
+            zone_id?: string;
+            /** @enum {string} */
+            status?: "planned" | "assigned" | "in_progress" | "completed" | "cancelled";
+            operation?: string;
+            assignee_group?: string;
+            /** Format: date */
+            planned_from?: string;
+            /** Format: date */
+            planned_to?: string;
+        };
         ExportRequest: {
             /** @enum {string} */
-            target_kind: "calculation" | "program_revision";
+            target_kind: "calculation" | "program_revision" | "work_calendar";
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
             format: "pdf" | "xlsx";
             /** @constant */
             language: "ru";
+            filters?: components["schemas"]["WorkCalendarFilters"];
         };
         ExportArtifact: {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            target_kind: "calculation" | "program_revision";
+            target_kind: "calculation" | "program_revision" | "work_calendar";
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */

@@ -120,7 +120,7 @@ function ArtifactRow({ id, format, onGone }: { id: string; format: Format; onGon
   const expired = Date.parse(a.expires_at) <= now;
   return (
     <div className="exp-artifact" data-export-id={a.id} data-format={a.format}>
-      <p><strong>{a.format === 'pdf' ? 'Готовый отчёт по расчёту' : 'Таблица расчёта для дальнейшей работы'}</strong><br /><span className="pg-muted">Сформирован {formatDateTime(a.created_at)}</span></p>
+      <p><strong>{a.target_kind === 'work_calendar' ? 'Зафиксированный календарь работ' : a.format === 'pdf' ? 'Готовый отчёт по расчёту' : 'Таблица расчёта для дальнейшей работы'}</strong><br /><span className="pg-muted">Сформирован {formatDateTime(a.created_at)}</span></p>
       <Button size="sm" variant="primary" icon="upload" busy={download.isPending} onClick={() => download.mutate()}>
         {a.format === 'pdf' ? 'Скачать PDF-отчёт' : 'Скачать таблицу XLSX'}
       </Button>
@@ -189,10 +189,10 @@ function JobRow({ id, onDone, onReset }: { id: string; onDone: (artifactId: stri
   );
 }
 
-function FormatRow({ kind, target, format }: { kind: Kind; target: string; format: Format }) {
+function FormatRow({ kind, target, stateTarget, format, filters }: { kind: Kind; target: string; stateTarget: string; format: Format; filters?: ExportRequest['filters'] }) {
   const { user, hasRole } = useSession();
   const startOk = useOperationAvailable('startExport');
-  const { entries, set } = useExportEntries(target);
+  const { entries, set } = useExportEntries(stateTarget);
   const entry = entries.find((e) => e.format === format) ?? null;
   const qc = useQueryClient();
   const start = useMutation({
@@ -201,7 +201,7 @@ function FormatRow({ kind, target, format }: { kind: Kind; target: string; forma
         await unwrap<Job>(
           api.POST('/v1/exports', {
             params: { header: { 'X-CSRF-Token': user?.csrf_token ?? '', 'Idempotency-Key': newIdempotencyKey() } },
-            body: { target_kind: kind, target_id: target, format, language: 'ru' },
+            body: { target_kind: kind, target_id: target, format, language: 'ru', filters },
           }),
         )
       ).data,
@@ -232,16 +232,18 @@ function FormatRow({ kind, target, format }: { kind: Kind; target: string; forma
 }
 
 /** PDF/XLSX of an immutable target (calculation snapshot or program revision), built by the server. */
-export function ExportPanel({ kind, target }: { kind: Kind; target: string }) {
+export function ExportPanel({ kind, target, filters }: { kind: Kind; target: string; filters?: ExportRequest['filters'] }) {
   const available = useOperationAvailable('getExport');
+  const formats: Format[] = kind === 'work_calendar' ? ['xlsx'] : FORMATS;
+  const stateTarget = filters ? `${target}@${encodeURIComponent(JSON.stringify(filters))}` : target;
   if (available === false) return <OperationUnavailable compact operationId="getExport" />;
   return (
     <div className="exp-panel" data-target={target}>
-      <h3>{t('export.title')}</h3>
-      <p className="pg-muted">{t(kind === 'calculation' ? 'export.desc.calculation' : 'export.desc.program')}</p>
+      <h3>{kind === 'work_calendar' ? 'Выгрузка календаря' : t('export.title')}</h3>
+      <p className="pg-muted">{kind === 'work_calendar' ? 'XLSX сохранит выбранные фильтры, наряды, факт выполнения и историю статусов на момент формирования.' : t(kind === 'calculation' ? 'export.desc.calculation' : 'export.desc.program')}</p>
       <div className="exp-rows">
-        {FORMATS.map((f) => (
-          <FormatRow key={f} kind={kind} target={target} format={f} />
+        {formats.map((f) => (
+          <FormatRow key={f} kind={kind} target={target} stateTarget={stateTarget} format={f} filters={filters} />
         ))}
       </div>
     </div>

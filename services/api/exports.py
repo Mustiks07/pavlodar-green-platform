@@ -88,10 +88,18 @@ def _target(db, access, target_kind, target_id):
         program_revision_access(db, access, revision)
         program = found(db.get(Program, revision.program_id))
         return revision, program.city_id
+    if target_kind == "work_calendar":
+        city = db.get(City, target_id)
+        if city is None:
+            raise DomainError(404, "not_found", "Object not found")
+        access.city(city.id)
+        return city, city.id
     raise DomainError(422, "export_target_invalid", "Unsupported export target")
 
 
 def authorize_artifact(db, access, artifact):
+    if artifact.target_kind == "work_calendar":
+        access.role("specialist")
     access.city(artifact.city_id)
     _target(db, access, artifact.target_kind, artifact.target_id)
     return artifact
@@ -625,6 +633,128 @@ def render_xlsx(context):
     return output.getvalue()
 
 
+def render_work_calendar_xlsx(snapshot):
+    """Render only the immutable queue-time snapshot; never re-read mutable work rows."""
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(
+        output,
+        {
+            "in_memory": True,
+            "strings_to_formulas": False,
+            "strings_to_urls": False,
+            "strings_to_numbers": False,
+        },
+    )
+    header = workbook.add_format(
+        {
+            "bold": True,
+            "font_color": "#FFFFFF",
+            "bg_color": "#14532D",
+            "align": "center",
+            "valign": "vcenter",
+        }
+    )
+    text_fmt = workbook.add_format({"font_color": "#1F2937", "valign": "top"})
+    number_fmt = workbook.add_format({"num_format": "#,##0.00", "valign": "top"})
+    int_fmt = workbook.add_format({"num_format": "#,##0", "valign": "top"})
+    date_fmt = workbook.add_format({"num_format": "dd.mm.yyyy", "valign": "top"})
+    datetime_fmt = workbook.add_format({"num_format": "dd.mm.yyyy hh:mm", "valign": "top"})
+
+    def make_sheet(name, columns, widths):
+        ws = workbook.add_worksheet(name)
+        ws.hide_gridlines(2)
+        ws.freeze_panes(1, 0)
+        ws.autofilter(0, 0, 0, len(columns) - 1)
+        ws.write_row(0, 0, columns, header)
+        for index, width in enumerate(widths):
+            ws.set_column(index, index, width)
+        return ws
+
+    def put(ws, row, col, value, kind="text"):
+        if value is None:
+            ws.write_blank(row, col, None, text_fmt)
+        elif kind == "number":
+            ws.write_number(row, col, float(Decimal(str(value))), number_fmt)
+        elif kind == "integer":
+            ws.write_number(row, col, int(value), int_fmt)
+        elif kind in {"date", "datetime"}:
+            parsed = datetime.fromisoformat(str(value))
+            # xlsxwriter requires a naive value while the captured ISO value remains in the snapshot.
+            ws.write_datetime(
+                row,
+                col,
+                parsed.replace(tzinfo=None),
+                date_fmt if kind == "date" else datetime_fmt,
+            )
+        else:
+            ws.write_string(row, col, _safe_text(value), text_fmt)
+
+    orders_ws = make_sheet(
+        "Календарь",
+        [
+            "ID наряда", "Участок", "Операция", "Начало", "Окончание", "План",
+            "Единица", "Выполнено", "Бригада", "Статус", "Обновлено",
+        ],
+        [38, 30, 30, 14, 14, 14, 14, 14, 24, 18, 20],
+    )
+    for row_index, row in enumerate(snapshot["orders"], 1):
+        values = [
+            (row["id"], "text"), (row["zone_name"], "text"),
+            (row["operation"], "text"), (row["planned_start"], "date"),
+            (row["planned_end"], "date"), (row["quantity"], "number"),
+            (row["unit"], "text"), (row["completed_quantity"], "number"),
+            (row.get("assignee_group"), "text"), (row["status"], "text"),
+            (row["updated_at"], "datetime"),
+        ]
+        for column, (value, kind) in enumerate(values):
+            put(orders_ws, row_index, column, value, kind)
+
+    completion_ws = make_sheet(
+        "Выполнение",
+        [
+            "ID записи", "ID наряда", "Выполнено", "Объём", "Вода, м³",
+            "Работа, мин", "Фактическая стоимость", "Комментарий", "Исполнитель",
+            "Актуальная запись", "Исправляет", "Создано",
+        ],
+        [38, 38, 20, 14, 14, 14, 20, 42, 28, 18, 38, 20],
+    )
+    for row_index, row in enumerate(snapshot["completions"], 1):
+        values = [
+            (row["id"], "text"), (row["work_order_id"], "text"),
+            (row["performed_at"], "datetime"), (row["quantity"], "number"),
+            (row.get("water_m3"), "number"), (row.get("crew_minutes"), "integer"),
+            (row.get("actual_care_cost"), "number"), (row["note"], "text"),
+            (row["actor_name"], "text"), ("да" if row["active"] else "нет", "text"),
+            (row.get("correction_of_id"), "text"), (row["created_at"], "datetime"),
+        ]
+        for column, (value, kind) in enumerate(values):
+            put(completion_ws, row_index, column, value, kind)
+
+    history_ws = make_sheet(
+        "История",
+        ["ID события", "ID наряда", "Из статуса", "В статус", "Причина", "Кто", "Когда"],
+        [38, 38, 18, 18, 42, 28, 20],
+    )
+    for row_index, row in enumerate(snapshot["history"], 1):
+        values = [
+            (row["id"], "text"), (row["work_order_id"], "text"),
+            (row.get("from_status"), "text"), (row["to_status"], "text"),
+            (row["reason"], "text"), (row["actor_name"], "text"),
+            (row["created_at"], "datetime"),
+        ]
+        for column, (value, kind) in enumerate(values):
+            put(history_ws, row_index, column, value, kind)
+
+    params_ws = make_sheet("Параметры", ["Параметр", "Значение"], [30, 70])
+    parameters = [("Зафиксировано", snapshot["captured_at"]), ("Нарядов", len(snapshot["orders"]))]
+    parameters.extend((key, value) for key, value in sorted(snapshot["filters"].items()))
+    for row_index, (key, value) in enumerate(parameters, 1):
+        put(params_ws, row_index, 0, key)
+        put(params_ws, row_index, 1, value)
+    workbook.close()
+    return output.getvalue()
+
+
 def persist_export(db, job):
     from services.api.security import Access
     from services.api.use_cases import audit
@@ -634,9 +764,15 @@ def persist_export(db, job):
         raise DomainError(500, "export_target_invalid", "Export job input is missing")
     access = Access(db, user, None)
     request = job.request_payload
-    context = build_context(db, access, request["target_kind"], request["target_id"])
     try:
-        data = render_pdf(context) if request["format"] == "pdf" else render_xlsx(context)
+        if request["target_kind"] == "work_calendar":
+            snapshot = request.get("work_calendar_snapshot")
+            if not snapshot:
+                raise DomainError(500, "export_target_invalid", "Frozen work calendar is missing")
+            data = render_work_calendar_xlsx(snapshot)
+        else:
+            context = build_context(db, access, request["target_kind"], request["target_id"])
+            data = render_pdf(context) if request["format"] == "pdf" else render_xlsx(context)
     except DomainError:
         raise
     except Exception as error:

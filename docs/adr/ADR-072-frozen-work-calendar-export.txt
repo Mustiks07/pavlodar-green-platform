@@ -1,0 +1,26 @@
+ADR-072: Frozen filtered work-calendar export
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-CARE-03 requires saved work to remain usable outside the platform. Existing exports covered
+calculation snapshots and program revisions, while the execution screen had no export matching
+its server-side filters. Re-reading mutable work orders in a background worker would produce a
+file different from the calendar the specialist requested.
+
+Decision
+Contract 1.17.0 adds export target `work_calendar`, using the city id as target id and the same
+zone, status, operation, assignee and overlapping-date filters as listWorkOrders. Only XLSX is
+accepted. Starting the specialist-only job freezes at most 5,000 authorized orders, current zone
+names, completion corrections, status events, actor display names, filters and capture time in the
+job input. The worker renders only this frozen input.
+
+The workbook contains four Russian sheets: Календарь, Выполнение, История and Параметры. Numbers
+and dates are native spreadsheet values; text is written with formula execution disabled. Artifact
+metadata and download repeat specialist and city authorization, and retain the existing checksum,
+expiry, job resume and immutable-storage guarantees.
+
+Consequences
+An export is an auditable view of the calendar at request time, not a live report. Changes made
+after queueing require a new export. Large unfiltered calendars fail with a typed 422 instead of
+silent truncation. Migrations 0033 and 0034 extend the durable job and artifact target constraints.

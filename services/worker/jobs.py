@@ -6,6 +6,7 @@ from sqlalchemy import select
 
 from packages.domain.errors import DomainError
 from services.api.models import (
+    City,
     Dataset,
     Job,
     JobEvent,
@@ -181,6 +182,19 @@ def enqueue_export(db, access, request):
     from services.api.exports import _target
 
     _, city_id = _target(db, access, request["target_kind"], request["target_id"])
+    frozen_request = dict(request)
+    if request["target_kind"] == "work_calendar":
+        from services.api.work_orders import freeze_work_calendar
+
+        if request["format"] != "xlsx":
+            raise DomainError(422, "export_format_invalid", "Work calendar export is XLSX only")
+        frozen_request["work_calendar_snapshot"] = freeze_work_calendar(
+            db,
+            access,
+            city_id,
+            request.get("filters") or {},
+            now(),
+        )
     job_id = uid()
     payload = {
         "id": job_id,
@@ -205,7 +219,7 @@ def enqueue_export(db, access, request):
         input_kind=request["target_kind"],
         state="queued",
         attempt=0,
-        request_payload=request,
+        request_payload=frozen_request,
         payload=payload,
     )
     db.add(job)
@@ -249,6 +263,12 @@ def authorize_job_input(db, access, job):
         session_access(db, access, job.input_ref_id)
         if job.owner_id != access.user.id:
             raise DomainError(403, "job_access_revoked", "Chat job ownership changed")
+        return
+    if job.input_kind == "work_calendar":
+        city = found(db.get(City, job.input_ref_id))
+        access.city(city.id)
+        if job.owner_id != access.user.id:
+            raise DomainError(403, "job_access_revoked", "Calendar export ownership changed")
         return
     raise DomainError(500, "job_input_invalid", "Job input kind is invalid")
 

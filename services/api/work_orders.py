@@ -7,12 +7,140 @@ from sqlalchemy import select
 
 from packages.domain.errors import DomainError
 from services.api.models import (
+    Principal,
     Scenario,
     WorkCompletionRecord,
     WorkOrderRecord,
     WorkOrderStatusEvent,
     Zone,
+    ZoneVersion,
 )
+
+WORK_CALENDAR_LIMIT = 5000
+
+
+def work_order_statement(city_id, filters):
+    """Build the canonical work-calendar filter before authorization/pagination/export."""
+    planned_from = filters.get("planned_from")
+    planned_to = filters.get("planned_to")
+    if planned_from and planned_to and planned_from > planned_to:
+        raise DomainError(
+            422,
+            "invalid_parameter",
+            "planned_from must not be after planned_to",
+            field_errors=[
+                {
+                    "path": "/planned_to",
+                    "code": "date_range_invalid",
+                    "message": "Конец периода не может быть раньше начала",
+                }
+            ],
+        )
+    statement = select(WorkOrderRecord).where(WorkOrderRecord.city_id == city_id)
+    if filters.get("zone_id"):
+        statement = statement.where(WorkOrderRecord.zone_id == filters["zone_id"])
+    if filters.get("status"):
+        statement = statement.where(WorkOrderRecord.status == filters["status"])
+    if filters.get("operation"):
+        statement = statement.where(
+            WorkOrderRecord.payload["operation"].astext.ilike(
+                f"%{filters['operation'].strip()}%"
+            )
+        )
+    if filters.get("assignee_group"):
+        statement = statement.where(
+            WorkOrderRecord.payload["assignee_group"].astext.ilike(
+                f"%{filters['assignee_group'].strip()}%"
+            )
+        )
+    if planned_from:
+        statement = statement.where(
+            WorkOrderRecord.payload["planned_end"].astext >= planned_from
+        )
+    if planned_to:
+        statement = statement.where(
+            WorkOrderRecord.payload["planned_start"].astext <= planned_to
+        )
+    return statement
+
+
+def freeze_work_calendar(db, access, city_id, filters, captured_at):
+    """Freeze an authorized calendar snapshot for deterministic background export."""
+    access.role("specialist")
+    access.city(city_id)
+    rows = list(
+        db.scalars(
+            work_order_statement(city_id, filters)
+            .order_by(WorkOrderRecord.updated_at, WorkOrderRecord.id)
+            .limit(WORK_CALENDAR_LIMIT + 1)
+        )
+    )
+    if len(rows) > WORK_CALENDAR_LIMIT:
+        raise DomainError(
+            422,
+            "work_calendar_export_limit",
+            f"Work calendar export exceeds {WORK_CALENDAR_LIMIT} rows; narrow the filters",
+        )
+    order_ids = [row.id for row in rows]
+    zone_ids = {row.zone_id for row in rows}
+    zone_rows = list(db.scalars(select(Zone).where(Zone.id.in_(zone_ids)))) if zone_ids else []
+    zone_versions = {
+        row.id: row
+        for row in db.scalars(
+            select(ZoneVersion).where(
+                ZoneVersion.id.in_([zone.current_version_id for zone in zone_rows])
+            )
+        )
+    } if zone_rows else {}
+    zones = {
+        zone.id: zone_versions[zone.current_version_id].payload.get("name", zone.id)
+        for zone in zone_rows
+        if zone.current_version_id in zone_versions
+    }
+    completions = list(
+        db.scalars(
+            select(WorkCompletionRecord)
+            .where(WorkCompletionRecord.work_order_id.in_(order_ids))
+            .order_by(WorkCompletionRecord.created_at, WorkCompletionRecord.id)
+        )
+    ) if order_ids else []
+    events = list(
+        db.scalars(
+            select(WorkOrderStatusEvent)
+            .where(WorkOrderStatusEvent.work_order_id.in_(order_ids))
+            .order_by(WorkOrderStatusEvent.created_at, WorkOrderStatusEvent.id)
+        )
+    ) if order_ids else []
+    actor_ids = {row.actor_id for row in completions + events}
+    actors = {
+        row.id: row.display_name
+        for row in db.scalars(select(Principal).where(Principal.id.in_(actor_ids)))
+    } if actor_ids else {}
+    corrected_ids = {row.correction_of_id for row in completions if row.correction_of_id}
+    return {
+        "captured_at": captured_at,
+        "filters": {key: value for key, value in filters.items() if value not in (None, "")},
+        "orders": [
+            {**row.payload, "zone_name": zones.get(row.zone_id, row.zone_id)} for row in rows
+        ],
+        "completions": [
+            {
+                **row.payload,
+                "id": row.id,
+                "actor_name": actors.get(row.actor_id, row.actor_id),
+                "active": row.id not in corrected_ids,
+            }
+            for row in completions
+        ],
+        "history": [
+            {
+                **row.payload,
+                "id": row.id,
+                "actor_name": actors.get(row.actor_id, row.actor_id),
+            }
+            for row in events
+        ],
+    }
 
 
 def work_order_access(access, order):

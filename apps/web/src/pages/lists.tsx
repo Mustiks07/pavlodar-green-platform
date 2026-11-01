@@ -37,6 +37,7 @@ import { useSession } from '../shell/session';
 import { plantImage } from '../features/plants/images';
 import { useZones } from '../features/zones/queries';
 import { cityDisplayName } from '../city';
+import { ExportPanel } from '../features/exports/ExportPanel';
 // The wizard (preview, upload, job tracking) is its own chunk: loaded only on the imports page.
 const ImportWizard = lazy(async () => ({ default: (await import('../features/imports/ImportWizard')).ImportWizard }));
 
@@ -920,6 +921,20 @@ export function ExecutionPage() {
               <h2 id="exec-cohorts-h">{t('exec.cohorts')}</h2>
               <p className="pg-muted">{t('exec.cohorts.desc')}</p>
               <CohortsPanel city={city} selected={cohort} onSelect={setCohort} />
+            </section> : null}
+            {hasOrders ? <section className="app-section" aria-label="Экспорт рабочего календаря">
+              <ExportPanel
+                kind="work_calendar"
+                target={city.id}
+                filters={{
+                  zone_id: zoneId || undefined,
+                  status: status || undefined,
+                  operation: operation.trim() || undefined,
+                  assignee_group: assignee.trim() || undefined,
+                  planned_from: plannedFrom || undefined,
+                  planned_to: plannedTo || undefined,
+                }}
+              />
             </section> : null}
           </>
         )}
