@@ -1525,8 +1525,13 @@
   z-index: 2;
   background: var(--pg-surface);
 }
+.app-split.program-workspace.is-open { grid-template-columns: minmax(17rem, 0.42fr) minmax(0, 1.58fr); }
+.app-split.program-workspace.is-open > .pg-card { position: static; max-height: none; }
 @media (max-width: 1100px) {
   .app-split.is-open {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-split.program-workspace.is-open {
     grid-template-columns: minmax(0, 1fr);
   }
   .app-split.is-open > .pg-card {
@@ -2438,6 +2443,21 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--pg-space-3);
 }
+.cmp-orient {
+  display: grid;
+  gap: var(--pg-space-3);
+  padding: var(--pg-space-4);
+  border: 1px solid color-mix(in srgb, var(--pg-accent) 45%, var(--pg-border));
+  border-radius: var(--pg-radius-lg);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--pg-accent-soft) 78%, var(--pg-surface)), var(--pg-surface));
+}
+.cmp-orient > header { display: grid; gap: var(--pg-space-1); }
+.cmp-orient > header small { color: var(--pg-accent-text); font-size: var(--pg-fs-xs); font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.cmp-orient > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pg-space-3); }
+.cmp-orient article { display: grid; gap: var(--pg-space-1); padding: var(--pg-space-3); border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: color-mix(in srgb, var(--pg-surface) 92%, transparent); }
+.cmp-orient article small { color: var(--pg-text-muted); }
+.cmp-orient article strong { font-size: var(--pg-fs-md); }
+.cmp-orient article span { color: var(--pg-accent-text); font-weight: 700; }
 .cmp-summary-card {
   display: grid;
   gap: var(--pg-space-3);
@@ -2564,6 +2584,7 @@
 }
 @media (max-width: 900px) {
   .cmp-summary-grid { grid-template-columns: 1fr; }
+  .cmp-orient > div { grid-template-columns: 1fr; }
   .cmp-pick {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -2599,6 +2620,10 @@
   border: 1px solid var(--pg-border);
   border-radius: var(--pg-radius);
 }
+.exp-artifact > p { margin: 0; }
+.exp-artifact__technical { width: 100%; padding-top: var(--pg-space-2); border-top: 1px solid var(--pg-border); }
+.exp-artifact__technical > summary { cursor: pointer; color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.exp-artifact__technical[open] > summary { margin-bottom: var(--pg-space-2); }
 
 /* Execution: work orders and cohorts */
 .exec-detail,
@@ -2884,7 +2909,13 @@
 .program-whatif > header span { display: grid; gap: 0.15rem; }
 .program-whatif > header small { color: var(--pg-accent-text); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .program-whatif > header h4, .program-whatif > p { margin: 0; }
-.program-whatif > header > strong { font-size: var(--pg-fs-xl); color: var(--pg-accent-text); }
+.program-whatif__delta { display: grid; justify-items: end; }
+.program-whatif__delta small { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.program-whatif__delta strong { font-size: var(--pg-fs-xl); color: var(--pg-accent-text); }
+.program-whatif__budgets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pg-space-2); }
+.program-whatif__budgets article { display: grid; gap: 0.15rem; padding: var(--pg-space-3); border-radius: var(--pg-radius); background: var(--pg-accent-soft); }
+.program-whatif__budgets small { color: var(--pg-text-muted); }
+.program-whatif__budgets strong { font-size: var(--pg-fs-lg); }
 .program-whatif__changes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pg-space-3); }
 .program-whatif__changes article { padding: var(--pg-space-3); border-radius: var(--pg-radius); background: var(--pg-surface-2); }
 .program-whatif__changes article.is-added { border-left: 4px solid var(--pg-positive); }
@@ -2938,7 +2969,9 @@
 @media (max-width: 720px) {
   .program-summary__metrics { grid-template-columns: 1fr; }
   .program-whatif__changes { grid-template-columns: 1fr; }
+  .program-whatif__budgets { grid-template-columns: 1fr; }
   .program-whatif > header { align-items: stretch; flex-direction: column; }
+  .program-whatif__delta { justify-items: start; }
   .program-resource-grid,
   .program-diff__selectors {
     grid-template-columns: 1fr;

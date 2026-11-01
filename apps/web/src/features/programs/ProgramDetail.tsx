@@ -46,6 +46,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
   const [revisionId, setRevisionId] = useSelected('revision');
   const [jobId, setJobId] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [optimizeAfterSave, setOptimizeAfterSave] = useState(false);
   const [transitionTarget, setTransitionTarget] = useState<Target | null>(null);
   const [reason, setReason] = useState('');
   const [name, setName] = useState(program.name);
@@ -138,10 +139,10 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
   const activeJob = job.data && ['queued', 'running', 'cancel_requested'].includes(job.data.state);
 
   useEffect(() => {
-    if (items.length < 2 || baseRevisionId || targetRevisionId) return;
+    if (items.length < 2) return;
     setBaseRevisionId(items[1]!.id);
     setTargetRevisionId(items[0]!.id);
-  }, [items, baseRevisionId, targetRevisionId]);
+  }, [items[0]?.id]); // newest result changed: compare it with the immediately previous result
   useEffect(() => {
     if (job.data?.state !== 'succeeded') return;
     void qc.invalidateQueries({ queryKey: ['program', program.id] });
@@ -179,7 +180,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
     onSuccess: (nextJob) => qc.setQueryData(['job', nextJob.id], nextJob),
   });
 
-  const openEditor = () => {
+  const openEditor = (reoptimize = false) => {
     const limit = current.resource_limits[0];
     setName(current.name);
     setBudget(current.capital_budget);
@@ -187,6 +188,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
     setCrew(limit?.crew_minutes === null || limit?.crew_minutes === undefined ? '' : String(limit.crew_minutes));
     setVisits(limit?.max_visits === null || limit?.max_visits === undefined ? '' : String(limit.max_visits));
     setCareBudget(limit?.care_budget ?? '');
+    setOptimizeAfterSave(reoptimize);
     setEditOpen(true);
   };
   const update = useMutation({
@@ -223,6 +225,10 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
       setEditOpen(false);
       void qc.invalidateQueries({ queryKey: ['program', program.id] });
       void qc.invalidateQueries({ queryKey: ['list', 'programs'] });
+      if (optimizeAfterSave) {
+        setOptimizeAfterSave(false);
+        optimize.mutate();
+      }
     },
   });
 
@@ -303,7 +309,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
       </div>
       {hasRole('specialist') ? (
         <div className="scn-actions">
-          {current.status === 'draft' ? <Button onClick={openEditor}>{t('program.edit')}</Button> : null}
+          {current.status === 'draft' ? <Button onClick={() => openEditor(false)}>{t('program.edit')}</Button> : null}
           {current.status === 'draft' ? <Button variant="primary" busy={optimize.isPending || calculationsPending} disabled={!current.priority_result_id || (!current.current_revision_id && !optimizationReady) || Boolean(activeJob)} onClick={() => optimize.mutate()}>{current.current_revision_id ? 'Пересчитать программу' : optimizationReady ? t('program.optimize') : 'Подготовка расчётов…'}</Button> : null}
           {transitions.map((option) => <Button key={option.target} variant={option.target === 'archived' ? 'secondary' : 'primary'} disabled={!current.current_revision_id} onClick={() => { setReason(''); setTransitionTarget(option.target); }}>{t(`transition.to.${option.target}` as AppKey)}</Button>)}
         </div>
@@ -337,7 +343,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
                     <small>{scenario ? (priorityZoneNames.get(scenario.zone_id) ?? 'Участок программы') : 'Загрузка участка…'}</small>
                     <strong>{scenario?.name ?? 'Загрузка проекта…'}</strong>
                   </div>
-                  {scenario ? <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={`/projects/${scenario.id}?city=${current.city_id}`}>Открыть</Link> : null}
+                  {scenario ? <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={`/projects/${scenario.id}?city=${current.city_id}&revision=${id}`}>Открыть</Link> : null}
                 </article>
               );
             })}
@@ -348,8 +354,12 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
         <section className="program-whatif" aria-labelledby="program-whatif-title">
           <header>
             <span><small>Сценарный анализ</small><h4 id="program-whatif-title">Что изменилось между двумя расчётами программы</h4></span>
-            {diff.data.capital_delta !== null ? <strong><MoneyText value={diff.data.capital_delta} /></strong> : null}
+            {diff.data.capital_delta !== null ? <span className="program-whatif__delta"><small>Изменение капитальных затрат</small><strong><MoneyText value={diff.data.capital_delta} /></strong></span> : null}
           </header>
+          <div className="program-whatif__budgets">
+            <article><small>Предыдущий результат</small><strong>{items.find((item) => item.id === baseRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === baseRevisionId)!.capital_total!} /> : '—'}</strong></article>
+            <article><small>Новый результат</small><strong>{items.find((item) => item.id === targetRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === targetRevisionId)!.capital_total!} /> : '—'}</strong></article>
+          </div>
           <div className="program-whatif__changes">
             <article className="is-added">
               <strong>Вошли в программу</strong>
@@ -361,6 +371,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
             </article>
           </div>
           <p>Измените лимиты программы и запустите оптимизацию — сервер сохранит новый результат, а здесь покажет точную разницу.</p>
+          {current.status === 'draft' ? <Button variant="primary" icon="target" disabled={Boolean(activeJob)} onClick={() => openEditor(true)}>Рассчитать при другом бюджете</Button> : null}
         </section>
       ) : null}
       {optimize.isError ? <ApiErrorView compact error={optimize.error} onRetry={() => optimize.mutate()} /> : null}
@@ -411,7 +422,7 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
       {selected ? <ExportPanel kind="program_revision" target={selected.id} /> : null}
       </details>
 
-      <Dialog open={editOpen} title={t('program.edit.title')} onClose={() => setEditOpen(false)} footer={<><Button onClick={() => setEditOpen(false)}>{t('action.cancel')}</Button><Button variant="primary" busy={update.isPending} disabled={!name.trim() || !budget.trim()} onClick={() => update.mutate()}>{t('program.edit.save')}</Button></>}>
+      <Dialog open={editOpen} title={optimizeAfterSave ? 'Новый бюджетный сценарий' : t('program.edit.title')} onClose={() => { setEditOpen(false); setOptimizeAfterSave(false); }} footer={<><Button onClick={() => { setEditOpen(false); setOptimizeAfterSave(false); }}>{t('action.cancel')}</Button><Button variant="primary" busy={update.isPending} disabled={!name.trim() || !budget.trim()} onClick={() => update.mutate()}>{optimizeAfterSave ? 'Сохранить и пересчитать' : t('program.edit.save')}</Button></>}>
         <p className="pg-muted">{t('program.edit.desc')}</p>
         <div className="scn-form">
           <Field label={t('program.field.name')} required>{({ id, describedBy }) => <Input id={id} aria-describedby={describedBy} value={name} onChange={(event) => setName(event.target.value)} />}</Field>

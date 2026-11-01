@@ -424,10 +424,14 @@ def ensure_dataset(
     return dataset, version_id, True
 
 
-def mvp_care_operations(scenario_id, revision, rate_ids):
-    """Build a small, explicit estimate: three watering and one care visit per season."""
+def mvp_care_operations(scenario_id, revision, rate_ids, layout):
+    """Build the explicit evaluation-profile care plan used by the demo calculations."""
     placement_ids = [item["id"] for item in revision["placements"]]
     total_pieces = sum(item["quantity"] for item in revision["placements"])
+    # This is a versioned synthetic evaluation input, never a hidden production default. The
+    # water-saving composition uses the profile's lower irrigation allowance; every snapshot keeps
+    # the exact operations and synthetic provenance so the assumption is reproducible.
+    watering_m3 = 1.0 if layout == "water_saving" else 1.5
     operations = []
     for year in range(3):
         for month in (5, 7, 9):
@@ -443,9 +447,9 @@ def mvp_care_operations(scenario_id, revision, rate_ids):
                     "month": month,
                     "year_offset": year,
                     "operation": "Оценочный полив проектных посадок",
-                    "quantity": 1.5,
+                    "quantity": watering_m3,
                     "unit": "m3",
-                    "water_m3": 1.5,
+                    "water_m3": watering_m3,
                     "crew_minutes": 90,
                     "visits": 1,
                     "rate_version_id": rate_ids["water"],
@@ -1176,6 +1180,9 @@ def bootstrap(clients, city, license_name):
                 else set()
             )
             desired_coefficient_id = profile_coefficient_id if is_hero else None
+            desired_care_operations = mvp_care_operations(
+                scenario["id"], revision, profile_rate_ids, layout
+            )
             if (
                 revision["catalog_version_id"] != profile_catalog_id
                 or revision["rule_version_id"] != MVP_RULE_ID
@@ -1183,7 +1190,7 @@ def bootstrap(clients, city, license_name):
                 or revision["coefficient_version_id"] != desired_coefficient_id
                 or set(revision["rate_version_ids"]) != set(profile_rate_ids.values())
                 or revision["care_strategy"] != "custom"
-                or len(revision["custom_care_operations"]) != 12
+                or revision["custom_care_operations"] != desired_care_operations
                 or any(
                     placement["stock_item_id"]
                     != profile_stock_by_plant.get(placement["plant_id"])
@@ -1241,9 +1248,7 @@ def bootstrap(clients, city, license_name):
                         for year in range(3)
                     ],
                     care_strategy="custom",
-                    custom_care_operations=mvp_care_operations(
-                        scenario["id"], revision, profile_rate_ids
-                    ),
+                    custom_care_operations=desired_care_operations,
                     comment=(
                         f"SYNTHETIC TEST · Оценочный профиль MVP: {title.lower()} с расчётной сметой, "
                         "некалиброванной приживаемостью и календарём ухода. "

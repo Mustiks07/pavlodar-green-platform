@@ -19,10 +19,11 @@ export function careCalendar(operations: CareOperation[]) {
 
 /**
  * A server CalculationSnapshot exactly as returned: cost breakdown, survival per placement, care
- * operations and ecosystem metrics. Nothing is summed or derived here; an incomplete total stays
- * unknown, partial results say so, and only blocking warnings are listed (presentation policy).
+ * operations and ecosystem metrics. The compact header only exposes the min/max of the returned
+ * one-year probabilities; no aggregate probability is invented. An incomplete total stays unknown,
+ * partial results say so, and only blocking warnings are listed (presentation policy).
  */
-export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnapshot; timeZone?: string }) {
+export function SnapshotView({ snapshot, timeZone, compact = false }: { snapshot: CalculationSnapshot; timeZone?: string; compact?: boolean }) {
   const [showAllSurvival, setShowAllSurvival] = useState(false);
   const gaps = snapshot.warnings.filter((g) => g.blocking);
   const revision = useQuery({
@@ -42,7 +43,18 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
   const placementNames = new Map(
     (revision.data?.placements ?? []).map((placement, index) => [placement.id, plantNames.get(placement.plant_id) ?? `Группа посадок ${index + 1}`]),
   );
+  const yearOneProbabilities = snapshot.survival
+    .map((result) => result.points.find((point) => point.year === 1)?.probability)
+    .filter((value): value is number => value !== null && value !== undefined);
+  const yearOneMin = yearOneProbabilities.length ? Math.min(...yearOneProbabilities) : null;
+  const yearOneMax = yearOneProbabilities.length ? Math.max(...yearOneProbabilities) : null;
+  const yearOneRange = yearOneMin === null || yearOneMax === null
+    ? '—'
+    : yearOneMin === yearOneMax
+      ? `${formatNumber(yearOneMin * 100, 0)}%`
+      : `${formatNumber(yearOneMin * 100, 0)}–${formatNumber(yearOneMax * 100, 0)}%`;
   const calendar = careCalendar(snapshot.care);
+  const moduleReason = (patterns: RegExp) => snapshot.warnings.find((item) => patterns.test(`${item.code} ${item.message}`))?.message;
   const ecosystemHorizons = [...new Set(snapshot.ecosystem.map((metric) => metric.horizon_year).filter((value): value is number => value !== null))].sort((a, b) => a - b);
   return (
     <div className="scn-calculation__result calc-story" data-calculation-id={snapshot.id} data-status={snapshot.status}>
@@ -60,7 +72,7 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
         <div className="calc-story__totals">
           <article><small>Известная стоимость</small><strong><MoneyText value={snapshot.cost.known_subtotal} /></strong><span>по доступным статьям</span></article>
           <article><small>Полная стоимость</small><strong>{snapshot.cost.status === 'complete' && snapshot.cost.total ? <MoneyText value={snapshot.cost.total} /> : '—'}</strong><span>{snapshot.cost.status === 'complete' ? 'все статьи учтены' : 'нужны недостающие расценки'}</span></article>
-          <article><small>Горизонты анализа</small><strong>{snapshot.survival.length ? '1 · 2 · 3 года' : '—'}</strong><span>приживаемость посадок</span></article>
+          <article><small>Приживаемость через 1 год</small><strong>{yearOneRange}</strong><span>{yearOneProbabilities.length ? `диапазон по ${yearOneProbabilities.length} группам` : 'прогноз ещё не рассчитан'}</span></article>
         </div>
         <details className="calc-story__technical">
           <summary>Техническая информация</summary>
@@ -76,6 +88,9 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
         </Notice>
       ) : null}
       <ExportPanel kind="calculation" target={snapshot.id} />
+      <details className={`calc-story__report${compact ? ' is-compact' : ''}`} open={!compact}>
+      <summary>Открыть полный расчёт: смета, приживаемость, уход и экологический эффект</summary>
+      <div className="calc-story__report-body">
       <h3>{t('scenario.calc.lines')}</h3>
       <CostBreakdown cost={snapshot.cost} compact />
       <section className="calc-story__section">
@@ -91,7 +106,7 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
             </Button>
           ) : null}
           </>
-        ) : <CalculationModuleEmpty text="Прогноз не вошёл в этот снимок. Запустите полный расчёт с модулем приживаемости." />}
+        ) : <CalculationModuleEmpty text={moduleReason(/survival|приживаем/i) ?? 'Для прогноза приживаемости нужны допустимая модель и входные данные проекта.'} />}
       </section>
       <section className="calc-story__section">
         <header><small>Календарь</small><h3>{t('calc.care')}</h3><p>Месяцы работ, потребность в воде и количество выездов бригады.</p></header>
@@ -119,7 +134,7 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
             </table></div>
           </details>
           </>
-        ) : <CalculationModuleEmpty text="План ухода не вошёл в этот снимок. Запустите полный расчёт с модулем ухода." />}
+        ) : <CalculationModuleEmpty text={moduleReason(/care|уход/i) ?? 'Для календаря ухода нужны закреплённые операции, нормы и горизонт планирования.'} />}
       </section>
       <section className="calc-story__section">
         <header><small>Эффект во времени</small><h3>{t('calc.ecosystem')}</h3><p>Одинаковый набор показателей на горизонтах 5, 10 и 20 лет.</p></header>
@@ -132,7 +147,7 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
               </section>
             ))}
           </div>
-        ) : <CalculationModuleEmpty text="Экологический эффект не вошёл в этот снимок. Запустите полный расчёт с соответствующим модулем." />}
+        ) : <CalculationModuleEmpty text={moduleReason(/ecosystem|ecolog|эколог/i) ?? 'Для экологического эффекта нужен утверждённый профиль коэффициентов.'} />}
       </section>
       {gaps.length ? (
         <Notice tone="warning" icon="alert" title={t('scenario.calc.gaps')}>
@@ -149,6 +164,8 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
           {t('scenario.calc.manifest')}
         </a>
       </p>
+      </div>
+      </details>
     </div>
   );
 }
@@ -179,7 +196,7 @@ export function useCalculation(id: string | null) {
   };
 }
 
-export function SnapshotById({ id, timeZone }: { id: string; timeZone?: string }) {
+export function SnapshotById({ id, timeZone, compact = false }: { id: string; timeZone?: string; compact?: boolean }) {
   const { available, query } = useCalculation(id);
   if (available === false) return <OperationUnavailable compact operationId="getCalculation" />;
   if (query.isPending) return <Skeleton lines={4} />;
@@ -189,5 +206,5 @@ export function SnapshotById({ id, timeZone }: { id: string; timeZone?: string }
     }
     return <ApiErrorView compact error={query.error} onRetry={() => void query.refetch()} />;
   }
-  return <SnapshotView snapshot={query.data} timeZone={timeZone} />;
+  return <SnapshotView snapshot={query.data} timeZone={timeZone} compact={compact} />;
 }

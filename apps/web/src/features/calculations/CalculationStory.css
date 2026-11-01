@@ -11,6 +11,12 @@
 .calc-story__totals article small, .calc-story__totals article span { color: var(--pg-text-muted); }
 .calc-story__totals article strong { font-size: var(--pg-fs-lg); }
 .calc-story__technical summary, .calc-story__details summary { cursor: pointer; color: var(--pg-accent-text); font-weight: 650; }
+.calc-story__report { border: 0; }
+.calc-story__report > summary { display: none; }
+.calc-story__report.is-compact { padding: 0.8rem 1rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: var(--pg-surface-2); }
+.calc-story__report.is-compact > summary { display: list-item; cursor: pointer; color: var(--pg-accent-text); font-weight: 700; }
+.calc-story__report.is-compact[open] > summary { margin-bottom: 1rem; }
+.calc-story__report-body { display: grid; gap: 1rem; }
 .calc-story__technical dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 0.8rem; margin: 0.65rem 0 0; }
 .calc-story__technical dt { color: var(--pg-text-muted); }
 .calc-story__technical dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }

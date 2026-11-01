@@ -12,7 +12,7 @@ const CITY = process.env.PG_CITY_ID ?? '10000000-0000-4000-8000-000000000001';
 const credentialPath = process.env.PG_TEST_CREDENTIALS;
 if (!credentialPath) throw new Error('Set PG_TEST_CREDENTIALS to an ignored local credentials file');
 const credentials = JSON.parse(readFileSync(credentialPath, 'utf8'));
-const output = resolve('../../docs/assets/readme');
+const output = resolve(process.env.PG_CAPTURE_OUT ?? '../../docs/assets/readme');
 mkdirSync(output, { recursive: true });
 
 async function login(page) {

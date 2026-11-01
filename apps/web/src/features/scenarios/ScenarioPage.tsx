@@ -746,6 +746,13 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
   const calcOk = useOperationAvailable('calculateFast');
   const zoneQ = useZone(scenario.data?.data.zone_id ?? null);
   const transitionOk = useOperationAvailable('transitionScenario');
+  const peerScenarios = useQuery({
+    queryKey: ['scenario-peers', cityId, scenario.data?.data.zone_id ?? ''],
+    enabled: Boolean(scenario.data?.data.zone_id),
+    queryFn: async ({ signal }) => (
+      await unwrap(api.GET('/v1/scenarios', { params: { query: { city_id: cityId, limit: 200 } }, signal }))
+    ).data.items.filter((item) => item.zone_id === scenario.data!.data.zone_id),
+  });
 
   const setViewed = (id: string | null) => {
     const next = new URLSearchParams(params);
@@ -765,6 +772,8 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
   const s = scenario.data.data;
   const isOld = Boolean(viewed) && viewed !== s.current_revision_id;
   const calculationRevisionId = isOld ? shown.data?.id ?? null : current.data?.id ?? null;
+  const compareRevisions = (peerScenarios.data ?? []).map((item) => item.current_revision_id).slice(0, 3);
+  const compareHref = `/compare?city=${encodeURIComponent(cityId)}${compareRevisions.length >= 2 ? `&revisions=${encodeURIComponent(compareRevisions.join(','))}` : ''}`;
 
   return (
     <>
@@ -778,6 +787,12 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
             </Badge>{' '}
             <Link to={`/?city=${cityId}&zone=${s.zone_id}`}>{t('scenario.openZone')}</Link> · {t('col.updated')}:{' '}
             {formatDateTime(s.updated_at, timeZone)}
+          </>
+        }
+        actions={
+          <>
+            <a className="pg-btn pg-btn--secondary" href="#scenario-recommendation">Подобрать растения</a>
+            <Link className="pg-btn pg-btn--primary" to={compareHref}>Сравнить варианты участка</Link>
           </>
         }
       />

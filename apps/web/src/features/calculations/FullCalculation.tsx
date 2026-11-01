@@ -101,7 +101,7 @@ export function FullCalculation({ revisionId, timeZone }: { revisionId: string; 
       {resultId && explicit.query.data && !explicitMatches ? <Notice tone="warning" title="Расчёт относится к другой версии проекта">Показан последний расчёт выбранной версии.</Notice> : null}
       {discoverSaved && saved.isPending ? <Skeleton lines={3} /> : null}
       {discoverSaved && saved.isError ? <ApiErrorView compact error={saved.error} onRetry={() => void saved.refetch()} /> : null}
-      {shownResultId ? <SnapshotById id={shownResultId} timeZone={timeZone} /> : null}
+      {shownResultId ? <SnapshotById id={shownResultId} timeZone={timeZone} compact /> : null}
       {discoverSaved && saved.data ? <p className="pg-muted">Показан последний сохранённый расчёт этой версии проекта.</p> : null}
       {jobId && job.isPending ? <Skeleton lines={2} /> : null}
       {jobId && job.isError ? (

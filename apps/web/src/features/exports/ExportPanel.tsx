@@ -120,31 +120,23 @@ function ArtifactRow({ id, format, onGone }: { id: string; format: Format; onGon
   const expired = Date.parse(a.expires_at) <= now;
   return (
     <div className="exp-artifact" data-export-id={a.id} data-format={a.format}>
-      <dl className="pg-dl">
-        <dt>{t('export.format')}</dt>
-        <dd>{a.format.toUpperCase()}</dd>
-        <dt>{t('export.created')}</dt>
-        <dd>{formatDateTime(a.created_at)}</dd>
-        <dt>SHA-256</dt>
-        <dd>
-          <code className="pg-code" title={a.sha256}>
-            {a.sha256.slice(0, 16)}…
-          </code>
-        </dd>
-        <dt>{t('export.link')}</dt>
-        <dd data-link-state={expired ? 'expired' : 'valid'}>
-          {expired ? <Badge tone="neutral">{t('export.link.expired')}</Badge> : <Badge tone="positive">{t('export.link.valid', { time: formatDateTime(a.expires_at) ?? a.expires_at })}</Badge>}
-        </dd>
-        <dt>{t('export.size')}</dt>
-        <dd data-byte-size={a.byte_size}>{t('export.size.value', { bytes: formatNumber(a.byte_size) ?? String(a.byte_size) })}</dd>
-        <dt>{t('export.mediaType')}</dt>
-        <dd>
-          <code className="pg-code">{a.media_type}</code>
-        </dd>
-      </dl>
+      <p><strong>{a.format === 'pdf' ? 'Готовый отчёт по расчёту' : 'Таблица расчёта для дальнейшей работы'}</strong><br /><span className="pg-muted">Сформирован {formatDateTime(a.created_at)}</span></p>
       <Button size="sm" variant="primary" icon="upload" busy={download.isPending} onClick={() => download.mutate()}>
-        {t('export.download', { format: a.format.toUpperCase() })}
+        {a.format === 'pdf' ? 'Скачать PDF-отчёт' : 'Скачать таблицу XLSX'}
       </Button>
+      <details className="exp-artifact__technical">
+        <summary>Техническая информация и целостность файла</summary>
+        <dl className="pg-dl">
+          <dt>SHA-256</dt>
+          <dd><code className="pg-code" title={a.sha256}>{a.sha256.slice(0, 16)}…</code></dd>
+          <dt>{t('export.link')}</dt>
+          <dd data-link-state={expired ? 'expired' : 'valid'}>{expired ? <Badge tone="neutral">{t('export.link.expired')}</Badge> : <Badge tone="positive">{t('export.link.valid', { time: formatDateTime(a.expires_at) ?? a.expires_at })}</Badge>}</dd>
+          <dt>{t('export.size')}</dt>
+          <dd data-byte-size={a.byte_size}>{t('export.size.value', { bytes: formatNumber(a.byte_size) ?? String(a.byte_size) })}</dd>
+          <dt>{t('export.mediaType')}</dt>
+          <dd><code className="pg-code">{a.media_type}</code></dd>
+        </dl>
+      </details>
       {downloaded ? (
         downloaded.matches ? (
           <p className="pg-muted" role="status" data-download-ok="true">

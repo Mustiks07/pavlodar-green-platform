@@ -171,7 +171,7 @@ export function RecommendationPanel({
 
   if (available === false) return null;
   return (
-    <section className="rec-panel" aria-labelledby="rec-panel-title">
+    <section className="rec-panel" id="scenario-recommendation" aria-labelledby="rec-panel-title">
       <header className="rec-panel__head">
         <span>
           <small>Автоматический подбор</small>

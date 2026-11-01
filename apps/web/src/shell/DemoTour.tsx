@@ -34,7 +34,6 @@ export function DemoTour({ open, onClose }: { open: boolean; onClose: () => void
   });
   const heroZone = zones.data?.find((item) => item.name === 'Двор жилого квартала');
   const hero = projects.data?.find((item) => item.name === 'Вариант B · экономия воды' && item.zone_id === heroZone?.id);
-  const query = city ? `?city=${encodeURIComponent(city.id)}` : '';
   return (
     <Dialog open={open} title="Маршрут показа · 3 минуты" onClose={onClose} footer={<Button onClick={onClose}>Закрыть</Button>}>
       <div className="demo-tour__lead">
@@ -44,7 +43,12 @@ export function DemoTour({ open, onClose }: { open: boolean; onClose: () => void
       <ol className="demo-tour__steps">
         {STEPS.map((step, index) => {
           const path = step.path === '/projects' && hero ? `/projects/${hero.id}` : step.path;
-          const href = `${path}${query}`;
+          const hrefParams = new URLSearchParams(city ? { city: city.id } : {});
+          if (step.path === '/compare' && heroZone) {
+            const revisions = (projects.data ?? []).filter((item) => item.zone_id === heroZone.id).map((item) => item.current_revision_id).slice(0, 3);
+            if (revisions.length >= 2) hrefParams.set('revisions', revisions.join(','));
+          }
+          const href = `${path}${hrefParams.size ? `?${hrefParams}` : ''}`;
           return (
             <li key={step.path}>
               <span className="demo-tour__number">{index + 1}</span>

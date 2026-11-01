@@ -62,11 +62,19 @@ function MetricCell({ m }: { m: Metric | null }) {
   );
 }
 
-function SnapshotSummary({ snapshot, scenario, city, zoneName }: { snapshot: CalculationSnapshot; scenario: Scenario | undefined; city: City; zoneName: string }) {
+function SnapshotSummary({ snapshot, scenario, city, zoneName, impactHorizon, impactKeys }: { snapshot: CalculationSnapshot; scenario: Scenario | undefined; city: City; zoneName: string; impactHorizon: number | null; impactKeys: string[] }) {
   const knownCost = snapshot.cost.status === 'complete' || Number(snapshot.cost.known_subtotal) > 0;
   const careMonths = [...new Set(snapshot.care.map((item) => item.month))].sort((a, b) => a - b);
-  const impactHorizon = Math.max(0, ...snapshot.ecosystem.map((item) => item.horizon_year ?? 0));
-  const impact = snapshot.ecosystem.filter((item) => item.horizon_year === impactHorizon && item.value !== null).slice(0, 2);
+  const wateringRates = [...new Set(snapshot.care.filter((item) => item.water_m3 > 0).map((item) => item.water_m3))];
+  const yearOne = snapshot.survival
+    .map((result) => result.points.find((point) => point.year === 1)?.probability)
+    .filter((value): value is number => value !== null && value !== undefined);
+  const survivalMin = yearOne.length ? Math.min(...yearOne) : null;
+  const survivalMax = yearOne.length ? Math.max(...yearOne) : null;
+  const survivalRange = survivalMin === null || survivalMax === null
+    ? 'ещё не рассчитана'
+    : `${survivalMin === survivalMax ? formatNumber(survivalMin * 100, 0) : `${formatNumber(survivalMin * 100, 0)}–${formatNumber(survivalMax * 100, 0)}`}% через 1 год`;
+  const impact = impactHorizon === null ? [] : impactKeys.map((key) => snapshot.ecosystem.find((item) => item.key === key && item.horizon_year === impactHorizon && item.value !== null)).filter((item): item is Metric => Boolean(item));
   return (
     <article className="cmp-summary-card">
       <header>
@@ -76,11 +84,12 @@ function SnapshotSummary({ snapshot, scenario, city, zoneName }: { snapshot: Cal
       <dl>
         <div><dt>Известная стоимость</dt><dd>{knownCost ? <MoneyText value={snapshot.cost.known_subtotal} /> : 'нужны расценки'}</dd></div>
         <div><dt>Календарь ухода</dt><dd>{careMonths.length ? `${careMonths.length} мес. работ` : 'ещё не рассчитан'}</dd></div>
-        <div><dt>Приживаемость</dt><dd>{snapshot.survival.length ? `${snapshot.survival.length} групп посадок` : 'ещё не рассчитана'}</dd></div>
+        <div><dt>Полив по плану</dt><dd>{wateringRates.length === 1 ? `${formatNumber(wateringRates[0], 2)} м³ на операцию` : wateringRates.length > 1 ? 'разные нормы по операциям' : 'не задан'}</dd></div>
+        <div><dt>Приживаемость</dt><dd>{survivalRange}</dd></div>
       </dl>
       {impact.length ? (
         <div className="cmp-summary-card__impact">
-          <small>Эффект через {impactHorizon} лет</small>
+          <small>Сопоставимый эффект через {impactHorizon} лет</small>
           {impact.map((metric) => (
             <span key={`${metric.key}:${metric.horizon_year}`}><em>{metricLabel(metric.key)}</em><strong><MetricCell m={metric} /></strong></span>
           ))}
@@ -94,7 +103,8 @@ function SnapshotSummary({ snapshot, scenario, city, zoneName }: { snapshot: Cal
 /**
  * Comparison of 2–3 scenario revisions through compareScenarios (ADR-027): the server picks each
  * revision's latest immutable CalculationSnapshot and returns them unchanged with comparability
- * warnings. The browser only lays them side by side: no differences, sums or conversions.
+ * warnings. The browser lays them side by side and points to minima among the exact returned values;
+ * it does not recompute cost, survival, care or ecosystem formulas.
  */
 export function ComparePanel({ city }: { city: City }) {
   const { user } = useSession();
@@ -148,6 +158,22 @@ export function ComparePanel({ city }: { city: City }) {
   const result = compare.data;
   const snapshots = result?.snapshots ?? [];
   const rows = metricRows(snapshots);
+  const commonImpactHorizons = snapshots.length ? [...new Set(snapshots[0]!.ecosystem.map((item) => item.horizon_year).filter((value): value is number => value !== null))]
+    .filter((horizon) => snapshots.every((snapshot) => snapshot.ecosystem.some((item) => item.horizon_year === horizon && item.value !== null)))
+    .sort((a, b) => b - a) : [];
+  const commonImpactHorizon = commonImpactHorizons[0] ?? null;
+  const commonImpactKeys = commonImpactHorizon === null || !snapshots.length ? [] : [...new Set(snapshots[0]!.ecosystem.filter((item) => item.horizon_year === commonImpactHorizon && item.value !== null).map((item) => item.key))]
+    .filter((key) => snapshots.every((snapshot) => snapshot.ecosystem.some((item) => item.key === key && item.horizon_year === commonImpactHorizon && item.value !== null)))
+    .slice(0, 2);
+  const sameCurrency = snapshots.length > 1 && new Set(snapshots.map((snapshot) => snapshot.cost.currency)).size === 1;
+  const lowestCost = sameCurrency ? snapshots
+    .filter((snapshot) => Number.isFinite(Number(snapshot.cost.known_subtotal)))
+    .sort((left, right) => Number(left.cost.known_subtotal) - Number(right.cost.known_subtotal))[0] : undefined;
+  const wateringCandidates = snapshots.map((snapshot) => {
+    const rates = [...new Set(snapshot.care.filter((item) => item.water_m3 > 0).map((item) => item.water_m3))];
+    return rates.length === 1 ? { snapshot, value: rates[0]! } : null;
+  }).filter((item): item is { snapshot: CalculationSnapshot; value: number } => item !== null);
+  const lowestWatering = wateringCandidates.sort((left, right) => left.value - right.value)[0];
   const problem = compare.error instanceof ApiError ? compare.error.problem : null;
   return (
     <div className="cmp" data-compared={snapshots.map((s) => s.id).join(',') || undefined}>
@@ -222,10 +248,19 @@ export function ComparePanel({ city }: { city: City }) {
           ) : (
             <p className="pg-muted">{t('compare.noWarnings')}</p>
           )}
+          {lowestCost || lowestWatering ? (
+            <section className="cmp-orient" aria-label="Ключевые ориентиры сравнения">
+              <header><small>Быстрый вывод</small><strong>Ключевые ориентиры среди выбранных вариантов</strong></header>
+              <div>
+                {lowestCost ? <article><small>Минимальная известная стоимость</small><strong>{byRevision.get(lowestCost.scenario_revision_id)?.name ?? 'Проект участка'}</strong><span><MoneyText value={lowestCost.cost.known_subtotal} /></span></article> : null}
+                {lowestWatering ? <article><small>Минимальный полив на операцию</small><strong>{byRevision.get(lowestWatering.snapshot.scenario_revision_id)?.name ?? 'Проект участка'}</strong><span>{formatNumber(lowestWatering.value, 2)} м³</span></article> : null}
+              </div>
+            </section>
+          ) : null}
           <div className="cmp-summary-grid">
             {snapshots.map((snapshot) => {
               const scenario = byRevision.get(snapshot.scenario_revision_id);
-              return <SnapshotSummary key={snapshot.id} snapshot={snapshot} scenario={scenario} city={city} zoneName={scenario ? (zoneNames.get(scenario.zone_id) ?? 'Проект участка') : 'Проект участка'} />;
+              return <SnapshotSummary key={snapshot.id} snapshot={snapshot} scenario={scenario} city={city} zoneName={scenario ? (zoneNames.get(scenario.zone_id) ?? 'Проект участка') : 'Проект участка'} impactHorizon={commonImpactHorizon} impactKeys={commonImpactKeys} />;
             })}
           </div>
           <details className="cmp-details">

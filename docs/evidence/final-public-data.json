@@ -1,7 +1,7 @@
 {
   "passed": true,
   "scope": "Verified public Pavlodar v2 vectors through HTTP/upload/worker/review/publication/MVT/card",
-  "package_manifest_sha256": "3f480182a9aa65402da939402a6a4239770e7950e3e6aa880eec2562164abc5d",
+  "package_manifest_sha256": "09f1320140d6e2d8133e1eafc56432732bdde160d54738f62dc7d46f1df22436",
   "working_bbox_epsg4326": [
     76.86,
     52.2,
@@ -14,16 +14,16 @@
   "datasets": [
     {
       "profile": "buildings",
-      "dataset_id": "377a2b0f-ab4c-4c33-914a-7b8dc644a1c1",
-      "dataset_version_id": "0b6798e3-6328-4add-bde6-2de812a26ce1",
+      "dataset_id": "cafdc591-4a42-448c-980e-eed0826d3fee",
+      "dataset_version_id": "e0c4c50e-6171-4f5d-a370-86bf9fc3fd9b",
       "sha256": "9815dc07879e74eb2928de2f5499d1df17917d4d5c9871f991d4789ce7dadb60",
       "record_count": 49552,
       "status": "published",
       "tiles": [
         {
-          "layer_id": "a6073ca1-4fdf-598b-9f23-8056acb26add",
+          "layer_id": "08d9a9de-8514-532e-8429-238b1c43dd8e",
           "geometry_type": "polygon",
-          "bytes": 45660
+          "bytes": 45724
         }
       ],
       "feature_card_source_record_id": "way/169855909",
@@ -31,16 +31,16 @@
     },
     {
       "profile": "roads",
-      "dataset_id": "19bf9858-9fff-440e-bca5-68ec1a12cd92",
-      "dataset_version_id": "4ade66a1-198d-4c3f-b462-d471c51fca26",
+      "dataset_id": "a5d00954-fc50-40b0-9328-ded011d4fd35",
+      "dataset_version_id": "853822c4-8651-4206-90ef-5ea806eaf768",
       "sha256": "a6b6cf888fba4037e5f9538b7bee5a02f6fb413c52e96e8987936eed07fd5f02",
       "record_count": 7746,
       "status": "published",
       "tiles": [
         {
-          "layer_id": "949c0caa-997f-5504-9c0e-7866b13979bd",
+          "layer_id": "050e1c47-4cb6-5b3b-9e86-dd6b793cf612",
           "geometry_type": "line",
-          "bytes": 50854
+          "bytes": 50883
         }
       ],
       "feature_card_source_record_id": "way/23490734",
@@ -48,14 +48,14 @@
     },
     {
       "profile": "green",
-      "dataset_id": "ad7e587d-3fe4-40bf-aeee-44e1821c4019",
-      "dataset_version_id": "eceedd27-07a7-4fb1-97a6-41872d60340c",
+      "dataset_id": "2450734f-7036-4214-8b11-3d29e0e35ae3",
+      "dataset_version_id": "4527d5d7-9c12-4905-8564-e07b6484e483",
       "sha256": "0393bb8a4f49367f408eb6c370a42b163b76fd7bfca378a962f5c61d66bfb84b",
       "record_count": 1043,
       "status": "published",
       "tiles": [
         {
-          "layer_id": "444b130c-05f0-5942-8976-5ec9ea2d7daf",
+          "layer_id": "b44455bf-57b2-5ad9-be7c-f0b2a5a59bc6",
           "geometry_type": "polygon",
           "bytes": 823
         }
@@ -65,14 +65,14 @@
     },
     {
       "profile": "trees",
-      "dataset_id": "a58e2423-e2bc-45f7-93c9-0cce54f5a353",
-      "dataset_version_id": "369db3b9-7d0d-4b79-a3dd-4e906603de22",
+      "dataset_id": "e9daf020-cfa8-475c-b6c0-88f80c045b1d",
+      "dataset_version_id": "c4d5555c-fc30-408d-a189-1e59eb89f2e7",
       "sha256": "2f3476ea67d6ee15f6e3f84b4b73777b6184f8db2e5eddf6397729828fd1dbdb",
       "record_count": 426,
       "status": "published",
       "tiles": [
         {
-          "layer_id": "c1490cc2-52ae-5383-831d-7e600b4cbc08",
+          "layer_id": "e7e096a2-0431-57dd-a2fc-ed563a425a32",
           "geometry_type": "point",
           "bytes": 583
         }
@@ -82,21 +82,21 @@
     },
     {
       "profile": "water",
-      "dataset_id": "bdbea55b-4f75-4f37-9146-392babd8257f",
-      "dataset_version_id": "8864fed6-fe77-416a-b5df-27c498cb76fb",
+      "dataset_id": "5f63d30b-f1f4-4e1a-b3f1-b677c9af9ed4",
+      "dataset_version_id": "c8a4f0fc-a0df-4f51-8737-ed5bfe3721f4",
       "sha256": "743a0c7178cf5ba4e1af3041803b04f76c4140348162b6063a1dc45b0ec50821",
       "record_count": 167,
       "status": "published",
       "tiles": [
         {
-          "layer_id": "54227577-35be-5f12-a6fe-0b212119241d",
-          "geometry_type": "polygon",
-          "bytes": 552
-        },
-        {
-          "layer_id": "e6b3bd04-8f6c-5cff-bd93-8c0b5a23137a",
+          "layer_id": "193f6aeb-98fa-5bae-aeb7-fe4fc4781534",
           "geometry_type": "line",
           "bytes": 873
+        },
+        {
+          "layer_id": "34b6c253-d35f-5a48-be77-10afdd45cfca",
+          "geometry_type": "polygon",
+          "bytes": 552
         }
       ],
       "feature_card_source_record_id": "way/22414514",
@@ -104,21 +104,21 @@
     },
     {
       "profile": "social_poi",
-      "dataset_id": "d5b4e442-385d-42cc-a967-5195541ca22f",
-      "dataset_version_id": "c111e696-7927-426a-be2a-44e3e245b919",
+      "dataset_id": "3d4520c9-61f0-4366-92bb-a0cc0087bfc9",
+      "dataset_version_id": "dc9b524d-8d06-477a-8daa-e51f6a689a0d",
       "sha256": "2205e6c69b6686d3140d641fd33a55fe7b305bb87f58809ec0215cf041995606",
       "record_count": 1210,
       "status": "published",
       "tiles": [
         {
-          "layer_id": "20a40571-b370-53e6-a6fc-5361c8e46bc7",
+          "layer_id": "0921f1bd-1beb-5dcf-bb03-28631d627da8",
           "geometry_type": "polygon",
           "bytes": 5411
         },
         {
-          "layer_id": "f01db368-d75c-59af-809c-95778455e683",
+          "layer_id": "2f79798a-1690-5a86-8d55-5a9dc155a446",
           "geometry_type": "point",
-          "bytes": 9976
+          "bytes": 9968
         }
       ],
       "feature_card_source_record_id": "node/636250015",

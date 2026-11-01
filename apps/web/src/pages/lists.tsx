@@ -522,7 +522,7 @@ function ProgramList({ city, columns }: { city: City; columns: Column<Program>[]
           { icon: 'table', label: 'Черновики', value: rows.filter((item) => item.status === 'draft').length, note: 'можно продолжить' },
         ]}
       />
-      <div className={selected ? 'app-split is-open' : 'app-split'}>
+      <div className={selected ? 'app-split program-workspace is-open' : 'app-split program-workspace'}>
         <ResourceList
         selectedId={selected}
         onSelect={(p) => setSelected(p.id)}
