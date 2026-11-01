@@ -566,7 +566,7 @@ function RevisionEditor({
           onChange={(id) => setEdits((e) => ({ ...e, rule_version_id: id }))}
           onUsable={setRuleOk}
         />
-        <Field label="Экологический коэффициент" hint="Необязательно. В расчёт попадёт только утверждённая неизменяемая версия.">
+        <Field label="Экологический профиль участка" hint="Необязательно. В расчёт попадёт только утверждённая неизменяемая версия.">
           {({ id, describedBy }) => (
             <Select
               id={id}
@@ -575,14 +575,27 @@ function RevisionEditor({
               onChange={(event) => setEdits((value) => ({ ...value, coefficient_version_id: event.target.value || null }))}
             >
               <option value="">Не выбран</option>
-              {(coefficients.data ?? []).map((item) => (
+              {(coefficients.data ?? []).map((item, index) => (
                 <option key={item.version_id} value={item.version_id}>
-                  {item.key} · {item.value} {item.unit} · {item.applicability}
+                  Экологический профиль участка{coefficients.data && coefficients.data.length > 1 ? ` ${index + 1}` : ''}
                 </option>
               ))}
             </Select>
           )}
         </Field>
+        {edits.coefficient_version_id ? (() => {
+          const coefficient = coefficients.data?.find((item) => item.version_id === edits.coefficient_version_id);
+          return coefficient ? (
+            <details className="scn-tech">
+              <summary>Техническая информация профиля</summary>
+              <dl className="pg-dl">
+                <dt>Показатель</dt><dd>{productLabel(coefficient.key)}</dd>
+                <dt>Значение</dt><dd>{coefficient.value} {coefficient.unit}</dd>
+                <dt>Применимость</dt><dd>{productLabel(coefficient.applicability)}</dd>
+              </dl>
+            </details>
+          ) : null;
+        })() : null}
         {coefficients.isError ? <ApiErrorView compact error={coefficients.error} onRetry={() => void coefficients.refetch()} /> : null}
         <Field label="Погодные данные" hint="Необязательно. Выбранная опубликованная версия закрепится в сценарии для теплового расчёта.">
           {({ id, describedBy }) => (

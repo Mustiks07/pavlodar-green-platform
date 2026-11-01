@@ -8,6 +8,7 @@ import { ApiErrorView } from '../../shell/ApiErrorView';
 import { OperationUnavailable } from '../../shell/OperationUnavailable';
 import { useSession } from '../../shell/session';
 import { isUuid } from '../map/publishedLayers';
+import { productLabel } from '../../productCopy';
 
 /** Mirrors the server gate: an explicit synthetic estimate may drive a draft, never approval. */
 export const ruleUsable = (r: RuleVersion) => (
@@ -31,7 +32,14 @@ function statusOf(r: RuleVersion): { tone: Tone; label: string } {
 }
 
 const revisionText = (r: RuleVersion) => t('rule.revision', { date: formatDate(r.revision_date) ?? r.revision_date });
-const optionLabel = (r: RuleVersion) => `${r.parameter} · ${r.act_number}, п. ${r.clause} · ${revisionText(r)}`;
+
+function ruleTitle(r: RuleVersion) {
+  const parameter = r.parameter.toLowerCase();
+  if (parameter.includes('plant') || parameter.includes('посад')) return 'Правила размещения растений';
+  return productLabel(r.parameter).replaceAll('_', ' ');
+}
+
+const optionLabel = (r: RuleVersion) => `${ruleTitle(r)} · ${revisionText(r)}`;
 
 /** Rule versions of the city the user may read (listRuleVersions, all statuses), bounded paging. */
 function useRuleVersions(cityId: string | null, enabled: boolean) {
@@ -58,25 +66,32 @@ function RuleDetails({ rule }: { rule: RuleVersion }) {
   const s = statusOf(rule);
   return (
     <div className="pl-rule__info" role="status">
+      <strong>{ruleTitle(rule)}</strong>
       <Badge tone={s.tone} icon={ruleUsable(rule) ? 'checkCircle' : 'alert'}>
         {s.label}
       </Badge>
-      <dl className="pg-dl">
-        <dt>{t('rule.parameter')}</dt>
-        <dd>
-          {rule.parameter}
-          {rule.value !== null ? ` = ${String(rule.value)}${rule.unit ? ` ${rule.unit}` : ''}` : ''}
-        </dd>
-        <dt>{t('rule.act')}</dt>
-        <dd>
-          {rule.act_number}, п. {rule.clause} · {revisionText(rule)}
-        </dd>
-        <dt>{t('rule.applicability')}</dt>
-        <dd>
-          {rule.applicability}
-          {rule.condition ? ` · ${rule.condition}` : ''}
-        </dd>
-      </dl>
+      <p className="pg-muted">Версия закрепляется в проекте и проверяется сервером при сохранении.</p>
+      <details className="scn-tech">
+        <summary>Техническая информация</summary>
+        <dl className="pg-dl">
+          <dt>{t('rule.parameter')}</dt>
+          <dd>
+            {productLabel(rule.parameter)}
+            {rule.value !== null ? ` = ${String(rule.value)}${rule.unit ? ` ${rule.unit}` : ''}` : ''}
+          </dd>
+          <dt>{t('rule.act')}</dt>
+          <dd>
+            {productLabel(rule.act_number)}, п. {productLabel(rule.clause)} · {revisionText(rule)}
+          </dd>
+          <dt>{t('rule.applicability')}</dt>
+          <dd>
+            {productLabel(rule.applicability)}
+            {rule.condition ? ` · ${productLabel(rule.condition)}` : ''}
+          </dd>
+          <dt>Статус исходной записи</dt>
+          <dd>{productLabel(rule.source_status)}</dd>
+        </dl>
+      </details>
       {ruleUsable(rule) ? null : (
         <Notice tone="warning" title={t('rule.unusable')}>
           {rule.superseded_by ? t('rule.supersededBy', { id: rule.superseded_by.slice(0, 8) }) : null}
