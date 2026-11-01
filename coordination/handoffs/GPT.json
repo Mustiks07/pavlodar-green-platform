@@ -1126,5 +1126,27 @@
     "decision": "ADR-063",
     "evidence": "docs/evidence/jury-assistant-recommendation",
     "limit": "Calculation, optimization and export remain separate explicitly confirmed actions"
+  },
+  "editable_care_resource_plan_20261102": {
+    "implementation_sha": "76aa53e",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Existing custom care operations can edit month, quantity, water, crew minutes and visits without altering frozen rule/rate lineage",
+      "Annual water, crew and visit limits use the canonical ResourceLimit structure with null distinct from zero",
+      "Save creates the ordinary immutable ScenarioRevision and the existing save-and-recalculate path runs the full server calculation",
+      "care_resource_exceeded now returns a localized field error bound to the exact year and resource input",
+      "Shrinking the horizon past existing operations blocks save instead of silently deleting work"
+    ],
+    "verification": [
+      "Focused server care calculation and resource-limit test passed",
+      "Frontend typecheck and production build passed",
+      "Authenticated hero-project browser acceptance passed 7/7",
+      "Zero water was rejected with planned 3 m3 versus available 0 m3 while the exact revision stayed current",
+      "Reviewed normal and rejection screenshots show a responsive full-width resource editor"
+    ],
+    "decision": "ADR-064",
+    "evidence": "docs/evidence/jury-care-plan",
+    "limit": "The editor does not invent new operations or claim that water edits alter survival unless the frozen model calculates it"
   }
 }
