@@ -1,0 +1,44 @@
+{
+  "base": "http://localhost:5173",
+  "checks": [
+    {
+      "name": "exact hero project exists",
+      "pass": true
+    },
+    {
+      "name": "calculated project opens an editable annual care plan",
+      "pass": true
+    },
+    {
+      "name": "water, crew and visit limits are visible together",
+      "pass": true
+    },
+    {
+      "name": "server binds the resource rejection to the exact water limit",
+      "pass": true,
+      "detail": "По плану 3 м³, доступно 0 м³."
+    },
+    {
+      "name": "rejected plan preserves the existing immutable revision",
+      "pass": true,
+      "detail": {
+        "originalRevision": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674",
+        "currentRevision": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674"
+      }
+    },
+    {
+      "name": "local value stays available for correction",
+      "pass": true
+    },
+    {
+      "name": "no API 5xx occurred",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "passed": true,
+  "screenshots": [
+    "docs/evidence/jury-care-plan/care-plan-editor.png",
+    "docs/evidence/jury-care-plan/care-plan-resource-rejected.png"
+  ]
+}

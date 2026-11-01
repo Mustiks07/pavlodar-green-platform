@@ -1,4 +1,4 @@
-.care-plan-editor { display: grid; gap: 1rem; padding: 1rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius-lg); background: var(--pg-surface-2); }
+.care-plan-editor { display: grid; grid-column: 1 / -1; min-width: 0; gap: 1rem; padding: 1rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius-lg); background: var(--pg-surface-2); }
 .care-plan-editor > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 .care-plan-editor > header small { color: var(--pg-accent); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .care-plan-editor > header h3 { margin: .2rem 0 0; }

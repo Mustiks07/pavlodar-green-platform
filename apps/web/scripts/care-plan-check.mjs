@@ -47,6 +47,8 @@ try {
   await action.click();
   const editor = page.locator('#scenario-care-editor');
   await editor.waitFor({ state: 'visible', timeout: 10_000 });
+  await editor.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
   check('calculated project opens an editable annual care plan', (await editor.locator('article').count()) > 0);
   check('water, crew and visit limits are visible together', await editor.getByLabel('Лимит воды, м³').isVisible() && await editor.getByLabel('Лимит работы бригады, мин').isVisible() && await editor.getByLabel('Лимит выездов').isVisible());
   await page.screenshot({ path: resolve(output, 'care-plan-editor.png') });
@@ -62,6 +64,8 @@ try {
   check('rejected plan preserves the existing immutable revision', currentRevision === originalRevision, { originalRevision, currentRevision });
   check('local value stays available for correction', await editor.getByLabel('Лимит воды, м³').inputValue() === '0');
   check('no API 5xx occurred', serverErrors.length === 0, serverErrors);
+  await editor.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
   await page.screenshot({ path: resolve(output, 'care-plan-resource-rejected.png') });
   await page.getByRole('button', { name: 'Отменить правки' }).click();
 } finally {
