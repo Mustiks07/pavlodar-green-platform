@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "cb046cb91ef25e669acabeb0fd09ec9a4339b7a0",
-  "state": "mandatory_3d_decision_loop_verified",
+  "head_sha": "26849eb",
+  "state": "mandatory_ai_number_lineage_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -963,5 +963,29 @@
       "Underground networks are not available and are not claimed as checked",
       "Unknown plant dimensions remain schematic and no authoritative growth curve is invented"
     ]
+  },
+  "mandatory_ai_number_lineage_20261102": {
+    "implementation_sha": "26849eb",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Persisted first-year survival metrics are attached as exact server Fact cards",
+      "Every fact discloses calculation snapshot, revision, method and source records",
+      "Friendly exact-result and canonical calculation-manifest links are one click away",
+      "Raw provider echoes of JSON, UUIDs and context fields fall back to a concise grounded Russian summary"
+    ],
+    "live_result": {
+      "scenario_id": "501255a4-582f-4127-ad61-86653fdf42e5",
+      "revision_id": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674",
+      "calculation_snapshot_id": "367ec1b8-e255-45d5-91e3-d7abc8c76b90",
+      "first_year_survival": "88% for 5 placement groups"
+    },
+    "verification": [
+      "Focused backend lineage and presentation tests passed",
+      "Frontend typecheck and production build passed",
+      "Authenticated live reply exposed five source-backed facts, both exact links, no browser errors and no API 5xx"
+    ],
+    "evidence": "docs/evidence/jury-assistant-lineage/assistant-number-lineage.png",
+    "limit": "Zone-area facts expose the server method but the current Fact contract has no ZoneVersion lineage field"
   }
 }
