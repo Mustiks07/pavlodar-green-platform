@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "dc3a45a",
-  "state": "jury_job_status_polished",
+  "head_sha": "124c615",
+  "state": "assistant_plant_decision_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1148,5 +1148,27 @@
     "decision": "ADR-064",
     "evidence": "docs/evidence/jury-care-plan",
     "limit": "The editor does not invent new operations or claim that water edits alter survival unless the frozen model calculates it"
+  },
+  "assistant_plant_decision_20261102": {
+    "implementation_sha": "124c615",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "An explicit assistant request prepares a reviewable replacement of the first unlocked placement with the best different admitted candidate",
+      "The server reuses the exact authorized frozen zone, catalog, rule, exclusions and recommendation weights",
+      "Only plant_id changes; quantity, position, dates, dimensions and frozen versions remain unchanged",
+      "The proposal card resolves Russian plant names and requires the existing explicit Apply or Reject decision",
+      "A pending or rejected proposal never mutates the ScenarioRevision"
+    ],
+    "verification": [
+      "Focused backend chat integration passed 14/14",
+      "Frontend proposal component passed 4/4 and production build passed",
+      "Authenticated hero-project browser acceptance passed 10/10",
+      "Reviewed evidence shows Сосна обыкновенная to Тополь белый with pending decision controls",
+      "No API 5xx occurred and explicit rejection preserved the exact current revision"
+    ],
+    "decision": "ADR-065",
+    "evidence": "docs/evidence/jury-assistant-recommendation",
+    "limit": "The deterministic shortcut targets the first unlocked placement; free-form multi-placement editing remains in the scenario editor"
   }
 }

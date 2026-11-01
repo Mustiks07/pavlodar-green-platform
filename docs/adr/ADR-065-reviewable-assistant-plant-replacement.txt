@@ -1,0 +1,27 @@
+ADR-065: Assistant plant replacement remains a human-reviewed immutable proposal
+Status: accepted
+Date: 2026-11-02
+
+Context
+The server-owned assistant could rank plants from the exact frozen zone, catalog and rule versions, but
+the workflow stopped at a list. A specialist then had to search for the chosen species manually in the
+scenario editor. This broke the required chain from recommendation to a reviewable project decision.
+
+Decision
+Add an allowlisted propose_placement_plant tool. For an explicit request, the server selects the first
+unlocked placement and the highest ranked eligible or requires-review candidate that differs from its
+current plant. The selection uses the same authorized server-owned recommendation, exclusions, locked
+plants and fixed weights as the read-only ranking. It changes only plant_id; quantity, point, date,
+dimensions and all frozen versions remain unchanged.
+
+The tool never applies its result. It stores the ordinary pending Proposal against the exact current draft
+revision. The UI resolves both plant names and presents a readable before/after decision. The existing
+explicit Apply action re-reads If-Match, creates an immutable ScenarioRevision and can start the normal
+full calculation; Reject records the decision without changing the project.
+
+Consequences
+The jury path is now continuous: ask for a grounded selection, ask to prepare the best replacement, review
+the exact species change and explicitly decide it. A stale revision, locked placement, excluded plant,
+foreign catalog or absent alternative fails closed. No provider-selected number or free-form mutation is
+treated as a project change.
+
