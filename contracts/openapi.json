@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.15.0",
-    "description": "Canonical API contract 1.15.0. Plant reads may bind to an immutable catalog version so historical scenario editing never drifts to the current catalog. All 1.14.1 operations remain compatible."
+    "version": "1.16.0",
+    "description": "Canonical API contract 1.16.0. Work-order calendars support server-side zone, operation, assignee, status and inclusive overlapping-date filters. All 1.15.0 operations remain compatible."
   },
   "servers": [
     {
@@ -3951,6 +3951,38 @@
                 "completed",
                 "cancelled"
               ]
+            }
+          },
+          {
+            "name": "operation",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "assignee_group",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "planned_from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "planned_to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
             }
           }
         ],

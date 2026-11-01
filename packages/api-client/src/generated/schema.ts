@@ -5258,6 +5258,10 @@ export interface operations {
                 limit?: number;
                 zone_id?: string;
                 status?: "planned" | "assigned" | "in_progress" | "completed" | "cancelled";
+                operation?: string;
+                assignee_group?: string;
+                planned_from?: string;
+                planned_to?: string;
             };
             header?: never;
             path?: never;

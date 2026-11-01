@@ -737,9 +737,22 @@ export function CatalogPage() {
 export function ExecutionPage() {
   const session = useSession();
   const [status, setStatus] = useFilter('status', ['planned', 'assigned', 'in_progress', 'completed', 'cancelled'] as const);
+  const [zoneId, setZoneId] = useFilter('zone');
+  const [operation, setOperation] = useFilter('operation');
+  const [assignee, setAssignee] = useFilter('assignee');
+  const [plannedFrom, setPlannedFrom] = useFilter('from');
+  const [plannedTo, setPlannedTo] = useFilter('to');
+  const [executionParams, setExecutionParams] = useSearchParams();
   const [order, setOrder] = useSelected('order');
   const [cohort, setCohort] = useSelected('cohort');
   const [orders, setOrders] = useState<WorkOrder[]>([]);
+  const zones = useZones(session.city?.id ?? null);
+  const clearWorkFilters = () => {
+    const next = new URLSearchParams(executionParams);
+    for (const key of ['status', 'zone', 'operation', 'assignee', 'from', 'to']) next.delete(key);
+    setExecutionParams(next, { replace: true });
+  };
+  const activeWorkFilters = [status, zoneId, operation, assignee, plannedFrom, plannedTo].filter(Boolean).length;
   const orderPresence = useQuery({
     queryKey: ['execution-order-presence', session.city?.id ?? ''],
     enabled: Boolean(session.city),
@@ -824,7 +837,7 @@ export function ExecutionPage() {
                   resource="work-orders"
                   operationId="listWorkOrders"
                   caption={t('page.execution')}
-                  params={{ city: city.id, status }}
+                  params={{ city: city.id, status, zoneId, operation, assignee, plannedFrom, plannedTo }}
                   columns={columns}
                   getRowId={(w) => w.id}
                   onRows={setOrders}
@@ -853,6 +866,27 @@ export function ExecutionPage() {
                           </Select>
                         )}
                       </Field>
+                      <Field label="Участок">
+                        {({ id }) => (
+                          <Select id={id} value={zoneId} onChange={(e) => setZoneId(e.target.value)}>
+                            <option value="">Все участки</option>
+                            {(zones.data?.items ?? []).map((zone) => <option key={zone.id} value={zone.id}>{zone.name}</option>)}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field label="Операция">
+                        {({ id }) => <Input id={id} type="search" value={operation} placeholder="Например, полив" onChange={(e) => setOperation(e.target.value)} />}
+                      </Field>
+                      <Field label="Бригада">
+                        {({ id }) => <Input id={id} type="search" value={assignee} placeholder="Название группы" onChange={(e) => setAssignee(e.target.value)} />}
+                      </Field>
+                      <Field label="Работы с">
+                        {({ id }) => <Input id={id} type="date" value={plannedFrom} onChange={(e) => setPlannedFrom(e.target.value)} />}
+                      </Field>
+                      <Field label="Работы до">
+                        {({ id }) => <Input id={id} type="date" value={plannedTo} onChange={(e) => setPlannedTo(e.target.value)} />}
+                      </Field>
+                      {activeWorkFilters ? <Button size="sm" variant="ghost" icon="x" onClick={clearWorkFilters}>Сбросить фильтры ({activeWorkFilters})</Button> : null}
                       <CreateWorkOrder city={city} onCreated={setOrder} />
                     </>
                   }
@@ -860,7 +894,19 @@ export function ExecutionPage() {
                     (
                       await unwrap(
                         api.GET('/v1/work-orders', {
-                          params: { query: { city_id: city.id, cursor, limit: 100, status: status || undefined } },
+                          params: {
+                            query: {
+                              city_id: city.id,
+                              cursor,
+                              limit: 100,
+                              zone_id: zoneId || undefined,
+                              status: status || undefined,
+                              operation: operation.trim() || undefined,
+                              assignee_group: assignee.trim() || undefined,
+                              planned_from: plannedFrom || undefined,
+                              planned_to: plannedTo || undefined,
+                            },
+                          },
                           signal,
                         }),
                       )

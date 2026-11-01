@@ -1,0 +1,24 @@
+ADR-071: Work calendar filters are server-backed and linkable
+Status: accepted
+Date: 2026-11-02
+
+Context
+The execution workspace could filter work orders only by status. F-CARE-03 requires a dispatcher to
+find work by zone, operation, time window, assignee and status. Client-side filtering would be wrong for
+paginated, role-filtered data and would produce incomplete results after reload.
+
+Decision
+Contract 1.16.0 extends listWorkOrders with optional operation, assignee_group, planned_from and
+planned_to. Operation and assignee use trimmed case-insensitive substring matching. A requested date
+range selects orders whose planned window overlaps it, with inclusive boundaries. planned_from after
+planned_to returns invalid_parameter with a field error. All filters execute before authorization-aware
+keyset pagination, and the cursor context contains every filter.
+
+The execution screen stores zone, operation, assignee, date range and status in the URL. It sends them
+to listWorkOrders, offers exact known zones, reports the number of active filters and clears only those
+filters without losing the selected order. No row is filtered or modified in the browser.
+
+Consequences
+Shared links and reloads restore the same authorized work calendar. Changing a filter invalidates a
+cursor rather than mixing pages. A viewer still sees only completed work orders. District is deliberately
+absent because neither Zone nor WorkOrder stores an authoritative district field.

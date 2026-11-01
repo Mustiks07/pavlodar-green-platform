@@ -218,7 +218,7 @@ route('get','/v1/jobs/{job_id}/events','streamJobEvents',None,desc='SSE: id=<eve
 paths['/v1/jobs/{job_id}/events']['get']['responses']['200']['content']={'text/event-stream':{'schema':st()}}
 paths['/v1/jobs/{job_id}/events']['get']['parameters'].append({'name':'Last-Event-ID','in':'header','schema':text})
 route('post','/v1/work-orders','createWorkOrder','WorkOrder','WorkOrderCreate',201,'specialist',etag=True)
-route('get','/v1/work-orders','listWorkOrders',paginated('WorkOrder'),city=True,paging=True,query={'zone_id':uid,'status':S['WorkOrder']['properties']['status']})
+route('get','/v1/work-orders','listWorkOrders',paginated('WorkOrder'),city=True,paging=True,query={'zone_id':uid,'status':S['WorkOrder']['properties']['status'],'operation':text,'assignee_group':text,'planned_from':date,'planned_to':date})
 route('get','/v1/work-orders/{work_order_id}','getWorkOrder','WorkOrder',etag=True)
 route('post','/v1/work-orders/{work_order_id}/transitions','transitionWorkOrder','WorkOrder','WorkTransition',200,'specialist',etag=True,conditional=True)
 route('post','/v1/work-orders/{work_order_id}/completions','recordWorkCompletion','WorkCompletion','WorkCompletionCreate',201,'specialist',conditional=True)

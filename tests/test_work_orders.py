@@ -6,11 +6,84 @@ from sqlalchemy.exc import DBAPIError
 
 from packages.domain.contracts import validate
 from services.api.db import session
-from services.api.models import Scenario, ScenarioRevision, WorkCompletionRecord
+from services.api.models import Scenario, ScenarioRevision, WorkCompletionRecord, WorkOrderRecord
 from tests.test_foundation import create_scenario, mutation
 from tools.dev.seed import CITY_ID
 
 pytestmark = pytest.mark.integration
+
+
+def test_work_order_calendar_server_filters_and_cursor_binding(clients):
+    first_zone, _, first_scenario_response = create_scenario(clients["specialist"])
+    second_zone, _, second_scenario_response = create_scenario(clients["specialist"])
+
+    def create(zone, scenario, operation, start, end, crew):
+        response = mutation(
+            clients["specialist"],
+            "POST",
+            "/v1/work-orders",
+            {
+                "city_id": CITY_ID,
+                "scenario_revision_id": scenario["current_revision_id"],
+                "zone_id": zone["id"],
+                "operation": operation,
+                "planned_start": start,
+                "planned_end": end,
+                "quantity": 1,
+                "unit": "piece",
+                "assignee_group": crew,
+            },
+        )
+        assert response.status_code == 201, response.text
+        return response.json()["id"]
+
+    first = create(first_zone, first_scenario_response.json(), "SYNTHETIC TEST Полив деревьев", "2027-05-01", "2027-05-05", "SYNTHETIC Север")
+    second = create(first_zone, first_scenario_response.json(), "SYNTHETIC TEST Обрезка", "2027-05-05", "2027-05-08", "SYNTHETIC Юг")
+    third = create(second_zone, second_scenario_response.json(), "SYNTHETIC TEST Полив газона", "2027-06-01", "2027-06-03", "SYNTHETIC Север")
+    fourth = create(second_zone, second_scenario_response.json(), "SYNTHETIC TEST Осмотр", "2027-07-01", "2027-07-02", "SYNTHETIC Запад")
+    with session() as db, db.begin():
+        completed = db.get(WorkOrderRecord, fourth)
+        completed.status = "completed"
+        completed.payload = {**completed.payload, "status": "completed"}
+
+    def ids(**params):
+        response = clients["specialist"].get(
+            "/v1/work-orders", params={"city_id": CITY_ID, "limit": 100, **params}
+        )
+        assert response.status_code == 200, response.text
+        return {item["id"] for item in response.json()["items"]}
+
+    assert ids(zone_id=first_zone["id"]) == {first, second}
+    assert ids(operation="полив") == {first, third}
+    assert ids(assignee_group="север") == {first, third}
+    assert ids(planned_from="2027-05-05", planned_to="2027-05-05") == {first, second}
+    assert ids(
+        zone_id=first_zone["id"],
+        operation="полив",
+        assignee_group="север",
+        planned_from="2027-05-05",
+        planned_to="2027-05-05",
+        status="planned",
+    ) == {first}
+    invalid = clients["specialist"].get(
+        "/v1/work-orders",
+        params={"city_id": CITY_ID, "planned_from": "2027-07-01", "planned_to": "2027-06-01"},
+    )
+    assert invalid.status_code == 422
+    assert invalid.json()["code"] == "invalid_parameter"
+
+    page = clients["specialist"].get(
+        "/v1/work-orders", params={"city_id": CITY_ID, "operation": "полив", "limit": 1}
+    ).json()
+    assert page["next_cursor"]
+    mismatched = clients["specialist"].get(
+        "/v1/work-orders",
+        params={"city_id": CITY_ID, "operation": "полив", "assignee_group": "север", "limit": 1, "cursor": page["next_cursor"]},
+    )
+    assert mismatched.status_code == 422
+    assert clients["viewer"].get(
+        "/v1/work-orders", params={"city_id": CITY_ID, "limit": 100}
+    ).json()["items"] == [clients["viewer"].get(f"/v1/work-orders/{fourth}").json()]
 
 
 def test_work_order_partial_completion_correction_and_workflow(clients):

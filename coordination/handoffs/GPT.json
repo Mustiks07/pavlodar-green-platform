@@ -1273,5 +1273,25 @@
     ],
     "decision": "ADR-070",
     "limit": "Exclusion never auto-replaces or deletes a locked or unlocked planting; the user resolves the conflict explicitly"
+  },
+  "work_calendar_filters_20261102": {
+    "implementation_sha": "pending",
+    "contract_version": "1.16.0",
+    "migration": "none",
+    "implemented": [
+      "listWorkOrders filters by zone, operation, assignee, status and inclusive overlapping date window",
+      "All filters run before authorization-aware keyset pagination and are bound into cursor context",
+      "Invalid date ranges return a typed field error",
+      "The execution screen keeps all work filters in the URL and provides a complete filter reset",
+      "No client-side row filtering or inferred district data is used"
+    ],
+    "verification": [
+      "Canonical 1.16.0 validation passed 398 checks and generated clients match",
+      "Focused backend acceptance covers every filter, conjunction, inclusive dates, invalid range and cursor mismatch",
+      "Viewer disclosure remains limited to completed work orders",
+      "Frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-071",
+    "limit": "This increment searches existing work; calendar export and authoritative district assignment remain separate capabilities"
   }
 }
