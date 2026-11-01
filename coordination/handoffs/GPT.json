@@ -1063,5 +1063,23 @@
     ],
     "evidence": "docs/evidence/jury-program-priority",
     "limit": "Only green deficit and soil coverage are admitted in the current profile; unavailable social and heat factors are not invented"
+  },
+  "assistant_numeric_guard_20261102": {
+    "implementation_sha": "28baaad",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Every provider-authored numeric claim is checked against attached server Facts",
+      "Exact and display-rounded ratios, horizons, costs, areas and priority scores remain readable",
+      "Unsupported mixed prose is replaced with the bounded authorized-context summary",
+      "Tool-call prose may mention only the validated quantity and proposal summaries are server-owned"
+    ],
+    "verification": [
+      "Full tests/test_chat.py suite passed 12/12",
+      "Ruff and git diff whitespace checks passed",
+      "Git credential account verified as Mustiks07 id 232028042 before push"
+    ],
+    "decision": "ADR-061",
+    "limit": "The guard does not create missing municipal data or turn provider text into a calculation"
   }
 }
