@@ -1,0 +1,30 @@
+ADR-062: Deterministic jury tour over existing product records
+Status: accepted
+Date: 2026-11-02
+
+Context
+The "Demo 3 minutes" dialog linked to five generic pages and closed after every click. Its map step did
+not select a zone, so the promised project-planting layer could not load. It also stopped before the exact
+calculation, execution plan and export controls. A presenter still had to search through the product while
+speaking, and the route could accidentally land on an empty or unrelated record.
+
+Decision
+Resolve one coherent story from existing authorized API records: the named courtyard, its active problem,
+water-saving scenario, latest immutable calculation, three same-zone revisions, current optimized city
+program and its execution plan. Build exact deep links from those records; do not copy identifiers into the
+client or create presentation-only data.
+
+After any step opens, keep a compact seven-step dock above the application with Back, Next and Finish. Store
+only the current step number in session storage so reload resumes the presentation; every business object is
+resolved again through the API. The final project link carries the exact revision and calculation snapshot,
+where the existing server PDF/XLSX controls are available. The assistant remains an explicit final action
+bound to that project.
+
+Consequences
+The presenter can start once and advance through city map, exact problem, project, comparison, program,
+execution and report without manual search. Missing required records disable the start instead of opening a
+misleading generic screen. Focused authenticated acceptance verifies all seven links, the enabled project
+planting layer, identical final calculation after navigation, reload resume and zero API 5xx/page errors.
+
+This is navigation over the product, not a scripted mock. Values and records remain server-owned and all
+normal authorization checks still apply.

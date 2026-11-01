@@ -1,0 +1,67 @@
+{
+  "base": "http://localhost:5173",
+  "city": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "startedAt": "2026-11-01T22:45:52.725Z",
+  "checks": [
+    {
+      "name": "tour exposes the full seven-step decision story",
+      "pass": true
+    },
+    {
+      "name": "tour resolves exact existing demo objects before start",
+      "pass": true
+    },
+    {
+      "name": "map step opens the exact zone and enables proposed plantings",
+      "pass": true,
+      "detail": {
+        "zone": "caaa59c2-20ce-4364-b4b2-ae1cd7b11b4e"
+      }
+    },
+    {
+      "name": "problem step opens one exact active problem",
+      "pass": true
+    },
+    {
+      "name": "project step is bound to exact revision and calculation",
+      "pass": true
+    },
+    {
+      "name": "comparison step carries variants of the prepared territory",
+      "pass": true
+    },
+    {
+      "name": "program step opens the existing optimized revision",
+      "pass": true
+    },
+    {
+      "name": "execution step keeps the guided route visible",
+      "pass": true
+    },
+    {
+      "name": "final report step returns to the same exact calculation",
+      "pass": true,
+      "detail": {
+        "calculation": "faa26c5c-53b2-47de-a94e-29d854fb7904"
+      }
+    },
+    {
+      "name": "current step survives reload",
+      "pass": true
+    },
+    {
+      "name": "tour produced no API 5xx or page errors",
+      "pass": true,
+      "detail": {
+        "serverErrors": [],
+        "pageErrors": []
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/jury-demo-tour/01-tour-ready.png",
+    "docs/evidence/jury-demo-tour/07-exact-report-step.png"
+  ],
+  "finishedAt": "2026-11-01T22:46:02.174Z",
+  "passed": true
+}
