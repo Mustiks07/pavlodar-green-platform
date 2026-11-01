@@ -1255,7 +1255,7 @@
     "limit": "Rotation remains absent because canonical Placement has no orientation and the schematic 3D tree is rotationally symmetric"
   },
   "reviewable_species_exclusion_20261102": {
-    "implementation_sha": "pending",
+    "implementation_sha": "7ad8d13",
     "contract_version": "1.15.0",
     "migration": "none",
     "implemented": [
