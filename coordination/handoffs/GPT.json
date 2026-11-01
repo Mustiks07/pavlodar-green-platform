@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "124c615",
-  "state": "assistant_plant_decision_verified",
+  "head_sha": "941020c",
+  "state": "execution_handoff_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1170,5 +1170,25 @@
     "decision": "ADR-065",
     "evidence": "docs/evidence/jury-assistant-recommendation",
     "limit": "The deterministic shortcut targets the first unlocked placement; free-form multi-placement editing remains in the scenario editor"
+  },
+  "program_execution_handoff_20261102": {
+    "implementation_sha": "941020c",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "The selected ProgramRevision becomes a three-project approval queue when no factual work order exists",
+      "Each project exposes exact frozen operations, water, crew time, visits and nearest care period",
+      "Each queue card deep-links to the exact ScenarioRevision for internal approval",
+      "Zero factual KPIs, generic advertising and empty work-order/cohort tables stay hidden until factual execution begins"
+    ],
+    "verification": [
+      "Frontend typecheck and production build passed",
+      "Authenticated specialist acceptance passed 6/6",
+      "Reviewed 1600x1000 evidence shows all three exact project handoffs above the care timeline",
+      "No API 5xx occurred and no factual work order or inspection was invented"
+    ],
+    "decision": "ADR-066",
+    "evidence": "docs/evidence/jury-execution-handoff",
+    "limit": "The shared public demo correctly has no factual execution because its planning projects are not internally approved"
   }
 }

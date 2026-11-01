@@ -1,0 +1,25 @@
+ADR-066: An unapproved program is shown as a concrete handoff queue, not empty execution
+Status: accepted
+Date: 2026-11-02
+
+Context
+The execution screen already had an exact frozen care plan for three selected projects, but immediately
+followed it with four zero counters, generic guidance and empty work-order and cohort tables. That made the
+mandatory program-to-execution route look unfinished. Creating fictional work orders or inspections would
+misrepresent factual municipal work, while the current projects are intentionally not approved.
+
+Decision
+When no WorkOrder exists for the city, use the selected ProgramRevision calculations as an explicit
+"Очередь передачи в работу". Show the exact zone, scenario, operation count, water, crew time, visits and
+nearest period for each selected project, with a deep link to the exact ScenarioRevision for internal
+approval. Hide factual work-order KPIs, generic execution advertising and empty cohort tables until at
+least one real WorkOrder exists.
+
+When work orders do exist, keep the existing factual work-order, completion, cohort, inspection,
+replacement and forecast-observed workflow unchanged.
+
+Consequences
+The screen now communicates both what is already calculated and the next accountable action without
+inventing execution. The current public demo shows three projects, 36 operations, 27.0 m3 water, 58.5 crew
+hours and 36 visits, then routes each project to approval. Actual progress remains absent until recorded.
+
