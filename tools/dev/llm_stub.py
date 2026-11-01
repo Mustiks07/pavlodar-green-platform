@@ -1,4 +1,4 @@
-"""Deterministic OpenAI-compatible LLM stub for the isolated browser stack (loopback only).
+"""Deterministic OpenAI/Ollama-compatible LLM stub for the isolated browser stack.
 
 Nothing leaves the machine. The reply depends only on the request, so browser checks can drive
 every assistant state through the real API -> outbox -> worker -> provider path:
@@ -65,13 +65,37 @@ def reply(payload):
     }
 
 
+def ollama_reply(payload):
+    """Expose the same deterministic behaviour through Ollama's native chat shape."""
+    status, body = reply(payload)
+    if status != 200:
+        return status, body
+    message = body["choices"][0]["message"]
+    for call in message.get("tool_calls") or []:
+        arguments = call.get("function", {}).get("arguments")
+        if isinstance(arguments, str):
+            call["function"]["arguments"] = json.loads(arguments)
+    return 200, {
+        "model": payload.get("model") or "synthetic-local",
+        "message": message,
+        "done": True,
+        "prompt_eval_count": 1,
+        "eval_count": 1,
+    }
+
+
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        if not self.path.endswith("/chat/completions"):
+        if not (
+            self.path.endswith("/chat/completions") or self.path.endswith("/api/chat")
+        ):
             self.send_error(404)
             return
         length = int(self.headers.get("Content-Length") or 0)
-        status, body = reply(json.loads(self.rfile.read(length) or b"{}"))
+        payload = json.loads(self.rfile.read(length) or b"{}")
+        status, body = (
+            ollama_reply(payload) if self.path.endswith("/api/chat") else reply(payload)
+        )
         data = json.dumps(body, ensure_ascii=False).encode()
         self.send_response(status)
         self.send_header("Content-Type", "application/json")

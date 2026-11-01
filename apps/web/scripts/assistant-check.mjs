@@ -3,7 +3,8 @@
 // scenario, starts a chat bound to its exact revision, gets an answer whose numbers come only from
 // server facts, reloads mid-answer (session and job resume from the URL), cancels and retries,
 // sees a provider failure, receives two proposals, applies one with a fresh If-Match (new revision,
-// nothing applied before the confirmation), gets a 412 on the other (kept on screen, re-read
+// nothing applied before the confirmation), calculates and compares the applied revision, gets a
+// 412 on the other (kept on screen, re-read
 // offered) and rejects it with a reason. A viewer cannot chat; phone dark has no horizontal scroll.
 //
 //   uv run python -m tools.dev.isolated_browser_env --cwd apps/web -- node scripts/assistant-check.mjs
@@ -64,7 +65,7 @@ const settled = (state = 'completed', timeout = 40_000) => lastAssistant().and(p
 
 // --- Start a session bound to the exact revision of the open project ---
 await page.goto(`${BASE}/projects/${fx.scenario_id}?city=${city.id}`);
-await page.getByRole('button', { name: 'Ассистент' }).click();
+await page.getByRole('button', { name: /Ассистент|Спросить ИИ/ }).click();
 await panel.getByRole('button', { name: 'Начать беседу' }).waitFor({ timeout: 15_000 }).catch(async (e) => {
   await shot(page, 'assistant-start-failed.png');
   console.log('panel:', await panel.innerText().catch(() => '(no panel)'), pageErrors);
@@ -160,6 +161,20 @@ check(
   { applyCalls, appliedId, status: p1Server.status },
 );
 
+// The assistant is not the source of calculated numbers: after the human apply, the ordinary
+// durable full-calculation job produces a second immutable snapshot and the server compares it.
+const outcome = card1.locator(`[data-proposal-outcome="${appliedId}"]`);
+await outcome.getByRole('button', { name: 'Рассчитать последствия' }).click();
+await outcome.getByText('сравнено', { exact: true }).waitFor({ timeout: 120_000 });
+const outcomeCards = await outcome.locator('.asst-outcome__card').count();
+const outcomeLink = await outcome.getByRole('link', { name: 'Открыть новый результат целиком' }).getAttribute('href');
+check(
+  'applied proposal: one explicit calculation produces a server-backed before/after result linked to the exact revision and snapshot',
+  outcomeCards === 2 && Boolean(outcomeLink?.includes(`revision=${appliedId}`)) && Boolean(outcomeLink?.includes('calc=')),
+  { outcomeCards, outcomeLink },
+);
+await shot(page, 'assistant-outcome.png');
+
 // The open project follows the applied revision; an untouched editor must not claim local edits.
 const followed = await page.locator('.pg-dl, table').getByText(appliedId.slice(0, 8)).first().waitFor({ timeout: 10_000 }).then(() => true).catch(() => false);
 const phantom = await page.getByText('Ваши несохранённые правки сделаны на другой ревизии').count();
@@ -203,7 +218,7 @@ await sp.ctx.close();
 // --- Viewer ---
 const vw = await signIn(browser, 'viewer');
 await vw.page.goto(`${BASE}/?city=${city.id}`);
-await vw.page.getByRole('button', { name: 'Ассистент' }).click();
+await vw.page.getByRole('button', { name: /Ассистент|Спросить ИИ/ }).click();
 const viewerText = await vw.page.locator('#assistant-body').innerText().catch(() => '');
 check('viewer: no chat controls, the role limitation is explained', viewerText.includes('Ассистент доступен специалистам') && (await vw.page.locator('#assistant-body').getByRole('button', { name: 'Начать беседу' }).count()) === 0);
 await vw.ctx.close();

@@ -13,6 +13,7 @@ import json
 import os
 import time
 from pathlib import Path
+from uuid import uuid4
 
 import httpx
 from sqlalchemy.engine import make_url
@@ -53,12 +54,30 @@ def main():
     from tests.test_calculations import setup_revision
 
     scenario, revision, saved, _ = setup_revision(clients)
+    base_revision_id = saved.json()["id"]
+    queued = clients["specialist"].post(
+        "/v1/calculations",
+        headers={"Idempotency-Key": str(uuid4())},
+        json={
+            "scenario_revision_id": base_revision_id,
+            "mode": "full",
+            "include_modules": ["cost", "survival", "care", "ecosystem"],
+            "seed": 0,
+        },
+    )
+    queued.raise_for_status()
+    wait_for_worker(queued.json()["id"])
+    finished = clients["specialist"].get(f"/v1/jobs/{queued.json()['id']}")
+    finished.raise_for_status()
+    if finished.json()["state"] != "succeeded":
+        raise SystemExit(f"Base calculation ended {finished.json()['state']}")
     print(
         json.dumps(
             {
                 "scenario_id": scenario["id"],
                 "zone_id": scenario["zone_id"],
-                "revision_id": saved.json()["id"],
+                "revision_id": base_revision_id,
+                "calculation_id": finished.json()["result_ref_id"],
                 "placement_id": revision["placements"][0]["id"],
                 "quantity": revision["placements"][0]["quantity"],
             }

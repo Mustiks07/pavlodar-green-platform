@@ -13,6 +13,7 @@ import {
   type Proposal,
   type Scenario,
   type ScenarioRevision,
+  type ScenarioRevisionPage,
 } from '@pg/api-client';
 import { Badge, Button, Field, formatDateTime, formatNumber, Icon, JobStatus, MetricValue, Notice, Select, Skeleton, StateView } from '@pg/ui';
 import { api, useOperationAvailable } from '../../api';
@@ -25,6 +26,7 @@ import { TERMINAL_JOB_STATES, useJob } from '../jobs/useJob';
 import { isUuid } from '../map/publishedLayers';
 import { cityDisplayName } from '../../city';
 import { useRevision, useZone, zk } from '../zones/queries';
+import { ProposalOutcome } from './ProposalOutcome';
 
 /** URL keys: the open chat session and the job of its pending answer; reload resumes both. */
 export const CHAT = 'chat';
@@ -35,8 +37,8 @@ const PENDING: ChatMessage['state'][] = ['queued', 'streaming'];
 const STATE_TONE = { queued: 'info', streaming: 'info', completed: 'positive', failed: 'negative', cancelled: 'neutral' } as const;
 const PROPOSAL_TONE = { pending: 'info', applied: 'positive', rejected: 'neutral', expired: 'neutral' } as const;
 const QUICK_PROMPTS = [
+  'Предложи увеличить на 1 количество одного подходящего растения в текущем проекте.',
   'Какие территории сейчас требуют внимания в первую очередь?',
-  'Предложи устойчивый состав растений для выбранного участка.',
   'Объясни стоимость, уход и ожидаемый эффект текущего проекта.',
 ];
 
@@ -262,6 +264,15 @@ export function ProposalCard({ id }: { id: string }) {
   });
   const p = proposal.data;
   const scenario = useScenarioById(p?.scenario_id ?? null);
+  const appliedRevisions = useQuery({
+    queryKey: ['assistant-proposal-revisions', p?.scenario_id ?? ''],
+    enabled: p?.status === 'applied',
+    queryFn: async ({ signal }) => (
+      await unwrap<ScenarioRevisionPage>(
+        api.GET('/v1/scenarios/{scenario_id}/revisions', { params: { path: { scenario_id: p!.scenario_id }, query: { limit: 200 } }, signal }),
+      )
+    ).data.items,
+  });
   const [step, setStep] = useState<'idle' | 'apply' | 'reject'>('idle');
   const [reason, setReason] = useState('');
   const [applied, setApplied] = useState<ScenarioRevision | null>(null);
@@ -329,6 +340,7 @@ export function ProposalCard({ id }: { id: string }) {
   if (proposal.isError) return <ApiErrorView compact error={proposal.error} onRetry={() => void proposal.refetch()} />;
   const value = proposal.data;
   const current = scenario.data?.data.current_revision_id ?? null;
+  const appliedRevision = applied ?? appliedRevisions.data?.find((revision) => revision.parent_revision_id === value.base_revision_id) ?? null;
   const conflict = apply.error instanceof ApiError && apply.error.category === 'revision_conflict' ? apply.error : null;
   const conflictCurrent = conflict?.problem?.current_revision_id ?? current;
   const projectLink = (revisionId: string) => `/projects/${value.scenario_id}?${new URLSearchParams({ ...(cityId ? { city: cityId } : {}), revision: revisionId })}`;
@@ -358,6 +370,7 @@ export function ProposalCard({ id }: { id: string }) {
           </Link>
         </Notice>
       ) : null}
+      {appliedRevision ? <ProposalOutcome scenarioId={value.scenario_id} baseRevisionId={value.base_revision_id} appliedRevisionId={appliedRevision.id} /> : null}
       {conflict ? (
         <div data-conflict="true">
         <Notice tone="warning" title={t('assistant.proposal.conflict')}>

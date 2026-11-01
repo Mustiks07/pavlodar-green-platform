@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { unwrap, type Scenario, type Zone } from '@pg/api-client';
 import { Button, Dialog, Icon, type IconName } from '@pg/ui';
 import { api } from '../api';
@@ -12,10 +12,10 @@ const STEPS: { icon: IconName; title: string; note: string; path: string }[] = [
   { icon: 'sprout', title: 'Открыть готовый проект', note: 'Подбор растений, смета, приживаемость, уход и эффект', path: '/projects' },
   { icon: 'compare', title: 'Сравнить варианты', note: 'Стоимость и результат разных стратегий на одном экране', path: '/compare' },
   { icon: 'target', title: 'Собрать программу города', note: 'Приоритеты, бюджет и оптимальная дорожная карта', path: '/program' },
-  { icon: 'calendar', title: 'Передать решение в работу', note: 'Бригады, план-факт, осмотры и замены', path: '/execution' },
 ];
 
 export function DemoTour({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const navigate = useNavigate();
   const { city } = useSession();
   const setAssistantOpen = useUi((state) => state.setAssistantOpen);
   const projects = useQuery({
@@ -34,6 +34,7 @@ export function DemoTour({ open, onClose }: { open: boolean; onClose: () => void
   });
   const heroZone = zones.data?.find((item) => item.name === 'Двор жилого квартала');
   const hero = projects.data?.find((item) => item.name === 'Вариант B · экономия воды' && item.zone_id === heroZone?.id);
+  const heroHref = hero ? `/projects/${hero.id}${city ? `?city=${city.id}` : ''}` : null;
   return (
     <Dialog open={open} title="Маршрут показа · 3 минуты" onClose={onClose} footer={<Button onClick={onClose}>Закрыть</Button>}>
       <div className="demo-tour__lead">
@@ -62,7 +63,11 @@ export function DemoTour({ open, onClose }: { open: boolean; onClose: () => void
       <div className="demo-tour__assistant">
         <Icon name="chat" size={20} />
         <span><strong>Финальный акцент: спросите ассистента</strong><small>Он объяснит текущий проект цифрами из сервера и подготовит изменение только на подтверждение.</small></span>
-        <Button variant="primary" size="sm" icon="chat" onClick={() => { setAssistantOpen(true); onClose(); }}>Спросить ИИ</Button>
+        <Button variant="primary" size="sm" icon="chat" disabled={!heroHref} onClick={() => {
+          if (heroHref) navigate(heroHref);
+          setAssistantOpen(true);
+          onClose();
+        }}>Спросить ИИ о проекте</Button>
       </div>
     </Dialog>
   );
