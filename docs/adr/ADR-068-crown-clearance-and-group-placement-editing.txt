@@ -17,7 +17,7 @@ The check is only the geometry of recorded crown footprints. It is not an agrono
 does not imply underground-network clearance. Building conflicts remain a separate frozen-dataset check.
 
 The editor adds modifier/checkbox multi-selection, group lock/unlock/delete, protected deletion of locked
-placements, undo/redo for group changes and optional visual axis snapping. It previews known crown
+placements, undo/redo for group changes and optional known-crown tangency/visual axis snapping. It previews known crown
 overlap, preserves the local draft after the authoritative 422, and highlights every rejected placement.
 No rotation control is added: the current canonical Placement and schematic 3D model have no orientation,
 so such a control would claim a state the server cannot store or render meaningfully.

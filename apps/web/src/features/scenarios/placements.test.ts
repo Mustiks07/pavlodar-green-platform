@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { add, commit, historyOf, insideZone, issuesOf, mergePlacements, move, newPlacement, redo, remove, undo, update } from './placements';
+import { add, commit, historyOf, insideZone, issuesOf, mergePlacements, metersBetween, move, newPlacement, redo, remove, snapToCrownTangent, undo, update } from './placements';
 
 const P = (id: string, x = 77, plant = 'p1') => newPlacement(plant, [x, 52.3], '2027-04-15', id);
 
@@ -42,6 +42,14 @@ describe('placement history', () => {
     expect(issues.get('a')).toContain('crown_overlap');
     expect(issues.get('b')).toContain('crown_overlap');
     expect(issues.get('unknown')).toBeUndefined();
+  });
+  it('snaps a known crown to exact tangency without moving unknown dimensions', () => {
+    const known = (id: string, x: number, radius: number | null, basis: 'measured' | 'unknown' = 'measured') => ({ ...P(id, x), initial_crown_radius_m: radius, dimension_basis: basis });
+    const list = [known('moving', 77, 2), known('fixed', 77.00005, 3), known('unknown', 77.0001, null, 'unknown')];
+    const snapped = snapToCrownTangent(list, 'moving', [77.000045, 52.3], 10);
+    expect(snapped).not.toBeNull();
+    expect(metersBetween(snapped!, list[1]!.position.coordinates as [number, number])).toBeCloseTo(5, 3);
+    expect(snapToCrownTangent(list, 'unknown', [77.00005, 52.3], 10)).toBeNull();
   });
 });
 

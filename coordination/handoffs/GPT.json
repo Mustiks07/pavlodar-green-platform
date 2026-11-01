@@ -1221,6 +1221,7 @@
       "Recorded known crown footprints cannot overlap in a saved revision",
       "Exact tangency passes and unknown dimensions remain non-blocking",
       "Both conflicting placement paths are returned and highlighted in the preserved local draft",
+      "Dragging a placement with known crown geometry snaps to exact tangency before falling back to visual axis alignment",
       "The editor supports modifier/checkbox multi-selection and group lock, unlock and delete",
       "Locked placements cannot be moved or deleted; group changes remain undoable"
     ],

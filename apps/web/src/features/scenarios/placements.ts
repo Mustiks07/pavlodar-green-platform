@@ -61,12 +61,38 @@ export function same(a: Placement[], b: Placement[]): boolean {
 
 /** Local problems the user can fix before sending; the server stays the authority. */
 export type PlacementIssue = 'no_date' | 'bad_quantity' | 'dimension_without_basis' | 'duplicate_id' | 'crown_overlap';
-const metersBetween = (a: LngLat, b: LngLat): number => {
+export const metersBetween = (a: LngLat, b: LngLat): number => {
   const lat = ((a[1] + b[1]) / 2) * Math.PI / 180;
   const dx = (a[0] - b[0]) * 111_320 * Math.cos(lat);
   const dy = (a[1] - b[1]) * 110_540;
   return Math.hypot(dx, dy);
 };
+
+/** Preview snap to the nearest recorded crown tangent. The server remains authoritative. */
+export function snapToCrownTangent(list: Placement[], movingId: string, at: LngLat, maxDistanceM: number): LngLat | null {
+  const moving = list.find((placement) => placement.id === movingId);
+  const movingRadius = moving?.dimension_basis === 'unknown' ? null : moving?.initial_crown_radius_m;
+  if (!movingRadius || movingRadius <= 0) return null;
+  let best: { gap: number; point: LngLat } | null = null;
+  for (const placement of list) {
+    const radius = placement.dimension_basis === 'unknown' ? null : placement.initial_crown_radius_m;
+    if (placement.id === movingId || !radius || radius <= 0) continue;
+    const center = placement.position.coordinates as LngLat;
+    const latScale = 110_540;
+    const lonScale = 111_320 * Math.cos(((at[1] + center[1]) / 2) * Math.PI / 180);
+    const dx = (at[0] - center[0]) * lonScale;
+    const dy = (at[1] - center[1]) * latScale;
+    const distance = Math.hypot(dx, dy);
+    const target = movingRadius + radius;
+    const gap = Math.abs(distance - target);
+    if (distance < 1e-6 || gap > maxDistanceM || (best && gap >= best.gap)) continue;
+    best = {
+      gap,
+      point: [center[0] + (dx / distance * target) / lonScale, center[1] + (dy / distance * target) / latScale],
+    };
+  }
+  return best?.point ?? null;
+}
 export function issuesOf(list: Placement[]): Map<string, PlacementIssue[]> {
   const out = new Map<string, PlacementIssue[]>();
   const seen = new Set<string>();

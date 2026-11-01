@@ -26,7 +26,7 @@ import { plantImage } from '../plants/images';
 import { Scene3DToggle } from '../scene3d/Scene3DPanel';
 import { useScene3D } from '../scene3d/useScene3D';
 import type { ScenePlanting } from '../scene3d/types';
-import { add, insideZone, issuesOf, move, newPlacement, redo, remove, same, undo, update, type LngLat, type PlacementHistory } from './placements';
+import { add, insideZone, issuesOf, metersBetween, move, newPlacement, redo, remove, same, snapToCrownTangent, undo, update, type LngLat, type PlacementHistory } from './placements';
 
 const coarse = () => window.matchMedia('(pointer: coarse)').matches;
 const HIT = () => (coarse() ? 18 : 8);
@@ -214,19 +214,24 @@ export function PlacementMap({
       let next: LngLat = [ll.lng, ll.lat];
       if (live.current.snapping) {
         const pointer = m.project(next);
-        let snapX: { distance: number; value: number } | null = null;
-        let snapY: { distance: number; value: number } | null = null;
-        for (const placement of live.current.placements) {
-          if (placement.id === d.id) continue;
-          const point = m.project(placement.position.coordinates as LngLat);
-          const dx = Math.abs(point.x - pointer.x);
-          const dy = Math.abs(point.y - pointer.y);
-          if (dx <= 8 && (!snapX || dx < snapX.distance)) snapX = { distance: dx, value: point.x };
-          if (dy <= 8 && (!snapY || dy < snapY.distance)) snapY = { distance: dy, value: point.y };
-        }
-        if (snapX || snapY) {
-          const snapped = m.unproject([snapX?.value ?? pointer.x, snapY?.value ?? pointer.y]);
-          next = [snapped.lng, snapped.lat];
+        const edge = m.unproject([pointer.x + 12, pointer.y]);
+        const crownSnap = snapToCrownTangent(live.current.placements, d.id, next, metersBetween(next, [edge.lng, edge.lat]));
+        if (crownSnap) next = crownSnap;
+        else {
+          let snapX: { distance: number; value: number } | null = null;
+          let snapY: { distance: number; value: number } | null = null;
+          for (const placement of live.current.placements) {
+            if (placement.id === d.id) continue;
+            const point = m.project(placement.position.coordinates as LngLat);
+            const dx = Math.abs(point.x - pointer.x);
+            const dy = Math.abs(point.y - pointer.y);
+            if (dx <= 8 && (!snapX || dx < snapX.distance)) snapX = { distance: dx, value: point.x };
+            if (dy <= 8 && (!snapY || dy < snapY.distance)) snapY = { distance: dy, value: point.y };
+          }
+          if (snapX || snapY) {
+            const snapped = m.unproject([snapX?.value ?? pointer.x, snapY?.value ?? pointer.y]);
+            next = [snapped.lng, snapped.lat];
+          }
         }
       }
       d.pos = next;
