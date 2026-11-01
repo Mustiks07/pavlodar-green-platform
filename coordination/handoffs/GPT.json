@@ -1253,5 +1253,25 @@
     ],
     "decision": "ADR-069",
     "limit": "Rotation remains absent because canonical Placement has no orientation and the schematic 3D tree is rotationally symmetric"
+  },
+  "reviewable_species_exclusion_20261102": {
+    "implementation_sha": "pending",
+    "contract_version": "1.15.0",
+    "migration": "none",
+    "implemented": [
+      "excluded_plant_ids is editable in the local draft and persisted only by an explicit revision save",
+      "Recommendation cards exclude or restore exact frozen-catalog species and invalidate stale results",
+      "The UI names exclusions and warns when a species remains in use without silently changing placements",
+      "The server rejects duplicate or foreign exclusions and conflicts with point or area plantings",
+      "Conflict field errors identify both the exclusion decision and the plant input"
+    ],
+    "verification": [
+      "Focused scenario validation covers used, unknown and duplicate exclusions without revision mutation",
+      "Recommendation acceptance returns plant_explicitly_excluded for a user decision",
+      "Frontend recommendation and placement tests passed",
+      "Frontend typecheck passed"
+    ],
+    "decision": "ADR-070",
+    "limit": "Exclusion never auto-replaces or deletes a locked or unlocked planting; the user resolves the conflict explicitly"
   }
 }

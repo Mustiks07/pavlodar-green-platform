@@ -1,0 +1,25 @@
+ADR-070: Species exclusion is a reviewable scenario decision
+Status: accepted
+Date: 2026-11-02
+
+Context
+ScenarioRevision already stored excluded_plant_ids and recommendation requests understood them, but the
+scenario editor always reused the base list. A user could not add or remove an exclusion. The revision
+validator also ignored that list, so raw API input could simultaneously exclude and place the same plant.
+That contradicted F-PLANT-05 and the fail-closed hard-constraint boundary.
+
+Decision
+The editable draft owns excluded_plant_ids and saves it only in the next immutable ScenarioRevision.
+Recommendation cards allow «Исключить из проекта» and «Вернуть в проект», show the current exclusions
+by plant name from the frozen catalog, and require a fresh server recommendation after a change. If a
+used species is excluded, the UI names the conflict but never deletes, moves or replaces its placements.
+
+The server requires exclusions to be unique and present in the exact frozen CatalogVersion. Placement
+and area-patch eligibility applies intrinsic_eligibility with explicitly_excluded. A conflict returns
+placement_plant_excluded with paths to both the exclusion decision and every first conflicting input;
+the current revision remains unchanged. Locked placements have no special bypass.
+
+Consequences
+Exclusion becomes an explicit, reversible and auditable design decision rather than a hidden client
+filter. Recommendation, manual placement and raw API callers now share the same hard constraint. The
+user must resolve a conflict deliberately by returning the species, replacing it or removing its inputs.

@@ -384,6 +384,18 @@ def test_recommendations_apply_hard_constraints_and_sourced_scores(clients):
     assert candidates[excluded_id]["eligibility"] == "excluded"
     assert candidates[excluded_id]["score"] is None
     assert candidates[excluded_id]["blockers"][0]["code"] == "plant_sensitive_site_excluded"
+    user_excluded = mutation(
+        clients["specialist"],
+        "POST",
+        "/v1/recommendations",
+        {**body, "excluded_plant_ids": [eligible_id]},
+    )
+    assert user_excluded.status_code == 200, user_excluded.text
+    explicit = next(
+        item for item in user_excluded.json()["candidates"] if item["plant_id"] == eligible_id
+    )
+    assert explicit["eligibility"] == "excluded"
+    assert explicit["blockers"][0]["code"] == "plant_explicitly_excluded"
 
     current_review = clients["viewer"].get(f"/v1/plants/{review_id}")
     scored_review = mutation(
@@ -489,6 +501,43 @@ def test_scenario_revision_validates_catalog_placement_and_exclusions(clients):
     )
     assert outside.status_code == 422 and outside.json()["code"] == "placement_outside_zone"
     eligible_placement = placement(eligible_id, [76.9805, 52.2805])
+    explicit_conflict = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {
+            **base,
+            "excluded_plant_ids": [eligible_id],
+            "placements": [eligible_placement],
+            "comment": "SYNTHETIC TEST explicit exclusion conflict",
+        },
+        etag=created.headers["etag"],
+    )
+    assert explicit_conflict.status_code == 422, explicit_conflict.text
+    assert explicit_conflict.json()["code"] == "placement_plant_excluded"
+    assert [item["path"] for item in explicit_conflict.json()["field_errors"]] == [
+        "/excluded_plant_ids/0",
+        "/placements/0/plant_id",
+    ]
+    unknown_exclusion = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {**base, "excluded_plant_ids": [str(uuid4())], "placements": []},
+        etag=created.headers["etag"],
+    )
+    assert unknown_exclusion.status_code == 422
+    assert unknown_exclusion.json()["field_errors"][0]["path"] == "/excluded_plant_ids/0"
+    duplicate_exclusion = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {**base, "excluded_plant_ids": [eligible_id, eligible_id], "placements": []},
+        etag=created.headers["etag"],
+    )
+    assert duplicate_exclusion.status_code == 422
+    assert duplicate_exclusion.json()["field_errors"][0]["path"] == "/excluded_plant_ids/1"
+    assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()["current_revision_id"] == scenario["current_revision_id"]
     saved = mutation(
         specialist,
         "POST",

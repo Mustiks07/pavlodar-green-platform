@@ -69,6 +69,8 @@ interface Edits {
   capital_budget: string;
   /** Point placements of the next revision; ids are stable across revisions. */
   placements: Placement[];
+  /** Explicit user exclusions within this immutable scenario revision. */
+  excluded_plant_ids: string[];
   /** Catalog snapshot the placements' plants come from (set from the chosen plant). */
   catalog_version_id: string | null;
   /** Expert-confirmed rule version; the server requires it together with placements. */
@@ -121,6 +123,7 @@ function editsFrom(r: ScenarioRevision): Edits {
     resource_limits: r.resource_limits,
     capital_budget: r.capital_budget ?? '',
     placements: r.placements,
+    excluded_plant_ids: r.excluded_plant_ids,
     catalog_version_id: r.catalog_version_id,
     rule_version_id: r.rule_version_id,
     coefficient_version_id: r.coefficient_version_id,
@@ -138,6 +141,7 @@ function isDirty(base: ScenarioRevision, e: Edits): boolean {
     JSON.stringify(e.resource_limits) !== JSON.stringify(base.resource_limits) ||
     (e.capital_budget || null) !== base.capital_budget ||
     !same(e.placements, base.placements) ||
+    JSON.stringify(e.excluded_plant_ids) !== JSON.stringify(base.excluded_plant_ids) ||
     e.catalog_version_id !== base.catalog_version_id ||
     e.rule_version_id !== base.rule_version_id
     || e.coefficient_version_id !== base.coefficient_version_id
@@ -193,6 +197,7 @@ function RevisionEditor({
       ? {
           ...stored.edits,
           placements: stored.edits.placements ?? base.placements,
+          excluded_plant_ids: stored.edits.excluded_plant_ids ?? base.excluded_plant_ids,
           catalog_version_id: stored.edits.catalog_version_id ?? base.catalog_version_id,
           rule_version_id: stored.edits.rule_version_id ?? base.rule_version_id,
           custom_care_operations: stored.edits.custom_care_operations ?? base.custom_care_operations,
@@ -280,6 +285,7 @@ function RevisionEditor({
       body.resource_limits = edits.resource_limits;
       body.capital_budget = edits.capital_budget || null;
       body.placements = edits.placements;
+      body.excluded_plant_ids = edits.excluded_plant_ids;
       body.catalog_version_id = edits.catalog_version_id;
       body.rule_version_id = edits.rule_version_id;
       body.coefficient_version_id = edits.coefficient_version_id;
@@ -576,9 +582,10 @@ function RevisionEditor({
           zoneVersionId={edits.rebind_zone_version && currentZoneVersionId ? currentZoneVersionId : base.zone_version_id}
           catalogVersionId={edits.catalog_version_id}
           ruleVersionId={edits.rule_version_id}
-          excludedPlantIds={base.excluded_plant_ids}
+          excludedPlantIds={edits.excluded_plant_ids}
           placements={edits.placements}
           onSelectPlant={setRecommendedPlant}
+          onExcludedChange={(excluded_plant_ids) => setEdits((value) => ({ ...value, excluded_plant_ids }))}
           disabled={!canEdit || save.isPending}
         />
         <div id="scenario-placement-editor">

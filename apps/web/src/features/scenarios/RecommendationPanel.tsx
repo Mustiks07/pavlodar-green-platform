@@ -67,7 +67,15 @@ export function buildRecommendationRequest({
   };
 }
 
-function RecommendationCard({ recommendation, plant, onSelect }: { recommendation: PlantRecommendation; plant: Plant | null; onSelect: (plant: Plant) => void }) {
+function RecommendationCard({ recommendation, plant, excluded, inUse, disabled, onSelect, onToggleExclude }: {
+  recommendation: PlantRecommendation;
+  plant: Plant | null;
+  excluded: boolean;
+  inUse: boolean;
+  disabled: boolean;
+  onSelect: (plant: Plant) => void;
+  onToggleExclude: () => void;
+}) {
   const eligibility = ELIGIBILITY[recommendation.eligibility];
   const knownContributions = recommendation.contributions.filter((item) => item.score !== null);
   return (
@@ -81,7 +89,7 @@ function RecommendationCard({ recommendation, plant, onSelect }: { recommendatio
           </span>
         </span>
         <span className="rec-card__result">
-          <Badge tone={eligibility.tone}>{eligibility.label}</Badge>
+          <Badge tone={excluded ? 'negative' : eligibility.tone}>{excluded ? 'исключён в черновике' : eligibility.label}</Badge>
           <strong>{recommendation.score === null ? '—' : recommendation.score.toFixed(0)}</strong>
           <small>из 100</small>
         </span>
@@ -111,9 +119,15 @@ function RecommendationCard({ recommendation, plant, onSelect }: { recommendatio
           {recommendation.blockers.map((item, index) => <li key={`${item.code}-${index}`}>{item.message}</li>)}
         </ul>
       </details>
-      <Button size="sm" variant="secondary" icon="map" disabled={!plant || recommendation.eligibility === 'excluded'} onClick={() => plant && onSelect(plant)}>
-        Разместить этот вид
-      </Button>
+      {inUse && excluded ? <Notice tone="warning" title="Вид уже используется">Сначала замените или удалите его посадки. Сервер не удалит их автоматически.</Notice> : null}
+      <div className="pg-actions">
+        <Button size="sm" variant="secondary" icon="map" disabled={disabled || excluded || !plant || recommendation.eligibility === 'excluded'} onClick={() => plant && onSelect(plant)}>
+          Разместить этот вид
+        </Button>
+        <Button size="sm" variant={excluded ? 'secondary' : 'danger'} disabled={disabled || !plant} onClick={onToggleExclude}>
+          {excluded ? 'Вернуть в проект' : 'Исключить из проекта'}
+        </Button>
+      </div>
     </article>
   );
 }
@@ -125,6 +139,7 @@ export function RecommendationPanel({
   excludedPlantIds,
   placements,
   onSelectPlant,
+  onExcludedChange,
   disabled = false,
 }: {
   zoneVersionId: string;
@@ -133,6 +148,7 @@ export function RecommendationPanel({
   excludedPlantIds: string[];
   placements: Placement[];
   onSelectPlant: (plant: Plant) => void;
+  onExcludedChange: (ids: string[]) => void;
   disabled?: boolean;
 }) {
   const { user } = useSession();
@@ -168,6 +184,14 @@ export function RecommendationPanel({
     },
   });
   const goToPlacement = () => document.getElementById('scenario-placement-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const usedPlantIds = useMemo(() => new Set(placements.map((placement) => placement.plant_id)), [placements]);
+  const toggleExcluded = (plantId: string) => {
+    const next = excludedPlantIds.includes(plantId)
+      ? excludedPlantIds.filter((id) => id !== plantId)
+      : [...excludedPlantIds, plantId];
+    onExcludedChange(next);
+    recommendation.reset();
+  };
 
   if (available === false) return null;
   return (
@@ -198,6 +222,19 @@ export function RecommendationPanel({
       {recommendation.isError ? <ApiErrorView compact error={recommendation.error} onRetry={() => recommendation.mutate()} /> : null}
       {recommendation.isPending || plants.isPending ? <Skeleton lines={4} /> : null}
       {plants.isError ? <ApiErrorView compact error={plants.error} onRetry={() => void plants.refetch()} /> : null}
+      {excludedPlantIds.length ? (
+        <div className="rec-panel__summary" role="status">
+          <strong>Исключено из проекта: {excludedPlantIds.length}</strong>
+          <span>{excludedPlantIds.map((id) => plantById.get(id)?.russian_name ?? id.slice(0, 8)).join(', ')}</span>
+          <div className="pg-actions">
+            {excludedPlantIds.map((id) => (
+              <Button key={id} size="sm" variant="ghost" disabled={disabled} onClick={() => toggleExcluded(id)}>
+                Вернуть {plantById.get(id)?.russian_name ?? 'вид'}
+              </Button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       {recommendation.data ? (
         recommendation.data.candidates.length ? (
           <>
@@ -206,7 +243,18 @@ export function RecommendationPanel({
               <span>Оценка показывается только при достаточном покрытии признаков.</span>
             </div>
             <div className="rec-panel__grid">
-              {recommendation.data.candidates.map((item) => <RecommendationCard key={item.plant_id} recommendation={item} plant={plantById.get(item.plant_id) ?? null} onSelect={(plant) => { onSelectPlant(plant); goToPlacement(); }} />)}
+              {recommendation.data.candidates.map((item) => (
+                <RecommendationCard
+                  key={item.plant_id}
+                  recommendation={item}
+                  plant={plantById.get(item.plant_id) ?? null}
+                  excluded={excludedPlantIds.includes(item.plant_id)}
+                  inUse={usedPlantIds.has(item.plant_id)}
+                  disabled={disabled}
+                  onToggleExclude={() => toggleExcluded(item.plant_id)}
+                  onSelect={(plant) => { onSelectPlant(plant); goToPlacement(); }}
+                />
+              ))}
             </div>
             <div className="rec-panel__footer">
               <p>Выберите подходящий вид и разместите его точкой внутри участка. Проверки геометрии и ограничений повторит сервер.</p>

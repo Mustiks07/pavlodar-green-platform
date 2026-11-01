@@ -841,7 +841,8 @@ def validate_scenario_registry(
         catalog_synthetic = catalog.synthetic
     if body["rule_version_id"] is not None:
         usable_rule(db, access, body["rule_version_id"], city_id=scenario.city_id)
-    if not body["placements"] and not body["area_patches"]:
+    excluded = body["excluded_plant_ids"]
+    if not body["placements"] and not body["area_patches"] and not excluded:
         return catalog_synthetic
     if body["catalog_version_id"] is None:
         raise DomainError(
@@ -850,19 +851,78 @@ def validate_scenario_registry(
             "Placements require catalog_version_id",
         )
     plants = {row.plant_id: row.payload for row in rows}
+    if len(excluded) != len(set(excluded)):
+        raise DomainError(
+            422,
+            "plant_input_invalid",
+            "Excluded plant ids must be unique",
+            field_errors=[
+                {
+                    "path": f"/excluded_plant_ids/{index}",
+                    "code": "duplicate_id",
+                    "message": "Вид уже исключён",
+                }
+                for index, plant_id in enumerate(excluded)
+                if plant_id in excluded[:index]
+            ],
+        )
+    unknown_exclusions = [
+        (index, plant_id) for index, plant_id in enumerate(excluded) if plant_id not in plants
+    ]
+    if unknown_exclusions:
+        raise DomainError(
+            422,
+            "catalog_version_unavailable",
+            "Excluded plant is not in the frozen catalog",
+            field_errors=[
+                {
+                    "path": f"/excluded_plant_ids/{index}",
+                    "code": "plant_not_in_catalog",
+                    "message": "Вида нет в закреплённой версии каталога",
+                }
+                for index, _ in unknown_exclusions
+            ],
+        )
+    exclusion_index = {plant_id: index for index, plant_id in enumerate(excluded)}
     zone_shape = shape(zone_version.payload["geometry"])
     identities = [item["id"] for item in body["placements"]] + [
         item["id"] for item in body["area_patches"]
     ]
     if len(identities) != len(set(identities)):
         raise DomainError(422, "plant_input_invalid", "Placement and patch ids must be unique")
-    for placement in body["placements"]:
+    for placement_index, placement in enumerate(body["placements"]):
         plant = plants.get(placement["plant_id"])
         if plant is None:
             raise DomainError(422, "catalog_version_unavailable", "Placement plant is not in catalog")
-        eligibility, _ = intrinsic_eligibility(plant, zone_version.payload["purpose"])
+        explicitly_excluded = placement["plant_id"] in exclusion_index
+        eligibility, _ = intrinsic_eligibility(
+            plant,
+            zone_version.payload["purpose"],
+            explicitly_excluded=explicitly_excluded,
+        )
         if eligibility == "excluded":
-            raise DomainError(422, "placement_plant_excluded", "Excluded plant cannot be placed")
+            field_errors = []
+            if explicitly_excluded:
+                field_errors.append(
+                    {
+                        "path": f"/excluded_plant_ids/{exclusion_index[placement['plant_id']]}",
+                        "code": "excluded_plant_in_use",
+                        "message": "Исключённый вид уже используется в посадке",
+                    }
+                )
+            field_errors.append(
+                {
+                    "path": f"/placements/{placement_index}/plant_id",
+                    "code": "placement_plant_excluded",
+                    "message": "Исключённый вид нельзя разместить",
+                }
+            )
+            raise DomainError(
+                422,
+                "placement_plant_excluded",
+                "Excluded plant cannot be placed",
+                field_errors=field_errors,
+            )
         if not zone_shape.covers(Point(placement["position"]["coordinates"][:2])):
             raise DomainError(422, "placement_outside_zone", "Placement is outside zone geometry")
         if placement["stock_item_id"] is not None:
@@ -893,13 +953,39 @@ def validate_scenario_registry(
             )
     _validate_crown_clearance(body)
     _validate_building_conflicts(db, body, previous_placements)
-    for patch in body["area_patches"]:
+    for patch_index, patch in enumerate(body["area_patches"]):
         plant = plants.get(patch["plant_id"])
         if plant is None:
             raise DomainError(422, "catalog_version_unavailable", "Patch plant is not in catalog")
-        eligibility, _ = intrinsic_eligibility(plant, zone_version.payload["purpose"])
+        explicitly_excluded = patch["plant_id"] in exclusion_index
+        eligibility, _ = intrinsic_eligibility(
+            plant,
+            zone_version.payload["purpose"],
+            explicitly_excluded=explicitly_excluded,
+        )
         if eligibility == "excluded":
-            raise DomainError(422, "placement_plant_excluded", "Excluded plant cannot be patched")
+            field_errors = []
+            if explicitly_excluded:
+                field_errors.append(
+                    {
+                        "path": f"/excluded_plant_ids/{exclusion_index[patch['plant_id']]}",
+                        "code": "excluded_plant_in_use",
+                        "message": "Исключённый вид уже используется в покрытии",
+                    }
+                )
+            field_errors.append(
+                {
+                    "path": f"/area_patches/{patch_index}/plant_id",
+                    "code": "placement_plant_excluded",
+                    "message": "Исключённый вид нельзя использовать в покрытии",
+                }
+            )
+            raise DomainError(
+                422,
+                "placement_plant_excluded",
+                "Excluded plant cannot be patched",
+                field_errors=field_errors,
+            )
         patch_shape = shape(patch["geometry"])
         if not zone_shape.covers(patch_shape):
             raise DomainError(422, "placement_outside_zone", "Area patch is outside zone geometry")
