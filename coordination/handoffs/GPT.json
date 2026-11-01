@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "657ba72",
-  "state": "program_launch_passport_verified",
+  "head_sha": "cc2d572",
+  "state": "frozen_building_project_3d_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1012,5 +1012,29 @@
     ],
     "evidence": "docs/evidence/jury-execution-passport/program-launch-passport.png",
     "limit": "The projects are draft, so the passport does not create or claim factual work orders or completions"
+  },
+  "frozen_building_project_3d_20261102": {
+    "implementation_sha": "cc2d572",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Placement maps load only published building layers frozen in that exact scenario revision",
+      "Plan footprints and admitted positive server heights are shown without deriving unknown metres",
+      "Before/after maps keep their own immutable dataset-version inputs",
+      "Recommendation and placement workspaces now span the full project-editor width"
+    ],
+    "live_result": {
+      "project_placement_groups": 5,
+      "rendered_exact_version_buildings": 19,
+      "consecutive_passes": 2
+    },
+    "verification": [
+      "Focused authenticated placement 3D check passed twice consecutively",
+      "Frontend production build passed",
+      "Tracked credential-pattern scan passed",
+      "No browser errors or API 5xx were observed"
+    ],
+    "evidence": "docs/evidence/jury-placement-3d/placement-editor-3d.png",
+    "limit": "A historical frozen building version that is no longer published is not substituted with current city data"
   }
 }
