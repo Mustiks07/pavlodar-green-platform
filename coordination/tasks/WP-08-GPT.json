@@ -1,0 +1,32 @@
+{
+  "task_id": "WP-08",
+  "owner": "GPT",
+  "integration_partner": "Claude",
+  "state": "integration_verified",
+  "branch": "gpt/WP-00-foundation",
+  "api_url": "http://localhost:8001",
+  "canonical_contract": "1.4.0 feature contract; integrated client currently matches additive 1.5.0",
+  "migration": "0016_spatial_results",
+  "implemented_backend": [
+    "durable idempotent shadow runs through PostgreSQL outbox and Celery worker",
+    "immutable authorized SpatialResult storage with same-city resource concealment",
+    "GET /v1/spatial-results/{result_id}/artifact as application/geo+json",
+    "registered shadow validation, timeout and missing-height problem codes",
+    "one recorded-height policy shared by map cards, 3D inputs and shadow calculations",
+    "real HTTP/outbox/worker smoke using published Pavlodar building inputs and an explicitly labelled synthetic test zone"
+  ],
+  "verified_joint_acceptance": [
+    "scenario date/time controls start the canonical durable shadow job and resume after reload",
+    "authorized artifact renders on the map and in 3D without client shadow formulas",
+    "browser smoke covers progress, cancel/retry, daytime result, unavailable night result, rerun and IDOR 404"
+  ],
+  "evidence": [
+    "docs/adr/ADR-030-analytical-shadow-runs.txt",
+    "docs/evidence/wp08-shadow-live.json",
+    "docs/evidence/wp08-shadow-ui/report.json",
+    "docs/evidence/foundation_restore.json",
+    "tests/test_shadow_runs.py"
+  ],
+  "known_issue": "WebGL context restore passed 4 of 5 heavy-suite runs and remains load-flaky",
+  "production_ready": false
+}

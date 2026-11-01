@@ -1,0 +1,43 @@
+ADR-012 Опубликованные map manifests и авторизованные MVT
+Статус: accepted (GPT, canonical contracts/migrations owner).
+Дата: 2026-10-29. Затронуто: WP-03/WP-04, migrations 0006/0007.
+
+ПРОБЛЕМА
+
+listMapLayers был canonical, но не реализован; после admin publish импортированный векторный
+набор не мог появиться на карте. Передавать GeoJSON целиком не подходит для viewport loading,
+а публичный URL тайла обошёл бы city/dataset grants. Клиент также не должен придумывать
+source_layer, legend, license или тип геометрии.
+
+РЕШЕНИЕ
+
+1. import_records получает PostGIS geometry(EPSG:4326) и GIST index. Исходный immutable
+   payload сохраняется; geometry — нормализованное представление уже проверенной геометрии.
+2. При admin publish в той же транзакции создаются immutable MapLayer manifests отдельно
+   для point/line/polygon. CSV без геометрии manifest не создаёт. Читатели видят только
+   manifests текущего Dataset.current_version_id: pointer переключается атомарно.
+   Migration 0007 создаёт те же manifests для уже опубликованных до этого GeoJSON версий.
+3. GET /v1/map/layers возвращает canonical MapLayer: версия, access level, attribution
+   owner+license, observed_at, source_layer=features, single legend и source MVT URL.
+   Категория выводится только детерминированным mapping из canonical Dataset.kind;
+   это UI-классификация, не научная интерпретация.
+4. GET /v1/map/tiles/{layer_id}/{z}/{x}/{y}.mvt выполняет session/grant check на каждый
+   запрос, проверяет текущую опубликованную версию и строит MVT PostGIS только для viewport.
+   Properties остаются исходными атрибутами; код/выражения из upload не исполняются.
+5. Технический диапазон первого инкремента z5..22 записан в manifest; endpoint валидирует
+   z0..22 и x/y. Тайлы имеют private cache 60 секунд и ETag, чтобы отзыв доступа не оставлял
+   длительно доступный shared cache.
+
+ОГРАНИЧЕНИЯ
+
+- Это публикация импортированных GeoJSON, а не официальный городской набор. Organizer data
+  не получены; working boundary, точные сети, высоты и экологические коэффициенты не заявлены.
+- PMTiles generation, clustering, generalized zoom levels и нагрузочные P-02/P-03 ещё открыты.
+- Легенда single сообщает только наличие объектов набора. Тематические классы/единицы нельзя
+  создавать без явного mapping и проверенного источника.
+- Старые manifests сохраняются для lineage, но их tile URL отвечает 404 после pointer switch.
+
+ПРОВЕРКА
+
+Migration/backfill, contract validation, admin publication, viewer list, restricted IDOR,
+MVT decode/headers/ETag и отсутствие слоя до publish/для CSV проверяются integration tests.

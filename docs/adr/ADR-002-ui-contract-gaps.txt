@@ -1,0 +1,115 @@
+ADR-002 Недостающие в контракте 1.0.0 поля для карты, легенд и deep links
+Статус: proposed (Claude, WP-02). Требует acknowledgement GPT в coordination/handoffs/GPT.json.
+Тип изменения: только additive. Существующие поля, enum и единицы не меняются.
+Затронутые задачи: WP-00 (freeze), WP-01 (auth), WP-03 (публикация слоёв), WP-04 (карта), WP-06.
+
+ПРОБЛЕМА
+Критическая проверка contracts/openapi.json 1.0.0 со стороны клиента выявила места,
+где UI либо не может выполнить обязательное требование ТЗ, либо был бы вынужден
+придумать собственные данные (что запрещено AGENTS.md):
+
+G1. MapLayer не содержит source_layer. Векторный MVT/PMTiles источник в MapLibre
+    нельзя отрисовать без имени слоя внутри тайла. Клиент не должен угадывать имя.
+G2. MapLayer не содержит описания легенды. F-MAP-01: «легенда обязательна; каждая
+    активная шкала имеет единицу, период и источник». Сейчас UI мог бы только
+    сочинить классы и цвета самостоятельно - это локальная интерпретация данных.
+G3. MapLayer.kind - произвольная строка. UI группирует слои по F-MAP-01 (граница,
+    районы, здания, участки, почвы, зелень, ограничения, социальные объекты,
+    проблемы, приоритет, посадки, качество данных) и не может делать это по
+    свободному тексту. Нужен enum, согласованный с перечнем F-MAP-01.
+G4. MapLayer не сообщает тип геометрии и состояние публикации. Без geometry_type
+    невозможно выбрать fill/line/circle; без stale UI не может обозначить слой,
+    чья исходная версия заменена (F-DATA-06).
+G5. GET /auth/login не имеет return_to. ТЗ §03: сохранённая ссылка восстанавливает
+    город, зону, сценарий, ревизию, вид карты и фильтры. После истечения сессии
+    пользователь теряет deep link, если BFF всегда возвращает на «/».
+G6. Metric.key и unit - свободные строки, SEMANTICS обещает «единый справочник
+    единиц в foundation». Клиенту нужен машинный реестр (ключ -> размерность,
+    точность отображения), чтобы не вводить отдельные единицы на фронтенде.
+
+ВАРИАНТЫ
+A. Клиент держит собственные таблицы стилей/легенд/единиц. Отклонено: это
+   вторая интерпретация данных, расходится с сервером при публикации новой версии.
+B. Сервер отдаёт полный MapLibre style JSON. Отклонено: смешивает данные и
+   оформление, мешает дизайн-токенам, тёмной теме и проверке контраста.
+C. (выбрано) Сервер отдаёт семантическое описание легенды (классы/шкала,
+   единица, период, свойство); клиент отображает его своими токенами.
+
+ИЗМЕНЕНИЕ (additive)
+
+1. MapLayer - новые обязательные для новых ответов поля (сервер 1.1.0):
+   source_layer: string | null      - null только для raster
+   geometry_type: "polygon" | "line" | "point" | "raster"
+   kind: enum (заменяет свободную строку на совместимое подмножество значений):
+     boundary, district, road, water, building, zone, soil, existing_green,
+     restriction, population, social_facility, problem, priority, proposed_planting,
+     data_quality, shade, surface_temperature, air_temperature
+   is_stale: boolean
+   legend: Legend
+
+   Legend:
+   {
+     "mode": "categorical" | "sequential" | "diverging" | "single",
+     "property": string | null,         - атрибут признака в тайле
+     "unit": string | null,             - ключ из реестра единиц, null для категорий
+     "period": {"from": "YYYY-MM-DD"|null, "to": "YYYY-MM-DD"|null} | null,
+     "classes": [
+       {"key": string, "label": string, "min": number|null, "max": number|null,
+        "value": string|null, "semantic": "positive"|"negative"|"neutral"|"warning"|"unknown"}
+     ],
+     "unknown_class_key": string | null - класс для value=null; никогда не «0»
+   }
+   Цвет на сервере не передаётся: клиент сопоставляет semantic + индекс класса
+   с токенами шкал дизайн-системы. Источник шкалы = MapLayer.attribution +
+   dataset_version_id, уже присутствующие в контракте.
+
+   ДО:
+   {"id":"…","kind":"existing_green_osm","source_type":"pmtiles", … }
+   ПОСЛЕ:
+   {"id":"…","kind":"existing_green","source_type":"pmtiles","source_layer":"green",
+    "geometry_type":"polygon","is_stale":false,
+    "legend":{"mode":"categorical","property":"cover_type","unit":null,"period":null,
+      "classes":[{"key":"tree_canopy","label":"Кроны деревьев","min":null,"max":null,
+                  "value":"tree_canopy","semantic":"positive"}],
+      "unknown_class_key":null}, … }
+
+   Совместимость kind: старые значения, отличные от enum, сервер 1.0.x не выпускал
+   (сервера ещё нет), поэтому сужение строки до enum до первого релиза безопасно.
+   Если GPT предпочитает строгую совместимость, оставить kind: string и добавить
+   новое поле category: enum - клиент поддержит любой из двух вариантов.
+
+2. GET /auth/login - query return_to: string (optional), только относительный
+   same-origin путь, начинающийся с "/" и не с "//"; сервер валидирует по allowlist
+   и хранит в server-side state. Невалидный - игнорировать и вести на "/".
+   Клиент передаёт текущий pathname+search (содержит city/zone/scenario/revision,
+   bbox/zoom, фильтры). Это не обход прав: сервер проверяет доступ при чтении.
+
+3. contracts/units.json (генерируется build_contracts.py):
+   [{"key":"m2","dimension":"area","display_decimals":0},
+    {"key":"t_CO2_per_year","dimension":"mass_flow","display_decimals":2}, …]
+   и contracts/metric_keys.json: [{"key":"air_cooling","unit":"degC",
+   "kind":"flow|stock|state","domain":"ecosystem"}].
+   Локализованные подписи хранит клиент в i18n по машинному ключу. Неизвестный
+   ключ UI показывает как сам ключ с пометкой «нет подписи», не скрывает метрику.
+
+ЗАМЕЧАНИЯ БЕЗ ИЗМЕНЕНИЯ КОНТРАКТА СЕЙЧАС (вынести в WP-06 до старта)
+- Placement не имеет rotation_deg, а F-3D-03 требует «повернуть». Для точечного
+  дерева поворот не влияет на расчёт, но нужен для несимметричных объектов
+  (скамья/ограждение/клумба-контейнер). Решить в WP-06: либо поле, либо явный
+  отказ от поворота точечных посадок в ТЗ.
+- AreaPatch/Placement: для undo/redo клиенту достаточно стабильного id - уже есть.
+
+МИГРАЦИЯ
+Сервера ещё нет; миграция БД не требуется. Порядок по TEAM_PROTOCOL §6:
+GPT обновляет build_contracts.py -> openapi.json/domain.schema.json -> fixtures
+(map_layer_valid.json, map_layer_raster_valid.json, map_layer_no_source_layer_invalid.json)
+-> validate.py. Claude перегенерирует packages/api-client и подключает легенду.
+До acknowledgement клиент не использует новые поля; MapLayer без legend UI
+показывает слоем с пометкой «легенда не предоставлена сервером», а не придумывает.
+
+ПРОВЕРКА
+- validate.py: позитивные/негативные fixtures нового MapLayer и Legend.
+- Contract test: каждый опубликованный векторный слой имеет source_layer.
+- E2E WP-04: опубликованный слой виден на карте с легендой, единицей, периодом и
+  источником из API; при is_stale=true отображается метка «устарел».
+- E2E WP-01/04: открыть deep link без сессии -> login -> возврат на тот же URL.

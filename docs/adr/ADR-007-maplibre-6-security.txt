@@ -1,0 +1,56 @@
+ADR-007 Переход клиента с MapLibre GL JS 5.20.0 на 6.16.0 по требованиям безопасности
+Статус: accepted (Claude, владелец клиента; изменение предложено и проверено GPT в a8a78a9).
+Дата: 29.10.2026. Затронуто: WP-00 (lockfiles), WP-02, WP-04, WP-06. ТЗ §04 называет
+стартовую пару MapLibre 5.20.0 + Three 0.180.0; это решение заменяет MapLibre часть.
+
+Проблема
+npm audit на зафиксированных в WP-02 версиях (apps/web/package-lock.json до a8a78a9):
+- maplibre-gl <=6.4.0 — critical: XSS через обход DOM.sanitize(); исправление только в 6.x.
+- react-router 6.0.0–7.17.0 — high: open redirect / внешний redirect, turbo-stream RCE.
+- vite <=6.4.3 — high: обход server.fs.deny на Windows, отдача файлов public/.
+- vitest/tinypool — critical: чтение файлов/RCE в dev-инструментах.
+- playwright <1.55.1 — high: загрузка браузеров без проверки сертификата.
+Остаться на уязвимой версии ради совпадения с ТЗ нельзя (ТЗ §25: зависимости
+проверяются на уязвимости).
+
+Решение
+maplibre-gl 6.16.0, react-router 7.18.5, vite 6.4.5, vitest 4.1.12, @playwright/test 1.64.1
+(точные версии в apps/web/package.json и lockfile). MapLibre 6 поставляет отдельный
+module worker: URL задаётся через setWorkerUrl(…?worker&url), сборка Vite target es2022.
+
+Совместимость
+API карты, используемое клиентом (Map, GeoJSONSource, fill/line слои, fitBounds,
+queryRenderedFeatures, NavigationControl/ScaleControl), работает без изменений.
+Пара с Three 0.180.0 проверена (см. ниже): совместима при трёх обязательных условиях.
+
+Проверка (после слияния в 3797c18)
+npm ci; tsc -b; vitest 14/14; vite build; npm audit — 0 уязвимостей; check:api.
+Браузерные сценарии повторены на живом API (см. coordination/handoffs/CLAUDE.json).
+
+Проверка совместимости MapLibre 6.16.0 + Three 0.180.0 (WP-06 foundation, 29.10.2026)
+Стенд: Microsoft Edge (Playwright msedge, headless, программный WebGL2), apps/web/scripts/
+scene3d-check.mjs, отчёт docs/evidence/wp06-foundation/report.json, 19/19 проверок.
+Результат: совместимо. Three рисует в custom layer MapLibre с общим WebGL2-контекстом и общим
+depth-буфером (renderingMode '3d'), модуль грузится отдельным чанком только по запросу.
+
+Обязательные условия (найдены проверкой, без них пара работает неверно):
+1. Матрица: брать args.defaultProjectionData.mainMatrix (0..1 mercator -> clip).
+   args.modelViewProjectionMatrix в MapLibre 6 в мировых пикселях; со старым шаблоном
+   «render(gl, matrix)» сцена не рисуется вовсе (0 draw calls), без ошибок в консоли.
+2. Один THREE.WebGLRenderer на GL-контекст карты. Конструктор Three 0.180 создаёт
+   4 текстуры-заглушки (WebGLState) и 3 framebuffer, которые renderer.dispose() не удаляет:
+   новый renderer на каждое включение 3D даёт утечку +4 текстуры/+3 FBO за цикл.
+   Слой при снятии освобождает свои геометрии/материалы (и программы) и renderLists.
+3. Потеря контекста: MapLibre 6 уничтожает стиль, сохраняет снимок и восстанавливает его,
+   но custom layer не восстанавливает (предупреждение в консоли). Потерю наблюдать событием
+   карты 'webglcontextlost' (onRemove слоя вызывается раньше слушателей холста), пересоздавать
+   слой после события карты 'webglcontextrestored' и 'idle'. Кэш renderer сбрасывается.
+
+Измерения: совпадение контуров Three с map.project при 4 положениях камеры — худшее
+1.1e-7 px; вертикальная метрика совпадает с fill-extrusion MapLibre визуально (эталон 30 м,
+скриншот harness; числовой проверки высоты нет — та же шкала meterInMercatorCoordinateUnits);
+после 25 циклов включения/выключения живые WebGL buffers/VAO/programs/textures/framebuffers
+вернулись к исходным, рост JS heap ~0.5 МБ при принудительном GC; чанк threeLayer 515 kB
+(132 kB gzip), в основном бандле Three отсутствует. 60 кадр/с на тестовой сцене в headless
+программном рендере — справочно, не приёмка P-04 (нужно реальное устройство).
+Не проверено: globe-проекция (используется только mercator), terrain, реальные данные зданий.

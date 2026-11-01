@@ -1,0 +1,61 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "mvp-survival-expert-rules-v1",
+      "properties": {
+        "record_type": "survival_model",
+        "model_kind": "expert_rules",
+        "calibration_status": "uncalibrated",
+        "applicability": "SYNTHETIC TEST: единая оценочная кривая MVP; не локальная модель Павлодара",
+        "qualitative_confidence": "low",
+        "survival_guidance": [
+          {
+            "kind": "risk",
+            "factor": "Дефицит влаги в первый сезон",
+            "score": 0.9,
+            "weight": 0,
+            "explanation": "Высокий уровень внимания: пересыхание корневого кома осложняет укоренение. Это экспертный фактор профиля, а не поправка к процентам прогноза."
+          },
+          {
+            "kind": "risk",
+            "factor": "Уплотнение и плохой дренаж почвы",
+            "score": 0.7,
+            "weight": 0,
+            "explanation": "Средне-высокий уровень внимания: застой воды и недостаток воздуха у корней могут ухудшить состояние посадок."
+          },
+          {
+            "kind": "risk",
+            "factor": "Пропуск сезонных осмотров",
+            "score": 0.6,
+            "weight": 0,
+            "explanation": "Средний уровень внимания: без осмотров позже обнаруживаются повреждения, усыхание и необходимость замены."
+          },
+          {
+            "kind": "measure",
+            "factor": "Выполнять полив по календарю",
+            "score": 0.9,
+            "weight": 0,
+            "explanation": "Высокий приоритет: соблюдать утверждённые месяцы и объёмы полива, корректируя работы только после осмотра специалистом."
+          },
+          {
+            "kind": "measure",
+            "factor": "Осматривать посадки весной и осенью",
+            "score": 0.8,
+            "weight": 0,
+            "explanation": "Высокий приоритет: фиксировать состояние, повреждения и фактическую потребность в уходе или замене."
+          }
+        ],
+        "points": [
+          {"year": 1, "probability": 0.88, "lower": 0.78, "upper": 0.94},
+          {"year": 2, "probability": 0.80, "lower": 0.68, "upper": 0.89},
+          {"year": 3, "probability": 0.74, "lower": 0.60, "upper": 0.85}
+        ],
+        "checked_at": "2026-10-31",
+        "expert_status": "pending"
+      },
+      "geometry": {"type": "Point", "coordinates": [76.9527, 52.2889]}
+    }
+  ]
+}

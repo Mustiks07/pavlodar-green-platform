@@ -1,0 +1,169 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:21:21.835Z",
+  "checks": [
+    {
+      "name": "basemap: OpenFreeMap liberty style loaded under platform layers",
+      "pass": true,
+      "detail": {
+        "layers": 120,
+        "top": [
+          "feature-highlight-line",
+          "feature-highlight-point",
+          "zone-history-line"
+        ],
+        "firstPlatform": 111,
+        "lastBasemap": 110,
+        "note": null
+      }
+    },
+    {
+      "name": "basemap: building extrusions flattened (unverified OpenMapTiles heights not shown as volume)",
+      "pass": true,
+      "detail": [
+        {
+          "id": "building-3d",
+          "h": 0
+        }
+      ]
+    },
+    {
+      "name": "basemap: attribution OpenFreeMap / OpenMapTiles / OpenStreetMap kept",
+      "pass": true,
+      "detail": {
+        "attrib": "OpenFreeMap © OpenMapTiles Data from OpenStreetMap"
+      }
+    },
+    {
+      "name": "basemap failure: explained; platform layers still drawn on blank background",
+      "pass": true,
+      "detail": {
+        "note": true,
+        "layersOk": true
+      }
+    },
+    {
+      "name": "createDataset from the wizard selects the new dataset",
+      "pass": true,
+      "detail": {
+        "datasetId": "6fbef7c9-9471-46b6-ad4e-bc84b26778b6"
+      }
+    },
+    {
+      "name": "KML: shown as not supported by the parser, upload disabled",
+      "pass": true
+    },
+    {
+      "name": "GeoJSON that the server would reject as a whole is blocked before upload",
+      "pass": true
+    },
+    {
+      "name": "nothing was uploaded for KML or invalid root",
+      "pass": true,
+      "detail": [
+        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
+        "PUT /v1/uploads/45b33578-f2bc-458d-a738-5b5841ec535b",
+        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
+        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
+        "PUT /v1/uploads/70ec0c9c-be0a-4408-b368-c45641ca6f55",
+        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
+        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
+        "PUT /v1/uploads/239984ce-715e-42e9-9759-8e0abc2cfe77",
+        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports"
+      ]
+    },
+    {
+      "name": "ticket -> PUT -> startImport -> Job succeeded (real API)",
+      "pass": true,
+      "detail": {
+        "state": "succeeded",
+        "kind": "import",
+        "requests": [
+          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
+          "PUT /v1/uploads/45b33578-f2bc-458d-a738-5b5841ec535b",
+          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
+          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
+          "PUT /v1/uploads/70ec0c9c-be0a-4408-b368-c45641ca6f55",
+          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
+          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
+          "PUT /v1/uploads/239984ce-715e-42e9-9759-8e0abc2cfe77",
+          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports"
+        ]
+      }
+    },
+    {
+      "name": "QualityReport shown for the new version (needs_review, 2 valid records)",
+      "pass": true,
+      "detail": {
+        "valid": 2,
+        "errors": 0,
+        "publish_allowed": true
+      }
+    },
+    {
+      "name": "specialist cannot publish (admin only)",
+      "pass": true
+    },
+    {
+      "name": "reload resumes the job view from the URL",
+      "pass": true,
+      "detail": {
+        "url": "http://localhost:5174/imports?city=10000000-0000-4000-8000-000000000001&job=322cf871-4621-4767-9b1d-cde173b8a553&importDataset=6fbef7c9-9471-46b6-ad4e-bc84b26778b6"
+      }
+    },
+    {
+      "name": "server rejection of an invalid geometry is shown with its reason (no fake success)",
+      "pass": true,
+      "detail": {
+        "status": false,
+        "errors": 1,
+        "issues": [
+          "record_invalid"
+        ]
+      }
+    },
+    {
+      "name": "CSV imported as a table; UI warned coordinates stay columns",
+      "pass": true,
+      "detail": {
+        "content_kind": "table",
+        "records": 2
+      }
+    },
+    {
+      "name": "admin sees publish only on versions that are not published/rejected",
+      "pass": true,
+      "detail": {
+        "count": 2
+      }
+    },
+    {
+      "name": "admin reject with reason -> version rejected",
+      "pass": true
+    },
+    {
+      "name": "admin publish: server result shown (published, or refusal with reasons)",
+      "pass": true,
+      "detail": {
+        "current": "95005b75-3a3a-488d-8511-4c470bfcf74e",
+        "dialog": ""
+      }
+    },
+    {
+      "name": "viewer: no upload form, role explained",
+      "pass": true
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp03-import-ui/map-basemap.png",
+    "docs/evidence/wp03-import-ui/map-basemap-failed.png",
+    "docs/evidence/wp03-import-ui/kml-not-supported.png",
+    "docs/evidence/wp03-import-ui/geojson-preview.png",
+    "docs/evidence/wp03-import-ui/geojson-imported.png",
+    "docs/evidence/wp03-import-ui/geojson-rejected.png",
+    "docs/evidence/wp03-import-ui/csv-preview.png",
+    "docs/evidence/wp03-import-ui/admin-after-publish.png"
+  ],
+  "finishedAt": "2026-10-31T08:23:01.570Z",
+  "passed": true
+}

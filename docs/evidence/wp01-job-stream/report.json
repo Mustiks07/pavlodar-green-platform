@@ -1,0 +1,51 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T07:37:51.534Z",
+  "checks": [
+    {
+      "name": "this environment serves streamJobEvents (contract 1.5.0, ADR-035)",
+      "pass": true
+    },
+    {
+      "name": "import job tracked through the SSE stream (200 text/event-stream), getJob read only at start/terminal",
+      "pass": true,
+      "detail": {
+        "transportSeen": true,
+        "streams": [
+          {
+            "status": 200,
+            "type": "text/event-stream; charset=utf-8"
+          }
+        ],
+        "getJobReads": 1
+      }
+    },
+    {
+      "name": "stream unavailable: polling fallback reaches the terminal state",
+      "pass": true,
+      "detail": {
+        "pollingSeen": true,
+        "getJobReads": 1,
+        "state": "succeeded"
+      }
+    },
+    {
+      "name": "reload keeps tracking the job from the URL and ends in its terminal state",
+      "pass": true,
+      "detail": {
+        "state": "succeeded",
+        "streamsAfterReload": 1
+      }
+    },
+    {
+      "name": "no page errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp01-job-stream/job-stream-done.png"
+  ],
+  "finishedAt": "2026-10-31T07:38:18.078Z",
+  "passed": true
+}

@@ -1,0 +1,7 @@
+{
+  "status": "not_approved",
+  "cloud_llm_allowed": null,
+  "service_data_egress_allowed": null,
+  "production_host": null,
+  "reason": "Владелец продукта не подтвердил; исследование не дает такого разрешения."
+}

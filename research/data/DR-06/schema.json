@@ -1,0 +1,459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DR-06 research staging package",
+  "type": "object",
+  "properties": {
+    "weather.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_id",
+          "time_utc",
+          "source_id",
+          "method",
+          "grid_latitude",
+          "grid_longitude",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "precipitation",
+          "shortwave_radiation",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "et0_fao_evapotranspiration"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "time_utc": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "grid_latitude": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "degree north"
+          },
+          "grid_longitude": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "degree east"
+          },
+          "temperature_2m": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "°C"
+          },
+          "relative_humidity_2m": {
+            "type": [
+              "integer"
+            ],
+            "x-unit": "%"
+          },
+          "precipitation": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "mm"
+          },
+          "shortwave_radiation": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "W/m²"
+          },
+          "wind_speed_10m": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "m/s"
+          },
+          "wind_direction_10m": {
+            "type": [
+              "integer"
+            ],
+            "x-unit": "°"
+          },
+          "et0_fao_evapotranspiration": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "mm"
+          }
+        }
+      },
+      "description": "ERA5 0.25°, почасовая ячейка. Параметры API и исходный JSON сохранены; не измерения станции."
+    },
+    "imagery_catalog.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "scene_id",
+          "source_id",
+          "observed_at",
+          "cloud_cover_granule_pct",
+          "city_cloud_cover_pct",
+          "red_resolution_m",
+          "nir_resolution_m",
+          "scl_resolution_m",
+          "raster_crs",
+          "metadata_url",
+          "pixels_downloaded",
+          "classification_validated"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "scene_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "cloud_cover_granule_pct": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "percent"
+          },
+          "city_cloud_cover_pct": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ],
+            "x-unit": "percent"
+          },
+          "red_resolution_m": {
+            "type": [
+              "integer"
+            ],
+            "x-unit": "m"
+          },
+          "nir_resolution_m": {
+            "type": [
+              "integer"
+            ],
+            "x-unit": "m"
+          },
+          "scl_resolution_m": {
+            "type": [
+              "integer"
+            ],
+            "x-unit": "m"
+          },
+          "raster_crs": {
+            "type": [
+              "string"
+            ]
+          },
+          "metadata_url": {
+            "type": [
+              "string"
+            ]
+          },
+          "pixels_downloaded": {
+            "type": [
+              "boolean"
+            ]
+          },
+          "classification_validated": {
+            "type": [
+              "boolean"
+            ]
+          }
+        }
+      },
+      "description": "Идентификаторы реальных сцен. Два ответа каталога — ограниченная выборка, не полный архив лета. Облачность гранулы не облачность города."
+    },
+    "coefficients.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_id",
+          "topic",
+          "value",
+          "status",
+          "reason",
+          "source_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "topic": {
+            "type": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "data.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "source_id",
+          "available",
+          "method",
+          "resolution",
+          "resolution_unit",
+          "observed_at",
+          "crs",
+          "applicability"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "dataset_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "available": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "resolution": {
+            "type": [
+              "integer",
+              "null",
+              "number"
+            ]
+          },
+          "resolution_unit": {
+            "type": [
+              "string"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "crs": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "applicability": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "search_log.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "search_id",
+          "checked_at",
+          "query_or_access",
+          "method",
+          "result",
+          "limitation"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "search_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "query_or_access": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "result": {
+            "type": [
+              "string"
+            ]
+          },
+          "limitation": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "sources.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "title",
+          "url",
+          "publisher",
+          "checked_at",
+          "observed_at",
+          "license",
+          "method",
+          "note"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "string"
+            ]
+          },
+          "publisher": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "license": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "note": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "checked_at — дата проверки; observed_at — дата/период источника, null если не указан. unknown лицензия не разрешает перепубликацию полного текста."
+    }
+  },
+  "required": [
+    "weather.csv",
+    "imagery_catalog.csv",
+    "coefficients.csv",
+    "data.csv",
+    "search_log.csv",
+    "sources.csv"
+  ],
+  "additionalProperties": false,
+  "x-csv": {
+    "encoding": "UTF-8",
+    "delimiter": ",",
+    "null_literal": "null",
+    "decimal_separator": ".",
+    "money": "decimal string, KZT",
+    "source_refs_separator": ";"
+  },
+  "x-crs": {
+    "GeoJSON": "EPSG:4326, [longitude,latitude]",
+    "distance_calculation": "EPSG:32643; no distances calculated here"
+  },
+  "x-import": "Staging only; map external identifiers to canonical UUIDs. No auto publish or approval.",
+  "x-other-formats": {
+    "buildings.geojson": "geojson.schema.json"
+  }
+}

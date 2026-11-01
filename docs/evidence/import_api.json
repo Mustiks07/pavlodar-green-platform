@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "scope": "Real OIDC, HTTP upload, PostgreSQL outbox, Redis/Celery import, atomic admin publication, MapLayer manifest, authorized PostGIS MVT and canonical feature detail",
+  "dataset_id": "bf27393d-bbf9-43bc-980d-5239f7e93679",
+  "upload_id": "654a2fb4-5552-46ac-9f5a-6a67c534edad",
+  "job_id": "c4dd8435-f964-4ccd-9aca-30c0eaf5d94f",
+  "dataset_version_id": "d72ede1b-5ac5-4645-801d-87153b23ebf4",
+  "valid_count": 1,
+  "map_layer_id": "61183c6e-b156-5d17-8d27-c2114e344fe1",
+  "map_feature_id": "b9e6a111-aa28-508c-9912-c29b36d0bc7f",
+  "mvt_bytes": 160,
+  "organizer_data_received": false,
+  "synthetic_test_input": true,
+  "supported_in_this_increment": [
+    "geojson",
+    "csv"
+  ],
+  "still_rejected_with_quality_report": [
+    "kml",
+    "shp_zip"
+  ]
+}

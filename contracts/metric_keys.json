@@ -1,0 +1,83 @@
+{
+  "version": "1.13.0",
+  "metrics": [
+    {
+      "key": "zone_area",
+      "unit": "m2",
+      "kind": "stock",
+      "domain": "context"
+    },
+    {
+      "key": "soil_coverage_fraction",
+      "unit": "1",
+      "kind": "state",
+      "domain": "context"
+    },
+    {
+      "key": "existing_green_area",
+      "unit": "m2",
+      "kind": "stock",
+      "domain": "context"
+    },
+    {
+      "key": "existing_green_feature_count",
+      "unit": "piece",
+      "kind": "stock",
+      "domain": "context"
+    },
+    {
+      "key": "air_cooling",
+      "unit": "degC",
+      "kind": "state",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "surface_temperature_change",
+      "unit": "degC",
+      "kind": "state",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "shade_area",
+      "unit": "m2",
+      "kind": "stock",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "green_area",
+      "unit": "m2",
+      "kind": "stock",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "green_area_per_person",
+      "unit": "m2",
+      "kind": "state",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "stormwater_retained",
+      "unit": "m3",
+      "kind": "flow",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "co2_sequestered",
+      "unit": "t_CO2_per_year",
+      "kind": "flow",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "pollutants_removed",
+      "unit": "kg_per_year",
+      "kind": "flow",
+      "domain": "ecosystem"
+    },
+    {
+      "key": "survival_probability",
+      "unit": "1",
+      "kind": "state",
+      "domain": "survival"
+    }
+  ]
+}

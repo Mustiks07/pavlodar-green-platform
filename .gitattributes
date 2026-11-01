@@ -1,0 +1,16 @@
+* text=auto
+*.json text eol=lf
+*.py text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.mmd text eol=lf
+*.pdf binary
+*.png binary
+
+# Preserve delivery checksums, including CSV CRLF.
+research/data/** -text
+
+# Deterministic generated TypeScript clients across Windows/Linux.
+*.ts text eol=lf
+*.tsx text eol=lf

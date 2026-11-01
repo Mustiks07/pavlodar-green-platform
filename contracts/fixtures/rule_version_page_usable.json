@@ -1,0 +1,29 @@
+{
+  "schema": "RuleVersionPage",
+  "expected_valid": true,
+  "data": {
+    "items": [
+      {
+        "id": "71000000-0000-4000-8000-000000000001",
+        "source": {
+          "dataset_version_id": "72000000-0000-4000-8000-000000000001",
+          "source_record_id": "synthetic-rule-source",
+          "label": "SYNTHETIC TEST restrictions",
+          "uri": null
+        },
+        "act_number": "SYNTHETIC TEST POLICY",
+        "clause": "test-clause",
+        "revision_date": "2026-10-30",
+        "parameter": "plant_hard_constraints_reviewed",
+        "value": true,
+        "unit": null,
+        "applicability": "SYNTHETIC TEST city only",
+        "condition": null,
+        "review_status": "expert_confirmed",
+        "source_status": "SYNTHETIC TEST fixture",
+        "superseded_by": null
+      }
+    ],
+    "next_cursor": null
+  }
+}

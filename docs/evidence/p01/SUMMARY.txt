@@ -1,0 +1,40 @@
+P-01 (TZ §26): city map ready for interaction <= 5 s p95, cold load.
+
+Method (scripts: apps/web/scripts/p01-bench.mjs)
+- Production build served by `vite preview` on :4173, proxied to the integration API :8001.
+- Authenticated viewer session; Microsoft Edge (Playwright, headless), viewport 1440x900.
+- CDP network emulation 20 Mbit/s down/up, RTT 50 ms. Basemap (OpenFreeMap) over the real internet.
+- 30 cold runs (new browser context = empty HTTP cache) and 30 warm reloads.
+- Readiness = performance mark 'pg:map-ready': city boundary and zones from the API drawn AND the
+  first map 'idle' (that includes basemap tiles). 'pg:map-style-ready' = style loaded, platform
+  layers can be drawn. Both marks are in MapWorkspace.tsx and usable as production telemetry.
+
+Results (ms)                       cold p50  cold p95  cold max  warm p50  warm p95   FCP p50 cold
+baseline-single-bundle.json            1908     12982     16587       794      1037        640
+split-lazy-chunks.json                 1793      2118      5100      1006      1145        420
+P-01 pass                         baseline: NO     split: YES (p95 2118 <= 5000)
+
+Bundles
+- Before: one 1,593 kB entry chunk (MapLibre + React + app).
+- After: entry index 87.6 kB (28.9 kB gz) + react 281 kB + query 35 kB (both modulepreloaded);
+  maplibre 1,065 kB and the map page 35 kB load only for the map route (prefetched on landing on
+  "/" before React mounts, on nav hover/focus otherwise); lists 28 kB, ImportWizard 19.5 kB,
+  ScenarioPage 14 kB, threeLayer 515 kB (only when 3D is switched on). Dev fixtures (UiGallery,
+  3D harness) are not in the production build.
+
+Analysis of the slow runs
+- The two baseline outliers (16.6 s, 13.0 s) and the single split outlier (5.1 s) are external:
+  in the 13.0 s run the OpenFreeMap style itself took 12.75 s; in the 16.6 s and 5.1 s runs the
+  style was ready at ~1.0 s and the time was spent waiting for basemap tiles before first idle.
+  The 'pg:map-ready' definition deliberately includes basemap tiles, so it is conservative.
+- Cross-origin basemap transfer sizes read 0 (no Timing-Allow-Origin on OpenFreeMap), so the
+  basemap share cannot be measured from the page; the attribution above comes from the marks.
+- Warm p50 grew by ~0.2 s: the map route is now one more request hop (entry -> map chunk), and
+  `vite preview` revalidates every file on reload (304s). With `Cache-Control: immutable` for the
+  hashed /assets/* files in the production web server the revalidation disappears (deployment
+  recommendation for GPT; not measured here).
+
+Limits
+- One machine, one browser, emulated network; real mobile networks and CPUs are not covered.
+- The integration API runs locally, so API latency is lower than a remote deployment would have.
+- Organizer data not received; the city/zones are the integration test data (17 zones).

@@ -1,0 +1,46 @@
+{
+  "fixture_only": true,
+  "schema": "CityPage",
+  "expected_valid": true,
+  "origin": "Captured from running API with explicit synthetic test profile; not organizer data",
+  "data": {
+    "items": [
+      {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "name": "Павлодар — СИНТЕТИЧЕСКИЙ ТЕСТОВЫЙ КОНТУР",
+        "boundary": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                76.9,
+                52.2
+              ],
+              [
+                77.1,
+                52.2
+              ],
+              [
+                77.1,
+                52.4
+              ],
+              [
+                76.9,
+                52.4
+              ],
+              [
+                76.9,
+                52.2
+              ]
+            ]
+          ]
+        },
+        "timezone": "Asia/Almaty",
+        "metric_crs": "EPSG:32643",
+        "boundary_status": "working",
+        "boundary_version_id": "10000000-0000-4000-8000-000000000002"
+      }
+    ],
+    "next_cursor": null
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "url": "https://archive-api.open-meteo.com/v1/archive?latitude=52.287&longitude=76.967&start_date=2025-07-01&end_date=2025-07-07&hourly=temperature_2m,relative_humidity_2m,precipitation,shortwave_radiation,wind_speed_10m,wind_direction_10m,et0_fao_evapotranspiration&models=era5&timezone=UTC&wind_speed_unit=ms",
+  "checked_at": "2026-10-29",
+  "method": "GET, Windows Invoke-WebRequest, TLS verification enabled",
+  "response_location": {
+    "latitude": 52.25,
+    "longitude": 77.0,
+    "elevation": 135.0,
+    "utc_offset_seconds": 0,
+    "timezone": "GMT"
+  },
+  "requested_location": {
+    "latitude": 52.287,
+    "longitude": 76.967
+  },
+  "model": "era5"
+}

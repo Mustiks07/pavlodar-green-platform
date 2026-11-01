@@ -1,0 +1,772 @@
+{
+  "label": "osm-v2-60144",
+  "requirement": "P-01: map ready <= 5000 ms p95, cold",
+  "git": "9d9501d8395a4f89dad9a7f726c079ba2e43800c",
+  "measuredAt": "2026-10-31T11:14:35.005Z",
+  "machine": {
+    "platform": "win32 10.0.19045",
+    "cpu": "AMD Ryzen 5 5500U with Radeon Graphics         ",
+    "cores": 12,
+    "memGB": 11
+  },
+  "browser": "msedge 156.0.4314.50 (Playwright, headless)",
+  "network": "20 Mbit/s down/up, RTT 50 ms (CDP emulation); API http://localhost:8001 via vite preview proxy; basemap OpenFreeMap over the real internet",
+  "readiness": "performance mark 'pg:map-ready' (boundary + zones drawn, first map idle incl. basemap tiles)",
+  "chunks": [
+    {
+      "file": "maplibre-CRU4Kyyq.js",
+      "bytes": 1065397
+    },
+    {
+      "file": "maplibre-gl-worker-DQFTlV5b.js",
+      "bytes": 517372
+    },
+    {
+      "file": "threeLayer-BKkNDK8Z.js",
+      "bytes": 515285
+    },
+    {
+      "file": "react-BDLuxtnW.js",
+      "bytes": 280840
+    },
+    {
+      "file": "index-BDUFGCR5.js",
+      "bytes": 192071
+    },
+    {
+      "file": "lists-B68-5iC0.js",
+      "bytes": 73911
+    },
+    {
+      "file": "maplibre--S9olhOP.css",
+      "bytes": 71505
+    },
+    {
+      "file": "index-Bv92jGGb.css",
+      "bytes": 49580
+    },
+    {
+      "file": "MapWorkspace-CxUnE3Xf.js",
+      "bytes": 45625
+    },
+    {
+      "file": "ScenarioPage-CsaqlUQf.js",
+      "bytes": 37840
+    },
+    {
+      "file": "query-DDttnm-m.js",
+      "bytes": 37810
+    },
+    {
+      "file": "ShadowPanel-7m59W2zj.js",
+      "bytes": 27183
+    },
+    {
+      "file": "ImportWizard-BC6knC4-.js",
+      "bytes": 19248
+    },
+    {
+      "file": "gates-BbWAOkk7.js",
+      "bytes": 17979
+    },
+    {
+      "file": "ZoneCard-B9qUBXzD.js",
+      "bytes": 10447
+    },
+    {
+      "file": "misc-C2q3vPDb.js",
+      "bytes": 8685
+    },
+    {
+      "file": "FullCalculation-Dbcg2vgI.js",
+      "bytes": 7283
+    },
+    {
+      "file": "ExportPanel-BMoonxEV.js",
+      "bytes": 6864
+    },
+    {
+      "file": "queries-CyhZbEho.js",
+      "bytes": 4522
+    }
+  ],
+  "cold": {
+    "mapReadyMs": {
+      "n": 30,
+      "p50": 7208,
+      "p95": 8013,
+      "max": 8122,
+      "mean": 7300
+    },
+    "styleReadyMs": {
+      "n": 30,
+      "p50": 859,
+      "p95": 1001,
+      "max": 1006,
+      "mean": 875
+    },
+    "fcpMs": {
+      "n": 30,
+      "p50": 324,
+      "p95": 400,
+      "max": 420,
+      "mean": 327
+    },
+    "jsTransferBytes": {
+      "n": 30,
+      "p50": 490001,
+      "p95": 490001,
+      "max": 490001,
+      "mean": 490001
+    },
+    "basemapTransferBytes": {
+      "n": 30,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    }
+  },
+  "warm": {
+    "mapReadyMs": {
+      "n": 30,
+      "p50": 1096,
+      "p95": 1204,
+      "max": 1232,
+      "mean": 1033
+    },
+    "styleReadyMs": {
+      "n": 30,
+      "p50": 420,
+      "p95": 477,
+      "max": 488,
+      "mean": 427
+    },
+    "fcpMs": {
+      "n": 30,
+      "p50": 100,
+      "p95": 164,
+      "max": 164,
+      "mean": 108
+    },
+    "jsTransferBytes": {
+      "n": 30,
+      "p50": 1080,
+      "p95": 1080,
+      "max": 1080,
+      "mean": 1080
+    },
+    "basemapTransferBytes": {
+      "n": 30,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    }
+  },
+  "passP01": false,
+  "rawCold": [
+    {
+      "mapReadyMs": 7237.300000011921,
+      "styleReadyMs": 990.3999999761581,
+      "fcpMs": 352,
+      "domContentLoadedMs": 280,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7233.700000047684,
+      "styleReadyMs": 877.3000000119209,
+      "fcpMs": 324,
+      "domContentLoadedMs": 265.9000000357628,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7690.099999964237,
+      "styleReadyMs": 898.0999999642372,
+      "fcpMs": 344,
+      "domContentLoadedMs": 256.80000001192093,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 6946.400000035763,
+      "styleReadyMs": 830.8000000119209,
+      "fcpMs": 300,
+      "domContentLoadedMs": 247.5,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7773.399999976158,
+      "styleReadyMs": 861.0999999642372,
+      "fcpMs": 292,
+      "domContentLoadedMs": 239.69999998807907,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 8122.400000035763,
+      "styleReadyMs": 831.6000000238419,
+      "fcpMs": 300,
+      "domContentLoadedMs": 242.5,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7380.800000011921,
+      "styleReadyMs": 837,
+      "fcpMs": 320,
+      "domContentLoadedMs": 239.9000000357628,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7208.400000035763,
+      "styleReadyMs": 859,
+      "fcpMs": 328,
+      "domContentLoadedMs": 265.10000002384186,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 6828.399999976158,
+      "styleReadyMs": 942.1000000238419,
+      "fcpMs": 336,
+      "domContentLoadedMs": 266.5,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 6974.100000023842,
+      "styleReadyMs": 906.8000000119209,
+      "fcpMs": 300,
+      "domContentLoadedMs": 245.10000002384186,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7519.099999964237,
+      "styleReadyMs": 814.8000000119209,
+      "fcpMs": 300,
+      "domContentLoadedMs": 246.80000001192093,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7614.699999988079,
+      "styleReadyMs": 843.8999999761581,
+      "fcpMs": 336,
+      "domContentLoadedMs": 265.0999999642372,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7063.5,
+      "styleReadyMs": 1001.0999999642372,
+      "fcpMs": 380,
+      "domContentLoadedMs": 282.39999997615814,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7264.300000011921,
+      "styleReadyMs": 950.6000000238419,
+      "fcpMs": 420,
+      "domContentLoadedMs": 277,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7640.400000035763,
+      "styleReadyMs": 1006.1000000238419,
+      "fcpMs": 328,
+      "domContentLoadedMs": 266.69999998807907,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7076.699999988079,
+      "styleReadyMs": 781.9000000357628,
+      "fcpMs": 300,
+      "domContentLoadedMs": 233.69999998807907,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 6834.600000023842,
+      "styleReadyMs": 898.1000000238419,
+      "fcpMs": 300,
+      "domContentLoadedMs": 242.10000002384186,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7111.300000011921,
+      "styleReadyMs": 867.6999999880791,
+      "fcpMs": 300,
+      "domContentLoadedMs": 246.19999998807907,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7175.199999988079,
+      "styleReadyMs": 816.1000000238419,
+      "fcpMs": 296,
+      "domContentLoadedMs": 242.10000002384186,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7346.699999988079,
+      "styleReadyMs": 842.3999999761581,
+      "fcpMs": 332,
+      "domContentLoadedMs": 248.39999997615814,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7086.399999976158,
+      "styleReadyMs": 853,
+      "fcpMs": 348,
+      "domContentLoadedMs": 247.39999997615814,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7481,
+      "styleReadyMs": 853.6999999880791,
+      "fcpMs": 324,
+      "domContentLoadedMs": 262.19999998807907,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 8012.5,
+      "styleReadyMs": 858.5,
+      "fcpMs": 336,
+      "domContentLoadedMs": 261.60000002384186,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7554.300000011921,
+      "styleReadyMs": 867.3000000119209,
+      "fcpMs": 312,
+      "domContentLoadedMs": 238.19999998807907,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7072.300000011921,
+      "styleReadyMs": 876.3000000119209,
+      "fcpMs": 296,
+      "domContentLoadedMs": 244.89999997615814,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 6986.5,
+      "styleReadyMs": 858.3999999761581,
+      "fcpMs": 344,
+      "domContentLoadedMs": 272,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7147.5,
+      "styleReadyMs": 901.1000000238419,
+      "fcpMs": 320,
+      "domContentLoadedMs": 260.4000000357628,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7637.600000023842,
+      "styleReadyMs": 833.6000000238419,
+      "fcpMs": 328,
+      "domContentLoadedMs": 266.60000002384186,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 7102.5,
+      "styleReadyMs": 815.1999999880791,
+      "fcpMs": 312,
+      "domContentLoadedMs": 253.5,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 6869.699999988079,
+      "styleReadyMs": 890.6999999880791,
+      "fcpMs": 400,
+      "domContentLoadedMs": 281.19999998807907,
+      "jsTransferBytes": 490001,
+      "appTransferBytes": 1628739,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    }
+  ],
+  "rawWarm": [
+    {
+      "mapReadyMs": 802.9000000357628,
+      "styleReadyMs": 477.30000001192093,
+      "fcpMs": 164,
+      "domContentLoadedMs": 124,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1145.5,
+      "styleReadyMs": 415.89999997615814,
+      "fcpMs": 92,
+      "domContentLoadedMs": 55.69999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1231.7999999523163,
+      "styleReadyMs": 400,
+      "fcpMs": 92,
+      "domContentLoadedMs": 47,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 796.1999999880791,
+      "styleReadyMs": 458.30000001192093,
+      "fcpMs": 140,
+      "domContentLoadedMs": 75.60000002384186,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 815.6000000238419,
+      "styleReadyMs": 438.10000002384186,
+      "fcpMs": 104,
+      "domContentLoadedMs": 59.69999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 194421,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 861.8999999761581,
+      "styleReadyMs": 488.10000002384186,
+      "fcpMs": 164,
+      "domContentLoadedMs": 82.10000002384186,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 194421,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 745.7999999523163,
+      "styleReadyMs": 414.19999998807907,
+      "fcpMs": 92,
+      "domContentLoadedMs": 52.19999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1189.3999999761581,
+      "styleReadyMs": 448.30000001192093,
+      "fcpMs": 120,
+      "domContentLoadedMs": 63.89999997615814,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1203.8999999761581,
+      "styleReadyMs": 409.5,
+      "fcpMs": 84,
+      "domContentLoadedMs": 46.69999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1154.9000000357628,
+      "styleReadyMs": 415.4000000357628,
+      "fcpMs": 100,
+      "domContentLoadedMs": 49.90000003576279,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 728.0999999642372,
+      "styleReadyMs": 397.19999998807907,
+      "fcpMs": 92,
+      "domContentLoadedMs": 45,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 62523,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1174.1000000238419,
+      "styleReadyMs": 429.19999998807907,
+      "fcpMs": 104,
+      "domContentLoadedMs": 57.5,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1069.8999999761581,
+      "styleReadyMs": 421.30000001192093,
+      "fcpMs": 116,
+      "domContentLoadedMs": 61.89999997615814,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1069.699999988079,
+      "styleReadyMs": 406.69999998807907,
+      "fcpMs": 84,
+      "domContentLoadedMs": 45.39999997615814,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 896.5,
+      "styleReadyMs": 459.10000002384186,
+      "fcpMs": 92,
+      "domContentLoadedMs": 53.60000002384186,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 194421,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1108.8999999761581,
+      "styleReadyMs": 423.69999998807907,
+      "fcpMs": 88,
+      "domContentLoadedMs": 48.799999952316284,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1178.8999999761581,
+      "styleReadyMs": 394.19999998807907,
+      "fcpMs": 108,
+      "domContentLoadedMs": 41.5,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1159.0999999642372,
+      "styleReadyMs": 447.30000001192093,
+      "fcpMs": 156,
+      "domContentLoadedMs": 91.5,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1092.3999999761581,
+      "styleReadyMs": 409.60000002384186,
+      "fcpMs": 104,
+      "domContentLoadedMs": 40.5,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 760.3000000119209,
+      "styleReadyMs": 419.5,
+      "fcpMs": 124,
+      "domContentLoadedMs": 54.30000001192093,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 194421,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1136,
+      "styleReadyMs": 439,
+      "fcpMs": 148,
+      "domContentLoadedMs": 84.10000002384186,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1094.800000011921,
+      "styleReadyMs": 419,
+      "fcpMs": 108,
+      "domContentLoadedMs": 58.19999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1096.1000000238419,
+      "styleReadyMs": 402.80000001192093,
+      "fcpMs": 92,
+      "domContentLoadedMs": 49.39999997615814,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 868.5999999642372,
+      "styleReadyMs": 436.69999998807907,
+      "fcpMs": 88,
+      "domContentLoadedMs": 38.19999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 194421,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1157.699999988079,
+      "styleReadyMs": 411.69999998807907,
+      "fcpMs": 84,
+      "domContentLoadedMs": 43.69999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1172.699999988079,
+      "styleReadyMs": 411.80000001192093,
+      "fcpMs": 84,
+      "domContentLoadedMs": 48.30000001192093,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1153,
+      "styleReadyMs": 441.39999997615814,
+      "fcpMs": 116,
+      "domContentLoadedMs": 76.30000001192093,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1200.5,
+      "styleReadyMs": 435.5,
+      "fcpMs": 128,
+      "domContentLoadedMs": 65.69999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 749.3999999761581,
+      "styleReadyMs": 413.19999998807907,
+      "fcpMs": 80,
+      "domContentLoadedMs": 41.19999998807907,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    },
+    {
+      "mapReadyMs": 1168.699999988079,
+      "styleReadyMs": 433.5,
+      "fcpMs": 96,
+      "domContentLoadedMs": 58.89999997615814,
+      "jsTransferBytes": 1080,
+      "appTransferBytes": 228766,
+      "basemapTransferBytes": 0,
+      "zones": 29
+    }
+  ]
+}

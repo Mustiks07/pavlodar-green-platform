@@ -1,0 +1,53 @@
+{
+  "agent": "GPT",
+  "task_id": "FINAL-PRODUCT-INTEGRATION",
+  "base_sha": "8f94c95",
+  "head_sha": "2d2c6ea",
+  "state": "platform_ready_visual_journey_verified",
+  "contract_version": "1.13.0",
+  "api_operations": {
+    "implemented": 102,
+    "canonical": 102
+  },
+  "product_snapshot": {
+    "published_city_objects": 60144,
+    "prepared_zones": 3,
+    "project_variants": 9,
+    "catalog_plants": 9,
+    "city_programs": 1,
+    "assistant": "live project-bound provider response verified"
+  },
+  "delivered": [
+    "task-oriented navigation and global project search",
+    "map-first city overview with 2D/3D and guided next actions",
+    "three curated planting alternatives for each prepared zone",
+    "human-readable comparison, program, readiness and execution workspaces",
+    "project-bound assistant output rendered without internal revision identifiers",
+    "derived restriction problem API with durable specialist decisions",
+    "release README and current authenticated product captures",
+    "canonical 265-vertex DR-01 working city boundary without changing linked city id",
+    "photographic territory cards for projects and problems plus a visual execution journey",
+    "product-safe map, source, import and assistant labels with technical lineage kept in disclosures"
+  ],
+  "verification": {
+    "canonical_contract_checks": 398,
+    "frontend_unit_tests": 75,
+    "backend_regression": "293 passed",
+    "generated_client": "1.13.0 synchronized",
+    "dependency_audit": "0 high-severity npm vulnerabilities",
+    "focused_city_boundary": "265 vertices; bbox 76.8599921,52.1931974..77.2048261,52.4503782",
+    "authenticated_route_capture": "map, 3D, problems, program, projects, compare, catalog, execution, sources and scenario refreshed",
+    "responsive_map": "390x844, no horizontal overflow"
+  },
+  "external_gates": [
+    "physical-device touch and 3D acceptance",
+    "production hosting and WAL/PITR recovery",
+    "locally approved soil, restriction, weather and ecological coefficient versions",
+    "complete accepted supplier prices and care inputs before program optimization"
+  ],
+  "integrity_notes": [
+    "No official boundary or local calibration claim is made.",
+    "Unknown prices and unavailable coefficients remain null and block approval instead of becoming invented values.",
+    "Secrets and provider keys remain local and are not committed."
+  ]
+}

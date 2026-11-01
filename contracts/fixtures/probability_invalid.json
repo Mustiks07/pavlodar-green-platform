@@ -1,0 +1,11 @@
+{
+  "fixture_only": true,
+  "schema": "SurvivalPoint",
+  "expected_valid": false,
+  "data": {
+    "year": 1,
+    "probability": 85,
+    "lower": null,
+    "upper": null
+  }
+}

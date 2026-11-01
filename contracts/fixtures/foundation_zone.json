@@ -1,0 +1,52 @@
+{
+  "fixture_only": true,
+  "schema": "Zone",
+  "expected_valid": true,
+  "origin": "Captured from running API with explicit synthetic test profile; not organizer data",
+  "data": {
+    "id": "129ab7a5-2fc9-4a62-9700-3636c5d0391b",
+    "version_id": "bface4c4-a4fd-4822-92e8-3f3723611e46",
+    "city_id": "10000000-0000-4000-8000-000000000001",
+    "name": "SYNTHETIC zone",
+    "purpose": "park",
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            76.98,
+            52.28
+          ],
+          [
+            76.981,
+            52.28
+          ],
+          [
+            76.981,
+            52.281
+          ],
+          [
+            76.98,
+            52.281
+          ],
+          [
+            76.98,
+            52.28
+          ]
+        ]
+      ]
+    },
+    "area_m2": 7591.458720536456,
+    "data_gaps": [
+      {
+        "code": "safety_inputs_missing",
+        "message": "Soil, utilities and expert restrictions have not been verified",
+        "required_inputs": [
+          "DR-03"
+        ],
+        "blocking": true
+      }
+    ],
+    "updated_at": "2026-10-29T12:39:25.408044Z"
+  }
+}

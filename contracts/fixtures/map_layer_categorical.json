@@ -1,0 +1,35 @@
+{
+  "fixture_only": true,
+  "schema": "MapLayer",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; URL is not a production tile service",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000701",
+    "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+    "dataset_id": "00000000-0000-4000-8000-000000000700",
+    "name": "SYNTHETIC quality layer",
+    "kind": "fixture_quality",
+    "source_type": "mvt",
+    "source_url": "/tiles/synthetic/{z}/{x}/{y}.pbf",
+    "dataset_version_id": "00000000-0000-4000-8000-000000000702",
+    "min_zoom": 8,
+    "max_zoom": 18,
+    "attribution": "SYNTHETIC fixture",
+    "access_level": "internal",
+    "observed_at": null,
+    "category": "data_quality",
+    "source_layer": "quality",
+    "geometry_type": "polygon",
+    "is_stale": false,
+    "legend": {
+      "mode": "categorical",
+      "property": "quality_state",
+      "unit": null,
+      "period": null,
+      "classes": [
+        { "key": "unknown", "label": "Нет данных", "value": "unknown", "min": null, "max": null, "semantic": "unknown" }
+      ],
+      "unknown_class_key": "unknown"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "licenses.csv": [
+    {
+      "source_id": "OSM-LICENSE",
+      "license": "ODbL-1.0",
+      "scope": "База геоданных; атрибуция и ODbL, не разрешение на массовую загрузку публичных тайлов.",
+      "approval": "not_product_owner_approved"
+    },
+    {
+      "source_id": "WEATHER-LICENSE",
+      "license": "CC-BY-4.0 data; separate API service terms",
+      "scope": "Данные CC BY 4.0; бесплатный API отдельно ограничен некоммерческим использованием.",
+      "approval": "not_product_owner_approved"
+    }
+  ],
+  "data.csv": [
+    {
+      "record_id": "DR-07-hosting",
+      "topic": "hosting",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Требуется ответ владельца/организаторов; поиском не устанавливается.",
+      "source_id": "PROJECT-TZ"
+    },
+    {
+      "record_id": "DR-07-cloud_llm_permission",
+      "topic": "cloud_llm_permission",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Требуется ответ владельца/организаторов; поиском не устанавливается.",
+      "source_id": "PROJECT-TZ"
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "PROJECT-TZ",
+      "title": "ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29",
+      "url": "repo:docs/TZ_DEVELOPMENT.txt",
+      "publisher": "Проект team-vtiposhnik",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-10-29",
+      "license": "unknown",
+      "method": "project_requirement",
+      "note": "Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке."
+    },
+    {
+      "source_id": "OSM-LICENSE",
+      "title": "OpenStreetMap copyright and licence",
+      "url": "https://www.openstreetmap.org/copyright",
+      "publisher": "OpenStreetMap Foundation",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "ODbL-1.0",
+      "method": "license_terms",
+      "note": ""
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+Research intake integration — 2026-10-29
+Canonical contract: 1.0.0 unchanged. Delivery commit: 21b7d88.
+API: http://localhost:8001; Claude Vite proxy PG_API_ORIGIN=http://127.0.0.1:8001.
+Local HTTP is the development/test profile, not a production deployment.
+City ID: 2de4e9e4-1602-5bdb-b17d-13df22510458.
+
+Implemented
+100 research files stored byte-for-byte in PostgreSQL with original hashes, plus
+the manifest as receipt metadata. The separately committed source delivery retains
+the original manifest bytes; planning was merged by request ID. No tariff PDF.
+Immutable source/record versions retain raw nulls, units, applicability, dates,
+legal paragraph/revision and reasons. Stable external identity mappings do not
+constitute approval or publication into canonical plant/rate/model registries.
+DR-02/05 mirrored stock is four versions/eight occurrences. Sources referenced by
+each occurrence resolve to the exact staged source version. Six numeric foot ranges
+have explicit 0.3048 conversions; raw values remain intact. Genus, cultivar, batch
+are not conflated. Taxa remain needs_review; no safety inferred from missing traits.
+Geometry originals and 111 feature occurrences are retained (1 boundary/110 OSM
+buildings). Empty restrictions and soil files remain empty with explicit data gaps.
+No rows are fabricated for cohorts/inspections/care. News is training_eligible=false.
+No active water tariffs, automatic law engine, growth curves or local survival model.
+
+Existing API sequence for Claude
+1. GET /v1/cities and select the research city (not the synthetic test city).
+2. GET /v1/datasets?city_id=2de4e9e4-1602-5bdb-b17d-13df22510458
+   Seven internal datasets; current_version_id=null means no published version.
+3. GET /v1/datasets/{dataset_id}/versions
+   Specialist/admin can inspect needs_review versions even when current is null.
+4. GET /v1/dataset-versions/{version_id}/quality
+   publish_allowed=false; warning issues contain limitations and source provenance
+   (URL, publisher, checked_at distinct from observed_at, license and method).
+   valid_count is CSV structural validity only, not scientific acceptance.
+5. POST /v1/dataset-versions/{version_id}/publish with Reason, CSRF and idempotency
+   returns 422 research_publication_blocked with canonical DataGap blockers.
+   A hidden/disabled UI button alone is not the gate.
+Captured real response fixtures: contracts/fixtures/research_*.json.
+
+Readiness by operation
+Source/quality reads: available for explicitly granted specialist/admin users.
+Working boundary preview and draft zone geometry: available, boundary_status=working.
+Empty scenario save/version/restore: available; not an approved planting plan.
+Catalog/research record details: stored, canonical read API proposed in ADR-005.
+Quotation arithmetic: exact Decimal kernel with explicit input assumptions; incomplete
+cost has total=null, known_subtotal and missing_rate gaps. No rate auto-selection.
+Automatic placement/approval: blocked by missing safety data and expert approval.
+Full cost: blocked by missing works/tax/logistics/rate applicability.
+Survival training/calibration: unavailable without linked cohorts and observations.
+Exact shadow/microclimate/eco KPI: unavailable without validated input/model versions.
+The ERA5 sample and scene metadata do not substitute for local measurements/rasters.
+Cloud egress and production deployment: owner decisions DR-07 remain unresolved.
+
+Verified
+62 tests passed against disposable PostgreSQL/PostGIS, including duplicate intake,
+transaction rollback, source lineage, quantity null vs zero, immutable staging,
+authorization, publication denial and partial cost. Real OIDC HTTP after service
+rebuild/restart read all seven quality reports and rejected seven publish attempts.
+Restore into a new database matched 18 table fingerprints including research bytes.
+Browser: committed Claude UI f380d78243d8e426614505c1e0828e6c16b1ba82 is integrated
+in the GPT worktree. The browser shows seven persisted source rows, source version,
+unknown observation date, quality summary and publication gate, plus the dashed
+working OSM boundary. Evidence: docs/evidence/foundation-ui/integrated-*.png.
+Review browser on localhost:5175 reused a test OIDC session; writes/login remain
+configured for localhost:5173. The obsolete compatibility API on 8000 was stopped.
+14 frontend tests, generated-client comparison, typecheck and production build pass.
+Known dependency advisories were fixed; npm audit reports zero known vulnerabilities.
+Claude ACK of ADR-002/003 is recorded; ADR-006 corrections to ADR-004 are pending
+before atomic 1.1 regeneration. Independent shared-SHA acceptance is still pending.
+Quality issue details are returned by the API but UI currently shows counts only.
+Long nav labels and wide source tables still require scrolling at 1280px.
+
+Legal verification
+Research claims and legal_checks.json are preserved. This integration attempted
+the primary Adilet URLs; the web reader returned a JavaScript shell and the browser
+did not load the act body. No independent successful legal recheck is claimed.
+No legal rule is active. Primary-text verification and expert resolution remain
+required before use, especially #299/33 replacement and conflicting care durations.
+
+Scope still outstanding
+WP-03 generic quarantine/upload/ZIP/parser/jobs, mapping and publish pipeline;
+WP-04 map layers/tiles/legends; subsequent full calculation, planning, 3D, assistant,
+export and execution packages retain their original acceptance criteria.

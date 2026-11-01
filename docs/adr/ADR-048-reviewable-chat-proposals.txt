@@ -1,0 +1,44 @@
+ADR-048: Reviewable chat proposals без автоматического изменения сценария
+Статус: принято для третьего инкремента WP-10
+Дата: 2026-10-31
+
+Контекст
+Canonical 1.11.0 уже определяет Proposal, getProposal, applyProposal и rejectProposal, но
+операции не были доступны. Передача модели полного AppendRevisionInput слишком широка: ответ
+provider недоверенный, может содержать чужие идентификаторы, устаревшую базу или неполные поля.
+
+Решение
+1. Миграция 0030 хранит Proposal отдельно от ChatMessage. Proposal принадлежит создателю
+   chat job, привязан к точным Scenario и base ScenarioRevision, имеет срок 24 часа и состояния
+   pending/applied/rejected/expired.
+2. Первый разрешённый инструмент намеренно узкий: propose_placement_quantity меняет количество
+   одного существующего unlocked placement. В модель передаётся максимум 100 разрешённых
+   placements. Модель не формирует полную ревизию и не может вызвать apply/reject.
+3. Сервер проверяет точный набор tool arguments, UUID, границы quantity и locked-флаг, копирует
+   immutable base revision, меняет только quantity и валидирует получившийся AppendRevisionInput
+   сгенерированной canonical-моделью до записи Proposal.
+4. applyProposal — отдельный пользовательский mutation. Он повторно проверяет owner/admin,
+   доступ ко всем frozen inputs, pending/expiry, body.base_revision_id, current scenario revision,
+   If-Match, draft status и затем вызывает обычный save_revision. Поэтому каталог, правила,
+   ставки, care calendar и все остальные ограничения совпадают с ручным созданием ревизии.
+5. rejectProposal записывает решение и audit event. Idempotency replay повторно проверяет доступ.
+   Устаревшая база, истёкший или уже решённый Proposal возвращает revision_conflict и не создаёт
+   новую ревизию.
+6. Если сценарий изменился между provider call и сохранением, tool result отбрасывается, а чат
+   получает детерминированное сообщение перечитать актуальную версию.
+
+Совместимость
+Canonical schemas/operations остаются 1.11.0: реализованы уже опубликованные операции. Миграция
+additive. Старые ChatMessage имеют proposal_id=null. Shared API не мигрируется во время работы
+Claude; coordinated rollout должен идти сразу до 0030.
+
+Проверка
+- tool создаёт pending Proposal, но не меняет current_revision_id;
+- viewer/outsider не получают Proposal, owner/admin проходят повторную проверку;
+- неверная base revision и stale If-Match дают 412;
+- apply создаёт полную новую ScenarioRevision один раз и повторно проходит save_revision;
+- reject и apply имеют idempotent replay с повторной авторизацией;
+- synthetic cleanup удаляет Proposal до связанного chat/scenario дерева;
+- restore fingerprint включает proposals и требует migration 0030.
+- readiness принимает только migration 0030; отдельный regression test не допускает отставания
+  health gate от Alembic head при следующей миграции.

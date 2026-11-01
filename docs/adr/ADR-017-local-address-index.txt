@@ -1,0 +1,51 @@
+ADR-017 Локальный версионированный адресный индекс вместо публичного autocomplete
+Статус: accepted by GPT (canonical backend/data owner); UI integration pending Claude.
+Дата: 2026-10-30. Основа: canonical 1.2.0, backend fe60499.
+
+ПРОБЛЕМА
+
+Canonical operation searchAddresses уже существует, но не была реализована. F-MAP-02 запрещает
+использовать публичный Nominatim как массовый autocomplete и требует не переносить карту за пределы
+города при нечётком результате. Организатор не передал лицензированный адресный реестр, поэтому
+подмена локального индекса внешним API или выдуманными адресами недопустима.
+
+РЕШЕНИЕ
+
+- Migration 0010 создаёт immutable address_entries и pg_trgm index. Записи строятся только при
+  admin publication из принятой DatasetVersion; source_record_id, dataset/version, исходный label,
+  confidence и PointOnSurface сохраняются. Смена current_version автоматически исключает старый
+  индекс из поиска, но не уничтожает lineage.
+- Распознаются только явные canonical address поля: full_address/address/addr:full либо
+  street + house_number с ограниченным набором aliases. `name` здания не превращается в адрес.
+  Запись вне текущей boundary города не индексируется.
+- Поиск выполняется в PostgreSQL: exact/prefix/substring выше trigram fuzzy. Нормализация ограничена
+  casefold, whitespace и ё->е; никакого исправления или геокодирования на стороне клиента нет.
+  Неоднозначность возвращает список кандидатов, а не один молча выбранный результат.
+- Каждый результат содержит canonical SourceRef и confidence. Cursor привязан к user, city, query
+  и точному набору current DatasetVersion; после публикации новой версии старый cursor отклоняется.
+- Dataset access проверяется до поиска: restricted index без DatasetGrant не участвует даже в
+  проверке доступности. Если принятого доступного индекса нет, API возвращает 503
+  address_index_unavailable с blocking DataGap DR-08. Пустой результат при существующем индексе —
+  обычная страница 200.
+
+КОНТРАКТ И ДАННЫЕ
+
+OpenAPI/Domain остаются 1.2.0: searchAddresses, AddressResult/Page и default Problem уже canonical.
+В problem-code registry добавлены additive codes address_index_unavailable/address_dataset_missing.
+Создан DR-08 для локального адресного реестра. Пока он не закрыт, UI должен показывать ручной выбор
+на карте и не утверждать полноту адресов.
+
+ПРОВЕРКА
+
+- SYNTHETIC public GeoJSON проходит import -> review -> publish -> immutable address index -> API.
+- Проверены exact/substring/trigram typo, ё->е, polygon PointOnSurface, pagination/cursor mismatch,
+  no-result 200, out-of-city exclusion и provenance до source_record_id.
+- Restricted-only index доступен grant holder и выглядит unavailable для viewer без grant.
+- Отсутствующий индекс возвращает структурированный 503/DataGap; outsider city получает 404.
+- Full backend regression: 97 tests; ruff, 358 spec checks, pip-audit и secret-pattern scan проходят.
+
+ОГРАНИЧЕНИЯ
+
+Реального адресного набора организатора нет; все acceptance fixtures явно SYNTHETIC. Не реализованы
+transliteration, морфология, синонимы улиц, подъезды/квартиры, reverse geocoding и provider fallback.
+Coverage/качество должны прийти из DR-08 и пройти тот же review/publication pipeline.

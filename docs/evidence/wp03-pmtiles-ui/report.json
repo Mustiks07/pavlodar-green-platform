@@ -1,0 +1,138 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T07:38:45.994Z",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC public layer published and served as dynamic MVT before the archive exists",
+      "pass": true,
+      "detail": {
+        "statuses": [
+          201,
+          201,
+          204,
+          202,
+          200
+        ],
+        "job": "succeeded",
+        "type": "mvt"
+      }
+    },
+    {
+      "name": "archive registered; listMapLayers now reports source_type=pmtiles with the archive URL",
+      "pass": true,
+      "detail": {
+        "status": 0,
+        "archiveBytes": 6252,
+        "archiveTiles": 6,
+        "type": "pmtiles",
+        "url": "/v1/map/archives/09ac43a2-89b6-5e4f-9b94-e8db549b369f.pmtiles",
+        "err": ""
+      }
+    },
+    {
+      "name": "viewer: archive layer renders all SYNTHETIC features",
+      "pass": true,
+      "detail": {
+        "onMap": true,
+        "n": 9
+      }
+    },
+    {
+      "name": "archive read only by single Range requests (206, application/vnd.pmtiles); no dynamic tile requests",
+      "pass": true,
+      "detail": {
+        "archive": [
+          {
+            "status": 206,
+            "range": "bytes=0-16383",
+            "type": "application/vnd.pmtiles"
+          },
+          {
+            "status": 206,
+            "range": "bytes=4706-5478",
+            "type": "application/vnd.pmtiles"
+          },
+          {
+            "status": 206,
+            "range": "bytes=5479-6251",
+            "type": "application/vnd.pmtiles"
+          },
+          {
+            "status": 206,
+            "range": "bytes=5479-6251",
+            "type": "application/vnd.pmtiles"
+          },
+          {
+            "status": 206,
+            "range": "bytes=4706-5478",
+            "type": "application/vnd.pmtiles"
+          }
+        ],
+        "dynamic": 0
+      }
+    },
+    {
+      "name": "overzoom past the archive max zoom keeps the features",
+      "pass": true,
+      "detail": {
+        "onMap": true,
+        "n": 4
+      }
+    },
+    {
+      "name": "feature card opens from an archive tile (server card by feature_id)",
+      "pass": true,
+      "detail": {
+        "fid": "f0e7ebf6-be19-0c84-557a-fdd976d6e48a",
+        "card": "SYNTHETIC TEST PMTiles 0-0\n\nSYNTHETIC TEST PMTiles 07:38:46\n\nВерсия набора\n0e9887b5\nГеометрия\nполигоны\nДоступ\nоткрытый\nВысота\nне указана (основание неизвестно)\nПОКАЗАТЕЛИ\n\nСервер не рассчитывает показ"
+      }
+    },
+    {
+      "name": "toggle hides and restores the archive layer",
+      "pass": true,
+      "detail": {
+        "off": {
+          "onMap": false,
+          "n": 0
+        },
+        "on": {
+          "onMap": true,
+          "n": 4
+        }
+      }
+    },
+    {
+      "name": "reload renders the archive layer again",
+      "pass": true,
+      "detail": {
+        "rr": {
+          "onMap": true,
+          "n": 4
+        },
+        "requests": 5
+      }
+    },
+    {
+      "name": "archive 503 is shown on the layer card instead of a silent empty map",
+      "pass": true
+    },
+    {
+      "name": "no page errors in the viewer session",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp03-pmtiles-ui/pmtiles-z15.png",
+    "docs/evidence/wp03-pmtiles-ui/pmtiles-card.png",
+    "docs/evidence/wp03-pmtiles-ui/pmtiles-503.png"
+  ],
+  "finishedAt": "2026-10-31T07:39:22.523Z",
+  "passed": true,
+  "synthetic": {
+    "dataset": "f651d934-de1b-42d7-8b9d-d78549160c85",
+    "layer": "09ac43a2-89b6-5e4f-9b94-e8db549b369f",
+    "archiveBytes": 6252,
+    "archiveTiles": 6
+  }
+}

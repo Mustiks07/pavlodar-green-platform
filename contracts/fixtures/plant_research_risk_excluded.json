@@ -1,0 +1,31 @@
+{
+  "fixture_only": true,
+  "schema": "Plant",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; exclusion is research-only and not an official local rule",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000211",
+    "version_id": "00000000-0000-4000-8000-000000000212",
+    "latin_name": "Synthetic species",
+    "russian_name": "Синтетический пример",
+    "cultivar": null,
+    "stratum": "tree",
+    "traits": [],
+    "allergy_risk": "high",
+    "toxicity_risk": "unknown",
+    "expert_status": "pending",
+    "taxon_rank": "species",
+    "local_evidence": null,
+    "sensitive_site_status": "excluded",
+    "exclusion_reason": "Исследовательский риск требует проверки экспертом",
+    "exclusion_basis": "research_risk",
+    "review_reasons": [
+      {
+        "code": "RESEARCH_RISK_NOT_LOCAL_RULE",
+        "message": "Исключение не является официальным запретом Павлодара",
+        "required_inputs": ["DR-02", "DR-03"],
+        "blocking": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+ADR-036 Неизменяемые входы городской программы до запуска solver
+Статус: accepted by GPT; WP-07 foundation.
+Дата: 2026-10-30. Основа: F-PRIO-01/02, F-PROG-01..04, canonical 1.5.0.
+
+ПРОБЛЕМА
+
+Оптимизатор нельзя строить поверх изменяемого draft JSON: после изменения бюджета, воды или
+кандидатов невозможно доказать, на каких входах получен результат. Простой порядок по priority
+также нельзя называть оптимальным распределением ресурсов.
+
+РЕШЕНИЕ
+
+- Migration 0018 добавляет Program, append-only ProgramInputVersion, нормализованные ссылки
+  ProgramInputCandidate на точные ScenarioRevision и append-only ProgramRevision для следующего
+  solver-инкремента.
+- createProgram и updateProgramDraft проверяют город и текущие права на каждый candidate revision,
+  уникальность кандидатов/периодов/весов/coverage groups/diversity caps, ненулевую сумму весов,
+  наличие кандидатов у required/excluded/coverage zones и отсутствие required/excluded конфликта.
+- Изменение draft создаёт новую входную версию с parent, не переписывает старую. ETag связывает
+  update с текущей версией; stale intent получает 412.
+- Draft видят владелец и admin. Даже approved Program в будущем не обходит доступ к связанным
+  dataset/rule/rate/model входам ScenarioRevision.
+- Program.current_revision_id пока null. Этот инкремент намеренно не выдаёт sorted candidates за
+  solver output; optimizeProgram будет включён только с дискретными ресурсами и проверяемыми
+  статусами optimal/feasible/infeasible/timeout.
+
+ПРОВЕРКА
+
+API-тесты покрывают create/get/list/update, idempotent replay, viewer concealment/admin access,
+immutable trigger, parent history, ETag 412, нулевые веса, дубли кандидатов и конфликт зон.
+Полный regression и restore evidence фиксируются в handoff после безопасной миграции shared БД.
+
+СОВМЕСТИМОСТЬ
+
+Canonical contract остаётся 1.5.0: все четыре операции и схемы уже существовали. Migration 0018
+additive. Старый cleanup scope SHA автоматически станет недействителен после миграции; перед
+любым удалением требуется новый read-only plan и новое явное подтверждение.

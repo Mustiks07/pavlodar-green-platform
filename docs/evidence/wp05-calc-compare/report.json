@@ -1,0 +1,143 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:19:33.726Z",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC zone and three scenarios",
+      "pass": true,
+      "detail": [
+        "3fca4d13-0a3f-4530-b7de-88a92db7b1d1",
+        "49e33193-51e2-40f0-98a9-5168c9ee737f",
+        "0217e66e-888c-440d-99a1-bd4b46693f15"
+      ]
+    },
+    {
+      "name": "start 503 offers retry; the retried run is a new job",
+      "pass": true,
+      "detail": {
+        "startErr": true,
+        "jobA": "89bf65bd-1150-45fe-87a6-fcfa87f44a88"
+      }
+    },
+    {
+      "name": "succeeded job -> canonical CalculationSnapshot loaded by result_ref_id (not just the terminal job)",
+      "pass": true,
+      "detail": {
+        "job": "succeeded",
+        "ref": "d0ed882c-9e70-443e-876e-f32d30860080",
+        "snapA": "d0ed882c-9e70-443e-876e-f32d30860080",
+        "snapshotReads": 2
+      }
+    },
+    {
+      "name": "partial result shown as partial; incomplete total is unknown, not zero",
+      "pass": true,
+      "detail": {
+        "status": "partial",
+        "costStatus": "complete",
+        "total": "0.00",
+        "text": "Неполный расчёт\nсинтетические входы\nИзвестная сумма\n0,00 ₸\nИтог\n0,00 ₸\nРассчитано\n31.10.2026, 13:19\nСнимок расчёта\nd0ed882c\nСтроки серверной сметы\nПосадочный материал\n\nстрок нет в результате сервера —"
+      }
+    },
+    {
+      "name": "job tracked through the SSE stream (shared useJob)",
+      "pass": true,
+      "detail": {
+        "transport": null,
+        "streams": [
+          200
+        ]
+      }
+    },
+    {
+      "name": "reload during the run resumes the same job and lands on its snapshot",
+      "pass": true,
+      "detail": {
+        "jobB": "edddeba1-fbfc-47e3-869b-b059c656dcc9",
+        "snapB": "db059492-798f-43a2-a4e2-1e129bd0ba96",
+        "state": "succeeded"
+      }
+    },
+    {
+      "name": "reload keeps the snapshot from the URL",
+      "pass": true
+    },
+    {
+      "name": "cancel: UI ends in the server state (cancelled keeps the previous snapshot; a run that finished first shows its snapshot)",
+      "pass": true,
+      "detail": {
+        "couldCancel": true,
+        "state": "cancelled"
+      }
+    },
+    {
+      "name": "unknown snapshot id: not found state, nothing invented",
+      "pass": true
+    },
+    {
+      "name": "compare: columns are the server-chosen snapshots, each linked by its exact id",
+      "pass": true,
+      "detail": {
+        "compared": [
+          "d0ed882c-9e70-443e-876e-f32d30860080",
+          "db059492-798f-43a2-a4e2-1e129bd0ba96"
+        ],
+        "links": [
+          "d0ed882c-9e70-443e-876e-f32d30860080",
+          "db059492-798f-43a2-a4e2-1e129bd0ba96"
+        ],
+        "serverIds": [
+          "d0ed882c-9e70-443e-876e-f32d30860080",
+          "db059492-798f-43a2-a4e2-1e129bd0ba96"
+        ]
+      }
+    },
+    {
+      "name": "compare: comparability warnings shown as returned",
+      "pass": true,
+      "detail": {
+        "warnings": [
+          "comparison_snapshot_partial",
+          "comparison_snapshot_partial"
+        ]
+      }
+    },
+    {
+      "name": "compare: unknown totals stay unknown (not 0), statuses and snapshot ids visible",
+      "pass": true,
+      "detail": {
+        "unknownTotals": 0
+      }
+    },
+    {
+      "name": "compare without a calculation: 422 names the revision with a link to its scenario",
+      "pass": true,
+      "detail": {
+        "named": true,
+        "linkToC": 1
+      }
+    },
+    {
+      "name": "no page errors in the specialist session",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "phone (dark): comparison fits (table scrolls inside its box)",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp05-calc-compare/calc-start-503.png",
+    "docs/evidence/wp05-calc-compare/calc-full-snapshot.png",
+    "docs/evidence/wp05-calc-compare/calc-cancel.png",
+    "docs/evidence/wp05-calc-compare/compare-a-b.png",
+    "docs/evidence/wp05-calc-compare/compare-missing.png",
+    "docs/evidence/wp05-calc-compare/compare-mobile-dark.png"
+  ],
+  "finishedAt": "2026-10-31T08:20:04.522Z",
+  "passed": true
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "QualityReport",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "id": "06baaa24-91ef-50d9-845a-97e8f5af9623",
+    "issues": [
+      {
+        "code": "research_not_approved",
+        "message": "Найденное не равно допущенному к production.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-01",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-01",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Неизвестные и недатированные параметры не заменены нулями.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-01",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-01",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Официальное покрытие города неизвестно; рабочий контур не прошел приемку.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-01",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"PROJECT-TZ\", \"title\": \"ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29\", \"url\": \"repo:docs/TZ_DEVELOPMENT.txt\", \"publisher\": \"Проект team-vtiposhnik\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-10-29\", \"license\": \"unknown\", \"method\": \"project_requirement\", \"note\": \"Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "PROJECT-TZ",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"OSM\", \"title\": \"Городской срез Geofabrik Kazakhstan, OSM\", \"url\": \"https://download.geofabrik.de/asia/kazakhstan.html\", \"publisher\": \"OpenStreetMap contributors / Geofabrik\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-10-28T21:21:02Z\", \"license\": \"ODbL-1.0\", \"method\": \"community_record\", \"note\": \"Повторно использованы готовые preflight файлы с проверкой checksum. Новая загрузка OSM не выполнялась. Рабочий контур way/170089891 не официальный.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "OSM",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"OSM-LICENSE\", \"title\": \"OpenStreetMap copyright and licence\", \"url\": \"https://www.openstreetmap.org/copyright\", \"publisher\": \"OpenStreetMap Foundation\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"ODbL-1.0\", \"method\": \"license_terms\", \"note\": \"\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "OSM-LICENSE",
+        "suggested_action": null
+      }
+    ],
+    "error_count": 0,
+    "valid_count": 2,
+    "record_count": 2,
+    "warning_count": 8,
+    "publish_allowed": false,
+    "issues_truncated": false,
+    "dataset_version_id": "6db8cbb3-51b8-5363-b941-15186deafdf4",
+    "issues_next_cursor": null
+  }
+}

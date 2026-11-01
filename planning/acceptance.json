@@ -1,0 +1,24 @@
+{
+  "version": "1.1.0",
+  "status_note": "Статусы подтверждены автоматическими, браузерными и живыми интеграционными проверками. AC-18 проверен на опубликованных открытых данных Павлодара; официальный набор организатора не поступал.",
+  "criteria": [
+    {"id":"AC-01","title":"Импорт и качество","status":"verified","evidence":["docs/evidence/wp03-import-ui/report.json","docs/evidence/wp03-kml-shp-live.json"]},
+    {"id":"AC-02","title":"Карта и scope","status":"verified","evidence":["docs/evidence/final-public-data.json","docs/evidence/wp03-osm-v2/report.json"]},
+    {"id":"AC-03","title":"Каталог и hard constraints","status":"verified","evidence":["docs/evidence/wp05-catalog.json","tests/test_catalog.py"]},
+    {"id":"AC-04","title":"Сценарии и concurrency","status":"verified","evidence":["docs/evidence/wp04-zones-scenarios/report.json","docs/evidence/wp04-zone-drawing/report.json"]},
+    {"id":"AC-05","title":"Смета","status":"verified","evidence":["docs/evidence/wp05-calc-compare/report.json","tests/test_calculations.py"]},
+    {"id":"AC-06","title":"Survival","status":"verified","evidence":["tests/test_survival_guidance.py","docs/JURY_ACCEPTANCE_MATRIX.md"]},
+    {"id":"AC-07","title":"Уход и ресурсы","status":"verified","evidence":["tests/test_calculations.py","docs/assets/readme/platform-scenario.png"]},
+    {"id":"AC-08","title":"Программа и solver","status":"verified","evidence":["docs/evidence/demo-contour/report.json","docs/assets/readme/platform-program.png"]},
+    {"id":"AC-09","title":"Экоэффект","status":"verified","evidence":["tests/test_ecosystem.py","docs/JURY_ACCEPTANCE_MATRIX.md"]},
+    {"id":"AC-10","title":"3D и тени","status":"verified","evidence":["docs/evidence/wp03-open-data/open-buildings-3d.png","docs/assets/readme/platform-3d.png"]},
+    {"id":"AC-11","title":"Исполнение","status":"verified","evidence":["docs/evidence/demo-contour/specialist-execution.png","apps/web/scripts/execution-check.mjs"]},
+    {"id":"AC-12","title":"Ассистент","status":"verified","evidence":["tests/test_chat.py","docs/assets/readme/platform-assistant.png"]},
+    {"id":"AC-13","title":"Экспорт","status":"verified","evidence":["tests/test_exports.py","docs/JURY_ACCEPTANCE_MATRIX.md"]},
+    {"id":"AC-14","title":"Безопасность","status":"verified","evidence":["docs/evidence/foundation_oidc.json","docs/evidence/wp02-integration/report.json"]},
+    {"id":"AC-15","title":"Эксплуатация","status":"verified_local_stack","evidence":["docs/evidence/foundation_restore.json","docs/evidence/foundation_queue.json","tools/dev/start-demo.ps1"]},
+    {"id":"AC-16","title":"UX","status":"verified","evidence":["docs/evidence/final-visual/mobile-map-final.png","docs/evidence/wp02/report.json"]},
+    {"id":"AC-17","title":"Производительность","status":"verified","evidence":["docs/evidence/p01/SUMMARY.txt","docs/evidence/map_tile_performance.json"]},
+    {"id":"AC-18","title":"Приёмка организаторов","status":"verified_open_data","evidence":["docs/JURY_ACCEPTANCE_MATRIX.md","docs/QUICK_DEMO_GUIDE.md","docs/evidence/final-public-data.json"]}
+  ]
+}

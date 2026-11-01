@@ -1,0 +1,27 @@
+{
+  "task_id": "WP-11",
+  "owner": "GPT",
+  "state": "in_progress",
+  "branch": "gpt/WP-00-foundation",
+  "implementation_sha": "844f8a8c63e1166b650a73becd46b48a87d3fcb2",
+  "migration": "0017_map_archives",
+  "implemented_local": [
+    "PostgreSQL custom-format backup restored only into a newly named database",
+    "39 table fingerprints and migration head compared after restore",
+    "upload and PMTiles volumes archived separately from metadata",
+    "every database-referenced restored file checked by storage key, size and SHA-256",
+    "browser sessions, partial files and recoverable synthetic trash excluded"
+  ],
+  "evidence": [
+    "docs/adr/ADR-033-local-artifact-recovery.txt",
+    "docs/evidence/foundation_restore.json",
+    "tools/dev/restore_check.py"
+  ],
+  "pending_production": [
+    "WAL/PITR and scheduled encrypted backups",
+    "remote versioned object storage and cross-host recovery",
+    "retention, rotation and restore drills",
+    "measured RPO/RTO and production runbook"
+  ],
+  "production_ready": false
+}

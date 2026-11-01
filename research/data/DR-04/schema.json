@@ -1,0 +1,508 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DR-04 research staging package",
+  "type": "object",
+  "properties": {
+    "reported_events.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event_id",
+          "source_id",
+          "report_date",
+          "place",
+          "reported_taxon",
+          "reported_planted",
+          "unit",
+          "method",
+          "planting_date_exact",
+          "inspection_date",
+          "alive",
+          "dead",
+          "unknown",
+          "training_eligible",
+          "reason"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "event_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "report_date": {
+            "type": [
+              "string"
+            ]
+          },
+          "place": {
+            "type": [
+              "string"
+            ]
+          },
+          "reported_taxon": {
+            "type": [
+              "string"
+            ]
+          },
+          "reported_planted": {
+            "type": [
+              "integer"
+            ],
+            "x-unit": "piece"
+          },
+          "unit": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "planting_date_exact": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "inspection_date": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "alive": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "dead": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "unknown": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "training_eligible": {
+            "type": [
+              "boolean"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "cohorts.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "cohort_id",
+          "source_id",
+          "planting_date",
+          "taxon_id",
+          "stock_id",
+          "site_id",
+          "original_count"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "cohort_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "planting_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "taxon_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stock_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "site_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "original_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "x-unit": "piece"
+          }
+        }
+      },
+      "description": ""
+    },
+    "observations.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "observation_id",
+          "cohort_id",
+          "source_id",
+          "observed_at",
+          "alive",
+          "dead",
+          "unknown",
+          "method"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "observation_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cohort_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "alive": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "x-unit": "piece"
+          },
+          "dead": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "x-unit": "piece"
+          },
+          "unknown": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "x-unit": "piece"
+          },
+          "method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "care_actual.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "operation_id",
+          "cohort_id",
+          "source_id",
+          "performed_at",
+          "operation",
+          "quantity",
+          "unit"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "operation_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cohort_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "performed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "quantity": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "data.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_id",
+          "topic",
+          "value",
+          "status",
+          "reason",
+          "source_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "topic": {
+            "type": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "search_log.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "search_id",
+          "checked_at",
+          "query_or_access",
+          "method",
+          "result",
+          "limitation"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "search_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "query_or_access": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "result": {
+            "type": [
+              "string"
+            ]
+          },
+          "limitation": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "sources.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "title",
+          "url",
+          "publisher",
+          "checked_at",
+          "observed_at",
+          "license",
+          "method",
+          "note"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "string"
+            ]
+          },
+          "publisher": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "license": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "note": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "checked_at — дата проверки; observed_at — дата/период источника, null если не указан. unknown лицензия не разрешает перепубликацию полного текста."
+    }
+  },
+  "required": [
+    "reported_events.csv",
+    "cohorts.csv",
+    "observations.csv",
+    "care_actual.csv",
+    "data.csv",
+    "search_log.csv",
+    "sources.csv"
+  ],
+  "additionalProperties": false,
+  "x-csv": {
+    "encoding": "UTF-8",
+    "delimiter": ",",
+    "null_literal": "null",
+    "decimal_separator": ".",
+    "money": "decimal string, KZT",
+    "source_refs_separator": ";"
+  },
+  "x-crs": {
+    "GeoJSON": "EPSG:4326, [longitude,latitude]",
+    "distance_calculation": "EPSG:32643; no distances calculated here"
+  },
+  "x-import": "Staging only; map external identifiers to canonical UUIDs. No auto publish or approval."
+}

@@ -1,0 +1,58 @@
+ADR-014 Стабильная идентичность слоя и явные grants закрытых наборов
+Статус: proposed by GPT, canonical owner; требуется acknowledgement Claude при регенерации клиента.
+Дата: 2026-10-30. Основа: main 8e36204, ADR-013 P4/P5.
+
+ПРОБЛЕМА
+
+MapLayer 1.1 содержит только dataset_version_id. После публикации новой версии id манифеста
+меняется, поэтому клиент не может устойчиво сохранить видимость набора или открыть его карточку.
+Кроме того, restricted DatasetGrant создаётся только владельцу. Глобальный admin-bypass раскрыл
+бы содержимое закрытых наборов, а без отдельной операции администратор не может получить grant.
+
+РЕШЕНИЕ
+
+1. Выпустить additive contract 1.2.0. MapLayer получает обязательный dataset_id: uuid.
+   Миграция 0009 дописывает его в уже опубликованные JSONB-манифесты из нормализованной колонки.
+2. Добавить admin-only операции:
+   GET /v1/cities/{city_id}/principals — только активные пользователи с CityGrant;
+   GET/POST /v1/datasets/{dataset_id}/grants;
+   DELETE /v1/datasets/{dataset_id}/grants/{user_id}.
+3. Admin CityGrant разрешает только администрирование списка grants. Он не разрешает читать
+   версии, тайлы, features или иное содержимое restricted dataset. Для чтения по-прежнему нужен
+   явный DatasetGrant.
+4. Grant можно выдать только активному пользователю того же города. Добавление и отзыв требуют
+   CSRF, idempotency key и непустую reason; оба события записываются в audit.
+5. Атрибуция MapLayer остаётся plain text. Organizer data и научные data gates не меняются.
+
+JSON ДО / ПОСЛЕ
+
+1.1 MapLayer:
+{"id":"...","city_id":"...","dataset_version_id":"..."}
+
+1.2 MapLayer:
+{"id":"...","city_id":"...","dataset_id":"...","dataset_version_id":"..."}
+
+Grant request/response:
+{"user_id":"00000000-0000-4000-8000-000000000001","reason":"Проверка публикации"}
+{"dataset_id":"...","user_id":"00000000-0000-4000-8000-000000000001"}
+
+СОВМЕСТИМОСТЬ И МИГРАЦИЯ
+
+Изменение additive для HTTP-клиента, но strict schema 1.1 не принимает новое обязательное поле.
+Claude должен атомарно регенерировать TypeScript-клиент из canonical 1.2.0. Видимость слоя следует
+ключевать по dataset_id; layer id остаётся идентификатором конкретного манифеста/семейства.
+Миграция: 0009_map_layer_dataset_id; изменения таблиц нет, только детерминированный backfill JSONB.
+
+ПРОВЕРКА
+
+- schema/fixtures/generated Python and TypeScript drift checks;
+- restricted owner видит набор, admin без grant не видит содержимое;
+- admin того же города выдаёт себе grant, получает доступ, затем отзывает и снова получает 404;
+- specialist/viewer не управляют grants; чужой город и inactive principal отклоняются;
+- повтор с тем же idempotency key возвращает прежний ответ, другой key даёт grant_exists;
+- listMapLayers возвращает dataset_id старым и новым опубликованным манифестам после migration.
+
+ЗАТРОНУТЫЕ ПАКЕТЫ
+
+WP-00 canonical compatibility; WP-01 auth/audit; WP-03 dataset publication; WP-04 map visibility
+и admin UI. WP-05+ не получают обхода доступа к входным данным.

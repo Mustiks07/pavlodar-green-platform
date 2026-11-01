@@ -1,0 +1,10 @@
+taxon_id,scientific_name,name_ru,rank,cultivar,local_evidence,school_hospital_status,expert_approved,source_refs
+populus_alba,Populus alba,Тополь белый,species,null,Назван в городском плане зеленого пояса,requires_review,false,LOCAL-20260520;NC-POPLAR
+pinus_sylvestris,Pinus sylvestris,Сосна обыкновенная,species,null,"Городской источник называет сосну без вида; вид — кандидат, требует сверки дендроплана",requires_review,false,LOCAL-20260520;NC-PINE
+tilia_cordata,Tilia cordata,Липа мелколистная,species,null,Посадки липы в городе подтверждены только до рода; вид требует сверки,requires_review,false,LOCAL-20260520;NC-LINDEN
+syringa_vulgaris,Syringa vulgaris,Сирень обыкновенная,species,null,Городской источник называет сирень без вида; вид требует сверки,requires_review,false,LOCAL-20260520;NC-LILAC
+picea_obovata,Picea obovata,Ель сибирская,species,null,Питомник указывает товар в Павлодаре; не испытание в городе,requires_review,false,BIOSAD-STOCK;RHS-SPRUCE
+ricinus_communis,Ricinus communis,Клещевина обыкновенная,species,null,Представлена в интернет-каталоге; исключение из предлагаемых детских/больничных посадок по риску,excluded_research_risk,false,BIOSAD-HOME;NC-CASTOR
+salix_sp,Salix sp.,"Ива, вид не указан",genus,null,Названа в городском плане,requires_review,false,LOCAL-20260520
+acer_sp,Acer sp.,"Клён, вид не указан",genus,null,Назван в городском плане,requires_review,false,LOCAL-20260520
+fraxinus_sp,Fraxinus sp.,"Ясень, вид не указан",genus,null,Назван в городском плане,requires_review,false,LOCAL-20260520

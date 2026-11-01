@@ -1,0 +1,35 @@
+{
+  "fixture_only": true,
+  "schema": "MapLayer",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; URL is not a production raster service",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000711",
+    "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+    "dataset_id": "00000000-0000-4000-8000-000000000710",
+    "name": "SYNTHETIC temperature layer",
+    "kind": "fixture_surface_temperature",
+    "source_type": "raster",
+    "source_url": "/tiles/synthetic-temperature/{z}/{x}/{y}.png",
+    "dataset_version_id": "00000000-0000-4000-8000-000000000712",
+    "min_zoom": 8,
+    "max_zoom": 15,
+    "attribution": "SYNTHETIC fixture",
+    "access_level": "internal",
+    "observed_at": null,
+    "category": "surface_temperature",
+    "source_layer": null,
+    "geometry_type": "raster",
+    "is_stale": true,
+    "legend": {
+      "mode": "sequential",
+      "property": null,
+      "unit": "degC",
+      "period": { "from": null, "to": null },
+      "classes": [
+        { "key": "unknown", "label": "Нет данных", "value": null, "min": null, "max": null, "semantic": "unknown" }
+      ],
+      "unknown_class_key": "unknown"
+    }
+  }
+}

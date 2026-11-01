@@ -1,0 +1,58 @@
+ADR-032 Двухфазная очистка только явно маркированных synthetic fixtures
+Статус: accepted by GPT; execution requires explicit operator confirmation and is not performed.
+Дата: 2026-10-30. Основа: ADR-029/031, shared development database at migration 0017.
+
+ПРОБЛЕМА
+
+Старые браузерные и live-smoke прогоны до введения disposable database оставили в общей dev-БД
+наборы `SYNTHETIC TEST`/`SYNTHETIC LIVE`. Они закрывают реальные здания при map picking и засоряют
+список слоёв. Автоматическое удаление по одному слову SYNTHETIC небезопасно: пользователь мог
+создать похожее название, immutable triggers нельзя молча обходить, а metadata и upload bytes
+восстанавливаются разными способами.
+
+РЕШЕНИЕ
+
+Добавлена локальная команда `tools.dev.cleanup_synthetic` с двумя отдельными фазами.
+
+1. `plan --output FILE` только читает БД и формирует полный список UUID/версий/storage keys,
+   counts, foreign-key blockers, migration и SHA-256 всего scope. Allowlist узкий и требует
+   одновременно служебный префикс имени и точное служебное поле owner:
+   - `SYNTHETIC TEST %` + `SYNTHETIC integration test`;
+   - `SYNTHETIC LIVE %` + `Integration smoke`;
+   - точный foundation fixture `SYNTHETIC TEST source registry` + `Synthetic integration test`.
+   Похожий пользовательский набор другого владельца не входит в план.
+   После завершения WP-08 plan v2 также включает zone только когда текущее и все исторические
+   имена имеют точный служебный шаблон, на zone есть scenario фиксированного локального test
+   specialist, и все scenarios этого zone имеют только служебные synthetic-имена. Любой иной
+   owner/name исключает весь zone из scope.
+2. `execute --plan FILE --confirm FULL_SHA256` доступен только для local development/test БД.
+   Он повторно строит scope и отказывается работать при любом изменении, пустом плане или ссылке
+   из scenario/rules/rates/research/staging/stock/model/address registries.
+3. Перед транзакцией автоматически создаётся custom-format pg_dump с отдельным SHA-256.
+   Immutable triggers отключаются только внутри транзакции для точных строк и включаются после
+   немедленной проверки deferred constraints. Ошибка откатывает и удаления, и DDL trigger state.
+4. Upload/PMTiles bytes не удаляются безвозвратно: существующие точные storage keys перемещаются
+   после DB commit в `.local/synthetic-trash/<timestamp>-<scope>/`, откуда их можно восстановить.
+   Audit/job/idempotency evidence без FK сохраняется.
+5. Plan v2 dependency-aware удаляет allowlisted zones, версии, scenarios/revisions, их terminal
+   jobs/events/outbox, calculation snapshots и spatial results. Активный job, upload-ссылка на job
+   или revision другого scenario на версию zone блокирует весь execute.
+
+ПРОВЕРКА
+
+- Тест создаёт точный allowlisted импорт и похожий пользовательский набор, сверяет scope hash,
+  удаляет только allowlisted dataset/version/upload/record tree и подтверждает, что DB triggers
+  остались enabled.
+- Второй тест создаёт allowlisted scenario с завершённым durable Job и похожий zone с обычным
+  пользовательским scenario. Удаляется только служебное дерево вместе с job/event/outbox;
+  пользовательский zone/scenario и все immutable triggers сохраняются.
+- Read-only shared plan v2 на 2026-10-30 нашёл 49 datasets, 86 versions/uploads, 75 map layers,
+  153 records, а также 33 zones, 76 zone versions, 52 scenarios, 118 revisions, 19 terminal jobs,
+  3 calculation snapshots и 17 spatial results. Все 11 blocker counts равны нулю. Scope SHA:
+  `74dea3dd08fdf9e31b881452b30727d99fc87d59ba8bd5e2770c0c664e904487`.
+  Execute намеренно не запускался.
+
+ОПЕРАЦИОННОЕ РЕШЕНИЕ
+
+Регрессия Claude завершена, но cleanup не исполняется без явного подтверждения оператором полного
+SHA plan v2. Любое параллельное изменение scope делает сохранённый SHA недействительным.

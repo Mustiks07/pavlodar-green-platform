@@ -1,0 +1,466 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:38:09.272Z",
+  "checks": [
+    {
+      "name": "specialist upload v1 via wizard: job succeeded, not yet a layer",
+      "pass": true,
+      "detail": {
+        "datasetId": "05612bf5-c224-4d07-aae9-f3621a8d39ef",
+        "versionId": "3e5079e8-4b5f-4c0e-b072-de11dfcdfbd2",
+        "state": "succeeded"
+      }
+    },
+    {
+      "name": "admin publish creates a polygon manifest for v1 (server)",
+      "pass": true,
+      "detail": [
+        {
+          "g": "polygon",
+          "s": "features",
+          "url": "/v1/map/tiles/f0564712-92dc-5618-a48b-2a56fbe8b432/{z}/{x}/{y}.mvt"
+        }
+      ]
+    },
+    {
+      "name": "layer appears on the map after publish without a page reload",
+      "pass": true,
+      "detail": {
+        "appeared": true,
+        "layers": [
+          "fill",
+          "line"
+        ],
+        "rendered": 10,
+        "sec": 4,
+        "reloads": 0
+      }
+    },
+    {
+      "name": "polygon layer drawn as fill + outline from source_layer \"features\"",
+      "pass": true
+    },
+    {
+      "name": "MVT tiles fetched from the server source_url (200, vector-tile type)",
+      "pass": true,
+      "detail": {
+        "n": 6,
+        "sample": [
+          {
+            "url": "/v1/map/tiles/f0564712-92dc-5618-a48b-2a56fbe8b432/15/23393/10778.mvt",
+            "status": 200,
+            "type": "application/vnd.mapbox-vector-tile",
+            "at": 1793435915900
+          },
+          {
+            "url": "/v1/map/tiles/f0564712-92dc-5618-a48b-2a56fbe8b432/15/23392/10778.mvt",
+            "status": 200,
+            "type": "application/vnd.mapbox-vector-tile",
+            "at": 1793435915901
+          }
+        ]
+      }
+    },
+    {
+      "name": "panel shows legend, observed_at, access_level and dataset_version_id; no source line (attribution lives in the map control)",
+      "pass": true,
+      "detail": "SYNTHETIC TEST слой 08:38:11\nоткрытый\n\nзоны · полигоны\n\nЛегенда\nОбъекты опубликованного набора\nЕдиница\n—\nПериод\n—\nСведения о версии\nВерсия набора\n3e5079e8\nДата наблюдения\nдата наблюдения не указана\nМасштабы\nz5–22 · mvt"
+    },
+    {
+      "name": "map attribution includes the layer attribution (escaped text)",
+      "pass": true,
+      "detail": "SYNTHETIC integration test · CC0-1.0 | OpenFreeMap © OpenMapTiles Data from OpenStreetMap"
+    },
+    {
+      "name": "legend swatch is the semantic token (neutral, basemap palette), not an invented colour",
+      "pass": true,
+      "detail": "var(--pg-basemap-neutral)"
+    },
+    {
+      "name": "MVT carries a uuid feature_id property (not the numeric row id)",
+      "pass": true,
+      "detail": {
+        "feature_id": "d107da37-f16e-980c-369a-d8efb9423336"
+      }
+    },
+    {
+      "name": "click on a feature: server card from getMapFeature(feature_id) — label, version; no source/unverified lines (presentation policy)",
+      "pass": true,
+      "detail": {
+        "requests": [
+          {
+            "path": "/v1/map/features/d107da37-f16e-980c-369a-d8efb9423336",
+            "status": 200
+          },
+          {
+            "path": "/v1/map/features/d107da37-f16e-980c-369a-d8efb9423336",
+            "status": 200
+          },
+          {
+            "path": "/v1/map/features/d107da37-f16e-980c-369a-d8efb9423336",
+            "status": 200
+          },
+          {
+            "path": "/v1/map/features/74cb85b0-2aa4-c089-e067-57f4cf603cd3",
+            "status": 200
+          }
+        ],
+        "text": "SYNTHETIC v1 участок B\n\nSYNTHETIC TEST слой 08:38:11\n\nВерсия набора\n3e5079e8\nГеометрия\nполигоны\nДоступ\nоткрытый\nВысота\nне указана (основание неизвестно)\nПОКАЗАТЕЛИ\n\nСервер не рассчитывает показатели для объектов этого набора.\n\nАтрибуты из тайла (4)"
+      }
+    },
+    {
+      "name": "open feature is in the URL (?feature=<uuid>)",
+      "pass": true,
+      "detail": {
+        "urlFeature": "d107da37-f16e-980c-369a-d8efb9423336"
+      }
+    },
+    {
+      "name": "server geometry of the feature is highlighted on the map",
+      "pass": true,
+      "detail": {
+        "features": 4
+      }
+    },
+    {
+      "name": "tile attributes stay available as text without an unverified label; HTML not interpreted; platform id hidden",
+      "pass": true,
+      "detail": "SYNTHETIC v1 участок B\n\nSYNTHETIC TEST слой 08:38:11\n\nВерсия набора\n3e5079e8\nГеометрия\nполигоны\nДоступ\nоткрытый\nВысота\nне указана (основание неизвестно)\nПОКАЗАТЕЛИ\n\nСервер не рассчитывает показатели для объектов этого набора.\n\nАтрибуты из тайла (4)\n\nАтрибуты опубликованной версии набора в том виде, "
+    },
+    {
+      "name": "feature card survives reload (server card from the URL, highlight restored, no tile attributes)",
+      "pass": true,
+      "detail": {
+        "hlReload": 4,
+        "text": "SYNTHETIC v1 участок B\n\nSYNTHETIC TEST слой 08:38:11\n\nВерсия набора\n3e5079e8\nГеометрия\nполигоны\nДоступ\nоткрытый\nВысота\nне указана (основание неизвестно)\nПОКАЗАТ"
+      }
+    },
+    {
+      "name": "closing the card clears the URL and the highlight",
+      "pass": true
+    },
+    {
+      "name": "selecting a zone closes the feature card (one selection in the URL)",
+      "pass": true,
+      "detail": {
+        "zone": true,
+        "feature": null
+      }
+    },
+    {
+      "name": "hiding a layer removes its source; the choice survives reload",
+      "pass": true,
+      "detail": {
+        "hiddenGone": true,
+        "stillHidden": true,
+        "unchecked": true
+      }
+    },
+    {
+      "name": "re-enabling draws it again",
+      "pass": true
+    },
+    {
+      "name": "viewport loading: only the newly visible tiles per source are requested, all answered",
+      "pass": true,
+      "detail": {
+        "zoom": 13,
+        "canvas": [
+          832,
+          746
+        ],
+        "sources": 1,
+        "tileResponses": 8,
+        "statuses": [
+          200
+        ],
+        "tileMsP50": 21,
+        "tileMsP95": 31,
+        "perSourcePerPan": 2,
+        "publishedSourcesLoadedMs": [
+          2400,
+          1534,
+          2022,
+          2171
+        ],
+        "mapIdleInclBasemapMs": [
+          2402,
+          1536,
+          2024,
+          2173
+        ],
+        "sequentialTileMs": [
+          13,
+          13,
+          13,
+          14,
+          14,
+          15,
+          15,
+          18
+        ],
+        "parallel32": {
+          "viaBrowserAndProxyMs": 176,
+          "viaNodeDirectToApiMs": 271,
+          "directStatuses": [
+            200
+          ]
+        }
+      }
+    },
+    {
+      "name": "below min_zoom no tiles are requested and the panel says to zoom in",
+      "pass": true,
+      "detail": {
+        "lowZoom": 0
+      }
+    },
+    {
+      "name": "viewer sees the published public layer",
+      "pass": true
+    },
+    {
+      "name": "viewer (below specialist): internal layers neither listed nor served",
+      "pass": true,
+      "detail": {
+        "internalForAdmin": 1,
+        "internalForViewer": 0,
+        "tileStatus": 403
+      }
+    },
+    {
+      "name": "v2 (polygon + line + point) publishes three manifests; v1 manifest is no longer listed",
+      "pass": true,
+      "detail": [
+        "line",
+        "polygon",
+        "point"
+      ]
+    },
+    {
+      "name": "version switch without reload: old source removed, no old tiles requested after the switch",
+      "pass": true,
+      "detail": {
+        "switched": true,
+        "oldGone": true,
+        "oldAfterSwitch": [
+          404,
+          404,
+          404,
+          404,
+          404,
+          404
+        ],
+        "oldAfterRemoval": 0
+      }
+    },
+    {
+      "name": "geometry_type drives rendering: polygon fill+line, line line, point circle",
+      "pass": true,
+      "detail": {
+        "line": "line",
+        "polygon": "fill+line",
+        "point": "circle"
+      }
+    },
+    {
+      "name": "published data stays under platform layers (boundary, zones, selection)",
+      "pass": true,
+      "detail": {
+        "zoneIdx": 117,
+        "maxData": 114
+      }
+    },
+    {
+      "name": "feature of a superseded version: card shows \"not available\" (404), no stale server data",
+      "pass": true,
+      "detail": {
+        "gone": true
+      }
+    },
+    {
+      "name": "restricted layer: grant holder sees it; specialist and viewer without grant get no manifest and 404 tiles",
+      "pass": true,
+      "detail": {
+        "specialistTile": 404,
+        "seenBy": {
+          "specialist": false,
+          "admin": true,
+          "viewer": false
+        },
+        "access": "restricted",
+        "viewerListed": false,
+        "viewerTile": 404
+      }
+    },
+    {
+      "name": "getMapFeature on a restricted record: grant holder 200, specialist and viewer 404",
+      "pass": true,
+      "detail": {
+        "admin": 200,
+        "specialist": 404,
+        "viewer": 404
+      }
+    },
+    {
+      "name": "getMapFeature: unknown uuid 404 problem+json; numeric MVT id is not an API id (4xx)",
+      "pass": true,
+      "detail": {
+        "unknown": {
+          "status": 404,
+          "type": "application/problem+json"
+        },
+        "numericId": 422
+      }
+    },
+    {
+      "name": "viewer with a restricted feature link sees \"not available\", nothing of the record",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "leaked": false
+      }
+    },
+    {
+      "name": "unknown layer id: 404 problem+json, no tile",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "type": "application/problem+json"
+      }
+    },
+    {
+      "name": "tile without a session is refused (401)",
+      "pass": true,
+      "detail": {
+        "status": 401
+      }
+    },
+    {
+      "name": "getMapFeature without a session is refused (401)",
+      "pass": true,
+      "detail": {
+        "status": 401
+      }
+    },
+    {
+      "name": "tile 403 is shown on the layer, not silently empty",
+      "pass": true
+    },
+    {
+      "name": "listMapLayers 503: error with retry; retry recovers without reload",
+      "pass": true,
+      "detail": {
+        "errShown": true,
+        "recovered": true
+      }
+    },
+    {
+      "name": "cross-origin source_url is refused (no request, explained)",
+      "pass": true,
+      "detail": {
+        "note": true,
+        "requests": 0
+      }
+    },
+    {
+      "name": "getMapFeature 503: error with retry in the card; retry recovers; shared link frames the feature",
+      "pass": true,
+      "detail": {
+        "errShown": true,
+        "recovered": true,
+        "zoom": 17,
+        "layer": "ee29bf5a-0ac6-528d-84d1-375cfd60bc5a"
+      }
+    },
+    {
+      "name": "feature card fits a phone viewport without covering the 3D toggle",
+      "pass": true,
+      "detail": {
+        "box": {
+          "x": 16,
+          "y": 517.84375,
+          "width": 358,
+          "height": 229.40625
+        },
+        "toggle": {
+          "x": 12,
+          "y": 144.78125,
+          "width": 86.3125,
+          "height": 28
+        }
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp04-map-layers/layer-published-admin.png",
+    "docs/evidence/wp04-map-layers/layer-inspector.png",
+    "docs/evidence/wp04-map-layers/feature-card-reload.png",
+    "docs/evidence/wp04-map-layers/layer-v2-viewer.png",
+    "docs/evidence/wp04-map-layers/layer-v2-panel.png",
+    "docs/evidence/wp04-map-layers/feature-card-404.png",
+    "docs/evidence/wp04-map-layers/layer-tiles-403.png",
+    "docs/evidence/wp04-map-layers/layers-list-503.png",
+    "docs/evidence/wp04-map-layers/feature-card-503.png",
+    "docs/evidence/wp04-map-layers/feature-card-dark.png",
+    "docs/evidence/wp04-map-layers/feature-card-mobile.png",
+    "docs/evidence/wp04-map-layers/layer-v2-dark.png"
+  ],
+  "perf": {
+    "zoom": 13,
+    "canvas": [
+      832,
+      746
+    ],
+    "sources": 1,
+    "tileResponses": 8,
+    "statuses": [
+      200
+    ],
+    "tileMsP50": 21,
+    "tileMsP95": 31,
+    "perSourcePerPan": 2,
+    "publishedSourcesLoadedMs": [
+      2400,
+      1534,
+      2022,
+      2171
+    ],
+    "mapIdleInclBasemapMs": [
+      2402,
+      1536,
+      2024,
+      2173
+    ],
+    "sequentialTileMs": [
+      13,
+      13,
+      13,
+      14,
+      14,
+      15,
+      15,
+      18
+    ],
+    "parallel32": {
+      "viaBrowserAndProxyMs": 176,
+      "viaNodeDirectToApiMs": 271,
+      "directStatuses": [
+        200
+      ]
+    }
+  },
+  "finishedAt": "2026-10-31T08:40:01.169Z",
+  "passed": true,
+  "synthetic": {
+    "datasets": [
+      "SYNTHETIC TEST слой 08:38:11",
+      "SYNTHETIC TEST restricted 08:38:11"
+    ],
+    "versions": [
+      "3e5079e8-4b5f-4c0e-b072-de11dfcdfbd2",
+      "48c41f39-d089-4db6-9cce-ff92bbc3f7da",
+      "18bd154a-0e23-451f-af82-7ecb808819c7"
+    ]
+  }
+}

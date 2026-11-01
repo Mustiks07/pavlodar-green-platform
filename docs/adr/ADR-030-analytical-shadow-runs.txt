@@ -1,0 +1,126 @@
+ADR-030 Analytical shadow runs as durable worker jobs with immutable SpatialResult
+Статус: accepted and integrated by GPT (canonical contract/migration owner).
+Дата: 2026-10-30. Основа: canonical 1.4.0; Claude worker foundation 525585b.
+
+ПРОБЛЕМА
+
+Контракт содержит startShadowRun (ShadowRequest -> Job kind=shadow), getSpatialResult и
+SpatialResult, но сервер их не реализует: worker отвечает handler_not_available, хранилища
+SpatialResult нет. Дополнительно:
+- getMapFeature всегда возвращает height_basis=unknown: правила чтения высоты здания из
+  опубликованной записи на сервере нет;
+- существующий run_job держит строку jobs под FOR UPDATE на всё время вычисления, поэтому
+  cancelJob ждёт окончания расчёта и не может его прервать;
+- SoftTimeLimitExceeded Celery не обрабатывается: задача остаётся running до истечения lease и
+  повторяется recover() до трёх раз, хотя детерминированный перерасход времени повторится.
+
+РЕШЕНИЕ
+
+1. packages/domain/shadow.py — метод shadow-analytic-1, чистые функции без БД:
+   - положение Солнца по уравнениям NOAA (Meeus), UT, видимая высота с поправкой рефракции NOAA
+     для стандартной атмосферы; азимут от севера по часовой стрелке;
+   - земля — горизонтальная плоскость у основания объектов; без рельефа, отражений и
+     светопропускания крон;
+   - здание — вертикальная призма над контуром; тень — точная сумма Минковского контура и
+     горизонтального вектора тени (контур, его перенос и четырёхугольник на каждое ребро, включая
+     внутренние кольца);
+   - посадка — непрозрачная сфера радиуса кроны с вершиной на заданной высоте; тень — эллипс
+     (малая полуось r, большая r/sin(h)); стволы не учитываются;
+   - площадь тени на открытой земле участка (участок минус контуры зданий) считается точным
+     пересечением полигонов; сетка grid_resolution_m — только для артефакта и контроля;
+   - объекты без пригодной высоты/размеров исключаются и перечисляются; высота по умолчанию не
+     подставляется. analytical_verified принимает только measured; estimated_preview — measured,
+     recorded_unverified, floors_estimate (здания) и measured/catalog/estimated (посадки);
+     visual_placeholder не участвует никогда;
+   - соседние здания учитываются в буфере, равном длине тени самого высокого здания, но не более
+     500 м; длиннее 500 м тень обрезается и это сообщается (shadow_length_capped).
+2. packages/domain/heights.py — record_height(properties) -> (height_m, height_basis, floors):
+   объявленные издателем height_m + height_basis; OSM height в метрах -> recorded_unverified;
+   building:levels сохраняется как floors, но высота из этажности не выводится, пока нет принятого
+   коэффициента высоты этажа. Предлагается использовать ту же функцию в getMapFeature/MVT.
+3. services/worker/shadow.py — обработчик job kind=shadow:
+   - входы читаются в короткой транзакции: зона из frozen zone_version, здания только из frozen
+     dataset_version_ids ревизии с kind=buildings в радиусе 500 м (ST_DWithin в EPSG:32643, не
+     более 20 000 записей), посадки ревизии;
+   - вычисление идёт вне транзакций; checkpoint не чаще раза в 20 с продлевает lease через
+     jobs.heartbeat и видит cancel_requested -> job cancelled без результата;
+   - собственный лимит 200 с (ниже soft limit Celery 240 с) -> failed shadow_timeout без повтора;
+     SoftTimeLimitExceeded -> failed job_timeout без повтора (run_job);
+   - падение worker -> истечение lease -> recover() (не более трёх попыток); id результата =
+     uuid5(job.id), а jobs.complete() перепроверяет lease, поэтому двойной записи нет;
+   - результат и событие succeeded фиксируются одной транзакцией в jobs.complete().
+4. SpatialResult (kind=shadow):
+   - metrics: shade_area (m2, horizon_year=0, method_version=shadow-analytic-1), status
+     estimated либо synthetic для синтетических входов, qualitative_confidence medium
+     (analytical_verified) / low (estimated_preview), source_refs — frozen buildings versions;
+   - unknown не равен нулю: нет набора зданий в ревизии -> partial + blocking
+     buildings_dataset_missing и shade_area=null; здания рядом есть, но ни одной пригодной высоты ->
+     partial + blocking building_heights_missing и shade_area=null; зданий в радиусе нет -> это
+     настоящий 0;
+   - исключённые объекты -> non-blocking shadow_input_excluded:<reason> со списком id (до 20);
+   - Солнце ниже горизонта -> status=unavailable, sun_below_horizon, без артефакта;
+   - artifact_url=/v1/spatial-results/{id}/artifact: GeoJSON полигона тени в EPSG:4326 и
+     метаданные (момент, положение Солнца, режим, сетка EPSG:32643, значения ячеек).
+5. API: startShadowRun (specialist; проверка смещения в datetime и режима до постановки,
+   authorized_revision, enqueue kind=shadow с request_payload, audit shadow.queued, replay по
+   Idempotency-Key как у startCalculation) и getSpatialResult (повторная авторизация ревизии).
+   Операции включены после применения migration 0016_spatial_results.
+
+КАНОНИЧЕСКАЯ ИНТЕГРАЦИЯ GPT
+
+1. Migration 0016_spatial_results создаёт:
+
+   CREATE TABLE spatial_results (
+     id uuid PRIMARY KEY,
+     scenario_revision_id uuid NOT NULL REFERENCES scenario_revisions(id),
+     city_id uuid NOT NULL REFERENCES cities(id),
+     job_id uuid NOT NULL UNIQUE REFERENCES jobs(id),
+     kind varchar NOT NULL CHECK (kind IN ('shadow','invest_air','solweig_tmrt')),
+     payload jsonb NOT NULL,
+     artifact jsonb,
+     created_at timestamptz NOT NULL
+   );
+   CREATE INDEX spatial_results_revision_idx ON spatial_results (scenario_revision_id, created_at DESC);
+   CREATE INDEX spatial_results_city_idx ON spatial_results (city_id);
+   CREATE TRIGGER spatial_results_immutable BEFORE UPDATE OR DELETE ON spatial_results
+     FOR EACH ROW EXECUTE FUNCTION reject_immutable_write();
+
+   downgrade запрещён (результаты — история расчётов). Restore fingerprint включает таблицу.
+2. Canonical 1.4.0 добавляет GET /v1/spatial-results/{result_id}/artifact
+   (getSpatialResultArtifact, viewer, повторная авторизация ревизии) ->
+   application/geo+json: FeatureCollection {features:[{id:"shadow", geometry: Polygon|MultiPolygon|null,
+   properties:{role:"shadow"}}], metadata:{method_version, datetime, geometry_mode,
+   sun:{elevation_deg, azimuth_deg}, crs_of_grid:"EPSG:32643", grid:{origin, resolution_m, rows,
+   cols, ground_cells, shaded_cells}, grid_values: (0|1|null)[][], zone_area_m2, open_ground_m2,
+   used_buildings, used_trees}}. Без этой операции 3D не может показать полигон тени, только число.
+3. Реестр problem_codes включает shadow_datetime_naive (422), shadow_mode_invalid (422),
+   shadow_zone_invalid (422), shadow_grid_invalid (422), shadow_grid_too_large (422),
+   shadow_inputs_too_large (422), shadow_location_invalid (422), sun_below_horizon (422),
+   shadow_timeout (503), job_timeout (503) с title_ru.
+4. shade_area остаётся канонической метрикой этого инкремента; shade_fraction отложена до принятого
+   UX/аналитического требования.
+5. getMapFeature и shadow worker используют один record_height(), поэтому карта, 3D и тени читают
+   высоту одинаково, без коэффициента этажности и placeholder.
+
+ПРОВЕРКА
+
+- tests/test_shadow.py (19): эталонный вектор NREL SPA (Reda & Andreas 2003: зенит 50.11162°,
+  азимут 194.34024°; получено 50.1086° и 194.3426°), кульминация в солнцестояние для Павлодара,
+  симметрия утро/вечер, ночь; куб 10 м при 30/45/60° и при диагональном Солнце (точные площади
+  100+L·10 и 100+L·10√2); невыпуклый контур с двором против независимого перебора по отрезкам
+  (±1 %); эллипс кроны (площадь πr²/sin h, смещение (H−r)/tan h); соседнее здание; исключения по
+  высоте/основанию/геометрии; отказ на неверной зоне и слишком большой сетке; низкое Солнце; отмена.
+- tests/test_shadow_job.py (17): чтение высоты, правила результата (unknown ≠ 0), смещение в
+  datetime, checkpoint (deadline/cancel), стабильный id, отмена в run_shadow.
+- tests/test_shadow_runs.py (integration): API -> outbox job -> run_job -> SpatialResult ->
+  application/geo+json artifact на мигрированной PostGIS, включая replay/cancel/IDOR.
+- Живой smoke на http://localhost:8001 прошёл через OIDC, PostgreSQL outbox, Redis/Celery и
+  immutable result: один реальный опубликованный building input дал Polygon и shade_area=573.8 m2
+  для явно обозначенной SYNTHETIC TEST зоны.
+
+ОГРАНИЧЕНИЯ
+
+Метод геометрический и мгновенный: без рельефа, рассеянного света, пропускания крон, сезонной
+листвы и роста. Он не является калибровкой, официальной инсоляционной оценкой или нормативным
+расчётом. Высоты OSM — записанные значения, а не измерения; режим analytical_verified их не
+принимает. InVEST/SOLWEIG по-прежнему закрыты data gates.

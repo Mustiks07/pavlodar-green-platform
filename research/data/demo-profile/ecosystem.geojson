@@ -1,0 +1,109 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "green-area-tree-planning",
+      "properties": {
+        "record_type": "ecosystem_coefficient",
+        "metric_key": "green_area",
+        "value": 16,
+        "unit": "m2",
+        "basis": "per_tree_year",
+        "horizon_factors": {"5": 0.25, "10": 0.625, "20": 1},
+        "qualitative_confidence": "low",
+        "source_url": null,
+        "method_note": "SYNTHETIC TEST: внутренняя планировочная гипотеза площади кроны дерева; не локальное измерение и не норматив."
+      },
+      "geometry": {"type": "Point", "coordinates": [76.98, 52.28]}
+    },
+    {
+      "type": "Feature",
+      "id": "green-area-shrub-planning",
+      "properties": {
+        "record_type": "ecosystem_coefficient",
+        "metric_key": "green_area",
+        "value": 4,
+        "unit": "m2",
+        "basis": "per_shrub_year",
+        "horizon_factors": {"5": 0.5, "10": 0.8, "20": 1},
+        "qualitative_confidence": "low",
+        "source_url": null,
+        "method_note": "SYNTHETIC TEST: внутренняя планировочная гипотеза площади кроны кустарника; не локальное измерение и не норматив."
+      },
+      "geometry": {"type": "Point", "coordinates": [76.98, 52.28]}
+    },
+    {
+      "type": "Feature",
+      "id": "co2-usda-nrs200-reference",
+      "properties": {
+        "record_type": "ecosystem_coefficient",
+        "metric_key": "co2_sequestered",
+        "value": 0.828666,
+        "unit": "kg_CO2_per_year",
+        "basis": "per_green_m2_year",
+        "source_url": "https://doi.org/10.2737/NRS-GTR-200",
+        "method_note": "Справочный, не локальный коэффициент: 0.226 kg C/m2/year × 44/12 = 0.828666 kg CO2/m2/year; USDA Forest Service GTR-NRS-200."
+      },
+      "geometry": {"type": "Point", "coordinates": [76.98, 52.28]}
+    },
+    {
+      "type": "Feature",
+      "id": "pollutants-itree-us-reference",
+      "properties": {
+        "record_type": "ecosystem_coefficient",
+        "metric_key": "pollutants_removed",
+        "value": 0.008385,
+        "unit": "kg_per_year",
+        "basis": "per_green_m2_year",
+        "source_url": "https://doi.org/10.1016/j.envpol.2014.05.028",
+        "method_note": "Справочная сумма ставок удаления загрязнителей для городов США: 8.385 g/m2/year = 0.008385 kg/m2/year; i-Tree/Nowak et al.; не локальная калибровка Павлодара."
+      },
+      "geometry": {"type": "Point", "coordinates": [76.98, 52.28]}
+    },
+    {
+      "type": "Feature",
+      "id": "oxygen-usda-nowak-reference",
+      "properties": {
+        "record_type": "ecosystem_coefficient",
+        "metric_key": "oxygen_produced",
+        "value": 0.602667,
+        "unit": "kg_per_year",
+        "basis": "per_green_m2_year",
+        "source_url": "https://doi.org/10.2737/NRS-GTR-200",
+        "method_note": "Справочный, не локальный коэффициент: 0.226 kg C/m2/year × 32/12 = 0.602667 kg O2/m2/year по методу USDA/Nowak."
+      },
+      "geometry": {"type": "Point", "coordinates": [76.98, 52.28]}
+    },
+    {
+      "type": "Feature",
+      "id": "air-cooling-synthetic-green-fraction",
+      "properties": {
+        "record_type": "ecosystem_coefficient",
+        "metric_key": "air_cooling",
+        "value": 2,
+        "unit": "degC",
+        "basis": "green_fraction",
+        "qualitative_confidence": "low",
+        "source_url": null,
+        "method_note": "SYNTHETIC TEST: при 100% расчётного покрытия зеленью эффект принят равным 2 °C; низкая уверенность, не локальное наблюдение и не климатическая калибровка Павлодара."
+      },
+      "geometry": {"type": "Point", "coordinates": [76.98, 52.28]}
+    },
+    {
+      "type": "Feature",
+      "id": "stormwater-synthetic-per-green-area",
+      "properties": {
+        "record_type": "ecosystem_coefficient",
+        "metric_key": "stormwater_retained",
+        "value": 0.12,
+        "unit": "m3",
+        "basis": "per_green_m2_year",
+        "qualitative_confidence": "unknown",
+        "source_url": null,
+        "method_note": "SYNTHETIC TEST: 0.12 м³ удержанной воды на 1 м² расчётного озеленения в год; неизвестная уверенность, не локальное измерение и не гидрологическая калибровка Павлодара."
+      },
+      "geometry": {"type": "Point", "coordinates": [76.98, 52.28]}
+    }
+  ]
+}

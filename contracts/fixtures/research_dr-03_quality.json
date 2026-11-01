@@ -1,0 +1,139 @@
+{
+  "schema": "QualityReport",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "id": "e9d1676c-6e80-5ff3-948f-b46244b1cf22",
+    "issues": [
+      {
+        "code": "research_not_approved",
+        "message": "Найденное не равно допущенному к production.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-03",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-03",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Неизвестные и недатированные параметры не заменены нулями.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-03",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-03",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Нормы не исчерпывающие; сроки ухода требуют толкования.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-03",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Нет открытого слоя сетей и точечных почвенных pH/EC; нельзя считать пустой слой разрешением на посадку.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-03",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LAW-GREEN\", \"title\": \"Правила создания, содержания и защиты зеленых насаждений населенных пунктов Павлодарской области, №52/4 от 11.09.2023\", \"url\": \"https://adilet.zan.kz/rus/docs/G23P000524M\", \"publisher\": \"Павлодарский областной маслихат / ИПС Әділет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-03-26\", \"license\": \"unknown\", \"method\": \"legal_text\", \"note\": \"Прочитан консолидированный текст и история через браузер. Последняя отображенная редакция 26.03.2026; не подменяет полный набор строительных норм.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LAW-GREEN",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LAW-GREEN-AMEND\", \"title\": \"Изменения №257/29 от 26.03.2026\", \"url\": \"https://adilet.zan.kz/rus/docs/G26P025729M\", \"publisher\": \"Павлодарский областной маслихат / ИПС Әділет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-03-26\", \"license\": \"unknown\", \"method\": \"legal_text\", \"note\": \"Изменены пп.39,58,59. Карточка указывает официальную публикацию 09.04.2026; вступление через десять календарных дней после публикации. Точную календарную дату не подменяем датой принятия.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LAW-GREEN-AMEND",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LAW-SCHOOL\", \"title\": \"Санитарные правила к объектам образования, приказ ҚР ДСМ-76 от 05.08.2021\", \"url\": \"https://adilet.zan.kz/rus/docs/V2100023890\", \"publisher\": \"Министерство здравоохранения РК / ИПС Әділет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-07-24\", \"license\": \"unknown\", \"method\": \"legal_text\", \"note\": \"История показывает редакцию 24.07.2026, приказ №83. П.2 исключает дошкольные объекты. П.5 отсылает к строительным нормативам. Старые цитаты про ядовитые плоды не обнаружены в текущем тексте; разрешение на опасные посадки из этого не следует.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LAW-SCHOOL",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LAW-HEALTH\", \"title\": \"Санитарные правила к объектам здравоохранения, ҚР ДСМ-96/2020\", \"url\": \"https://adilet.zan.kz/rus/docs/V2000021080\", \"publisher\": \"Министерство здравоохранения РК / ИПС Әділет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2023-04-05\", \"license\": \"unknown\", \"method\": \"legal_text\", \"note\": \"История прочитана: 11.08.2020, 28.01.2022, 05.04.2023. Найденные в поиске отступы из акта 2010 года не перенесены в действующие правила.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LAW-HEALTH",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LAW-IMPROVEMENT-OLD\", \"title\": \"Правила благоустройства №134/14 от 11.07.2024 — отменены\", \"url\": \"https://adilet.zan.kz/rus/docs/G24P013414M\", \"publisher\": \"Павлодарский областной маслихат / ИПС Әділет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-08-21\", \"license\": \"unknown\", \"method\": \"legal_text\", \"note\": \"Живой первоисточник сообщает отмену решением №299/33 от 21.08.2026. Поисковая копия со статусом на 26.03.2026 устарела.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LAW-IMPROVEMENT-OLD",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"SOIL-NNC\", \"title\": \"Оценка загрязнения редкоземельными металлами в системе снег–почва–растительность на территории г. Павлодар и пригорода, с.36–42\", \"url\": \"https://doi.org/10.52676/1729-7885-2024-4-36-42\", \"publisher\": \"А.А. Фаурат, Г.С. Ажаев; Вестник НЯЦ РК / Торайгыров университет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2023\", \"license\": \"unknown\", \"method\": \"laboratory_study\", \"note\": \"Исходный PDF: https://www.nnc.kz/media/bulletin/files/ZH9dkWRCd1.pdf . Отбор 0–15 см; город и пригород различены. Нет пригодной таблицы точечных pH/EC для посадочных зон. Значения pH из соседней статьи не относятся к этой выборке.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "SOIL-NNC",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"SOILGRIDS\", \"title\": \"SoilGrids250m v2.0 documentation\", \"url\": \"https://docs.isric.org/globaldata/soilgrids/SoilGrids_faqs.html\", \"publisher\": \"ISRIC — World Soil Information\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"model_documentation\", \"note\": \"Глобальная ML-модель 250 м и шесть глубин; не лабораторная проба города. Растры не выгружались, pH/EC участков не заполнялись.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "SOILGRIDS",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"PROJECT-TZ\", \"title\": \"ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29\", \"url\": \"repo:docs/TZ_DEVELOPMENT.txt\", \"publisher\": \"Проект team-vtiposhnik\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-10-29\", \"license\": \"unknown\", \"method\": \"project_requirement\", \"note\": \"Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "PROJECT-TZ",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LAW-IMPROVEMENT-2026\", \"title\": \"Правила благоустройства №299/33 от 21.08.2026\", \"url\": \"https://adilet.zan.kz/rus/docs/G26P029933M\", \"publisher\": \"Павлодарский областной маслихат / НЦПС Әділет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-08-21\", \"license\": \"unknown\", \"method\": \"legal_text\", \"note\": \"Карточка: действующий; официальная публикация 01.09.2026. В истории одна редакция. П.2 решения отменяет №134/14 и мартовское №258/29. П.3: действие по истечении десяти календарных дней после первой официальной публикации.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LAW-IMPROVEMENT-2026",
+        "suggested_action": null
+      }
+    ],
+    "error_count": 0,
+    "valid_count": 33,
+    "record_count": 33,
+    "warning_count": 15,
+    "publish_allowed": false,
+    "issues_truncated": false,
+    "dataset_version_id": "946d3ce6-8761-50af-b76e-4c5db99de190",
+    "issues_next_cursor": null
+  }
+}

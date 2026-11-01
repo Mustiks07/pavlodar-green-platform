@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "scope": "Verified public Pavlodar v2 vectors through HTTP/upload/worker/review/publication/MVT/card",
+  "package_manifest_sha256": "09f1320140d6e2d8133e1eafc56432732bdde160d54738f62dc7d46f1df22436",
+  "working_bbox_epsg4326": [76.86, 52.2, 77.2, 52.4],
+  "working_bbox_is_official_boundary": false,
+  "organizer_data_received": false,
+  "height_from_levels": false,
+  "total_record_count": 60144,
+  "datasets": [
+    {
+      "profile": "buildings",
+      "sha256": "9815dc07879e74eb2928de2f5499d1df17917d4d5c9871f991d4789ce7dadb60",
+      "record_count": 49552,
+      "status": "published",
+      "tiles": [{"geometry_type": "polygon", "bytes": 45642}],
+      "feature_card_source_record_id": "way/169855909",
+      "feature_card_height_m": 10.0
+    },
+    {
+      "profile": "roads",
+      "sha256": "a6b6cf888fba4037e5f9538b7bee5a02f6fb413c52e96e8987936eed07fd5f02",
+      "record_count": 7746,
+      "status": "published",
+      "tiles": [{"geometry_type": "line", "bytes": 50885}],
+      "feature_card_source_record_id": "way/23490734",
+      "feature_card_height_m": null
+    },
+    {
+      "profile": "green",
+      "sha256": "0393bb8a4f49367f408eb6c370a42b163b76fd7bfca378a962f5c61d66bfb84b",
+      "record_count": 1043,
+      "status": "published",
+      "tiles": [{"geometry_type": "polygon", "bytes": 823}],
+      "feature_card_source_record_id": "way/22414539",
+      "feature_card_height_m": null
+    },
+    {
+      "profile": "trees",
+      "sha256": "2f3476ea67d6ee15f6e3f84b4b73777b6184f8db2e5eddf6397729828fd1dbdb",
+      "record_count": 426,
+      "status": "published",
+      "tiles": [{"geometry_type": "point", "bytes": 583}],
+      "feature_card_source_record_id": "node/3608777021",
+      "feature_card_height_m": null
+    },
+    {
+      "profile": "water",
+      "sha256": "743a0c7178cf5ba4e1af3041803b04f76c4140348162b6063a1dc45b0ec50821",
+      "record_count": 167,
+      "status": "published",
+      "tiles": [
+        {"geometry_type": "line", "bytes": 873},
+        {"geometry_type": "polygon", "bytes": 552}
+      ],
+      "feature_card_source_record_id": "way/22414514",
+      "feature_card_height_m": null
+    },
+    {
+      "profile": "social_poi",
+      "sha256": "2205e6c69b6686d3140d641fd33a55fe7b305bb87f58809ec0215cf041995606",
+      "record_count": 1210,
+      "status": "published",
+      "tiles": [
+        {"geometry_type": "polygon", "bytes": 5413},
+        {"geometry_type": "point", "bytes": 9971}
+      ],
+      "feature_card_source_record_id": "node/636250015",
+      "feature_card_height_m": null
+    }
+  ],
+  "raster_status": {
+    "available_in_package": ["WorldCover", "Copernicus DEM", "SoilGrids", "JRC Global Surface Water"],
+    "published": false,
+    "reason": "Canonical API has no COG/raster publication pipeline yet"
+  }
+}

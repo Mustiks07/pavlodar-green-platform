@@ -1,0 +1,18 @@
+ADR-055: Data-gated thermal runs without fabricated output
+Status: accepted
+Date: 2026-11-01
+
+Context
+startThermalRun was canonical but absent. No approved local runtime/calibration bundle for
+InVEST Air or SOLWEIG TMRT has been delivered.
+
+Decision
+Accept a thermal job only when its published weather dataset and approved parameter coefficient
+are both authorized, belong to the scenario city, and are frozen in the scenario revision. The
+durable worker currently records an unavailable SpatialResult with the exact missing runtime
+reason instead of emitting invented temperatures or rasters.
+
+Consequences
+The operation, queue, lineage, cancellation/recovery envelope and result retrieval now work.
+Complete thermal metrics and artifacts remain data- and adapter-gated; absence is explicit and is
+never represented as zero.

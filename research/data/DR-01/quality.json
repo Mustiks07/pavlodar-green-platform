@@ -1,0 +1,61 @@
+{
+  "checked_at": "2026-10-29",
+  "research_status": "not_found",
+  "acceptance_met": false,
+  "city": "Павлодар",
+  "official_boundary_confirmed": false,
+  "real_world_city_coverage": null,
+  "accuracy": null,
+  "accuracy_reason": "Нет локальной независимой проверки; точность и разрешение не одно и то же.",
+  "tables": {
+    "data.csv": {
+      "row_count": 2,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 2,
+        "status": 0,
+        "reason": 0,
+        "source_id": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "sources.csv": {
+      "row_count": 3,
+      "null_count_by_column": {
+        "source_id": 0,
+        "title": 0,
+        "url": 0,
+        "publisher": 0,
+        "checked_at": 0,
+        "observed_at": 1,
+        "license": 0,
+        "method": 0,
+        "note": 0
+      },
+      "duplicate_whole_rows": 0
+    }
+  },
+  "limitations": [
+    "Найденное не равно допущенному к production.",
+    "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+    "Неизвестные и недатированные параметры не заменены нулями.",
+    "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+    "Официальное покрытие города неизвестно; рабочий контур не прошел приемку."
+  ],
+  "coverage_basis": "Исследование ограничено городом Павлодаром; внешние справочные/сравнительные данные явно помечены. Доля площади в официальном контуре unknown.",
+  "geometry_files": {
+    "working_boundary.geojson": {
+      "feature_count": 1,
+      "crs": "EPSG:4326",
+      "metric_accuracy_m": null
+    }
+  },
+  "geometry_validation": {
+    "working_boundary.geojson": {
+      "feature_count": 1,
+      "invalid_features": [],
+      "topology_repaired": false
+    }
+  }
+}

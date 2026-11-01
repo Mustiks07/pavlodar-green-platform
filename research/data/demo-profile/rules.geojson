@@ -1,0 +1,45 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "mvp-care-rule",
+      "properties": {
+        "record_type": "rule_version",
+        "id": "8e7b6d54-76c6-5f66-8d21-a5f6cc58bca9",
+        "act_number": "SYNTHETIC TEST: MVP-CARE-01",
+        "clause": "prototype",
+        "revision_date": "2026-10-31",
+        "parameter": "plant_hard_constraints_reviewed",
+        "value": true,
+        "unit": null,
+        "applicability": "Только сквозная демонстрация MVP; перед применением требуется профильный специалист",
+        "condition": "Не использовать для официального утверждения или закупки",
+        "review_status": "verified_text_requires_expert",
+        "source_status": "SYNTHETIC TEST: проектное правило без экспертного подтверждения",
+        "superseded_by": null
+      },
+      "geometry": {"type": "Point", "coordinates": [76.9527, 52.2889]}
+    },
+    {
+      "type": "Feature",
+      "id": "mvp-green-coverage-target",
+      "properties": {
+        "record_type": "rule_version",
+        "id": "f6714b9a-11f4-5dfc-8205-46125498f0d6",
+        "act_number": "SYNTHETIC TEST: MVP-COVERAGE-01",
+        "clause": "prototype",
+        "revision_date": "2026-10-31",
+        "parameter": "green_coverage_target",
+        "value": 0.30,
+        "unit": "1",
+        "applicability": "Оценочный профиль MVP, доля площади существующей зелени",
+        "condition": "Не использовать как официальный норматив или локально утверждённый целевой показатель",
+        "review_status": "expert_confirmed",
+        "source_status": "SYNTHETIC TEST: проектное целевое значение для демонстрации MVP",
+        "superseded_by": null
+      },
+      "geometry": {"type": "Point", "coordinates": [76.9527, 52.2889]}
+    }
+  ]
+}

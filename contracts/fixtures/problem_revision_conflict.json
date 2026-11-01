@@ -1,0 +1,16 @@
+{
+  "fixture_only": true,
+  "schema": "Problem",
+  "expected_valid": true,
+  "data": {
+    "type": "https://team-vtiposhnik.example/problems/revision-conflict",
+    "title": "Версия изменилась",
+    "status": 412,
+    "detail": "Получите текущую ревизию перед сохранением",
+    "code": "REVISION_CONFLICT",
+    "request_id": "00000000-0000-0000-0000-000000000009",
+    "current_revision_id": "00000000-0000-0000-0000-000000000005",
+    "field_errors": [],
+    "blockers": []
+  }
+}

@@ -1,0 +1,593 @@
+{
+  "base": "http://localhost:5173",
+  "contract": "1.1.0",
+  "contractSha": "7fb6cf60eb932ed6dac912aa38c8f2d07e0a43c2",
+  "startedAt": "2026-10-29T21:03:04.797Z",
+  "checks": [
+    {
+      "name": "server publishes contract 1.1.0",
+      "pass": true,
+      "detail": {
+        "spec": "1.1.0"
+      }
+    },
+    {
+      "name": "Sources page renders every readiness item from GET /v1/source-readiness",
+      "pass": true,
+      "detail": {
+        "api": 65,
+        "ui": 65,
+        "city": "Павлодар — СИНТЕТИЧЕСКИЙ ТЕСТОВЫЙ КОНТУР"
+      }
+    },
+    {
+      "name": "ADR-008: content_kind=mixed shown as mixed with its stated composition, not as ready",
+      "pass": true,
+      "detail": {
+        "mixedApi": [],
+        "mixedUi": []
+      }
+    },
+    {
+      "name": "record_count null shown as unknown (never 0)",
+      "pass": true,
+      "detail": {
+        "nullCounts": 0,
+        "unknownUi": 0
+      }
+    },
+    {
+      "name": "readiness cards are labelled with dataset names",
+      "pass": true,
+      "detail": {
+        "named": [
+          "SYNTHETIC TEST слой 18:43:13",
+          "SYNTHETIC TEST импорт 18:51:12",
+          "SYNTHETIC TEST импорт 16:46:33",
+          "SYNTHETIC TEST импорт 16:52:18",
+          "SYNTHETIC TEST слой 18:37:27",
+          "SYNTHETIC TEST слой 19:01:15",
+          "SYNTHETIC TEST слой 20:33:36",
+          "SYNTHETIC TEST импорт 16:48:48",
+          "SYNTHETIC TEST слой 18:39:40",
+          "SYNTHETIC TEST импорт 18:01:07",
+          "SYNTHETIC TEST импорт 16:54:03",
+          "SYNTHETIC TEST импорт 17:00:08",
+          "SYNTHETIC TEST импорт 20:48:28",
+          "SYNTHETIC TEST импорт 18:51:12",
+          "SYNTHETIC TEST слой 18:35:16",
+          "SYNTHETIC TEST импорт 17:00:08",
+          "SYNTHETIC TEST импорт 16:47:44",
+          "SYNTHETIC TEST слой 18:27:26",
+          "SYNTHETIC TEST слой 18:43:13",
+          "SYNTHETIC TEST слой 20:39:33",
+          "SYNTHETIC TEST импорт 17:00:08",
+          "SYNTHETIC TEST слой 18:26:18",
+          "SYNTHETIC TEST импорт 20:50:25",
+          "SYNTHETIC TEST импорт 16:52:18",
+          "SYNTHETIC TEST импорт 16:47:44",
+          "SYNTHETIC TEST слой 20:55:25",
+          "SYNTHETIC TEST restricted 18:35:16",
+          "SYNTHETIC TEST импорт 18:51:12",
+          "SYNTHETIC TEST импорт 16:52:18",
+          "SYNTHETIC TEST слой 18:39:40",
+          "SYNTHETIC TEST импорт 16:48:48",
+          "SYNTHETIC TEST импорт 16:48:48",
+          "SYNTHETIC TEST слой 20:38:26",
+          "SYNTHETIC TEST импорт 18:01:07",
+          "SYNTHETIC TEST слой 20:39:33",
+          "SYNTHETIC TEST импорт 18:15:19",
+          "SYNTHETIC TEST слой 20:51:28",
+          "SYNTHETIC TEST импорт 18:21:05",
+          "SYNTHETIC TEST слой 20:55:25",
+          "SYNTHETIC TEST слой 19:01:15",
+          "SYNTHETIC TEST импорт 16:47:44",
+          "SYNTHETIC TEST импорт 20:48:28",
+          "SYNTHETIC TEST импорт 16:58:11",
+          "SYNTHETIC TEST импорт 20:50:25",
+          "SYNTHETIC TEST импорт 16:58:11",
+          "SYNTHETIC TEST импорт 18:15:19",
+          "SYNTHETIC TEST слой 18:27:26",
+          "SYNTHETIC TEST слой 20:51:28",
+          "SYNTHETIC TEST импорт 16:55:33",
+          "SYNTHETIC TEST импорт 18:21:05",
+          "SYNTHETIC TEST импорт 18:15:19",
+          "SYNTHETIC TEST слой 18:31:20",
+          "SYNTHETIC TEST импорт 16:55:33",
+          "SYNTHETIC TEST импорт 16:54:03",
+          "SYNTHETIC TEST слой 20:33:36",
+          "SYNTHETIC TEST импорт 18:01:07",
+          "SYNTHETIC TEST импорт 16:55:33",
+          "SYNTHETIC TEST импорт 20:48:28",
+          "SYNTHETIC TEST импорт 18:21:05",
+          "SYNTHETIC TEST слой 18:37:27",
+          "SYNTHETIC TEST импорт 16:58:11",
+          "SYNTHETIC TEST слой 18:31:20",
+          "SYNTHETIC TEST импорт 20:50:25",
+          "SYNTHETIC TEST слой 18:35:16",
+          "SYNTHETIC TEST импорт 16:54:03"
+        ]
+      }
+    },
+    {
+      "name": "client reports contract 1.1.0 in the status bar",
+      "pass": true,
+      "detail": {
+        "status": "API: работает\n· сборка API foundation-development\nконтракт 1.1.0\nвремя: Asia/Almaty"
+      }
+    },
+    {
+      "name": "dataset version shows readiness state, content kind, records and check date (1.1.0 fields)",
+      "pass": true,
+      "detail": {
+        "excerpt": "SYNTHETIC TEST слой 18:43:13\nТип\nzones\nВладелец\nSYNTHETIC integration test\nЛицензия\nCC0-1.0\nИсходный адрес\nне указан\nЗарегистрирован\n29.10.2026, 23:43\nВерсии\nопубликована\nтекущая\n4ad1f353\nСодержимое доступно\nвекторные объекты\n\nПрименимость: Ожидает admin review\n\nЗаписей\n3\nПериод данных\nне указан\nПро"
+      }
+    },
+    {
+      "name": "Problem title comes from contracts/problem_codes.json",
+      "pass": true,
+      "detail": {
+        "code": "not_found",
+        "expectedTitle": "Объект не найден",
+        "shownTitle": "Объект не найден"
+      }
+    },
+    {
+      "name": "setup: zone v1 -> scenario on v1 -> zone updated to v2",
+      "pass": true,
+      "detail": {
+        "s": [
+          201,
+          201,
+          200
+        ]
+      }
+    },
+    {
+      "name": "GET /v1/zone-versions/{id} returns the immutable v1 geometry",
+      "pass": true,
+      "detail": {
+        "area_v1": 43703.43170930321,
+        "area_v2": 69925.49072656692
+      }
+    },
+    {
+      "name": "scenario on v1 shows then/now areas from the server",
+      "pass": true,
+      "detail": {
+        "then": 43703.43170930321,
+        "now": 69925.49072656692
+      }
+    },
+    {
+      "name": "map draws the historical outline from getZoneVersion next to the current zone",
+      "pass": true,
+      "detail": {
+        "drawn": 4
+      }
+    },
+    {
+      "name": "reload keeps the historical overlay (URL state)",
+      "pass": true,
+      "detail": {
+        "drawnAfter": 4
+      }
+    },
+    {
+      "name": "hide removes the overlay and the URL parameter",
+      "pass": true,
+      "detail": {
+        "hidden": 0
+      }
+    },
+    {
+      "name": "no uncaught page errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "shots": [
+    "docs/evidence/contract-1.1/sources-readiness.png",
+    "docs/evidence/contract-1.1/dataset-version-readiness.png",
+    "docs/evidence/contract-1.1/problem-title-registry.png",
+    "docs/evidence/contract-1.1/scenario-zone-version.png",
+    "docs/evidence/contract-1.1/map-zone-history.png"
+  ],
+  "observed": {
+    "readiness": [
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 3
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "table",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "load_failed",
+        "kind": "vector",
+        "records": 1
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      },
+      {
+        "dr": null,
+        "state": "available",
+        "kind": "vector",
+        "records": 2
+      }
+    ],
+    "mixedPresent": 0
+  },
+  "finishedAt": "2026-10-29T21:03:18.096Z",
+  "passed": true
+}

@@ -1,0 +1,939 @@
+{
+  "agent": "GPT",
+  "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
+  "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
+  "head_sha": "1a9befc",
+  "state": "wp03_public_data_v2_shared_publication_complete_client_acceptance_pending",
+  "changed_paths": [
+    ".dockerignore",
+    ".env.example",
+    ".gitattributes",
+    ".github/workflows/backend.yml",
+    ".gitignore",
+    ".node-version",
+    ".python-version",
+    "alembic.ini",
+    "apps/web/.env.example",
+    "apps/web/README.md",
+    "apps/web/index.html",
+    "apps/web/package-lock.json",
+    "apps/web/package.json",
+    "apps/web/public/favicon.svg",
+    "apps/web/scripts/capture-evidence.mjs",
+    "apps/web/scripts/check-api-client.mjs",
+    "apps/web/scripts/check-contrast.mjs",
+    "apps/web/scripts/integration-check.mjs",
+    "apps/web/src/api.ts",
+    "apps/web/src/app.css",
+    "apps/web/src/dev/UiGallery.tsx",
+    "apps/web/src/dev/testFixtures.ts",
+    "apps/web/src/env.d.ts",
+    "apps/web/src/features/map/MapWorkspace.tsx",
+    "apps/web/src/features/resources/ResourceList.tsx",
+    "apps/web/src/features/resources/details.tsx",
+    "apps/web/src/i18n.ts",
+    "apps/web/src/main.tsx",
+    "apps/web/src/nav.ts",
+    "apps/web/src/pages/lists.tsx",
+    "apps/web/src/pages/misc.tsx",
+    "apps/web/src/routes.tsx",
+    "apps/web/src/shell/ApiErrorView.tsx",
+    "apps/web/src/shell/AppShell.tsx",
+    "apps/web/src/shell/LoginButton.tsx",
+    "apps/web/src/shell/OperationUnavailable.tsx",
+    "apps/web/src/shell/gates.tsx",
+    "apps/web/src/shell/session.tsx",
+    "apps/web/src/shell/ui-store.ts",
+    "apps/web/tsconfig.json",
+    "apps/web/vite.config.ts",
+    "contracts/fixtures/foundation_cities.json",
+    "contracts/fixtures/foundation_dataset.json",
+    "contracts/fixtures/foundation_revision.json",
+    "contracts/fixtures/foundation_scenario.json",
+    "contracts/fixtures/foundation_zone.json",
+    "contracts/fixtures/research_city.json",
+    "contracts/fixtures/research_datasets.json",
+    "contracts/fixtures/research_dr-01_quality.json",
+    "contracts/fixtures/research_dr-02_quality.json",
+    "contracts/fixtures/research_dr-03_quality.json",
+    "contracts/fixtures/research_dr-04_quality.json",
+    "contracts/fixtures/research_dr-05_quality.json",
+    "contracts/fixtures/research_dr-06_quality.json",
+    "contracts/fixtures/research_dr-07_quality.json",
+    "coordination/STATUS.json",
+    "coordination/handoffs/GPT.json",
+    "coordination/handoffs/research-data-2026-10-29.json",
+    "coordination/tasks/WP-00-GPT.json",
+    "coordination/tasks/WP-01-GPT.json",
+    "docs/FOUNDATION_RUNBOOK.txt",
+    "docs/adr/ADR-029-pavlodar-open-working-layers.txt",
+    "docs/evidence/pavlodar_open_import.json",
+    "docs/evidence/pavlodar_open_live.json",
+    "docs/RESEARCH_INTEGRATION.txt",
+    "docs/adr/ADR-002-ui-contract-gaps.txt",
+    "docs/adr/ADR-003-foundation-integrity.txt",
+    "docs/adr/ADR-004-data-readiness-ui-fields.txt",
+    "docs/adr/ADR-005-research-staging.txt",
+    "docs/adr/ADR-006-contract-1.1-review.txt",
+    "docs/evidence/claude_acknowledgement.json",
+    "docs/evidence/foundation-ui/integrated-source-quality.png",
+    "docs/evidence/foundation-ui/integrated-working-map.png",
+    "docs/evidence/foundation-ui/research-sources.png",
+    "docs/evidence/foundation-ui/sources.png",
+    "docs/evidence/foundation_oidc.json",
+    "docs/evidence/foundation_queue.json",
+    "docs/evidence/foundation_restore.json",
+    "docs/evidence/foundation_tests.json",
+    "docs/evidence/github_ci_blocker.json",
+    "docs/evidence/research_api.json",
+    "docs/evidence/research_receipt.json",
+    "docs/evidence/research_restore.json",
+    "docs/evidence/research_tests.json",
+    "docs/evidence/shared_integration.json",
+    "docs/evidence/wp02-integration/admin-specialist.png",
+    "docs/evidence/wp02-integration/admin-viewer.png",
+    "docs/evidence/wp02-integration/catalog-specialist.png",
+    "docs/evidence/wp02-integration/catalog-viewer.png",
+    "docs/evidence/wp02-integration/map-specialist.png",
+    "docs/evidence/wp02-integration/map-viewer.png",
+    "docs/evidence/wp02-integration/problems-specialist.png",
+    "docs/evidence/wp02-integration/problems-viewer.png",
+    "docs/evidence/wp02-integration/projects-specialist.png",
+    "docs/evidence/wp02-integration/projects-viewer.png",
+    "docs/evidence/wp02-integration/report.json",
+    "docs/evidence/wp02-integration/sources-detail-specialist.png",
+    "docs/evidence/wp02-integration/sources-detail-viewer.png",
+    "docs/evidence/wp02-integration/sources-specialist.png",
+    "docs/evidence/wp02-integration/sources-viewer.png",
+    "docs/evidence/wp02/catalog-desktop-1440.png",
+    "docs/evidence/wp02/catalog-desktop-1920.png",
+    "docs/evidence/wp02/catalog-mobile-390.png",
+    "docs/evidence/wp02/catalog-tablet-1024.png",
+    "docs/evidence/wp02/compare-desktop-1440.png",
+    "docs/evidence/wp02/compare-desktop-1920.png",
+    "docs/evidence/wp02/compare-mobile-390.png",
+    "docs/evidence/wp02/compare-tablet-1024.png",
+    "docs/evidence/wp02/gallery-assistant-panel-desktop-1440.png",
+    "docs/evidence/wp02/gallery-desktop-1440-dark.png",
+    "docs/evidence/wp02/gallery-desktop-1440.png",
+    "docs/evidence/wp02/gallery-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-catalog-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-catalog-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-catalog-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-catalog-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-cost-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-cost-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-cost-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-cost-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-data-desktop-1440-dark.png",
+    "docs/evidence/wp02/gallery-g-data-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-data-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-data-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-data-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-errors-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-errors-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-errors-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-errors-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-height-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-height-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-height-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-height-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-legend-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-legend-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-legend-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-legend-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-progress-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-progress-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-progress-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-progress-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-ready-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-ready-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-ready-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-ready-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-states-desktop-1440-dark.png",
+    "docs/evidence/wp02/gallery-g-states-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-states-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-states-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-states-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-table-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-table-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-table-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-table-tablet-1024.png",
+    "docs/evidence/wp02/gallery-mobile-390.png",
+    "docs/evidence/wp02/gallery-table-keyboard-desktop-1440.png",
+    "docs/evidence/wp02/gallery-tablet-1024.png",
+    "docs/evidence/wp02/map-desktop-1440-dark.png",
+    "docs/evidence/wp02/map-desktop-1440.png",
+    "docs/evidence/wp02/map-desktop-1920.png",
+    "docs/evidence/wp02/map-mobile-390-nav-open.png",
+    "docs/evidence/wp02/map-mobile-390.png",
+    "docs/evidence/wp02/map-tablet-1024.png",
+    "docs/evidence/wp02/notfound-desktop-1440.png",
+    "docs/evidence/wp02/notfound-desktop-1920.png",
+    "docs/evidence/wp02/notfound-mobile-390.png",
+    "docs/evidence/wp02/notfound-tablet-1024.png",
+    "docs/evidence/wp02/problems-desktop-1440-forbidden.png",
+    "docs/evidence/wp02/problems-desktop-1440-unauthenticated.png",
+    "docs/evidence/wp02/problems-desktop-1440.png",
+    "docs/evidence/wp02/problems-desktop-1920.png",
+    "docs/evidence/wp02/problems-mobile-390.png",
+    "docs/evidence/wp02/problems-tablet-1024.png",
+    "docs/evidence/wp02/report.json",
+    "infra/Dockerfile",
+    "infra/compose.yml",
+    "migrations/env.py",
+    "migrations/sql/0001_foundation.sql",
+    "migrations/sql/0002_research.sql",
+    "migrations/versions/0001_foundation.py",
+    "migrations/versions/0002_research.py",
+    "package-lock.json",
+    "package.json",
+    "packages/api-client/README.md",
+    "packages/api-client/src/generated/schema.ts",
+    "packages/api-client/src/index.ts",
+    "packages/api-client/src/transport.test.ts",
+    "packages/api-client/src/transport.ts",
+    "packages/api-client/src/types.ts",
+    "packages/domain/contracts.py",
+    "packages/domain/cost.py",
+    "packages/domain/errors.py",
+    "packages/domain/generated.py",
+    "packages/geo/geometry.py",
+    "packages/ui/README.md",
+    "packages/ui/src/components.css",
+    "packages/ui/src/components/DataTable.tsx",
+    "packages/ui/src/components/Icon.tsx",
+    "packages/ui/src/components/controls.tsx",
+    "packages/ui/src/components/data.tsx",
+    "packages/ui/src/components/layout.tsx",
+    "packages/ui/src/components/readiness.tsx",
+    "packages/ui/src/components/states.tsx",
+    "packages/ui/src/format.test.ts",
+    "packages/ui/src/format.ts",
+    "packages/ui/src/i18n.ts",
+    "packages/ui/src/index.ts",
+    "packages/ui/src/tokens.css",
+    "planning/data_requests.json",
+    "pyproject.toml",
+    "research/data/DR-01/README.txt",
+    "research/data/DR-01/data.csv",
+    "research/data/DR-01/expert_questions.txt",
+    "research/data/DR-01/geojson.schema.json",
+    "research/data/DR-01/metadata.json",
+    "research/data/DR-01/quality.json",
+    "research/data/DR-01/records.json",
+    "research/data/DR-01/sample.json",
+    "research/data/DR-01/schema.json",
+    "research/data/DR-01/sources.csv",
+    "research/data/DR-01/working_boundary.geojson",
+    "research/data/DR-02/README.txt",
+    "research/data/DR-02/data.csv",
+    "research/data/DR-02/expert_questions.txt",
+    "research/data/DR-02/plants.csv",
+    "research/data/DR-02/quality.json",
+    "research/data/DR-02/records.json",
+    "research/data/DR-02/sample.json",
+    "research/data/DR-02/schema.json",
+    "research/data/DR-02/search_log.csv",
+    "research/data/DR-02/sources.csv",
+    "research/data/DR-02/stock.csv",
+    "research/data/DR-02/traits.csv",
+    "research/data/DR-03/README.txt",
+    "research/data/DR-03/data.csv",
+    "research/data/DR-03/expert_questions.txt",
+    "research/data/DR-03/geojson.schema.json",
+    "research/data/DR-03/legal_checks.json",
+    "research/data/DR-03/quality.json",
+    "research/data/DR-03/records.json",
+    "research/data/DR-03/restrictions.geojson",
+    "research/data/DR-03/rules.csv",
+    "research/data/DR-03/sample.json",
+    "research/data/DR-03/schema.json",
+    "research/data/DR-03/search_log.csv",
+    "research/data/DR-03/soil_observations.csv",
+    "research/data/DR-03/soil_observations.geojson",
+    "research/data/DR-03/sources.csv",
+    "research/data/DR-04/README.txt",
+    "research/data/DR-04/care_actual.csv",
+    "research/data/DR-04/cohorts.csv",
+    "research/data/DR-04/data.csv",
+    "research/data/DR-04/expert_questions.txt",
+    "research/data/DR-04/observations.csv",
+    "research/data/DR-04/quality.json",
+    "research/data/DR-04/records.json",
+    "research/data/DR-04/reported_events.csv",
+    "research/data/DR-04/sample.json",
+    "research/data/DR-04/schema.json",
+    "research/data/DR-04/search_log.csv",
+    "research/data/DR-04/sources.csv",
+    "research/data/DR-04/validation_protocol.txt",
+    "research/data/DR-05/README.txt",
+    "research/data/DR-05/data.csv",
+    "research/data/DR-05/expert_questions.txt",
+    "research/data/DR-05/missing_rates.csv",
+    "research/data/DR-05/pricing_assumptions.txt",
+    "research/data/DR-05/quality.json",
+    "research/data/DR-05/rates.csv",
+    "research/data/DR-05/records.json",
+    "research/data/DR-05/resources.csv",
+    "research/data/DR-05/sample.json",
+    "research/data/DR-05/schema.json",
+    "research/data/DR-05/search_log.csv",
+    "research/data/DR-05/source_files/manifest.json",
+    "research/data/DR-05/sources.csv",
+    "research/data/DR-05/stock.csv",
+    "research/data/DR-06/README.txt",
+    "research/data/DR-06/buildings.geojson",
+    "research/data/DR-06/calibration_report.txt",
+    "research/data/DR-06/coefficients.csv",
+    "research/data/DR-06/data.csv",
+    "research/data/DR-06/expert_questions.txt",
+    "research/data/DR-06/geojson.schema.json",
+    "research/data/DR-06/imagery_catalog.csv",
+    "research/data/DR-06/preflight_lineage.json",
+    "research/data/DR-06/quality.json",
+    "research/data/DR-06/records.json",
+    "research/data/DR-06/sample.json",
+    "research/data/DR-06/schema.json",
+    "research/data/DR-06/search_log.csv",
+    "research/data/DR-06/sources.csv",
+    "research/data/DR-06/weather.csv",
+    "research/data/DR-06/weather_raw.json",
+    "research/data/DR-06/weather_request.json",
+    "research/data/DR-07/README.txt",
+    "research/data/DR-07/acceptance_hardware.txt",
+    "research/data/DR-07/data.csv",
+    "research/data/DR-07/deployment_constraints.txt",
+    "research/data/DR-07/expert_questions.txt",
+    "research/data/DR-07/licenses.csv",
+    "research/data/DR-07/provider_policy.json",
+    "research/data/DR-07/quality.json",
+    "research/data/DR-07/records.json",
+    "research/data/DR-07/sample.json",
+    "research/data/DR-07/schema.json",
+    "research/data/DR-07/sources.csv",
+    "research/data/README.txt",
+    "research/data/manifest.json",
+    "research/data/validate_package.py",
+    "research/data/validation_report.json",
+    "services/api/auth.py",
+    "services/api/config.py",
+    "services/api/db.py",
+    "services/api/main.py",
+    "services/api/models.py",
+    "services/api/replay.py",
+    "services/api/research.py",
+    "services/api/security.py",
+    "services/api/use_cases.py",
+    "services/worker/jobs.py",
+    "services/worker/main.py",
+    "tests/__init__.py",
+    "tests/conftest.py",
+    "tests/test_contracts.py",
+    "tests/test_foundation.py",
+    "tests/test_jobs.py",
+    "tests/test_research.py",
+    "tools/contracts/generate.py",
+    "tools/dev/bootstrap.py",
+    "tools/dev/import_research.py",
+    "tools/dev/queue_smoke.py",
+    "tools/dev/research_smoke.py",
+    "tools/dev/restore_check.py",
+    "tools/dev/seed.py",
+    "tools/dev/smoke_oidc.py",
+    "tools/dev/pavlodar_open_smoke.py",
+    "tools/data/fetch_pavlodar_osm.py",
+    "tools/data/publish_pavlodar_open.py",
+    "tests/test_open_data.py",
+    "tests/test_imports.py",
+    "tools/git/check-identity.ps1",
+    "tools/security/check.py",
+    "uv.lock"
+  ],
+  "contract_version": "1.11.0",
+  "implemented": [
+    "ADR-047/migration 0029 persist owner-scoped ChatSession/ChatMessage records and enable canonical createChatSession, sendChatMessage and listChatMessages without changing contract 1.11.0",
+    "User message, queued assistant message, Job and outbox are atomic; provider inference runs outside the transaction and cancellation does not wait for network timeout",
+    "City/zone/revision and ownership access is checked at API enqueue, job claim, context build and result persist; revoked city access fails before provider invocation",
+    "AUTHORIZED_CONTEXT is bounded and read-only; ChatMessage facts are server-owned and currently expose exact current ZoneVersion area via utm43n-area-v1",
+    "Idempotent enqueue, chronological cursor pagination, cancellation state synchronization and at-least-once result identity are verified",
+    "ADR-046 adds bounded provider-neutral OpenRouter/Groq/Gemini transport; provider output remains untrusted and no model can execute SQL, HTTP or a tool directly",
+    "Prompts are capped at 32 messages/50,000 characters and tools at 12 with bounded JSON schemas/arguments; unknown tools and malformed outputs fail closed",
+    "Fallback occurs only for timeout/network/auth/rate/model/5xx unavailability; invalid requests, invalid tool calls and safety refusals cannot switch providers",
+    "Local SYNTHETIC smoke redacts prompt/completion and credentials: free OpenRouter timed out within 20 seconds, Gemini 3.5 Flash-Lite then returned one allowlisted tool call",
+    "ADR-045/canonical 1.11.0/migration 0028 implement immutable PDF/XLSX export artifacts bound only to an authorized CalculationSnapshot or ProgramRevision",
+    "startExport runs through the durable outbox/worker path; getExport returns exact SHA-256/size/media metadata and a fresh 15-minute signed download URL",
+    "Every download rechecks the current session and target access, rejects tampered or expired tokens, and verifies the bounded artifact bytes before streaming",
+    "PDF embeds Cyrillic fonts and snapshot identifiers; XLSX has exact summary/quantities/rates/costs/care/survival/ecosystem/sources sheets, typed numbers/dates and no executable formulas",
+    "Browser-test isolation, synthetic cleanup and local recovery now include the export artifact volume; shared API/database were not restarted or migrated during Claude's increment",
+    "ADR-036/migration 0018 implement immutable Program input history, exact ScenarioRevision candidates and canonical create/get/list/update with access, validation, replay and ETag conflicts; no sorted list is mislabelled as optimization",
+    "ADR-035 enables the existing canonical streamJobEvents operation: authorized resumable SSE, strict per-job cursors, heartbeat, terminal close and access rechecks without a contract version change",
+    "Integrated Claude 38863d3 at e367ef1: real open-layer styling/3D and canonical server-computed shadow controls, reload resume, authorized artifact map/3D rendering and day/night states",
+    "ADR-034 makes import/calculation cancellation nonblocking: result writes stay in a savepoint and are atomically discarded when cancel_requested wins before publication",
+    "ADR-033 verifies local database plus upload/tile volume recovery: 39 table fingerprints and all 96 database-referenced upload files match exact size and SHA-256 after restore",
+    "ADR-032 plan v2 adds guarded cleanup for narrowly allowlisted historic dataset and zone/scenario/job/result trees: exact scope hash, blocker scan, automatic pg_dump and recoverable Docker-volume moves; execution awaits explicit confirmation",
+    "ADR-031/migration 0017 add immutable public PMTiles artifact registry, safe tile-volume keys, authorized single-Range delivery and dynamic MapLayer promotion without rewriting immutable payloads",
+    "Disposable real OIDC/import/outbox/Celery/publication/PMTiles smoke passes full 200, Range 206, ETag 304, EOF 416 and anonymous 401; shared data is unchanged and all real manifests remain MVT",
+    "Merged Claude through 0282552 at 1eb6e92 and integrated ADR-030: migration 0016, immutable SpatialResult storage, authorized GeoJSON artifact and registered shadow error codes",
+    "startShadowRun, getSpatialResult and getSpatialResultArtifact are enabled; real HTTP/outbox/Celery/worker smoke completed against published Pavlodar building inputs and an explicitly SYNTHETIC TEST zone",
+    "Map feature cards, 3D inputs and shadows now share record_height; floors or building:levels are never converted into invented metres",
+    "ADR-029 admits 8735 real OSM objects as 5 public datasets / 6 MVT layer families in canonical Pavlodar; viewer manifest, tile and feature-card acceptance passes",
+    "Canonical open-data tooling uses the real research CITY_ID, bounded fetches, resumable SHA publication and preserves license/provenance in server records",
+    "getMapFeature now returns imported finite nonnegative building height/basis/floors with its canonical source reference; no level-based estimate or placeholder was added",
+    "Existing research receipts can idempotently onboard an additional active city user without changing dataset access levels",
+    "Separate team-vtiposhnik-gpt worktree, branch gpt/WP-00-foundation",
+    "GitHub connector AND Git credential manager verified Mustiks07 id 232028042",
+    "Real OIDC authorization-code/PKCE flow through Keycloak and PostGIS-backed sessions verified",
+    "Foundation persistence, immutable revisions, role/grants/CSRF/idempotency and fenced job/outbox primitives",
+    "Real API response fixtures captured under explicit synthetic test profile",
+    "Verified research delivery 21b7d88; original bytes preserved; no tariff PDF",
+    "0002_research: immutable receipt/files/identities/versions/occurrences with DR-02/05 stock deduplication",
+    "Seven needs_review dataset versions exposed through existing Dataset/QualityReport API; publication blocked",
+    "Real decimal cost arithmetic keeps missing rates null; not yet a full WP-05 scenario calculation service",
+    "Existing transitionScenario now enforces ETag/revision/admin/data approval gates; review/draft/archive remains usable",
+    "Quality report issues honor bounded cursor pagination",
+    "Integrated Claude commits through 081c2d7: real zone/scenario flows, zone drawing/editing, 412 preservation, paginated quality issues and ADR-007",
+    "Integrated Claude WP-06 foundation through 4c14705: MapLibre 6 + Three 0.180 shared-context layer, lazy chunk, height-basis styles, GPU release and context restore evidence",
+    "Implemented GET /v1/zone-versions/{version_id} with city authorization and immutable historical payload",
+    "Implemented GET /v1/source-readiness with grant filtering and explicit research_unverified provenance",
+    "Stable problem/metric/unit registries and geometry field_errors added; API detail localization remains client-keyed",
+    "ADR-008 records mixed content_kind because accepted DR-06 contains vector, table, time series and imagery catalog artifacts",
+    "Integrated Claude contract 1.1 client b4af1b3 and handoff 0b1068a; generated schema/types and registries are synchronized",
+    "Migration 0004 restores exact DR-01..07 content kinds, counts and applicability from immutable ResearchQuality lineage",
+    "ADR-009 registers canonical piece unit and documents the readiness backfill without changing approval state",
+    "Integrated Claude optimization ee2311a/handoff 685648b and map-layer UI 62aca40/handoff 7e2ea4a; generated client, lazy chunks, published MVT rendering, legends and live version switching are synchronized",
+    "ADR-013 accepted in stages; P1 implemented at 3cd4c80 with one authorization/MVT SQL query, four configurable API workers and bounded database pools",
+    "Canonical contracts remain 1.1.0; the tile-performance increment did not change contracts or migrations",
+    "Implemented existing canonical getMapFeature at 3e0cf20: deterministic indexed UUID in MVT, current published feature detail, source lineage and dataset grant/IDOR enforcement",
+    "Migration 0008_map_feature_ids is live and the 22-table restore check passes; no canonical contract change was required",
+    "Integrated Claude verified feature card 2c8575c/handoff 8e48508: map click uses MVT feature_id, canonical server card and geometry highlight, URL persistence, stale-version handling and restricted IDOR states",
+    "Implemented P6 browser isolation at 73dd342: fixed disposable PostGIS database, Redis DB 9, temporary uploads, exact API restore and cleanup on success/failure",
+    "Made layers-check self-contained by creating its own SYNTHETIC zone and internal dataset; clean-room run passes 39/39 without depending on earlier suites"
+    ,"ADR-021 canonical 1.3.0 adds authorized paginated listRuleVersions with an expert-confirmed/non-superseded usable filter; 107 backend tests and 360 contract checks pass"
+    ,"ADR-022 and migration 0013 add source-backed immutable StockItem versions, authorized listStock and exact ScenarioRevision freezing without converting unknown quantity to zero"
+    ,"ADR-023 begins G3: backward-compatible rate_version_ids freeze the exact bundle in revision/hash/manifest; server Decimal material+planting bundle test totals 45.03 KZT"
+    ,"ADR-024/migration 0014 add source-backed survival model discovery and immutable expert-confirmed calculation; locally_validated is refused without DR-04 acceptance"
+    ,"ADR-025 implements immutable rule/rate-backed custom care calendars, annual resource limits and server-side care cost lines without client formulas"
+    ,"ADR-026/migration 0015 implement startCalculation as a durable request-backed outbox/worker job with fenced recovery and immutable snapshot result"
+    ,"ADR-027 implements authorized server-owned scenario comparison and internal approval gates requiring eligible complete durable full calculation evidence"
+    ,"ADR-028 adds server-only expected replacement cohort and separate risk-reserve lines; missing model/rate/care basis stays incomplete rather than zero"
+    ,"ADR-014 canonical 1.2.0 adds required MapLayer.dataset_id and explicit admin grant management without a restricted-content admin bypass"
+    ,"Migration 0009 backfilled dataset_id into all 73 existing immutable map manifests under a controlled trigger drop/recreate; 22-table restore remains exact"
+    ,"Grant workflow lists active city principals, requires same-city active recipients, CSRF/idempotency/reason, records audit, and restores 404 immediately after revoke"
+    ,"ADR-015/WP-03 implements KML and SHP ZIP parsing in a disposable subprocess with Linux resource limits, WGS84-only policy, defused XML and no archive extraction"
+    ,"Archive guards reject traversal/absolute/drive paths, case-folded duplicates, encryption, symlinks, compression bombs, entry floods and oversized coordinate/property workloads"
+    ,"ADR-019/migration 0011 implement immutable catalog snapshots, published source-backed traits, expert-confirmed rule lineage and fail-closed hard constraints"
+    ,"ADR-020/migration 0012 implement source-backed immutable rates and reproducible idempotent fast CalculationSnapshots with exact manifests"
+    ,"Fast material cost uses Decimal KZT; unknown/non-applicable rates remain null and unaccepted survival/care inputs remain explicit data gaps"
+  ],
+  "tests": [
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build/audit",
+      "result": "185 backend and 58 frontend tests pass; canonical 1.10.0 has 147 schemas, 100 operations and 387 checks; care work orders match frozen operations/calendar and correction-aware actual water, crew, visits and Decimal cost cannot exceed period limits",
+      "evidence": "ADR-044; tests/test_work_orders.py; migration 0027_work_order_resources"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build/audit",
+      "result": "184 backend and 58 frontend tests pass; canonical 1.9.0 has 147 schemas, 100 operations and 385 checks; exact placement-bound forecast/observed comparison fails closed on incomplete coverage, unknown outcomes, timing mismatch or missing forecast",
+      "evidence": "ADR-043; tests/test_cohorts.py; migration 0026_cohort_placement"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build/audit",
+      "result": "184 backend and 58 frontend tests pass; canonical 1.8.0 has 145 schemas, 99 operations and 382 checks; cohorts require completed placement evidence, inspections are append-only and replacement quantities cannot exceed latest observed deaths",
+      "evidence": "ADR-042; tests/test_cohorts.py; migration 0025_cohorts_inspections"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build/audit",
+      "result": "183 backend and 58 frontend tests pass; work orders enforce current approved scenarios, ETag transitions, exact partial totals, append-only corrections, viewer concealment and immutable database triggers",
+      "evidence": "ADR-041; tests/test_work_orders.py; migration 0024_work_orders"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build/audit",
+      "result": "182 backend and 58 frontend tests pass; canonical 1.7.0 has 144 schemas, 98 operations and 380 checks; ProgramRevision diff enforces historical access and returns deterministic server-owned input/scenario/calculation/objective/capital deltas",
+      "evidence": "ADR-040; tests/test_program_revision_diff.py; tests/test_program_optimization_api.py; docs/evidence/spec_validation.json"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build",
+      "result": "181 backend and 58 frontend tests pass; transitionProgram revalidates current immutable inputs and calculation lineage, reproduces the optimal solver result, enforces admin approval and blocks synthetic or unapproved scenarios",
+      "evidence": "ADR-039; tests/test_program_optimization_api.py; migration 0023_program_revision_inputs"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build",
+      "result": "181 backend and 58 frontend tests pass; optimizeProgram runs through durable job/worker/CP-SAT, persists objective/bound/gap/cost/violations and exact CalculationSnapshot lineage",
+      "evidence": "ADR-038; tests/test_program_optimization_api.py; tests/test_program_optimizer.py"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm check:api/test/build",
+      "result": "179 backend and 58 frontend tests pass; ProgramInputVersion freezes an authorized PriorityResult and the deterministic CP-SAT core enforces alternatives, budget, resources, stock, coverage and diversity",
+      "evidence": "ADR-038; tests/test_programs.py; tests/test_program_optimizer.py"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; pip-audit; security scan; npm test/build/check:api",
+      "result": "175 backend and 58 frontend tests pass; canonical 1.6 has 142 schemas, 97 operations, 48 fixtures and 374 checks; unknown priority inputs remain null and access is rechecked",
+      "evidence": "ADR-037; tests/test_priorities.py; docs/evidence/spec_validation.json"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; security scan",
+      "result": "172 backend tests pass; Program CRUD/version history/replay/access/validation/immutability and stale ETag are covered; 371 contract checks pass",
+      "evidence": "ADR-036; tests/test_programs.py"
+    },
+    {
+      "command": "pytest -q; ruff; spec validate; security scan",
+      "result": "170 backend tests pass; SSE delivers queued/terminal canonical events, resumes from header/query cursor and preserves 401/404/422 boundaries; 371 contract checks pass",
+      "evidence": "ADR-035; tests/test_job_events.py"
+    },
+    {
+      "command": "cleanup_synthetic plan v2; pytest -q; ruff; spec validate; security scan",
+      "result": "read-only scope covers 49 allowlisted datasets and 33 dependency-checked synthetic zones with 11 zero blockers; similarly named user data is retained; 168 backend tests and 371 contract checks pass",
+      "evidence": "docs/evidence/synthetic_cleanup_plan_summary.json; ADR-032; tests/test_cleanup_synthetic.py"
+    },
+    {
+      "command": "npm check:api/typecheck/test/build/audit; pytest jobs+shadow; spec validate",
+      "result": "integrated client matches canonical 1.5.0; 58 frontend tests, production build, zero npm vulnerabilities, 10 backend queue/shadow tests and 371 contract checks pass",
+      "evidence": "docs/evidence/wp03-open-data/report.json; docs/evidence/wp08-shadow-ui/report.json"
+    },
+    {
+      "command": "pytest -q; ruff; security scan",
+      "result": "167 backend tests pass; concurrent cancellation obtains the Job lock while result preparation is still running, publishes no result and ends cancelled",
+      "evidence": "ADR-034; tests/test_jobs.py"
+    },
+    {
+      "command": "restore_check; cleanup_synthetic plan; pytest -q; ruff; spec validation; pip-audit; security scan",
+      "result": "local recovery restores 39 tables plus 96/96 upload files and the empty PMTiles registry; cleanup remains read-only with corrected .bin storage keys; 166 backend tests and 371 contract checks pass",
+      "evidence": "docs/evidence/foundation_restore.json; docs/evidence/synthetic_cleanup_plan_summary.json; ADR-032; ADR-033"
+    },
+    {
+      "command": "cleanup_synthetic plan; pytest -q; ruff; security scan",
+      "result": "read-only shared plan identifies 49 datasets/86 versions/75 layers with zero foreign-registry blockers; deletion semantics retain a similarly named user dataset; full backend regression is 163 tests",
+      "evidence": "docs/evidence/synthetic_cleanup_plan_summary.json; ADR-032; tests/test_cleanup_synthetic.py"
+    },
+    {
+      "command": "pytest; ruff; spec validation; disposable pmtiles_range_smoke; restore_check; npm check/typecheck/test/build/audit; pip-audit; security scan",
+      "result": "162 backend tests; 371 contract checks; live PMTiles Range acceptance; 39-table restore; 52 frontend tests; builds and dependency/security checks pass",
+      "evidence": "docs/evidence/wp03-pmtiles-range-live.json; docs/evidence/foundation_restore.json; docs/evidence/spec_validation.json; ADR-031"
+    },
+    {
+      "command": "uv run --locked pytest -q; ruff; spec validate --write-evidence; restore_check; shadow_smoke; npm check:api/typecheck/test/build/audit",
+      "result": "161 backend tests; lint; 370 canonical checks; 38-table restore including spatial_results; real shadow job/artifact; 52 frontend tests; builds and dependency audits pass",
+      "evidence": "docs/evidence/wp08-shadow-live.json; docs/evidence/foundation_restore.json; docs/evidence/spec_validation.json; ADR-030"
+    },
+    {
+      "command": "uv run python -m tools.data.publish_pavlodar_open --manifest .local/pavlodar-open-20261030b/manifest.json; uv run python -m tools.dev.pavlodar_open_smoke",
+      "result": "idempotent real-city publication and viewer live acceptance pass: 5 datasets, 6 layer families, 8735 records, non-empty MVT samples and exact 10.0 m building height",
+      "evidence": "docs/evidence/pavlodar_open_import.json; docs/evidence/pavlodar_open_live.json; ADR-029"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check packages services tests tools migrations/versions; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py",
+      "result": "120 backend tests, lint, 364 canonical checks, dependency audit and tracked credential scan pass",
+      "evidence": "ADR-029; tests/test_open_data.py; tests/test_imports.py; tests/test_research.py"
+    },
+    {
+      "command": "uv run python -m tools.dev.smoke_oidc",
+      "result": "passed through container API",
+      "evidence": "docs/evidence/foundation_oidc.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.restore_check",
+      "result": "passed; versions and jobs restored, sessions excluded",
+      "evidence": "docs/evidence/foundation_restore.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.queue_smoke",
+      "result": "Redis outage preserved job; Celery delivered after restart; expected handler_not_available, not a successful calculation",
+      "evidence": "docs/evidence/foundation_queue.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.research_smoke",
+      "result": "contract 1.1 live after migration: 7 readiness rows and 7 quality reports read; 7 publication attempts denied through real OIDC",
+      "evidence": "docs/evidence/research_api.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.restore_check",
+      "result": "18 table fingerprints match including research bytes and source lineage",
+      "evidence": "docs/evidence/research_restore.json"
+    },
+    {
+      "command": "cd apps/web; PG_TEST_CREDENTIALS=<ignored local file> node scripts/scene3d-check.mjs",
+      "result": "Claude evidence 19/19: shared WebGL2 rendering, lazy load, height-basis distinction, 25-cycle resource baseline, context restore and fallbacks",
+      "evidence": "docs/evidence/wp06-foundation/report.json"
+    },
+    {
+      "command": "uv run pytest -q",
+      "result": "81 passed, 16 deprecation warnings",
+      "evidence": "local integration run at 3e0cf20"
+    },
+    {
+      "command": "uv run python tools/spec/validate.py --write-evidence",
+      "result": "347 checks passed; 127 schemas, 87 operations, 45 fixtures",
+      "evidence": "docs/evidence/spec_validation.json"
+    },
+    {
+      "command": "npm run check:api; npm run typecheck; npm test; npm run build; npm audit",
+      "result": "generated client synchronized; typecheck/build pass; 41/41 tests; contrast passes; 0 vulnerabilities",
+      "evidence": "docs/evidence/shared_integration.json"
+    },
+    {
+      "command": "PG_TEST_CREDENTIALS=<ignored> node scripts/contract11-check.mjs",
+      "result": "15/15 live UI/API checks after migration 0004; only DR-06 is mixed and all seven DR counts are explicit",
+      "evidence": "docs/evidence/contract-1.1/report.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.tile_bench",
+      "result": "real OIDC/local HTTP after feature UUID payload: concurrency 4 p95 25.2 ms; 32-request burst p95 320.9 ms; not a production SLA",
+      "evidence": "docs/evidence/map_tile_performance.json"
+    },
+    {
+      "command": "PG_TEST_CREDENTIALS=<ignored> node scripts/layers-check.mjs",
+      "result": "integrator rerun 39/39: publication, MVT, server feature card, URL reload, version switch, restricted IDOR, retry and mobile layout",
+      "evidence": "docs/evidence/wp04-map-layers/report.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.import_smoke",
+      "result": "real OIDC upload/import/publication returned MVT feature UUID and canonical getMapFeature source lineage",
+      "evidence": "docs/evidence/import_api.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.restore_check",
+      "result": "22 table fingerprints restored at migration 0008; sessions and upload bytes intentionally excluded",
+      "evidence": "docs/evidence/foundation_restore.json"
+    },
+    {
+      "command": "uv run python -m tools.dev.browser_test_env --cwd apps/web -- node scripts/layers-check.mjs",
+      "result": "39/39 on disposable database; test DB removed, Redis DB 9 empty, uploads removed, Docker API restored, shared database counts unchanged",
+      "evidence": "docs/evidence/wp04-map-layers/report.json"
+    },
+    {
+      "command": "uv run pytest -q; uv run python tools/spec/validate.py --write-evidence; uv run python -m tools.dev.restore_check",
+      "result": "81 passed; 358 checks, 132 schemas, 91 operations, 45 fixtures; 22 table fingerprints restored at migration 0009",
+      "evidence": "docs/evidence/spec_validation.json; docs/evidence/foundation_restore.json"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check packages services tests tools; uv run pip-audit; uv run python tools/security/check.py",
+      "result": "91 passed; targeted source lint passed; no known Python dependency vulnerabilities; tracked credential-pattern check passed",
+      "evidence": "local WP-03 parser verification at 08f4478"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check packages services tests tools; uv run python tools/spec/validate.py; uv run pip-audit",
+      "result": "94 passed; lint passed; 358 canonical checks passed; no known Python dependency vulnerabilities; PMTiles archives are byte-deterministic and match dynamic MVT",
+      "evidence": "docs/evidence/wp03-pmtiles.json and ADR-016"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check packages services tests tools migrations/versions; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py",
+      "result": "97 passed; lint and 358 canonical checks passed; no known vulnerabilities; tracked credential scan passed; local address index acceptance passes",
+      "evidence": "docs/evidence/wp04-address-search.json and ADR-017"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check packages services tests tools migrations/versions; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py",
+      "result": "100 passed; lint and 358 canonical checks passed; no known vulnerabilities; tracked credential scan passed; spatial ZoneContext acceptance passes",
+      "evidence": "docs/evidence/wp04-zone-context.json and ADR-018"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check packages services tests tools migrations/versions; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py",
+      "result": "106 passed; lint and 358 canonical checks passed; no known vulnerabilities; immutable catalog/rates/snapshots, Decimal control, null unknown prices, idempotency and stale reads pass",
+      "evidence": "docs/evidence/wp05-catalog.json; docs/evidence/wp05-fast-calculation.json; ADR-019; ADR-020"
+    },
+    {
+      "command": "npm run check:api; npm run typecheck; npm test; npm run build; browser_test_env placements-check + scenario-check; restore_check; kml_shp_smoke",
+      "result": "canonical client 1.2 synchronized; 52/52 unit, 22/22 placement and 21/21 scenario/calculation checks; 35-table restore; live KML/SHP publication passed",
+      "evidence": "docs/evidence/shared_integration.json; docs/evidence/wp03-kml-shp-live.json; docs/evidence/foundation_restore.json"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check; uv run python tools/spec/validate.py; uv run python -m tools.dev.restore_check",
+      "result": "108 backend tests, lint, 360 canonical checks and 36-table restore pass; shared API is healthy at migration 0013_stock_registry",
+      "evidence": "docs/evidence/foundation_restore.json; ADR-022"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check; uv run python tools/spec/validate.py; uv run python -m tools.dev.restore_check",
+      "result": "110 backend tests, lint, 364 canonical checks and 37-table restore pass; shared API is healthy at migration 0014_survival_models",
+      "evidence": "docs/evidence/foundation_restore.json; ADR-024"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check; uv run python tools/spec/validate.py",
+      "result": "111 backend tests, lint and 364 canonical checks pass; custom care resource rejection and material+care Decimal total are verified",
+      "evidence": "ADR-025; tests/test_calculations.py"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py; uv run python -m tools.dev.restore_check",
+      "result": "112 backend tests, lint, 364 canonical checks, dependency/security checks and 37-table restore pass; live HTTP/Keycloak/outbox/dispatcher/worker calculation succeeded on migration 0015_job_requests",
+      "evidence": "docs/evidence/foundation_restore.json; docs/evidence/wp05-full-job-live.json; ADR-026; tests/test_calculations.py"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check; uv run python tools/spec/validate.py",
+      "result": "114 backend tests, lint and 364 canonical checks pass; compare ordering/warnings/replay/IDOR and full-calculation approval gates are verified",
+      "evidence": "ADR-027; tests/test_calculations.py"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py",
+      "result": "115 backend tests, lint, 364 canonical checks and dependency/security checks pass; manual expected-cohort plus reserve total is 66.04 KZT without double counting",
+      "evidence": "ADR-028; tests/test_calculations.py"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check services packages tests tools; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py; npm --prefix apps/web test; npm --prefix apps/web run build; npm audit --prefix apps/web",
+      "result": "193 backend and 58 frontend tests pass; 389 canonical checks cover 147 schemas, 101 operations and 49 fixtures; builds, dependency audits and tracked credential scan pass",
+      "evidence": "ADR-045; tests/test_exports.py; docs/evidence/wp10/manifest.json"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check services packages tests tools; uv run python tools/spec/validate.py; uv run pip-audit; uv run python tools/security/check.py; uv run python -m tools.dev.llm_smoke",
+      "result": "200 backend tests, lint, 389 canonical checks, dependency/credential scans and a redacted real-provider fallback smoke pass; canonical contract remains 1.11.0",
+      "evidence": "ADR-046; tests/test_llm.py; docs/evidence/wp10/llm_provider_smoke.json"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check services packages tests tools migrations/versions; uv run python tools/spec/validate.py; npm --prefix apps/web run check:api; npm --prefix apps/web run typecheck; uv run pip-audit",
+      "result": "203 backend tests, lint, 389 canonical checks, generated-client drift, frontend typecheck and dependency audit pass on migration 0029",
+      "evidence": "ADR-047; tests/test_chat.py"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check services tests tools migrations; uv run python tools/spec/validate.py; npm --prefix apps/web run check:api; npm --prefix apps/web run typecheck; uv run pip-audit; docker compose --env-file .env -f infra/compose.yml config --quiet",
+      "result": "204 backend tests, lint, 389 canonical checks, generated-client drift, frontend typecheck, dependency audit and compose validation pass on migration 0030",
+      "evidence": "ADR-048; tests/test_chat.py; tests/test_cleanup_synthetic.py"
+    },
+    {
+      "command": "uv run pytest -q; uv run ruff check services tests tools migrations; uv run python tools/spec/validate.py; npm --prefix apps/web run check:api; npm --prefix apps/web run typecheck",
+      "result": "256 backend tests pass, including 51 deterministic adversarial chat/proposal policy cases; lint, 389 canonical checks, client drift and frontend typecheck pass",
+      "evidence": "tests/fixtures/chat_adversarial_cases.json; tests/test_chat_evals.py; docs/evidence/wp10/chat_adversarial_eval.json"
+    },
+    {
+      "command": "uv run pytest -q; npm --prefix apps/web test; npm --prefix apps/web run typecheck; npm --prefix apps/web run build; npm --prefix apps/web audit; python -m tools.dev.restore_check; PG_TEST_CREDENTIALS=<ignored> node apps/web/scripts/integration-check.mjs",
+      "result": "257 backend and 64 frontend tests pass; production build and audit pass; shared API is healthy on migration 0030; 49-table plus 96-upload restore passes; real Keycloak/OIDC viewer+specialist acceptance passes 30/30 without API 5xx",
+      "evidence": "docs/evidence/foundation_restore.json; docs/evidence/wp02-integration/report.json; ADR-048"
+    }
+  ],
+  "visual_review": {
+    "observed": "Claude UI through 7f680ff is merged at 505f3e4. Evidence covers PMTiles, full calculation/comparison, exports, WP-09 execution, zone drawing/versioning, published layers and the canonical feature card.",
+    "evidence": [
+      "docs/evidence/foundation-ui/integrated-source-quality.png",
+      "docs/evidence/foundation-ui/integrated-working-map.png",
+      "docs/evidence/wp04-zone-drawing/zone-created.png",
+      "docs/evidence/wp04-zone-drawing/edit-conflict-412.png",
+      "docs/evidence/wp06-foundation/harness-render.png",
+      "docs/evidence/wp06-foundation/app-3d-empty-state.png"
+    ],
+    "limitations": [
+      "Zone evidence uses explicitly labelled synthetic test geometry; research data remains unaccepted",
+      "Some server DataGap messages are English pending stable localization codes",
+      "Published MVT browser evidence uses explicitly labelled SYNTHETIC TEST inputs; automatic placement, full calculation and end-to-end product acceptance are not claimed",
+      "WP-06 compatibility was measured in software WebGL; real-device FPS/scale acceptance remains pending"
+    ]
+  },
+  "data_assumptions": [
+    "Organizer data not received; research partial/not_found is not acceptance; all acceptance_met=false",
+    "No local calibration, official boundary, exact networks or validated ecosystem coefficients"
+  ],
+  "breaking_changes": [
+    "Canonical 1.11.0 is additive; strict older clients must regenerate atomically to discover downloadExport and the registered export problem codes",
+    "Strict pre-1.3 validators do not know the additive rule, stock and survival-model discovery schemas; regenerate TypeScript atomically from canonical 1.3.0 before integration to main"
+  ],
+  "migrations": [
+    "0001_foundation",
+    "0002_research",
+    "0003_contract_1_1",
+    "0004_research_readiness",
+    "0005_generic_import",
+    "0006_map_layers",
+    "0007_map_layer_backfill",
+    "0008_map_feature_ids",
+    "0009_map_layer_dataset_id",
+    "0010_address_index",
+    "0011_catalog_rules",
+    "0012_calculation_snapshots",
+    "0013_stock_registry",
+    "0014_survival_models",
+    "0015_job_requests",
+    "0016_spatial_results",
+    "0017_map_archives",
+    "0018_programs",
+    "0019_priority_results",
+    "0020_program_priority_reference",
+    "0021_program_jobs",
+    "0022_program_calc_lineage",
+    "0023_program_revision_inputs",
+    "0024_work_orders",
+    "0025_cohorts_inspections",
+    "0026_cohort_placement",
+    "0027_work_order_resources",
+    "0028_export_artifacts",
+    "0029_chat_messages",
+    "0030_proposals"
+  ],
+  "known_issues": [
+    "WP-10 export UI is integrated; durable grounded chat, proposal review and 51-case adversarial evaluation backends are complete, but assistant/proposal UI remains",
+    "WP-03 GeoJSON/CSV/KML/SHP upload/job/publication, generalized MVT and public PMTiles registry/Range work; Claude protocol handler and representative browser acceptance remain",
+    "Local recovery verifies 49 application tables, 96 upload files and tile/export volumes; production WAL/PITR, remote object versioning and cross-host recovery remain WP-11",
+    "Legal primary-source recheck could not retrieve act body (web JS shell; browser loading); no rules activated",
+    "transitionScenario exists in canonical 1.0.0; previous absence claim corrected. Implemented review/draft/archive transitions; approval fails with critical data gaps",
+    "GitHub Actions jobs cannot start: account payments/spending limit reported by GitHub; no CI checks ran",
+    "getRuleVersion is implemented for explicitly typed records promoted from published restrictions datasets; research rules remain inactive and no production rule has been approved",
+    "calculateFast and durable full jobs use frozen stock/rate/model/custom-care inputs; standard generated care and ecosystem modules remain explicit unavailable gaps",
+    "ADR-013 P2 combined family tiles remains deferred; P4/P5 backend are implemented in 1.2.0, while Claude TypeScript/UI integration is pending",
+    "Historic shared browser database remains populated with prior SYNTHETIC runs; it is preserved rather than destructively cleaned and is excluded from future performance evidence",
+    "Isolated browser+Vite parallel32 timing was unstable (22.7 s) while direct API was 395 ms; proxy/browser diagnostic remains open and is not a production SLA"
+  ],
+  "requested_review": [
+    "Joint: review additive calculation-snapshot discovery by scenario revision and ExportArtifact.byte_size/media_type requested by the integrated client",
+    "Joint review: accept WP-00/01 foundation and contract synchronization; local checks pass but GitHub Actions remain blocked by account billing/spending limits",
+    "Joint map review: accept synchronized client 62aca40 and tile delivery 3cd4c80; production reverse-proxy/HTTP2 and representative real-layer load remain unverified",
+    "Full 47,974-building preflight was not delivered; continue using only 110 admitted recorded_unverified records and honest empty state",
+    "Joint integration is ready for review; retain truthful calculation/data gaps and SYNTHETIC labels in test evidence"
+  ],
+  "next_tasks": [
+    "Claude: sync main 8565b6b, verify client 1.13.0 and run live MultiLineString, layer card and viewport performance acceptance on the published v2 layers",
+    "GPT: integrate backend-polish 67bea72 after the shared browser stand is released",
+    "Do not execute synthetic cleanup without separate confirmation of exact scope SHA 50092345c5eb3b4fafa294f01456cb3e789528a9141e8f36f9d9f2d947be3601",
+    "Claude: integrate assistant/proposal review UI and complete remaining real-device 3D acceptance",
+    "Joint: isolate the load-flaky WebGL context restore check"
+  ],
+  "acknowledgements": [
+    "Claude WP-03 UI code 7e7643a and handoff 4a54ca0 fast-forward integrated; client matches d4beb4a and 28/28 frontend tests pass",
+    "ADR-011 accepted in stages: P1/P2/P4 accepted, P3 clarified as parsed-content readiness, P5/P6 deferred",
+    "ADR-002 direction accepted; retain kind string and add category enum; strict old schema validators require atomic pre-release regeneration to 1.1.0",
+    "Claude handoff at 081c2d7 acknowledges ADR-002/003, historical geometry read and atomic 1.1.0",
+    "Claude accepted all four ADR-006 truthful-null/boolean/conflict/exclusion-basis corrections without changes",
+    "ADR-002/004/006 are implemented in canonical 1.1.0 at 7fb6cf6; ADR-008 documents the DR-06 mixed-content correction",
+    "ADR-013 accepted in stages: P1/P3/P6 implemented; P4/P5 implemented by proposed ADR-014 canonical 1.2.0; P2 deferred and P7 retained"
+  ],
+  "integration": {
+    "planned_api_url": "http://localhost:8001",
+    "web_proxy": [
+      "/v1",
+      "/auth",
+      "/health"
+    ],
+    "compose_project_name": "pavlodar-gpt",
+    "api_url_verified": true,
+    "api_url": "http://localhost:8001",
+    "frontend_environment": "PG_API_ORIGIN=http://127.0.0.1:8001",
+    "browser_origin": "http://localhost:5173",
+    "review_ui_url": "http://localhost:5175",
+    "claude_merged_sha": "0282552652651d7d04264815121a2d7bdbe221d0",
+    "claude_merge_sha_latest": "505f3e4",
+    "canonical_1_4_sha": "9b4f351",
+    "canonical_1_5_sha": "17368b3",
+    "canonical_1_6_sha": "6b01a2a32dec211d7f4622ce3b166aba1b5c591d",
+    "canonical_1_6_1_sha": "2bd2ea4448ae85917ed84f59eb6785be6abcd40f",
+    "canonical_1_6_2_sha": "5dbc4608e73fd3da25e1f08d2c39c47151a07929",
+    "canonical_1_7_sha": "807f8a3222abb07f397bbf715f9ac681200cc6d4",
+    "canonical_1_8_sha": "ec02ba7268036dfeb2caedd4b73fb9106176281e",
+    "canonical_1_9_sha": "dc4ab348ebe319007a329e31f0bbd7ae920ab853",
+    "canonical_1_10_sha": "0d8d518c68fc1b32d4e2088ad3c4c337ee3f3ae7",
+    "canonical_1_11_sha": "38ff7dcab6fd8965cd3e99cec392b786ff91a0f5",
+    "draft_pr": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/pull/2",
+    "shared_implementation_sha": "95e2746",
+    "canonical_contract_sha": "2b67547",
+    "claude_code_sha": "c629d50756e24dc451f36696077d7bdc2f659433",
+    "claude_handoff_sha": "3aa23be7a1102e1595f9dff7059692475aa91524",
+    "claude_merge_sha": "389a045",
+    "typescript_1_2_sha": "bd9e6f8",
+    "live_integration_sha": "95e2746",
+    "registry_and_migration_correction_sha": "fd5f45ea241333c9ded1aa5abb14aec05f9b9046",
+    "generic_import_sha": "d4beb4ae55d576900e4594c6faf6e139e5ba0ed5",
+    "map_publication_sha": "618ee42b0ee5e2ac79db045db045e010418eef24",
+    "tile_delivery_sha": "3cd4c8090f0ab86848182c79a7859f5767f48708",
+    "map_feature_lineage_sha": "3e0cf2013d00876daed357a17c3d3a1b0441dd10",
+    "browser_test_isolation_sha": "73dd3420597267c4d38c74a003fe5a4b2c2552f6",
+    "restricted_grants_sha": "2b67547",
+    "pmtiles_preparation_sha": "5712504",
+    "address_search_sha": "db30ee6",
+    "zone_context_sha": "55afe00",
+    "catalog_constraints_sha": "dea308c",
+    "fast_calculation_sha": "8d580e3"
+  },
+  "research": {
+    "receipt_commit": "21b7d88",
+    "manifest_sha256": "eac58412633c8f054287be45ed6f6a901e9884ffbd5ab3ade6a771db53b3798e",
+    "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+    "staging_only": [
+      "9 taxa including 3 genera",
+      "4 quotes; DR-02/05 mirrors deduplicated",
+      "rules and water rates inactive",
+      "110 OSM buildings recorded_unverified",
+      "168 hours ERA5 one cell",
+      "82 scene metadata records; no pixels"
+    ],
+    "allowed_now": [
+      "authorized source/quality reads",
+      "working-boundary preview",
+      "draft zones and empty scenarios"
+    ],
+    "blocked_by_data": [
+      "automatic planting selection/approval",
+      "complete estimate",
+      "local survival calibration",
+      "exact shadows/microclimate/ecosystem KPI"
+    ],
+    "api": {
+      "passed": true,
+      "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+      "version_ids": [
+        "19368e08-9339-594d-9f4a-3195619e8569",
+        "946d3ce6-8761-50af-b76e-4c5db99de190",
+        "6d72643a-cf67-503d-bb49-67b1a1326c94",
+        "731dd97b-4a34-5ce2-bab2-ab5326045cbd",
+        "25296ca4-b183-5fea-82f5-d14e84ca0226",
+        "d21d39f1-931d-52d5-a33c-816a5bb83a5e",
+        "6db8cbb3-51b8-5363-b941-15186deafdf4"
+      ],
+      "real_http_oidc": true,
+      "quality_reports_read": 7,
+      "publication_denials": 7,
+      "organizer_data_received": false,
+      "acceptance_met": false,
+      "contract_version": "1.1.0",
+      "source_readiness_rows": 7,
+      "source_readiness_kinds": {
+        "DR-01": "vector",
+        "DR-02": "table",
+        "DR-03": "legal_text",
+        "DR-04": "table",
+        "DR-05": "table",
+        "DR-06": "mixed",
+        "DR-07": "table"
+      }
+    }
+  },
+  "backend_polish_20261031": {
+    "branch": "gpt/backend-polish-20261031",
+    "head_sha": "89402d0",
+    "contract_version": "1.12.0",
+    "contract_changed": false,
+    "migrations": [],
+    "implemented": [
+      "Assistant authorized context reads CostResult known_subtotal and total instead of nonexistent fields",
+      "Partial known subtotal remains distinct from a complete total",
+      "User-visible calculation blockers and import review applicability are localized to Russian"
+    ],
+    "verification": [
+      "isolated tests/test_chat.py: 5/5 passed",
+      "isolated tests/test_calculations.py: 10/10 passed",
+      "ruff and compileall passed"
+    ],
+    "deployment": "pending integration after Claude demo bootstrap; shared API intentionally left stable on main meanwhile"
+  },
+  "head_sha_scope": "Final hackathon release candidate on canonical 1.13.0: product, open-data publication, demo content and jury materials are integrated on main; no destructive cleanup deletion has run",
+  "final_release_20261101": {
+    "status": "ready_for_main",
+    "product": [
+      "60144 published Pavlodar objects across buildings, roads, green areas, trees, water and social facilities",
+      "3 prepared zones, 9 calculated project variants, comparison, 2027 city program and execution workflow",
+      "grounded assistant with server facts and human-confirmed proposals",
+      "responsive decision-oriented UI with 2D/3D, priority and calculation story views"
+    ],
+    "reproducibility": [
+      "tools/dev/start-demo.ps1 provisions the stack, demo profile and verified public vectors",
+      "research/data/pavlodar-public-vectors-v2.zip is hash-verified before publication",
+      "planning/acceptance.json records criterion-level evidence"
+    ],
+    "jury_materials": [
+      "presentation/Pavlodar_Greening_Final.pptx with embedded current 60-second video",
+      "presentation/Pavlodar_Greening_Final.pdf",
+      "presentation/Pavlodar_Greening_Demo_60s.mp4",
+      "output/Pavlodar_Green_Jury_Kit.zip"
+    ],
+    "verification": [
+      "398 canonical contract checks",
+      "73 frontend unit tests, TypeScript and production build",
+      "18 targeted backend tests after the final increment",
+      "validated 10-slide PowerPoint package and 60.000-second 1920x1080 H.264/AAC video",
+      "earlier full backend regression: 308 passed"
+    ]
+  }
+}

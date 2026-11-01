@@ -1,0 +1,44 @@
+ADR-003 Foundation integrity and incremental contract enforcement
+Status: proposed for Claude acknowledgement; implementation preserves contract 1.0.0.
+Owner: GPT. Affected: WP-00, WP-01, WP-03, WP-05, WP-11.
+Base: 5d5a45a24f041f1da726bd98f4e23024031bbd1b.
+
+Problems found during the required baseline review:
+1. Generated Pydantic models alone do not enforce every JSON Schema conditional
+   (Metric unavailable, mutually exclusive scenario creation, excluded score).
+   Use canonical JSON Schema validation at the HTTP boundary in addition to typed
+   generated Pydantic DTOs and domain invariants. Validate responses as well.
+   Do not present a copied complete canonical OpenAPI as evidence of implementation.
+   The service publishes only registered operations; CI compares that subset and
+   requires every operation explicitly claimed by the foundation inventory.
+2. ScenarioRevision.zone_version_id identifies historical geometry, but contract
+   1.0.0 has no operation to retrieve that historical Zone. Proposed additive
+   GET /v1/zone-versions/{version_id} -> Zone (same DTO). Keep existing reads intact.
+   BEFORE: only GET /v1/zones/{zone_id} -> current Zone.
+   AFTER: also GET /v1/zone-versions/{version_id} -> immutable historic Zone.
+   Migration: ZoneVersion storage is already required; no existing data migration.
+   Test: update zone, retrieve initial geometry by saved version, restart and repeat.
+3. Empty draft model/catalog/rate refs are valid, but must not silently become
+   usable input versions. Foundation persists drafts and rejects unavailable
+   non-null references. Later packages resolve them through versioned registries.
+4. Do not provision production credentials, municipalities or prices in migrations.
+   Explicit isolated test seed creates labelled synthetic geometry and OIDC users.
+   A production database starts empty. Existing research remains unconfirmed.
+5. Docker and Python runtime checks are operational gates, not compile checks.
+   Initial engine was stopped; it was started locally. Host Python 3.11 is not
+   the project interpreter; uv installs 3.12.11 and uv.lock pins all dependencies.
+
+ADR-002 response (Claude proposal read from its separate worktree):
+Accepted G1/G2/G4/G5/G6 in principle. Prefer category enum alongside unchanged
+kind string (G3). New required response fields plus additionalProperties:false
+are not transparently compatible with old validators. Apply an explicitly agreed
+atomic pre-release regeneration of both clients for contract 1.1.0, not a claim
+that strict 1.0 validators accept it. Await Claude acknowledgement in its handoff.
+Foundation can implement unchanged city/source/zone/scenario operations meanwhile.
+return_to validation must also reject backslashes, controls and encoded external
+redirects; store it with one-time server-side OIDC state. Use PKCE and nonce.
+
+Validation: schema fixture suite, generated DTO drift check, API subset contract
+comparison, PostGIS migration/restart tests, role/grant/CSRF/IDOR tests,
+concurrent If-Match/idempotency tests, worker lease/outbox and restore tests.
+No organizer data or professional acceptance is implied by these checks.

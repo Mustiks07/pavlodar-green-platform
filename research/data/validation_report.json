@@ -1,0 +1,78 @@
+{
+  "checked_at": "2026-10-29",
+  "status": "passed",
+  "checks": [
+    "JSON Schema 2020-12",
+    "CSV/typed JSON equivalence",
+    "source/taxon/stock foreign keys",
+    "money decimal KZT",
+    "numeric trait/rule units and applicability",
+    "GeoJSON extent, duplicates and Shapely validity",
+    "UTC hourly continuity and raw weather equivalence",
+    "no synthetic heights or fabricated survival/coefficients",
+    "planning evidence paths and blocked acceptance gates"
+  ],
+  "errors": [],
+  "warnings": [],
+  "packages": {
+    "DR-01": {
+      "tables": 2,
+      "non_source_rows": 2,
+      "geometry": {
+        "working_boundary.geojson": {
+          "feature_count": 1,
+          "invalid_features": [],
+          "topology_repaired": false
+        }
+      }
+    },
+    "DR-02": {
+      "tables": 6,
+      "non_source_rows": 159,
+      "geometry": {}
+    },
+    "DR-03": {
+      "tables": 5,
+      "non_source_rows": 33,
+      "geometry": {
+        "restrictions.geojson": {
+          "feature_count": 0,
+          "invalid_features": [],
+          "topology_repaired": false
+        },
+        "soil_observations.geojson": {
+          "feature_count": 0,
+          "invalid_features": [],
+          "topology_repaired": false
+        }
+      }
+    },
+    "DR-04": {
+      "tables": 7,
+      "non_source_rows": 7,
+      "geometry": {}
+    },
+    "DR-05": {
+      "tables": 7,
+      "non_source_rows": 30,
+      "geometry": {}
+    },
+    "DR-06": {
+      "tables": 6,
+      "non_source_rows": 262,
+      "geometry": {
+        "buildings.geojson": {
+          "feature_count": 110,
+          "invalid_features": [],
+          "topology_repaired": false
+        }
+      }
+    },
+    "DR-07": {
+      "tables": 3,
+      "non_source_rows": 9,
+      "geometry": {}
+    }
+  },
+  "scope": "Structural/provenance validation; not field truth, legal approval or model calibration"
+}

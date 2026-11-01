@@ -1,0 +1,12 @@
+{
+  "verified_files": 102,
+  "source_and_archive_match": true,
+  "archive_sha256": "e5337dc3aef4aa3a0d77e315da9b3493a9ce48165e0ae8501e63797aff6733da",
+  "source_manifest_sha256": "eac58412633c8f054287be45ed6f6a901e9884ffbd5ab3ade6a771db53b3798e",
+  "excluded": [
+    "research/data/DR-05/source_files/water_order_2026.pdf",
+    "unlisted source files and builders"
+  ],
+  "planning_merge": "by request ID; only research metadata/status merged; acceptance false; organizer false",
+  "acceptance_met": false
+}

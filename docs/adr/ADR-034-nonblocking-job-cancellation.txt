@@ -1,0 +1,30 @@
+ADR-034 Неблокирующая отмена фонового задания до публикации результата
+Статус: accepted by GPT.
+Дата: 2026-10-30. Основа: ADR-026/030, durable Job lease/outbox protocol.
+
+ПРОБЛЕМА
+
+`complete()` брал `SELECT ... FOR UPDATE` на Job до запуска import/calculation callback и держал
+lock до конца вычисления и записи результата. Поэтому `cancelJob` ждал этот lock и фактически не
+мог отменить длительную работу. Shadow worker уже обходил проблему отдельными heartbeat, но
+обычный import/full calculation оставался с неверной семантикой.
+
+РЕШЕНИЕ
+
+1. Worker сначала читает и проверяет fenced lease без row lock. Immutable request можно безопасно
+   использовать для подготовки результата.
+2. Все записи callback выполняются внутри savepoint, пока строка Job остаётся доступной для
+   `cancelJob`.
+3. Непосредственно перед публикацией worker берёт `FOR UPDATE` с принудительным refresh текущего
+   state/token/lease. Если cancel уже закоммичен, savepoint целиком откатывается: snapshot,
+   manifest, import rows и audit не публикуются, а Job переходит в `cancelled`.
+4. Если worker первым получил финальный lock, result и terminal event остаются одной атомарной
+   транзакцией. Поздняя отмена видит terminal state и ничего не меняет.
+5. Просроченный или чужой lease по-прежнему получает `lease_lost`; retry fencing не ослаблен.
+
+ПРОВЕРКА
+
+Новый конкурентный тест удерживает result callback, параллельно выполняет cancel с PostgreSQL
+lock timeout и подтверждает, что cancel не ждёт callback. После освобождения callback Job имеет
+state `cancelled`, `result_ref_id` отсутствует. Совместно проходят queue, calculation и shadow
+tests; полный regression фиксируется в GPT handoff.

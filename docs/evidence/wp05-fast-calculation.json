@@ -1,0 +1,34 @@
+{
+  "scope": "WP-05 source-backed rates and immutable fast calculation snapshots",
+  "date": "2026-10-30",
+  "contract_version": "1.2.0",
+  "migration": "0012_calculation_snapshots",
+  "organizer_data_received": false,
+  "synthetic_test_inputs_only": true,
+  "decimal_control": {
+    "unit_price_kzt": "10.01",
+    "quantity": 3,
+    "expected_subtotal_kzt": "30.03",
+    "actual_subtotal_kzt": "30.03"
+  },
+  "unknown_rate_control": {
+    "unit_price": null,
+    "subtotal": null,
+    "known_subtotal_kzt": "0.00",
+    "total": null,
+    "status": "incomplete"
+  },
+  "checks": {
+    "targeted_catalog_and_calculation": "6 passed",
+    "backend_regression": "106 passed",
+    "stale_snapshot": "old numbers unchanged; is_stale=true after new revision",
+    "database_immutability": "UPDATE rejected by trigger",
+    "idempotency": "same key and payload returned byte-equivalent response"
+  },
+  "not_claimed": [
+    "accepted Pavlodar rates or complete estimate",
+    "locally calibrated survival probabilities",
+    "accepted care calendar or resource feasibility",
+    "full/background calculation or approval readiness"
+  ]
+}

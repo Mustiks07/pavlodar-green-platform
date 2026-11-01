@@ -1,0 +1,95 @@
+{
+  "schema": "DatasetPage",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "items": [
+      {
+        "id": "05d4d24e-bb72-5dfd-86d2-1560d0d64684",
+        "kind": "rates",
+        "name": "DR-05 · Котировки — неполная смета",
+        "owner": "Исследовательский пакет 2026-10-29",
+        "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+        "license": "Разные лицензии; условия и источники в отчёте качества",
+        "created_at": "2026-10-29T13:00:54.528191Z",
+        "source_uri": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/tree/21b7d88/research/data/DR-05/",
+        "access_level": "internal",
+        "current_version_id": null
+      },
+      {
+        "id": "23194c28-95e8-5543-b2e3-c3b7a3dd0222",
+        "kind": "restrictions",
+        "name": "DR-03 · Нормы и пробелы ограничений",
+        "owner": "Исследовательский пакет 2026-10-29",
+        "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+        "license": "Разные лицензии; условия и источники в отчёте качества",
+        "created_at": "2026-10-29T13:00:54.528191Z",
+        "source_uri": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/tree/21b7d88/research/data/DR-03/",
+        "access_level": "internal",
+        "current_version_id": null
+      },
+      {
+        "id": "4363b2df-308b-5f89-be45-6b904d5fcacc",
+        "kind": "catalog",
+        "name": "DR-02 · Кандидаты растений и предложения",
+        "owner": "Исследовательский пакет 2026-10-29",
+        "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+        "license": "Разные лицензии; условия и источники в отчёте качества",
+        "created_at": "2026-10-29T13:00:54.528191Z",
+        "source_uri": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/tree/21b7d88/research/data/DR-02/",
+        "access_level": "internal",
+        "current_version_id": null
+      },
+      {
+        "id": "58cbd6da-e2d0-525c-a305-76b072c6abf4",
+        "kind": "catalog",
+        "name": "DR-07 · Лицензии и решения владельца",
+        "owner": "Исследовательский пакет 2026-10-29",
+        "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+        "license": "Разные лицензии; условия и источники в отчёте качества",
+        "created_at": "2026-10-29T13:00:54.528191Z",
+        "source_uri": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/tree/21b7d88/research/data/DR-07/",
+        "access_level": "internal",
+        "current_version_id": null
+      },
+      {
+        "id": "b4dd8ef2-91d4-53cc-8c9e-7cacb8dd99e0",
+        "kind": "weather",
+        "name": "DR-06 · OSM, ERA5 и метаданные Sentinel",
+        "owner": "Исследовательский пакет 2026-10-29",
+        "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+        "license": "Разные лицензии; условия и источники в отчёте качества",
+        "created_at": "2026-10-29T13:00:54.528191Z",
+        "source_uri": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/tree/21b7d88/research/data/DR-06/",
+        "access_level": "internal",
+        "current_version_id": null
+      },
+      {
+        "id": "ca3a1baf-6739-5454-837f-1ab0ba4907ff",
+        "kind": "observations",
+        "name": "DR-04 · Сообщения о посадках — без наблюдений",
+        "owner": "Исследовательский пакет 2026-10-29",
+        "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+        "license": "Разные лицензии; условия и источники в отчёте качества",
+        "created_at": "2026-10-29T13:00:54.528191Z",
+        "source_uri": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/tree/21b7d88/research/data/DR-04/",
+        "access_level": "internal",
+        "current_version_id": null
+      },
+      {
+        "id": "cb85d89d-d6a5-59da-835c-5dda1e83e0b3",
+        "kind": "boundary",
+        "name": "DR-01 · Рабочая граница OSM",
+        "owner": "Исследовательский пакет 2026-10-29",
+        "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+        "license": "Разные лицензии; условия и источники в отчёте качества",
+        "created_at": "2026-10-29T13:00:54.528191Z",
+        "source_uri": "https://github.com/AIFESTHackathon2026/team-vtiposhnik/tree/21b7d88/research/data/DR-01/",
+        "access_level": "internal",
+        "current_version_id": null
+      }
+    ],
+    "next_cursor": null
+  }
+}

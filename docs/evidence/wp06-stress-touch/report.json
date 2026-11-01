@@ -1,0 +1,270 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-30T23:23:55.690Z",
+  "device": "emulated only (no physical device attached)",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC building layer with 1 202 recorded heights published",
+      "pass": true,
+      "detail": {
+        "layer": "398bf58b-9465-5671-9f68-6d83364d8668",
+        "category": "building",
+        "features": 1202
+      }
+    },
+    {
+      "name": "3D on with the selected building: extrusions drawn, scene layer on",
+      "pass": true,
+      "detail": {
+        "featureA": "7484533a-a537-b085-c313-2f46f1b7ea06",
+        "scene": "on",
+        "sceneLayer": true,
+        "extrusionLayer": true,
+        "extruded": 983,
+        "highlight": 2
+      }
+    },
+    {
+      "name": "five context losses while rotating with 4x CPU throttling: each observed, explained, and 3D (extrusions + scene layer) drawn again",
+      "pass": true,
+      "detail": [
+        {
+          "n": 0,
+          "ms": 3205,
+          "back": true,
+          "frames": 7
+        },
+        {
+          "n": 1,
+          "ms": 2362,
+          "back": true,
+          "frames": 7
+        },
+        {
+          "n": 2,
+          "ms": 4728,
+          "back": true,
+          "frames": 5
+        },
+        {
+          "n": 3,
+          "ms": 2256,
+          "back": true,
+          "frames": 4
+        },
+        {
+          "n": 4,
+          "ms": 2009,
+          "back": true,
+          "frames": 8
+        }
+      ]
+    },
+    {
+      "name": "selection survives every restore: URL feature, card and highlight unchanged",
+      "pass": true,
+      "detail": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "name": "no page or WebGL errors besides the forced context loss",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "2D/3D sync after the stress: 3D pick of B moves card and URL; exiting 3D keeps B selected",
+      "pass": true,
+      "detail": {
+        "pickedB": "945ba266-5682-ab72-d411-8f8a26918fa1",
+        "pitch3d": 55.00000000000001,
+        "flat": 0
+      }
+    },
+    {
+      "name": "phone 2D: tap selects building A (card and URL)",
+      "pass": true,
+      "detail": {
+        "ta": [
+          30,
+          372
+        ]
+      }
+    },
+    {
+      "name": "phone: tap on the 3D toggle enters 3D with the selection kept",
+      "pass": true
+    },
+    {
+      "name": "touch: one-finger drag pans the 3D map",
+      "pass": true,
+      "detail": {
+        "from": [
+          77.0100000000026,
+          52.31000000000029
+        ],
+        "to": [
+          77.0112801277329,
+          52.30999999999753
+        ]
+      }
+    },
+    {
+      "name": "touch: two-finger vertical drag changes pitch, two-finger twist rotates",
+      "pass": true,
+      "detail": {
+        "pitch": [
+          55.00000000000001,
+          60
+        ],
+        "bearing": [
+          0,
+          -45.0000017161472
+        ]
+      }
+    },
+    {
+      "name": "touch: camera gestures are written to the URL",
+      "pass": true,
+      "detail": {
+        "city": "10000000-0000-4000-8000-000000000001",
+        "ll": "77.01594,52.31118",
+        "z": "16.00",
+        "feature": "7484533a-a537-b085-c313-2f46f1b7ea06",
+        "scene": "3d",
+        "p": "60",
+        "b": "-45"
+      }
+    },
+    {
+      "name": "phone 3D: tap selects building B; camera stays tilted",
+      "pass": true,
+      "detail": {
+        "tbPick": [
+          174,
+          180
+        ]
+      }
+    },
+    {
+      "name": "phone: no horizontal scroll; card and 3D controls do not overlap",
+      "pass": true,
+      "detail": {
+        "overflow": 0,
+        "tbox": {
+          "x": 12,
+          "y": 60,
+          "width": 118.453125,
+          "height": 28
+        },
+        "cbox": {
+          "x": 16,
+          "y": 458.609375,
+          "width": 358,
+          "height": 265.25
+        }
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp06-stress-touch/stress-3d-before.png",
+    "docs/evidence/wp06-stress-touch/stress-3d-after-restores.png",
+    "docs/evidence/wp06-stress-touch/phone-3d-touch.png"
+  ],
+  "measurements": {
+    "restoreCycles": [
+      {
+        "n": 0,
+        "lostSeen": true,
+        "notice": true,
+        "back": true,
+        "ms": 3205,
+        "frames": 7,
+        "selectionKept": true,
+        "scene": "on",
+        "sceneLayer": true,
+        "extrusionLayer": true,
+        "extruded": 675,
+        "highlight": 2
+      },
+      {
+        "n": 1,
+        "lostSeen": true,
+        "notice": true,
+        "back": true,
+        "ms": 2362,
+        "frames": 7,
+        "selectionKept": true,
+        "scene": "on",
+        "sceneLayer": true,
+        "extrusionLayer": true,
+        "extruded": 408,
+        "highlight": 2
+      },
+      {
+        "n": 2,
+        "lostSeen": true,
+        "notice": true,
+        "back": true,
+        "ms": 4728,
+        "frames": 5,
+        "selectionKept": true,
+        "scene": "on",
+        "sceneLayer": true,
+        "extrusionLayer": true,
+        "extruded": 323,
+        "highlight": 2
+      },
+      {
+        "n": 3,
+        "lostSeen": true,
+        "notice": true,
+        "back": true,
+        "ms": 2256,
+        "frames": 4,
+        "selectionKept": true,
+        "scene": "on",
+        "sceneLayer": true,
+        "extrusionLayer": true,
+        "extruded": 463,
+        "highlight": 2
+      },
+      {
+        "n": 4,
+        "lostSeen": true,
+        "notice": true,
+        "back": true,
+        "ms": 2009,
+        "frames": 8,
+        "selectionKept": true,
+        "scene": "on",
+        "sceneLayer": true,
+        "extrusionLayer": true,
+        "extruded": 849,
+        "highlight": 2
+      }
+    ],
+    "heapAfterCycles": {
+      "usedSize": 47695768,
+      "totalSize": 112713728,
+      "embedderHeapUsedSize": 11049888,
+      "backingStorageSize": 18010473
+    },
+    "phoneReachableMap": {
+      "x": 195,
+      "top": 52,
+      "bottom": 392,
+      "mid": 222
+    }
+  },
+  "finishedAt": "2026-10-30T23:25:21.787Z",
+  "passed": true,
+  "synthetic": {
+    "dataset": "SYNTHETIC TEST 3D нагрузка 23:24:00",
+    "version": "7a1eb734-47c6-4530-8ab8-962865826af6"
+  }
+}

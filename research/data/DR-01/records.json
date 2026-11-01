@@ -1,0 +1,55 @@
+{
+  "data.csv": [
+    {
+      "record_id": "DR-01-official_boundary",
+      "topic": "official_boundary",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Организаторский контур и CRS не переданы; OSM не заменяет официальную границу.",
+      "source_id": "PROJECT-TZ"
+    },
+    {
+      "record_id": "DR-01-organizer_layers",
+      "topic": "organizer_layers",
+      "value": null,
+      "status": "unavailable",
+      "reason": "В текущей поставке нет четырех наборов организатора и прав на них.",
+      "source_id": "PROJECT-TZ"
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "PROJECT-TZ",
+      "title": "ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29",
+      "url": "repo:docs/TZ_DEVELOPMENT.txt",
+      "publisher": "Проект team-vtiposhnik",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-10-29",
+      "license": "unknown",
+      "method": "project_requirement",
+      "note": "Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке."
+    },
+    {
+      "source_id": "OSM",
+      "title": "Городской срез Geofabrik Kazakhstan, OSM",
+      "url": "https://download.geofabrik.de/asia/kazakhstan.html",
+      "publisher": "OpenStreetMap contributors / Geofabrik",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-10-28T21:21:02Z",
+      "license": "ODbL-1.0",
+      "method": "community_record",
+      "note": "Повторно использованы готовые preflight файлы с проверкой checksum. Новая загрузка OSM не выполнялась. Рабочий контур way/170089891 не официальный."
+    },
+    {
+      "source_id": "OSM-LICENSE",
+      "title": "OpenStreetMap copyright and licence",
+      "url": "https://www.openstreetmap.org/copyright",
+      "publisher": "OpenStreetMap Foundation",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "ODbL-1.0",
+      "method": "license_terms",
+      "note": ""
+    }
+  ]
+}

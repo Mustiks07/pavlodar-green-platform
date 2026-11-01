@@ -1,0 +1,19 @@
+{
+  "classification": "SYNTHETIC LOCAL TRANSPORT SMOKE",
+  "date": "2026-10-31",
+  "prompt_or_completion_persisted": false,
+  "credentials_persisted": false,
+  "primary": {
+    "provider": "openrouter",
+    "model": "nvidia/nemotron-3.5-super-vl:free",
+    "result": "timeout_within_20_seconds"
+  },
+  "fallback": {
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "result": "allowlisted_tool_call",
+    "tool_call_count": 1,
+    "input_tokens": 47,
+    "output_tokens": 12
+  }
+}

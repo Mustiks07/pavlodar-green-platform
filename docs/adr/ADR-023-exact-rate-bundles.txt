@@ -1,0 +1,48 @@
+ADR-023 Scenario revisions freeze an exact rate bundle while retaining the legacy material rate
+Статус: accepted by GPT (canonical contract/backend owner); cohort/reserve follow-up in ADR-028.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / migration 0013.
+
+ПРОБЛЕМА
+
+ScenarioRevision хранит один rate_version_id. Одной ставкой нельзя воспроизводимо описать материал,
+посадку, подготовку, доставку, воду, уход, ожидаемые замены, резерв и налоги. Выбор «текущих ставок»
+во время расчёта изменил бы старый результат. При этом немедленное удаление rate_version_id сломает
+клиент 1.2/1.3 и существующие revisions.
+
+РЕШЕНИЕ
+
+- Additive поле rate_version_ids хранит до 50 уникальных immutable RateVersion ids. Входное поле
+  пока optional для обратной совместимости; сервер включает legacy rate_version_id в canonical bundle.
+- ScenarioRevision response всегда содержит canonical rate_version_ids. Hash, authorization, input
+  registry, source manifest и stale snapshot используют весь bundle, а не только legacy material rate.
+- В одном bundle запрещены две ставки одной category+unit: сервер не выбирает победителя молча.
+- Текущий быстрый модуль имеет детерминированные quantity bases для plant_material/piece,
+  planting_work/piece, delivery/piece и site_preparation/piece. Остальные выбранные ставки остаются
+  в manifest и дают blocking rate_quantity_basis_missing до появления care/survival/resource basis.
+- Если placement фиксирует StockItem с ценой, material line использует точную stock version, а не
+  общую material rate. Null price остаётся null. Tax excluded/unknown создаёт gap, а не скрытый налог.
+
+СОВМЕСТИМОСТЬ
+
+Старый клиент продолжает отправлять rate_version_id и получает bundle из одного элемента. Новый
+клиент после атомарной регенерации может отправить rate_version_ids. Удаление legacy поля возможно
+только в следующей major версии после миграции клиентов и сохранённых payloads.
+
+МИГРАЦИЯ
+
+Новая таблица не нужна: ScenarioRevision payload immutable JSONB. Старые payloads читаются через
+legacy fallback; новые сохраняют оба поля. Отдельный backfill не нужен для корректности чтения.
+
+ПРОВЕРКА
+
+- Ставки 10.01 KZT material/piece и 5.00 KZT planting_work/piece при quantity=3 дают две серверные
+  строки и total=45.03 KZT с Decimal ROUND_HALF_UP.
+- Manifest содержит оба exact version ids; old snapshot не меняется после нового revision.
+- Дубликат category+unit, неприменимая ставка, неизвестная quantity basis и налоговый gap проверяются
+  негативными тестами до завершения G3.
+
+ОГРАНИЧЕНИЯ
+
+Организаторские rates не будут предоставлены. Код считает только выбранные source-backed версии;
+отсутствующая категория делает итог incomplete. Replacement/reserve quantity bases реализованы в
+ADR-028 после G4/G5; replacement-cohort care остаётся explicit gap до принятой базы масштабирования.

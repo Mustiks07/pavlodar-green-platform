@@ -1,0 +1,252 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:32:16.546Z",
+  "browser": "chromium 156.0.4314.50",
+  "versions": {
+    "maplibre": "6.16.0",
+    "three": "0.180.0"
+  },
+  "checks": [
+    {
+      "name": "A1 Three renders inside MapLibre 6 custom layer (shared WebGL2 context)",
+      "pass": true,
+      "detail": {
+        "buildingsByBasis": {
+          "measured": 1,
+          "recorded_unverified": 1,
+          "floors_estimate": 1,
+          "visual_placeholder": 1,
+          "unknown": 1
+        },
+        "geometries": 9,
+        "textures": 0,
+        "programs": 5,
+        "drawCalls": 9,
+        "triangles": 48,
+        "disposed": false,
+        "geometriesAfterRelease": null
+      }
+    },
+    {
+      "name": "A2 footprints align with map.project under 4 camera states (< 0.5 px)",
+      "pass": true,
+      "detail": {
+        "worstPx": 1.1034889148042141e-7
+      }
+    },
+    {
+      "name": "A3 height bases are visually distinct (solid / opaque / translucent dashed / ghost dashed / flat)",
+      "pass": true,
+      "detail": [
+        {
+          "basis": "measured",
+          "extruded": true,
+          "fillOpacity": 1,
+          "dashedEdges": false
+        },
+        {
+          "basis": "recorded_unverified",
+          "extruded": true,
+          "fillOpacity": 0.85,
+          "dashedEdges": false
+        },
+        {
+          "basis": "floors_estimate",
+          "extruded": true,
+          "fillOpacity": 0.45,
+          "dashedEdges": true
+        },
+        {
+          "basis": "visual_placeholder",
+          "extruded": true,
+          "fillOpacity": 0.18,
+          "dashedEdges": true
+        },
+        {
+          "basis": "unknown",
+          "extruded": false,
+          "fillOpacity": null,
+          "dashedEdges": true
+        }
+      ]
+    },
+    {
+      "name": "A4 unmount releases all Three geometries, materials and programs",
+      "pass": true,
+      "detail": {
+        "buildingsByBasis": {
+          "measured": 1,
+          "recorded_unverified": 1,
+          "floors_estimate": 1,
+          "visual_placeholder": 1,
+          "unknown": 1
+        },
+        "geometries": 0,
+        "textures": 0,
+        "programs": 0,
+        "drawCalls": 9,
+        "triangles": 48,
+        "disposed": true,
+        "geometriesAfterRelease": 0
+      }
+    },
+    {
+      "name": "A5 25 mount/unmount cycles leave no live WebGL buffers/VAOs/programs/textures",
+      "pass": true,
+      "detail": {
+        "baseGl": {
+          "buffers": 44,
+          "vaos": 8,
+          "programs": 3,
+          "textures": 58,
+          "framebuffers": 3
+        },
+        "endGl": {
+          "buffers": 44,
+          "vaos": 8,
+          "programs": 3,
+          "textures": 58,
+          "framebuffers": 3
+        }
+      }
+    },
+    {
+      "name": "A6 JS heap growth after 25 cycles stays < 3 MB (forced GC)",
+      "pass": true,
+      "detail": {
+        "growthKB": 478
+      }
+    },
+    {
+      "name": "A7 forced context loss is observed",
+      "pass": true
+    },
+    {
+      "name": "A8 after restore the Three layer is recreated and draws again",
+      "pass": true,
+      "detail": {
+        "buildingsByBasis": {
+          "measured": 1,
+          "recorded_unverified": 1,
+          "floors_estimate": 1,
+          "visual_placeholder": 1,
+          "unknown": 1
+        },
+        "geometries": 9,
+        "textures": 0,
+        "programs": 5,
+        "drawCalls": 9,
+        "triangles": 48,
+        "disposed": false,
+        "geometriesAfterRelease": null
+      }
+    },
+    {
+      "name": "A9 no map/Three/WebGL errors in console",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "B1 2D map does not load the 3D module",
+      "pass": true,
+      "detail": [
+        "http://localhost:5174/src/features/scene3d/threeLayer.ts"
+      ]
+    },
+    {
+      "name": "B2 3D module loads on demand and adds the shared-context layer",
+      "pass": true,
+      "detail": {
+        "chunkRequests": 1,
+        "layer": true,
+        "pitch": 55.00000000000001
+      }
+    },
+    {
+      "name": "B3 no buildings are invented; legend and limits are explained",
+      "pass": true
+    },
+    {
+      "name": "B5 context loss in the app is explained; map style and 3D layer come back after restore",
+      "pass": true,
+      "detail": {
+        "lostShown": true,
+        "back": true,
+        "noticeGone": true,
+        "after": {
+          "scene": "on",
+          "scene3d": true,
+          "boundary": true,
+          "styleLoaded": false,
+          "layers": 121
+        }
+      }
+    },
+    {
+      "name": "B4 exit removes the layer and restores the 2D camera",
+      "pass": true,
+      "detail": {
+        "layer": false,
+        "pitch": 0
+      }
+    },
+    {
+      "name": "C1 without WebGL and without session: sign-in is shown first, nothing covers it",
+      "pass": true,
+      "detail": {
+        "text": "ГОРОДСКАЯ СРЕДА\n\nКарта озеленения\n\nОт выбора участка — к плану посадок\n\nИмпорт данных\n\nТребуется вход\n\nДоступ к слоям, проектам и отчётам определяется вашей рол"
+      }
+    },
+    {
+      "name": "C2 no 3D toggle is offered without WebGL",
+      "pass": true
+    },
+    {
+      "name": "C3 2D routes keep working without WebGL",
+      "pass": true,
+      "detail": {
+        "url": "http://localhost:5174/problems",
+        "errors": []
+      }
+    },
+    {
+      "name": "C4 signed in without WebGL: explicit fallback, its 2D link works, no 3D offered",
+      "pass": true,
+      "detail": {
+        "url": "http://localhost:5174/problems"
+      }
+    },
+    {
+      "name": "D1 failed 3D chunk is explained with retry; 2D map stays intact",
+      "pass": true,
+      "detail": {
+        "failed": true,
+        "mapAlive": true,
+        "retries": 1,
+        "state": "load_failed"
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp06-foundation/harness-render.png",
+    "docs/evidence/wp06-foundation/harness-after-restore.png",
+    "docs/evidence/wp06-foundation/app-3d-empty-state.png",
+    "docs/evidence/wp06-foundation/no-webgl-fallback.png",
+    "docs/evidence/wp06-foundation/no-webgl-signed-in.png",
+    "docs/evidence/wp06-foundation/app-3d-load-failed.png"
+  ],
+  "measurements": {
+    "maxGroundAlignmentPx": 1.1034889148042141e-7,
+    "glDeltaAfter25Cycles": {
+      "buffers": 0,
+      "vaos": 0,
+      "programs": 0,
+      "textures": 0,
+      "framebuffers": 0
+    },
+    "heapGrowthBytesAfter25Cycles": 489518,
+    "harnessFpsHeadlessSoftware": 60
+  },
+  "finishedAt": "2026-10-31T08:32:56.623Z",
+  "passed": true
+}

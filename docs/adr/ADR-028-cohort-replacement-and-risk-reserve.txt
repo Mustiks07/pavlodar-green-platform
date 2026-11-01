@@ -1,0 +1,36 @@
+ADR-028 Expected replacement cohorts and risk reserve are separate server cost lines
+Статус: accepted by GPT (calculation/contract owner); client integration pending.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / 69f6d83.
+
+ПРОБЛЕМА
+
+Материальная смета не учитывала ожидаемые замены и отдельный резерв риска. Нельзя умножать исходное
+число посадок на один и тот же процент ежегодно: это повторно оплачивает уже погибшие объекты. Нельзя
+также смешивать expected replacements с резервом, иначе строки удваиваются и перестают проверяться.
+
+РЕШЕНИЕ
+
+- Для frozen survival points S1/S2/S3 количество смертей исходной когорты в году t равно
+  N_initial * (S_(t-1) - S_t), где S0=1. Каждая когорта оплачивается ровно один раз в год смерти.
+- Для replacement_expected повторяются только выбранные exact per-piece material, planting_work и
+  delivery components. Первичная site preparation не повторяется автоматически.
+- Дробные expected quantities сохраняются до 6 знаков; каждая денежная строка округляется сервером
+  ROUND_HALF_UP до 0.01 KZT. Формула когорты сохраняется в CostLine, а не вычисляется клиентом.
+- risk_reserve — отдельная frozen rate category с unit=piece и quantity=N_initial. Она не входит в
+  expected replacement и не вычитается из него.
+- Без frozen survival model или risk_reserve rate итог cost становится incomplete с явным gap; это
+  unknown, а не ноль. Если есть custom care и ненулевая replacement cohort, до принятой формулы
+  масштабирования возвращается replacement_care_basis_missing.
+
+ПРОВЕРКА
+
+S1/S2/S3=0.8/0.7/0.6 при N=3 дают cohorts 0.6, 0.3, 0.3. При material=10.01,
+planting=5.00 и reserve=1.00 сервер получает initial 45.03 + replacements 18.01 + reserve 3.00 =
+66.04 KZT. В результате шесть replacement component lines (2 components x 3 years), одна reserve
+line и ни одного повторно начисленного cohort. Отдельный тест подтверждает fail-closed care gap.
+
+ОГРАНИЧЕНИЕ
+
+Replacement-cohort care не оценивается линейным коэффициентом без принятого правила: water, visits
+и crew time могут масштабироваться по-разному. Это следующий узкий инкремент, не скрытая нулевая
+стоимость. Локальная достоверность survival/rates не утверждается без соответствующих evidence.

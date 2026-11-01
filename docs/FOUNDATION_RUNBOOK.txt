@@ -1,0 +1,98 @@
+Foundation development environment (WP-00/WP-01; not product release acceptance)
+
+Shared baseline: 5d5a45a24f041f1da726bd98f4e23024031bbd1b.
+GPT branch: gpt/WP-00-foundation. Canonical schema remains 1.0.0 pending ADR acknowledgement.
+Node 22.20.0. Python 3.12.11. uv 0.8.17 generates uv.lock; uv sync --locked is mandatory.
+Frontend currently has its own apps/web package manifest/lock owned by Claude.
+Root package.json orchestrates commands without replacing that dependency ownership.
+
+INITIAL SETUP (repository root)
+  uv python install 3.12.11
+  uv sync --locked
+  uv run python tools/dev/bootstrap.py
+  docker compose --env-file .env -f infra/compose.yml up -d db redis keycloak --wait
+  uv run alembic upgrade head
+  uv run python -m tools.dev.seed --profile test
+  uv run uvicorn services.api.main:app --host 127.0.0.1 --port 8001 --no-access-log
+
+bootstrap creates ignored local random credentials. Never copy .env, test realm,
+.local/test-credentials.json, database dumps or session cookies into commits/handoffs.
+Test users admin/specialist/viewer have passwords only in .local/test-credentials.json.
+They are explicitly synthetic local identities, not production accounts.
+Migrations create no city, user, prices or models. Test seed is explicit and idempotent.
+
+CLAUDE INTEGRATION
+  API: http://localhost:8001; health: /health/ready; implemented subset: /openapi.json.
+  Vite PG_API_ORIGIN=http://127.0.0.1:8001; browser origin http://localhost:5173.
+  Forward /v1, /auth, /health unchanged. Use localhost in browser, not 127.0.0.1,
+  because Origin and OIDC callback allowlists match exactly.
+  GET /auth/login -> Keycloak. GET /v1/me -> roles/city_ids/csrf_token.
+  Writes: credentials same-origin, Origin, X-CSRF-Token, Idempotency-Key.
+  Read ETag unchanged; If-Match is required for zone edits and scenario revision appends.
+  On 412 reread Scenario/Zone, compare and apply intent; do not blindly retry edits.
+  ScenarioRevision read ETag identifies the immutable revision; append uses Scenario ETag.
+  An admin still requires a city grant and explicit restricted dataset grant.
+
+ISOLATED BROWSER CHECKS
+Browser journeys that create datasets must not run repeatedly against the shared development
+database. Use the disposable harness from the repository root:
+
+  uv run python -m tools.dev.browser_test_env --cwd apps/web -- node scripts/layers-check.mjs
+
+The harness validates that PostgreSQL is local, creates only the fixed database
+`pavlodar_browser_test`, uses Redis DB 9 and a temporary upload directory, temporarily replaces
+the local API on port 8001, and restores the Docker API in `finally`. The database and Redis DB
+are removed after the command, including on test failure. It never deletes rows from the shared
+`pavlodar` database. Keep the local Keycloak test realm and localhost:5173 web origin running;
+the harness starts Vite itself only when that port is free.
+
+SUPPORTED FOUNDATION
+  City/source registry reads, dataset creation, dataset-version reads, zones and
+  immutable geometry versions, scenario empty drafts/copies/revisions, audit reads,
+  auth sessions, job read/cancel and internal transactional outbox/lease primitives.
+  A source registry row is not an imported/published layer. No production data seed.
+  Plant/model/rate registries and calculation handlers arrive in dependent packages;
+  non-empty inputs using unavailable registries are rejected with structured blockers.
+  Canonical operations absent from /openapi.json are not implemented. No placeholder
+  successful calculation/optimization/import responses are returned.
+  Readiness checks DB/PostGIS/migration. Broker availability is a separate worker
+  concern; Redis outage must not make persisted city reads unavailable.
+
+VALIDATION
+  uv run python tools/spec/validate.py
+  uv run python tools/contracts/generate.py
+  git diff --exit-code -- packages/domain/generated.py
+  uv run pytest -q
+  uv run python -m tools.dev.smoke_oidc --write-fixtures
+  uv run python -m tools.dev.restore_check
+  uv run pip-audit
+Tests create/clear only pavlodar_test. Restore check creates a NEW pavlodar_restore_*
+database and leaves it for inspection; it never replaces existing databases.
+The local dump excludes browser sessions/login states and stays in ignored .local.
+The same check creates ignored upload/tile archives, restores them into temporary
+directories and verifies every database-referenced file by byte size and SHA-256:
+  .local/foundation-backup.dump
+  .local/foundation-uploads.tar.gz
+  .local/foundation-tiles.tar.gz
+Partial upload files and recoverable synthetic trash are excluded from the archives.
+Production WAL/PITR, remote object-store versioning, cross-host recovery, RPO/RTO
+and disaster procedures remain WP-11.
+
+DATA GATES
+DR-01/04 are research not_found; the other requests are partial. All acceptance
+gates remain false. The synthetic test city is separate from the research city,
+whose OSM working boundary is versioned and explicitly unconfirmed. Zone area is
+a real projection calculation, not a verified municipal measurement.
+No local calibration, precise utility networks, ecological accuracy or final cost claimed.
+
+REVIEWED RESEARCH DELIVERY
+  uv run alembic upgrade head
+  uv run python research/data/validate_package.py
+  uv run python -m tools.dev.import_research --actor-id <existing-admin-uuid> --grant-user <existing-specialist-uuid>
+  uv run python -m tools.dev.research_smoke
+The delivery validator is specific to the research submission and writes its report;
+it is not the production upload validator. The import adapter checks the pinned
+manifest and every research byte before a single atomic transaction. Repeated calls
+return the same receipt and do not change grants or duplicate stock. Credentials are
+not CLI parameters. The caller must already have an active admin principal; no
+principal or privilege is created by import. See docs/RESEARCH_INTEGRATION.txt.

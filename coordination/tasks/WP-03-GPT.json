@@ -1,0 +1,33 @@
+{
+  "task_id": "WP-03",
+  "owner": "GPT",
+  "state": "integration_testing",
+  "branch": "gpt/WP-00-foundation",
+  "backend_sha": "936f08195182dc6b4f80aef9b1cbea48d81500d7",
+  "contract_version": "1.5.0",
+  "migration": "0017_map_archives",
+  "api_url": "http://localhost:8001",
+  "implemented": [
+    "bounded streaming upload into quarantine",
+    "GeoJSON, CSV, isolated KML and bounded Shapefile ZIP validation/mapping",
+    "durable PostgreSQL job/result state with outbox and Redis/Celery execution",
+    "quality report, provenance, license gate and admin-only atomic publication",
+    "indexed PostGIS geometry, immutable MapLayer manifests and authorized MVT delivery",
+    "zoom-dependent topology-preserving line/polygon generalization",
+    "bounded deterministic PMTiles v3 offline build and verification for public current layers",
+    "immutable PMTiles artifact registry and authenticated full/Range/ETag delivery for public current layers",
+    "guarded two-phase synthetic dataset plus zone/scenario cleanup planner with exact scope SHA, dependency blockers, backup and recoverable file moves",
+    "idempotent bounded OSM fetch and canonical publication of 8735 real Pavlodar roads, green, trees, water and height-bearing buildings",
+    "viewer-visible real-city manifest/MVT/feature-card smoke with exact imported building height"
+  ],
+  "pending": [
+    "Claude reruns the live map UI against the 5 real Pavlodar datasets and 6 layer families",
+    "admit WorldCover/DEM rasters through a bounded versioned raster pipeline",
+    "execute plan v2 only after explicit operator confirmation of its exact full scope SHA",
+    "Claude PMTiles protocol handler and representative browser acceptance; registry and authorized HTTP Range delivery are implemented",
+    "representative large-layer viewport and archive performance acceptance",
+    "production remote object-store recovery; local upload/tile volume restore is verified under WP-11"
+  ],
+  "organizer_data_received": false,
+  "production_ready": false
+}

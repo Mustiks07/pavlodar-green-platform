@@ -1,0 +1,277 @@
+/*
+ * Design tokens. Components use only these variables; no raw colors elsewhere.
+ * Semantic colors never carry a status alone: every status also has an icon and text.
+ * Contrast targets WCAG AA (4.5:1 text, 3:1 UI). Checked by scripts/check-contrast.mjs.
+ */
+:root {
+  color-scheme: light;
+
+  /* Neutral surfaces */
+  --pg-bg: #f3f5f2;
+  --pg-surface: #ffffff;
+  --pg-surface-2: #f6f8f6;
+  --pg-surface-sunken: #eaf0ec;
+  --pg-overlay: rgb(17 24 21 / 0.44);
+  --pg-border: #dce3df;
+  --pg-border-strong: #74827b;
+
+  /* Product shell: the permanent municipal workspace navigation. */
+  --pg-sidebar: #0f493b;
+  --pg-sidebar-hover: #1b5a49;
+  --pg-sidebar-active: #2c7259;
+  --pg-sidebar-text: #f5f8f6;
+  --pg-sidebar-muted: #b7c9c1;
+  --pg-sidebar-border: rgb(236 246 241 / 0.18);
+  --pg-sidebar-avatar: rgb(255 255 255 / 0.14);
+  --pg-sidebar-positive: #9ed66e;
+  --pg-sidebar-warning: #f2c063;
+  --pg-sidebar-negative: #ff9b91;
+
+  /* Text */
+  --pg-text: #17201c;
+  --pg-text-muted: #4d5b55;
+  --pg-text-subtle: #66736d;
+  --pg-text-on-accent: #ffffff;
+
+  /* Brand / interactive */
+  --pg-accent: #176a4d;
+  --pg-accent-hover: #105a40;
+  --pg-accent-soft: #e4f1e9;
+  --pg-accent-text: #145b41;
+  --pg-focus: #1d5fd1;
+
+  /* Semantic status (text-safe on surface) */
+  --pg-positive: #1d6b3f;
+  --pg-positive-soft: #e3f2e8;
+  --pg-negative: #b3261e;
+  --pg-negative-soft: #fbe9e7;
+  --pg-warning: #8a5a00;
+  --pg-warning-soft: #fdf1d8;
+  --pg-info: #1f5aa6;
+  --pg-info-soft: #e5eefb;
+  --pg-neutral: #4d5b55;
+  --pg-neutral-soft: #eceff0;
+
+  /* Provenance (TZ §06): measured / estimated / synthetic / unavailable */
+  --pg-prov-measured: #1f5aa6;
+  --pg-prov-measured-soft: #e5eefb;
+  --pg-prov-estimated: #8a5a00;
+  --pg-prov-estimated-soft: #fdf1d8;
+  --pg-prov-synthetic: #7a2e8e;
+  --pg-prov-synthetic-soft: #f4e6f7;
+  --pg-prov-unavailable: #5b6661;
+  --pg-prov-unavailable-soft: #eceff0;
+
+  /* Map scales: sequential (need), diverging (change), categorical (types) */
+  --pg-seq-1: #edf6ef;
+  --pg-seq-2: #bfe0c8;
+  --pg-seq-3: #7fbf93;
+  --pg-seq-4: #3f9563;
+  --pg-seq-5: #17633b;
+  --pg-div-neg-2: #b3261e;
+  --pg-div-neg-1: #e8897f;
+  --pg-div-0: #eeeeee;
+  --pg-div-pos-1: #7db6dc;
+  --pg-div-pos-2: #1f5aa6;
+  --pg-cat-1: #1f6b4a;
+  --pg-cat-2: #1f5aa6;
+  --pg-cat-3: #b8640a;
+  --pg-cat-4: #7a2e8e;
+  --pg-cat-5: #a3243a;
+  --pg-cat-6: #2b7f86;
+  --pg-cat-7: #6b6f1f;
+  --pg-cat-8: #5b6661;
+  --pg-map-unknown: #9aa5a0;
+  --pg-map-bg: #e8ece9;
+  --pg-map-boundary: #17201c;
+  /* Semantic colours for data over the external basemap. The OpenFreeMap style is light in both
+     app themes, so these are not redefined for dark: same meaning, contrast against the basemap. */
+  --pg-basemap-positive: #1d6b3f;
+  --pg-basemap-negative: #b3261e;
+  --pg-basemap-warning: #8a5a00;
+  --pg-basemap-neutral: #4d5b55;
+  --pg-basemap-unknown: #7d8783;
+  --pg-basemap-halo: #ffffff;
+  /* Identity colours of published layer families (MapLayer.category) for single-class neutral
+     legends: they tell layers apart, they do not rate anything. */
+  --pg-basemap-road: #6b5a48;
+  --pg-basemap-green: #2f7a46;
+  --pg-basemap-water: #1f5aa6;
+  --pg-basemap-building: #8a4b32;
+  --pg-map-road: #6b5a48;
+  --pg-map-green: #2f7a46;
+  --pg-map-water: #1f5aa6;
+  --pg-map-building: #8a4b32;
+  /* Server-computed ground shadow (drawn translucent over the basemap in both themes). */
+  --pg-map-shadow: #1c2434;
+
+  /* Typography */
+  --pg-font: 'Manrope', 'Inter', 'Segoe UI', system-ui, -apple-system, 'Roboto', sans-serif;
+  --pg-font-mono: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;
+  --pg-fs-xs: 0.75rem;
+  --pg-fs-sm: 0.8125rem;
+  --pg-fs-md: 0.875rem;
+  --pg-fs-lg: 1rem;
+  --pg-fs-xl: 1.25rem;
+  --pg-fs-2xl: 1.5rem;
+  --pg-fs-3xl: 1.875rem;
+  --pg-lh-tight: 1.25;
+  --pg-lh: 1.45;
+  --pg-fw-regular: 400;
+  --pg-fw-medium: 500;
+  --pg-fw-semibold: 600;
+
+  /* Spacing (4px grid) */
+  --pg-space-1: 0.25rem;
+  --pg-space-2: 0.5rem;
+  --pg-space-3: 0.75rem;
+  --pg-space-4: 1rem;
+  --pg-space-5: 1.25rem;
+  --pg-space-6: 1.5rem;
+  --pg-space-8: 2rem;
+
+  /* Density: table rows */
+  --pg-row-compact: 2.5rem;
+  --pg-row-regular: 2.75rem;
+  --pg-control-h: 2.25rem;
+  --pg-control-h-sm: 1.75rem;
+
+  /* Shape and depth */
+  --pg-radius-sm: 6px;
+  --pg-radius: 9px;
+  --pg-radius-lg: 14px;
+  --pg-shadow-1: 0 1px 2px rgb(17 24 21 / 0.05);
+  --pg-shadow-2: 0 8px 28px rgb(17 24 21 / 0.10), 0 2px 6px rgb(17 24 21 / 0.05);
+
+  /* Motion: meaningful only, 150-250 ms (TZ §22) */
+  --pg-dur-fast: 150ms;
+  --pg-dur: 200ms;
+  --pg-dur-slow: 250ms;
+  --pg-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Layout */
+  --pg-topbar-h: 4.25rem;
+  --pg-statusbar-h: 1.75rem;
+  --pg-nav-w: 15.5rem;
+  --pg-nav-w-collapsed: 3.25rem;
+  --pg-z-panel: 10;
+  --pg-z-nav: 20;
+  --pg-z-overlay: 40;
+  --pg-z-toast: 50;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --pg-bg: #0f1412;
+    --pg-surface: #171d1a;
+    --pg-surface-2: #1c2420;
+    --pg-surface-sunken: #111714;
+    --pg-overlay: rgb(0 0 0 / 0.6);
+    --pg-border: #2e3934;
+    --pg-border-strong: #6b7a73;
+    --pg-text: #e8eeeb;
+    --pg-text-muted: #aebbb5;
+    --pg-text-subtle: #93a19a;
+    --pg-text-on-accent: #0c1310;
+    --pg-accent: #5cc08e;
+    --pg-accent-hover: #74cfa0;
+    --pg-accent-soft: #19362a;
+    --pg-accent-text: #7fd6a9;
+    --pg-focus: #7aa7ff;
+    --pg-positive: #6fd39a;
+    --pg-positive-soft: #183324;
+    --pg-negative: #ff8a80;
+    --pg-negative-soft: #3a1b19;
+    --pg-warning: #f2c063;
+    --pg-warning-soft: #352a12;
+    --pg-info: #8ab4f8;
+    --pg-info-soft: #172840;
+    --pg-neutral: #aebbb5;
+    --pg-neutral-soft: #242d29;
+    --pg-prov-measured: #8ab4f8;
+    --pg-prov-measured-soft: #172840;
+    --pg-prov-estimated: #f2c063;
+    --pg-prov-estimated-soft: #352a12;
+    --pg-prov-synthetic: #e0a3f0;
+    --pg-prov-synthetic-soft: #33203a;
+    --pg-prov-unavailable: #aebbb5;
+    --pg-prov-unavailable-soft: #242d29;
+    --pg-seq-1: #1b2b22;
+    --pg-seq-2: #24503a;
+    --pg-seq-3: #2f7a52;
+    --pg-seq-4: #4fa874;
+    --pg-seq-5: #8fd8aa;
+    --pg-div-0: #3a3f3d;
+    --pg-map-unknown: #66736d;
+    --pg-map-bg: #1a201d;
+    --pg-map-road: #c7b49c;
+    --pg-map-green: #74c98f;
+    --pg-map-water: #7eb0ee;
+    --pg-map-building: #e0a084;
+    --pg-map-boundary: #e8eeeb;
+    --pg-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+    --pg-shadow-2: 0 8px 24px rgb(0 0 0 / 0.5);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --pg-bg: #0f1412;
+  --pg-surface: #171d1a;
+  --pg-surface-2: #1c2420;
+  --pg-surface-sunken: #111714;
+  --pg-overlay: rgb(0 0 0 / 0.6);
+  --pg-border: #2e3934;
+  --pg-border-strong: #6b7a73;
+  --pg-text: #e8eeeb;
+  --pg-text-muted: #aebbb5;
+  --pg-text-subtle: #93a19a;
+  --pg-text-on-accent: #0c1310;
+  --pg-accent: #5cc08e;
+  --pg-accent-hover: #74cfa0;
+  --pg-accent-soft: #19362a;
+  --pg-accent-text: #7fd6a9;
+  --pg-focus: #7aa7ff;
+  --pg-positive: #6fd39a;
+  --pg-positive-soft: #183324;
+  --pg-negative: #ff8a80;
+  --pg-negative-soft: #3a1b19;
+  --pg-warning: #f2c063;
+  --pg-warning-soft: #352a12;
+  --pg-info: #8ab4f8;
+  --pg-info-soft: #172840;
+  --pg-neutral: #aebbb5;
+  --pg-neutral-soft: #242d29;
+  --pg-prov-measured: #8ab4f8;
+  --pg-prov-measured-soft: #172840;
+  --pg-prov-estimated: #f2c063;
+  --pg-prov-estimated-soft: #352a12;
+  --pg-prov-synthetic: #e0a3f0;
+  --pg-prov-synthetic-soft: #33203a;
+  --pg-prov-unavailable: #aebbb5;
+  --pg-prov-unavailable-soft: #242d29;
+  --pg-seq-1: #1b2b22;
+  --pg-seq-2: #24503a;
+  --pg-seq-3: #2f7a52;
+  --pg-seq-4: #4fa874;
+  --pg-seq-5: #8fd8aa;
+  --pg-div-0: #3a3f3d;
+  --pg-map-unknown: #66736d;
+  --pg-map-bg: #1a201d;
+  --pg-map-road: #c7b49c;
+  --pg-map-green: #74c98f;
+  --pg-map-water: #7eb0ee;
+  --pg-map-building: #e0a084;
+  --pg-map-boundary: #e8eeeb;
+  --pg-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --pg-shadow-2: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pg-dur-fast: 0ms;
+    --pg-dur: 0ms;
+    --pg-dur-slow: 0ms;
+  }
+}

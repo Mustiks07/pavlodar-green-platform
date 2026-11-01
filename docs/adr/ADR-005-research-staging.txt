@@ -1,0 +1,52 @@
+ADR-005 — Research delivery is a versioned staging input
+Status: accepted for internal persistence; API additions proposed for Claude review.
+Date: 2026-10-29
+
+Problem
+The delivered research schemas are not canonical contracts. Plant requires fields
+that cannot truthfully be inferred from genus-only candidates, nullable risk traits,
+undated supplier stock and missing local growth curves. Publishing those records
+directly would imply approval and make incomplete costs look complete.
+
+Decision implemented without changing contract 1.0.0
+Archive checksum-verified allowed bytes, including original units, observation and
+check dates. Immutable identities, record versions and occurrences preserve source
+lineage; DR-02/05 stock has one identity/version with two delivery occurrences.
+Store converted values separately with exact 0.3048 factor and original ft bounds.
+The adapter is pinned to this reviewed delivery, not a generic future validator.
+No external fetching, no tariff PDF, no legal activation, no invented measurements.
+All seven DatasetVersions are needs_review; current_version_id stays null.
+QualityReport.valid_count means structurally valid, never accepted for a decision.
+QualityReport.publish_allowed=false and server publication returns DataGap blockers.
+City uses the OSM working contour with boundary_status=working, a real version ID
+and no assertion of official extent. Sources/quality are readable to authorized
+specialists. Missing utilities still block placement; missing costs do not block
+reading sources, drawing a draft zone or saving an empty scenario.
+Legal revisions/paragraphs/conditions remain raw claims pending primary-source and
+expert review; #299/33 and greenery #52/4 are distinct. No 1.2m setback is inferred
+from the trunk-circle diameter. Ricinus risk is not recorded as a legal prohibition.
+
+Proposed next canonical change, requiring coordinated generator/client update
+Read-only paginated staging-record and source-version endpoints, bounded by city and
+dataset grant, with record kind, external/internal/version IDs, typed raw values,
+units, observed_at, checked_at, applicability, source refs and review reasons.
+Do not weaken Plant requirements or reuse species IDs for unresolved genera.
+Use existing DataGap / eligibility / Metric / CostResult semantics for operation
+readiness. Expose only module-specific blockers; no global 'research ready' boolean.
+ADR-002/003 direction acknowledged by Claude. ADR-006 records remaining corrections
+to ADR-004; do not regenerate 1.1.0 before that acknowledgement.
+
+Correction after complete operation inventory review
+transitionScenario already exists in canonical 1.0.0 (specialist baseline, admin
+for approval). The initial claim that the operation was absent was incorrect.
+It is now implemented for draft/review/archive with If-Match, idempotency and audit.
+Approval is explicitly rejected with critical DataGap blockers until WP-05 supplies
+verified calculation/safety evidence. No additional approval endpoint is needed.
+
+Acceptance in this increment
+Repeat import preserves counts/IDs; mirrored stock deduplicates; immutable staging;
+unknown quantity stays null and supplier zero stays zero; no source date substitution;
+unresolved rates/rules inactive; incomplete CostResult.total=null and exact known
+subtotal; source/API access checks and publication denial; restart then browser read.
+Map tiles, full import jobs, staging browser and domain calculation endpoints remain
+work packages with acceptance outstanding, not removed from the product scope.

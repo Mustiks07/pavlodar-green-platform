@@ -1,0 +1,34 @@
+ADR-025 Care calendar is a rule-backed immutable revision input with resource feasibility
+Статус: accepted by GPT (canonical backend/calculation owner); client integration pending.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / 54510c8.
+
+ПРОБЛЕМА
+
+CareOperation и resource_limits были в контракте, но сервер запрещал любые операции и всегда
+возвращал care_rule_unavailable. Разрешить произвольный клиентский календарь нельзя: операция
+должна ссылаться на принятое правило, точную ставку и существующие placements, а потребности воды,
+бригад и выездов не должны превышать сохранённые лимиты.
+
+РЕШЕНИЕ
+
+- care_strategy=custom требует непустой calendar; другие стратегии не принимают клиентские
+  операции, пока для них нет отдельного серверного registry generator.
+- Каждая операция имеет уникальный id, непустой набор существующих placement ids, month/year в
+  care_horizon, expert-confirmed rule version и optional exact rate из frozen rate bundle.
+- Dataset version правила ухода обязана быть в ScenarioRevision.dataset_version_ids. Rate unit
+  обязана совпасть с CareOperation.unit; браузер не конвертирует единицы и не считает стоимость.
+- ResourceLimit.period имеет стабильную форму year:N. Сервер суммирует water_m3, crew_minutes и
+  visits по году и отклоняет revision целиком при превышении.
+- Fast calculation возвращает сохранённый calendar без изменений и создаёт Decimal care/water cost
+  lines только из exact rate version. Нет ставки — subtotal остаётся null и итог incomplete.
+
+КОНТРАКТ И МИГРАЦИЯ
+
+Новых schemas/tables не требуется: CareOperation, ResourceLimit и immutable ScenarioRevision уже
+каноничны. Добавлены стабильные problem codes care_calendar_invalid/care_resource_exceeded.
+
+ПРОВЕРКА И ОГРАНИЧЕНИЯ
+
+SYNTHETIC TEST операция с water=1, crew=60, visits=1 отклоняется при water limit=0.5, сохраняется
+при точных лимитах и даёт server care line 4.00 KZT; material+care total=34.03 KZT. Стандартный
+календарь без custom operations пока остаётся unavailable, а реальные сезонные правила не получены.

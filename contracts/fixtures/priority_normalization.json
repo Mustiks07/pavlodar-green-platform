@@ -1,0 +1,30 @@
+{
+  "schema": "PriorityNormalization",
+  "expected_valid": true,
+  "data": {
+    "id": "f5f9b550-42ab-5bfd-bf5e-2c442ad5e254",
+    "name": "Доли контекста зоны v1",
+    "method_version": "zone-context-ratios-1",
+    "factors": [
+      {
+        "factor": "green_deficit",
+        "label": "Дефицит существующего озеленения",
+        "group": "need",
+        "formula": "1 - clamp(existing_green_area / zone_area, 0, 1)",
+        "unit": "1",
+        "minimum": 0,
+        "maximum": 1
+      },
+      {
+        "factor": "soil_coverage",
+        "label": "Покрытие почвенными данными",
+        "group": "readiness",
+        "formula": "clamp(soil_coverage_fraction, 0, 1)",
+        "unit": "1",
+        "minimum": 0,
+        "maximum": 1
+      }
+    ],
+    "created_at": "2026-10-30T00:00:00Z"
+  }
+}

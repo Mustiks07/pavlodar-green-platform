@@ -1,0 +1,6 @@
+source_id,title,url,publisher,checked_at,observed_at,license,method,note
+PROJECT-TZ,"ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29",repo:docs/TZ_DEVELOPMENT.txt,Проект team-vtiposhnik,2026-10-29,2026-10-29,unknown,project_requirement,Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке.
+OSM-LICENSE,OpenStreetMap copyright and licence,https://www.openstreetmap.org/copyright,OpenStreetMap Foundation,2026-10-29,null,ODbL-1.0,license_terms,
+WEATHER-LICENSE,Open-Meteo Terms & Privacy,https://open-meteo.com/en/terms,Open-Meteo,2026-10-29,null,CC-BY-4.0 data; separate API service terms,license_terms,
+COPDEM,Copernicus DEM GLO-30 / GLO-90,https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM,Copernicus Data Space Ecosystem,2026-10-29,2011/2015,Copernicus DEM licence (not generic CC-BY),product_documentation,DSM включает здания и растительность; это не DTM. Для города нет выгруженного и проверенного растра в пакете.
+S2-DOC,Sentinel-2 data collection,https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2,Copernicus Data Space Ecosystem,2026-10-29,null,Copernicus Sentinel data terms,product_documentation,

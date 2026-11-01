@@ -1,0 +1,133 @@
+ADR-004 Поля готовности данных, каталога, сметы и высот для исследовательского пакета
+Статус: proposed (Claude, WP-02/WP-04). Требует acknowledgement GPT. Additive к 1.0.0,
+выпускается вместе с ADR-002 как согласованная атомарная регенерация 1.1.0 (ADR-003).
+Нумерация согласована в GPT ADR-006: этот документ — ADR-004 (Claude); решение GPT
+о staging исследовательского пакета — ADR-005. Согласование с GPT ADR-005: глобального
+флага «research ready» нет; модульные blockers остаются в DataGap/eligibility/Metric/
+CostResult. Поэтому п.1 ниже — поля состояния в read-модели версий источника, а не
+агрегатная операция. Переход submit/approve сценария использует существующий
+transitionScenario (реализован GPT с проверкой approval gates).
+Исправления GPT ADR-006 (1–4) приняты Claude без изменений: nullable StockItem.observed_at
++ checked_at, is_local_supply boolean|null; nullable Rate.valid_from/price_observed_at +
+checked_at; RuleVersion.value number|boolean|null и review_status
+conflict_requires_review; Plant.exclusion_basis research_risk|expert_decision|
+legal_prohibition|null. Семантика provided_empty ≠ подтверждённое отсутствие, а
+blocks_operations — только канонические operationId.
+
+ПРОБЛЕМА
+Исследовательский пакет различает состояния, которые контракт 1.0.0 не может передать.
+UI обязан показать их (ТЗ §06, §22; задание пользователя от 29.10.2026), но не вправе
+читать research/*.csv напрямую или выводить их из свободного текста. Пробелы:
+
+R1 Готовность источника. Нельзя различить: «не предоставлено» (DR-01 official boundary,
+   DR-04 cohorts), «предоставлено, 0 объектов» (DR-03 restrictions.geojson, soil 0 строк),
+   «ошибка загрузки», «устаревшая версия», «исследовательское/непроверенное».
+   DatasetVersion.status описывает конвейер импорта, а не пригодность для расчёта.
+R2 Plant: нет ранга таксона (3 из 9 записей определены только до рода), локального
+   свидетельства, статуса для школ/больниц (requires_review), исследовательского исключения
+   по риску (клещевина). expert_status=pending не объясняет причину.
+R3 StockItem: нет статуса наличия (vendor_reported / not_in_stock / listing_only), города
+   поставщика и признака «внешний сравнительный товар» (GreenMax, вне Павлодара),
+   налогового статуса, даты складского учёта, размерного диапазона, контейнера/корня.
+   available_quantity=null vs 0 уже есть — сохраняется.
+R4 Rate: нет valid_to, даты наблюдения цены, статуса применимости
+   (requires_quote, later_changes_not_resolved), состава included/excluded.
+   Водные ставки 54-ОД имеют период 01.08.2026–31.07.2027 и не должны выглядеть действующими.
+R5 CostLine.category не имеет water; пользователь требует раздельно материал, работы,
+   доставку, уход и воду. Нет налогового режима и даты цены на строке.
+R6 Здания/3D: нет height_m/height_basis. DR-06 даёт 110 зданий с OSM height
+   (recorded_unverified); preflight — 47 974 контура без проверенной высоты.
+   Высота «этажность×3» и визуальные 6 м должны быть отличимы от записанной.
+R7 Правила: ZoneContext.restrictions ссылается на rule_version_id, но нет операции,
+   раскрывающей источник, пункт, редакцию, применимость и статус экспертного разбора
+   (rules.csv: verified_text_requires_expert; отмена №134/14 решением №299/33).
+R8 Природа набора: 82 записи Sentinel — каталог метаданных, не растр/NDVI; ERA5 — одна
+   модельная ячейка, не наблюдения по кварталам. Нужен признак вида содержимого.
+
+ВАРИАНТЫ
+A. UI читает research/*.json. Отклонено: обход импорта, прав, версий; запрещено заданием.
+B. Свободное metadata-поле. Отклонено SEMANTICS («не обходить произвольным metadata»).
+C. (выбрано) Типизированные additive поля на существующих и предложенных GPT read-моделях.
+
+ИЗМЕНЕНИЕ (additive; новые поля в ответах сервера 1.1.0)
+
+1. Состояние источника — в записи версии источника (endpoint из GPT ADR-005,
+   например GET /v1/source-versions?city_id&dataset_id), без агрегатной операции:
+   + "readiness_state": "not_provided" | "provided_empty" | "available" | "load_failed"
+                        | "stale" | "research_unverified"
+   + "content_kind": "vector" | "raster_product" | "imagery_catalog" | "model_timeseries"
+                     | "table" | "legal_text"
+   + "record_count": integer|null        - null = неизвестно; 0 = предоставлено пустым
+   + "checked_at": date|null, "observed_from": date|null, "observed_to": date|null
+   + "applicability": string|null        - например «одна ячейка ERA5, не по кварталам»
+   + "data_request_id": "DR-01".."DR-07"|null
+   + "review_reasons": [DataGap]
+   Для «не предоставлено» (официальная граница DR-01, когорты DR-04) у города нет
+   DatasetVersion; поэтому нужен список ожидаемых источников города с
+   readiness_state=not_provided и dataset_id=null — в том же endpoint, отдельными
+   строками. Последствия для операций остаются модульными blockers (DataGap) у
+   соответствующих расчётов, как предлагает GPT ADR-005; UI не выводит допустимость сам.
+
+2. Plant: + "taxon_rank": "species"|"genus"|"cultivar",
+          + "local_evidence": string|null,
+          + "sensitive_site_status": "allowed"|"requires_review"|"excluded",
+          + "exclusion_reason": string|null,
+          + "review_reasons": [DataGap]
+   allergy_risk/toxicity_risk unknown остаются unknown (не безопасно).
+
+3. StockItem: + "availability": "in_stock"|"not_in_stock"|"vendor_reported"|"listing_only"|"unknown",
+              + "supplier_city": string|null, + "is_local_supply": boolean,
+              + "height_min_m"/"height_max_m": number|null, + "container": string|null,
+              + "root_system": string|null, + "tax_mode": как Rate.tax_mode,
+              + "stock_counted_at": date|null, + "applicability": string|null
+   Правило: available_quantity=0 только при известном нуле; null — «остаток неизвестен».
+
+4. Rate: + "valid_to": date|null, + "price_observed_at": date|null,
+         + "applicability_status": "current"|"future"|"expired"|"requires_quote"
+                                   |"later_changes_not_resolved"|"unverified",
+         + "included": string|null, + "excluded": string|null
+   UI показывает «действует» только при applicability_status=current.
+
+5. CostLine.category: + "water" (enum расширяется; atomic 1.1.0).
+   CostLine: + "tax_mode", + "price_observed_at": date|null,
+             + "rate_status": как Rate.applicability_status|null.
+   CostResult без изменений: incomplete -> total=null, known_subtotal, data_gaps.
+
+6. MapFeature для зданий и свойства MVT слоя building:
+   + "height_m": number|null,
+   + "height_basis": "measured"|"recorded_unverified"|"floors_estimate"|"visual_placeholder"|"unknown",
+   + "floors": integer|null, + "height_source_ref": SourceRef|null
+   visual_placeholder допускается только в обзорном режиме (F-3D-02). Клиент рисует
+   placeholder-высоту иначе (полупрозрачно/штрих) и не использует её в аналитике.
+   Просьба к GPT: опубликовать полный набор контуров из preflight (47 974 ways) как
+   buildings DatasetVersion с height_basis per feature; 110 OSM-высот — подмножество.
+
+7. GET /v1/rule-versions/{rule_version_id} (getRuleVersion, viewer) ->
+   {"id","source":SourceRef,"act_number","clause","revision_date","parameter",
+    "value":number|null,"unit":string|null,"applicability","condition":string|null,
+    "review_status":"verified_text_requires_expert"|"expert_confirmed"|"superseded",
+    "superseded_by":uuid|null}
+
+СОВМЕСТИМОСТЬ И МИГРАЦИЯ
+Новые обязательные поля + additionalProperties:false несовместимы со строгим
+валидатором 1.0 (ADR-003): выпуск 1.1.0 одним согласованным коммитом контракта,
+регенерация Pydantic и TS-клиента, обновлённые fixtures. Миграция БД — по WP-01/03/05.
+До acknowledgement UI использует только поля 1.0.0; недостающие состояния показывает
+как «сервер не сообщает статус» и не выводит их сам.
+
+FIXTURES (GPT, synthetic=true)
+source_versions_readiness_mixed.json (по одной версии на каждый readiness_state), plant_genus_requires_review.json,
+stock_unknown_vs_zero.json (null и 0), stock_listing_only_external.json,
+rate_future_period_unverified.json, cost_incomplete_with_water.json,
+building_height_bases.json; негативные: stock_zero_with_unknown_availability_invalid.json,
+source_available_without_version_invalid.json.
+
+ПРОВЕРКА (совместная, браузер + реальный API)
+- Источник с метаданными и качеством: readiness item показывает период, checked_at,
+  качество, применимость и gaps.
+- provided_empty (restrictions 0 объектов) визуально и текстом отличается от not_provided.
+- Каталог: genus-запись и клещевина показывают причину review/исключения; unknown
+  токсичность не зелёная.
+- Склад: 0 и null различаются; GreenMax показан как внешний listing_only.
+- Смета incomplete: известная часть + недостающие категории, вода отдельной строкой.
+- 3D: recorded_unverified и visual_placeholder различимы в легенде и карточке.

@@ -1,0 +1,27 @@
+{
+  "task_id": "WP-04",
+  "owner": "Claude",
+  "integration_partner": "GPT",
+  "state": "integration_testing",
+  "branch": "gpt/WP-00-foundation",
+  "backend_sha": "55afe0002e07fcf600647cbe8f6713a59be48d5b",
+  "api_url": "http://localhost:8001",
+  "implemented_backend": [
+    "listMapLayers filtered by city, dataset grants and current published version",
+    "immutable source/license/version/legend manifests",
+    "GIST-indexed authorized PostGIS MVT with ETag and private cache",
+    "upgrade backfill for vector versions published before map-layer support",
+    "immutable local address index from accepted publications with provenance, fuzzy candidates and grant filtering",
+    "explicit address_index_unavailable/DataGap state while organizer DR-08 is open",
+    "authorized server spatial ZoneContext with UTM area, soil coverage fraction, existing green aggregates, rule-linked restrictions and explicit safety gaps"
+  ],
+  "pending_joint_acceptance": [
+    "Claude regenerates the TypeScript client and renders MVT by source_layer",
+    "published upload appears on the map with server legend and attribution",
+    "viewport performance and stale-pointer switch are browser-tested",
+    "Claude connects searchAddresses candidates/manual fallback and verifies keyboard/mobile UX",
+    "Claude adds stable Russian labels for the four context metric keys and verifies context states against the live API"
+  ],
+  "organizer_data_received": false,
+  "production_ready": false
+}

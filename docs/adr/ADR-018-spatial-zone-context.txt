@@ -1,0 +1,55 @@
+ADR-018 ZoneContext считается сервером из доступных current publications
+Статус: accepted by GPT (canonical backend/data owner); client labels pending Claude.
+Дата: 2026-10-30. Основа: canonical 1.2.0, backend dc164a1.
+
+ПРОБЛЕМА
+
+getZoneContext возвращал пустые metrics/restrictions и generic gap, хотя UI уже показывал секции
+контекста. F-MAP-03 требует серверные площадь/пересечения/буферы, долю покрытия почв, окружение,
+сети, качество и пробелы. Нельзя считать пустой слой сетей разрешением и нельзя смешивать
+restricted источники с ответом viewer.
+
+РЕШЕНИЕ
+
+- ZoneContext каждый раз привязан к current ZoneVersion и current DatasetVersion. Перед spatial
+  query применяется city+dataset access; недоступные restricted версии даже не участвуют в
+  агрегатах и source_refs.
+- Площадь зоны берётся из серверной UTM 43N проверки ZoneVersion. Почвенное покрытие — площадь
+  union(intersection) опубликованных polygon/multipolygon с зоной, делённая на площадь зоны;
+  overlap не суммируется дважды. Частичное покрытие возвращается числом 0..1 и отдельным gap,
+  а не единственным почвенным значением на всю зону.
+- Existing green возвращает union area полигонов и число всех пересекающих инвентарных features.
+  Никакие canopy/radius коэффициенты для point trees не выдумываются.
+- Ограничения возвращаются только при явном UUID rule_version_id. Геометрия, kind и status идут
+  из source record. Пустое пересечение не объявляется clearance; отсутствие network_kind создаёт
+  blocking utility gap. Ответ ограничен 50 records и 1000 vertices/record с явными truncation/
+  complexity gaps, чтобы карточка не стала неограниченным GeoJSON download.
+- Dataset sources сохраняются как SourceRef. Published quality warnings не исчезают, а становятся
+  non-blocking source_quality_warning. SYNTHETIC test city/version/явно маркированный dataset
+  дают Metric.status=synthetic; реальные spatial aggregates имеют status=estimated, не measured.
+- Canonical metric registry дополнен zone_area, soil_coverage_fraction, existing_green_area и
+  existing_green_feature_count с зарегистрированными units. Формулы помечены
+  method_version=zone-context-postgis-1.
+
+КОНТРАКТ
+
+Форма OpenAPI ZoneContext 1.2.0 не меняется; операция уже canonical. Добавлены только registry
+metric keys и стабильные DataGap codes. UI может отображать новые metrics generically, но Claude
+должен добавить понятные русские labels и не скрывать gaps, совпавшие по смыслу со старым generic
+zone gap.
+
+ПРОВЕРКА
+
+- Без источников: реальная server area + unavailable soil/green metrics + четыре явных gaps.
+- SYNTHETIC soil half-zone даёт coverage около 0.5; green quarter даёт area около 0.25 zone area;
+  point+polygon inventory даёт count=2 без выдуманной площади точки.
+- Restriction с rule lineage и network_kind возвращается confirmed; geometry остаётся source data.
+- Restricted soil виден grant holder и полностью исключён из viewer metrics/source_refs.
+- Targeted context/import regression и canonical registry validation проходят.
+
+ОГРАНИЧЕНИЯ
+
+Organizer DR-01/03 не закрыты. Нет официальной почвенной полноты, точных сетей или подтверждённых
+rule versions, поэтому текущая реальная городская карточка сохраняет unavailable/gap состояния.
+Не реализованы raster zonal statistics, buffers по нормативам и cached materialized aggregates;
+их нельзя добавлять до versioned rules/inputs и representative performance acceptance.

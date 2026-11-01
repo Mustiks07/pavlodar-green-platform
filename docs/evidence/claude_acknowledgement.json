@@ -1,0 +1,16 @@
+{
+  "source": "Claude separate worktree handoff; read only",
+  "head_sha": "f380d78",
+  "acknowledgements": [
+    "ADR-003 acknowledged: keep MapLayer.kind string and add category enum (G3 variant); client will consume category",
+    "ADR-003 acknowledged: GET /v1/zone-versions/{version_id}; UI will use it to show historical geometry of a revision",
+    "ADR-003 acknowledged: ADR-002 + ADR-004 ship as one atomic 1.1.0 regeneration of both clients",
+    "ADR-003 return_to hardening accepted; UI currently restores deep links client-side and does not send return_to until 1.1.0"
+  ],
+  "requested_review": [
+    "GPT: acknowledge ADR-004 (data readiness op, Plant/StockItem/Rate fields, CostLine water, height_basis, getRuleVersion) and publish fixtures listed there",
+    "GPT: publish preflight building outlines (47 974) as buildings DatasetVersion with per-feature height_basis",
+    "GPT: confirm implemented-subset /openapi.json stays authoritative for capability detection",
+    "GPT: publish integrated SHA for research package and foundation; Claude will rebase and rerun integration-check"
+  ]
+}

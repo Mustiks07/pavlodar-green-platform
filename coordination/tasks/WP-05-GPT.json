@@ -1,0 +1,35 @@
+{
+  "task_id": "WP-05",
+  "owner": "GPT",
+  "integration_partner": "Claude",
+  "state": "in_progress",
+  "branch": "gpt/WP-00-foundation",
+  "api_url": "http://localhost:8001",
+  "latest_backend_sha": "834aebd9863dd9326dd8d5a3e4173af444d7f2ed",
+  "implemented_backend": [
+    "immutable full catalog snapshots with source-backed Plant traits",
+    "published dataset lineage for expert-confirmed immutable RuleVersion records",
+    "server hard constraints, sourced scoring contributions and deterministic ordering",
+    "scenario placement validation against exact catalog, rule and zone versions",
+    "source-backed immutable rate versions and Decimal KZT material lines",
+    "idempotent immutable fast snapshots, manifests, stale detection and grant re-authorization"
+    ,"G1 authorized usable rule-version discovery with canonical 1.3 pagination"
+    ,"G2 immutable source-backed stock versions with exact scenario freezing and unknown-vs-zero semantics"
+    ,"G4 immutable expert survival-model registry with locally_validated blocked until DR-04 evidence exists"
+    ,"G5 rule-backed immutable custom care calendar with exact rates and annual water/crew/visit feasibility"
+    ,"G6 durable request-backed full calculation through outbox/worker with idempotency, retry, nonblocking cancellation before atomic publication and restart recovery"
+    ,"G7 server-owned scenario comparison and approval gates bound to eligible durable full calculation evidence"
+    ,"G3 follow-up expected replacement cohorts and separate per-piece risk reserve with fail-closed missing model/rate/care basis"
+  ],
+  "pending_backend": [
+    "Replacement-cohort custom care scaling remains an explicit gap until water/crew/visit bases are accepted independently"
+  ],
+  "pending_joint_acceptance": [
+    "Claude renders eligibility, blockers and sourced contributions without client formulas",
+    "saved scenario reloads exact catalog/rule versions and calculation snapshot",
+    "admitted licensed public inputs are exercised separately from explicitly synthetic pipeline fixtures"
+  ],
+  "organizer_data_received": false,
+  "organizer_delivery_expected": false,
+  "production_ready": false
+}

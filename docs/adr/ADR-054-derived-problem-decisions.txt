@@ -1,0 +1,18 @@
+ADR-054: Derived problem list and durable specialist decisions
+Status: accepted
+Date: 2026-11-01
+
+Context
+The product had a problem-zone page and canonical list/dismiss operations, but no server
+implementation. Creating unsupported heat or deficit claims would violate the data policy.
+
+Decision
+Derive problems only from current zone intersections with published restriction records that cite
+a registered rule version. Problem ids are the stable map-feature ids. Classification is a
+deterministic presentation mapping; the original restriction kind remains in the description.
+Dismissal is an immutable specialist decision with actor, reason and time, and is audited.
+
+Consequences
+Migration 0032 is required. Missing inputs remain DataGap values in zone context and are not
+promoted to rule-backed detected problems. New detections appear automatically when a restriction
+dataset or zone geometry changes; decisions remain attached to the stable source feature id.

@@ -1,0 +1,57 @@
+ADR-049: Hackathon demo data admission without silent gate bypass
+Status: accepted for implementation; no canonical contract or migration change.
+Date: 2026-10-31
+
+Context
+
+Organizer data will not be delivered. The platform still needs a populated, reproducible
+demonstration path. The available inputs are not equivalent:
+
+- output/pavlodar-public-data-v2-20261031.zip contains reproducible open geospatial data;
+- research/data/DR-02..05 and research-pavlodar-20261031 (1).zip contain useful plant,
+  vendor-price, legal and rate reference facts, but several source licenses are unknown;
+- research-pavlodar-20261031.zip contains unverifiable/example-looking records and must not
+  be admitted as product data.
+
+The current server correctly blocks publication when license is literally unknown and blocks
+planting/approval when plants, rules, models or rates have not passed their domain gates.
+Changing labels in the client must not change those server facts.
+
+Decision
+
+1. The first research-pavlodar-20261031.zip is rejected from canonical admission.
+2. Public geospatial v2 is admitted only through the existing import, validation and publish
+   operations, preserving checksums, source record ids and the working-BBOX limitation.
+3. DR-02..05 and the second research archive may feed an idempotent bootstrap only when every
+   published dataset has an explicit real reuse basis. The bootstrap must require that value;
+   it must not default unknown to a permissive string.
+4. Plants remain pending/requires_review, legal rules remain
+   verified_text_requires_expert, unresolved rates remain unresolved, and unknown supplier
+   quantities remain null. The bootstrap cannot promote any of these states.
+5. The normal product UI may keep provenance details out of the primary visual hierarchy, but
+   the server records, administrative manifests and exports remain authoritative and complete.
+6. A full click-through path beyond draft/partial calculation requires one of:
+   a) real license terms, expert decisions, accepted model/rates and a user-provided budget; or
+   b) a separately named SYNTHETIC DEMO profile whose entities cannot be confused with the
+      Pavlodar production city and cannot be used as evidence of local validity.
+7. The bootstrap must be idempotent, API-only, support a read-only --check mode, report created
+   versus reused entities, and never write directly to application tables.
+
+Consequences
+
+- Catalog, offers, rates, sources and draft scenarios can be populated honestly as soon as the
+  source reuse basis is resolved.
+- The interface can look complete without static UI mocks; all displayed values still come from
+  the server.
+- Approval, optimization, work orders and observed-outcome flows remain visibly unavailable in
+  the real Pavlodar city until their domain gates are satisfied.
+- Any hackathon-only synthetic end-to-end walkthrough is isolated by city/profile and can be
+  removed without touching real/open-data entities.
+
+Acceptance
+
+- Re-running bootstrap produces zero duplicates.
+- --check performs no mutations and reports every missing prerequisite.
+- An unknown license, pending plant, unconfirmed rule, missing model/rate or absent budget fails
+  closed with a concrete reason.
+- Viewer/specialist/admin browser checks use server entities, not client fixtures.

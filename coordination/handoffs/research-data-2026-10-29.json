@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-10-29",
+  "scope": "City of Pavlodar research staging only",
+  "requests": {
+    "DR-01": "not_found",
+    "DR-02": "partial",
+    "DR-03": "partial",
+    "DR-04": "not_found",
+    "DR-05": "partial",
+    "DR-06": "partial",
+    "DR-07": "partial"
+  },
+  "entrypoint": "research/data/README.txt",
+  "validation": "research/data/validation_report.json",
+  "acceptance_met": false,
+  "architecture_changed": false,
+  "production_changed": false,
+  "external_contacts_made": false,
+  "commits_or_pushes_made": false
+}

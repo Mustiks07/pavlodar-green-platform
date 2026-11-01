@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "mode": "read_only_plan",
+  "executed": false,
+  "database": "pavlodar",
+  "migration": "0017_map_archives",
+  "plan_format": "pavlodar-synthetic-cleanup-plan-v2",
+  "scope_sha256": "74dea3dd08fdf9e31b881452b30727d99fc87d59ba8bd5e2770c0c664e904487",
+  "counts": {
+    "datasets": 49,
+    "versions": 86,
+    "uploads": 86,
+    "map_layers": 75,
+    "import_records": 153
+  },
+  "scenario_counts": {
+    "zones": 33,
+    "zone_versions": 76,
+    "scenarios": 52,
+    "scenario_revisions": 118,
+    "jobs": 19,
+    "calculation_snapshots": 3,
+    "spatial_results": 17
+  },
+  "blockers": {
+    "address_entries": 0,
+    "rate_versions": 0,
+    "research_quality": 0,
+    "revision_datasets": 0,
+    "rule_versions": 0,
+    "staging_occurrences": 0,
+    "stock_item_versions": 0,
+    "survival_model_versions": 0,
+    "external_zone_version_revisions": 0,
+    "active_jobs": 0,
+    "uploads_using_jobs": 0
+  },
+  "reason_not_executed": "Claude WP-08 regression is complete, but destructive execution still requires explicit operator confirmation of the exact full scope SHA."
+}

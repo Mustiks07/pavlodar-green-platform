@@ -1,0 +1,5 @@
+record_id,topic,value,status,reason,source_id
+DR-03-soil_ph_ec,soil_ph_ec,null,unavailable,Есть исследование редкоземельных металлов 2023 года; нет точечных pH/EC с координатами и методом.,SOIL-NNC
+DR-03-utility_geometry,utility_geometry,null,unavailable,Открытый разрешенный к распространению слой сетей и охранных зон с точностью не получен.,PROJECT-TZ
+DR-03-building_utility_offsets,building_utility_offsets,null,unavailable,Таблица актуальных строительных отступов по классам сетей не подтверждена первичным действующим документом.,LAW-SCHOOL
+DR-03-school_hospital_plant_bans,school_hospital_plant_bans,null,unavailable,Нет проверенного полного перечня видов и условий для школ/больниц. Старые нормы не перенесены.,LAW-HEALTH

@@ -1,0 +1,493 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DR-02 research staging package",
+  "type": "object",
+  "properties": {
+    "plants.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "taxon_id",
+          "scientific_name",
+          "name_ru",
+          "rank",
+          "cultivar",
+          "local_evidence",
+          "school_hospital_status",
+          "expert_approved",
+          "source_refs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "taxon_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "scientific_name": {
+            "type": [
+              "string"
+            ]
+          },
+          "name_ru": {
+            "type": [
+              "string"
+            ]
+          },
+          "rank": {
+            "type": [
+              "string"
+            ]
+          },
+          "cultivar": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "local_evidence": {
+            "type": [
+              "string"
+            ]
+          },
+          "school_hospital_status": {
+            "type": [
+              "string"
+            ]
+          },
+          "expert_approved": {
+            "type": [
+              "boolean"
+            ]
+          },
+          "source_refs": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "Рабочий каталог кандидатов. Ни один таксон не утвержден для автоматического размещения."
+    },
+    "traits.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_id",
+          "taxon_id",
+          "trait",
+          "value",
+          "lower",
+          "upper",
+          "unit",
+          "source_id",
+          "method",
+          "applicability",
+          "reason"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "taxon_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "trait": {
+            "type": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lower": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "upper": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "applicability": {
+            "type": [
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "Числа сохранены в исходных единицах. USDA — категория, не местная температура; pH-категории не пороги исключения. null не означает отсутствие риска."
+    },
+    "stock.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stock_id",
+          "taxon_id",
+          "supplier",
+          "supplier_city",
+          "height_m",
+          "age_years",
+          "container",
+          "root_system",
+          "quantity",
+          "unit",
+          "price",
+          "currency",
+          "tax_status",
+          "checked_at",
+          "stock_count_date",
+          "availability",
+          "source_id",
+          "applicability",
+          "height_min_m",
+          "height_max_m"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "stock_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "taxon_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "supplier": {
+            "type": [
+              "string"
+            ]
+          },
+          "supplier_city": {
+            "type": [
+              "string"
+            ]
+          },
+          "height_m": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "x-unit": "m"
+          },
+          "age_years": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ],
+            "x-unit": "year"
+          },
+          "container": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "root_system": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "quantity": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "x-unit": "piece"
+          },
+          "unit": {
+            "type": [
+              "string"
+            ]
+          },
+          "price": {
+            "type": [
+              "string"
+            ],
+            "x-unit": "KZT/piece"
+          },
+          "currency": {
+            "type": [
+              "string"
+            ]
+          },
+          "tax_status": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "stock_count_date": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "availability": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "applicability": {
+            "type": [
+              "string"
+            ]
+          },
+          "height_min_m": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "m"
+          },
+          "height_max_m": {
+            "type": [
+              "number"
+            ],
+            "x-unit": "m"
+          }
+        }
+      },
+      "description": "Размер 20–40 cm переведен в 0.2–0.4 m по SI. Тот же stock_id в двух пакетах — одна запись. C3 сохранено как маркировка, возраст неизвестен."
+    },
+    "data.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_id",
+          "topic",
+          "value",
+          "status",
+          "reason",
+          "source_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "topic": {
+            "type": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": [
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "search_log.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "search_id",
+          "checked_at",
+          "query_or_access",
+          "method",
+          "result",
+          "limitation"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "search_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "query_or_access": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "result": {
+            "type": [
+              "string"
+            ]
+          },
+          "limitation": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "sources.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "title",
+          "url",
+          "publisher",
+          "checked_at",
+          "observed_at",
+          "license",
+          "method",
+          "note"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "string"
+            ]
+          },
+          "publisher": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "license": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "note": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "checked_at — дата проверки; observed_at — дата/период источника, null если не указан. unknown лицензия не разрешает перепубликацию полного текста."
+    }
+  },
+  "required": [
+    "plants.csv",
+    "traits.csv",
+    "stock.csv",
+    "data.csv",
+    "search_log.csv",
+    "sources.csv"
+  ],
+  "additionalProperties": false,
+  "x-csv": {
+    "encoding": "UTF-8",
+    "delimiter": ",",
+    "null_literal": "null",
+    "decimal_separator": ".",
+    "money": "decimal string, KZT",
+    "source_refs_separator": ";"
+  },
+  "x-crs": {
+    "GeoJSON": "EPSG:4326, [longitude,latitude]",
+    "distance_calculation": "EPSG:32643; no distances calculated here"
+  },
+  "x-import": "Staging only; map external identifiers to canonical UUIDs. No auto publish or approval."
+}

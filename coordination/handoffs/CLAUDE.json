@@ -1,0 +1,115 @@
+{
+  "agent": "Claude/GPT integration",
+  "task_id": "Final release-candidate integration and product README",
+  "base_sha": "d218128",
+  "head_sha": "c20359a",
+  "branch": "main (fast-forwarded from claude/final-integration-readme)",
+  "state": "final_release_integrated_short_acceptance_passed",
+  "changed_paths": [
+    "README.md",
+    "presentation/Pavlodar_Greening_Final.pptx",
+    "presentation/Pavlodar_Greening_Final.pdf",
+    "apps/web/src/features/map/publishedLayers.ts",
+    "apps/web/src/features/map/publishedLayers.test.ts",
+    "apps/web/src/features/map/MapWorkspace.tsx",
+    "apps/web/src/features/map/FeatureCard.tsx",
+    "apps/web/src/features/resources/ResourceList.tsx",
+    "apps/web/src/pages/lists.tsx",
+    "apps/web/src/i18n.ts",
+    "apps/web/scripts/osm-v2-check.mjs",
+    "apps/web/scripts/demo-contour-check.mjs",
+    "docs/evidence/wp03-osm-v2/**",
+    "docs/evidence/demo-contour/**"
+  ],
+  "contract_version": "1.13.0 accepted unchanged: validate passes (150 schemas, 102 operations, 53 fixtures); generated.py and the TypeScript client regenerate byte for byte; check:api passes",
+  "backend_used": "Shared API :8001 (contract 1.13.0, OSM v2 published: 60 144 public objects) through the integrated Astra/LOD Vite on :5173",
+  "implemented": [
+    "Added the final PowerPoint deck with its embedded MP4 plus a PDF fallback and placed both links at the start of README, with the video-capable PowerPoint first",
+    "Replaced assistant proposal identifiers with plant/scenario names and concise user-facing change descriptions",
+    "Replaced technical README evidence shots with reproducible live city-map and 3D captures focused on the real map stage; added an explicit bounded-AI workflow and secure operator setup for Gemini, Groq and OpenRouter",
+    "Added tools/dev/configure-llm.ps1: the key is entered through hidden input, written only to ignored local .env, never printed, and the assistant worker can be recreated with -Restart",
+    "Integrated backend polish 67bea72, Astra redesign 56b031e and OSM-v2/LOD client 8a3e3fc on main d218128 without changing canonical 1.13.0 or migrations",
+    "Added the idempotent demo bootstrap and replaced the specification-era root README with a product-first architecture, launch, operation, security and three-minute walkthrough guide using real browser evidence",
+    "Selection highlight for multi-part geometry: MapLibre reports MultiPoint/MultiLineString; the ring now covers Point and MultiPoint (a selected MultiPoint had no highlight), everything else gets the outline",
+    "Feature card shows the height row only for buildings or objects with a server height (roads and points showed 'height not given')",
+    "Program and execution empty states explain the real prerequisites (capital budget and scenarios with a full cost/care calculation; work orders only from approved scenarios, approval needs a full calculation without blocking gaps) and link to the projects page; no synthetic results",
+    "scripts/osm-v2-check.mjs and scripts/demo-contour-check.mjs: read-only live acceptance against the running API, no mocks"
+  ],
+  "tests": {
+    "final_short_acceptance": "2026-11-01: real Keycloak authorization-code/PKCE login and state-replay rejection pass; one live assistant job returns a non-empty grounded answer for the existing water-saving scenario",
+    "vitest": "69/69 on the combined release candidate",
+    "typecheck": "pass",
+    "build": "pass",
+    "contrast": "WCAG AA",
+    "check_api": "1.13.0, 150 schemas",
+    "contract_validation": "pass",
+    "generated_client_drift": "none",
+    "live_osm_v2": "Source branch acceptance is 9/9 across all eight OSM layer families including MultiLineString card/highlight/deep link. One combined-branch rerun recorded 8/9 because the shared API returned one transient 500 from listMapLayers while a Uvicorn child restarted; the user deferred the repeat and the 30-run post-LOD P-01 benchmark.",
+    "demo_contour": "22/22 on the combined Astra release candidate: 9 plants, 3 zones, 6 draft variants, partial server calculations, comparison and role-aware program/execution states",
+    "focused_release_candidate": "generated client matches canonical 1.13.0 (150 schemas); typecheck passes; 69/69 unit tests pass; production build passes"
+  },
+  "visual_review": "docs/evidence/wp03-osm-v2/*.png (road card, city centre), docs/evidence/demo-contour/*.png (catalog, zone, compare, program, execution per role)",
+  "verified_scenarios": [
+    "Viewer on the shared stand: OSM v2 roads/buildings/green/water/social layers, MultiLineString road card and highlight, deep link",
+    "Specialist/admin: demo catalog, zones, six draft variants with partial calculations, explained empty program and execution"
+  ],
+  "not_yet_verified_with_api": [
+    "Program and execution with real content: blocked by data (no capital budget, no expert-confirmed rules, no survival model, no local planting/care tariffs), not by the UI",
+    "Real-device touch/3D acceptance (no physical device attached)"
+  ],
+  "data_assumptions": [
+    "research/data read 29.10.2026 (uncommitted package); not embedded in UI. Only typed dev test fixtures labelled SYNTHETIC are used in /dev/ui",
+    "Organizer data not received; DR-01..DR-07 open",
+    "No building heights, floors-based heights, placeholder heights or eco indicators are generated by the UI; the 3D layer renders only what the server will send after 1.1.0",
+    "Organizer data not received: no claim of official boundary, network accuracy, local calibration or ecological coefficients; all browser-created datasets are labelled SYNTHETIC TEST"
+  ],
+  "breaking_changes": [],
+  "migrations": "none",
+  "acknowledgements": [
+    "ADR-003 acknowledged: keep MapLayer.kind string and add category enum (G3 variant)",
+    "ADR-003 acknowledged: GET /v1/zone-versions/{version_id}; UI will show historical geometry of a revision",
+    "ADR-003 acknowledged: ADR-002 + ADR-005 ship as one atomic 1.1.0 regeneration of both clients",
+    "ADR-003 return_to hardening accepted; UI restores deep links client-side and does not send return_to until 1.1.0",
+    "GPT ADR-005 (research staging) acknowledged: no global research-ready flag; module blockers via DataGap; source-version read endpoint welcome",
+    "GPT ADR-006 numbering accepted: Claude readiness ADR is ADR-004; earlier rename to ADR-005 reverted",
+    "GPT ADR-006 corrections 1-4 acknowledged without changes (nullable stock/rate dates + checked_at, is_local_supply boolean|null, RuleVersion.value number|boolean|null with conflict_requires_review, Plant.exclusion_basis)",
+    "GPT dependency/security changes in apps/web accepted after independent npm audit; recorded as ADR-007 (MapLibre 5.20.0 -> 6.16.0 replaces the TZ pin); Three 0.180.0 pairing to be verified first in WP-06",
+    "ADR-008 acknowledged: content_kind=mixed rendered with its applicability as composition and never presented as a ready product"
+  ],
+  "known_issues": [
+    "The demo stock dataset 'Предложения питомника БИОСАД, Павлодар (DR-02)' became a public point layer at the city reference point (stock datasets are published as map layers); the point is not the nursery's address. There is no API to hide or unpublish a layer: GPT request below",
+    "Full disposable browser regression and the official 30-cold-run post-LOD P-01 benchmark are deferred by user request and are not claimed by this handoff",
+    "Viewers see no scenarios: drafts are visible to specialists only and nothing can be approved without a full calculation"
+  ],
+  "requested_review": [
+    "GPT: do not create map layers for non-spatial kinds (stock, rates, catalog), or add an admin operation to hide/unpublish a layer; then retire the BIOSAD stock point layer",
+    "GPT: an operation for an expert to confirm a RuleVersion (reviewer, reason, audit) so placements become possible without a false status",
+    "GPT: typed non-spatial import for rule and stock records (no invented geometry)",
+    "GPT/product: StockItem cannot express 'vendor says sold out' without a stock count (not_in_stock requires a counted 0); the demo uses availability=unknown with the vendor's words in applicability",
+    "GPT/product: approval policy when survival/care modules are honestly unavailable; a real program capital budget",
+    "Final release content through c20359a was fast-forwarded to main; GitHub publication uses verified Mustiks07 credentials",
+    "Joint: run the deferred browser/performance acceptance before the final judged deployment"
+  ],
+  "next_tasks": [
+    "Deferred by user: full disposable browser matrix and 30-run production P-01 after LOD",
+    "Backend: accepted rule/budget/rate/care inputs for the complete program-to-execution journey",
+    "Real-device touch/3D acceptance when a device is available"
+  ],
+  "merged_from": "d218128",
+  "previous_head_sha": "8a3e3fc",
+  "commits": {
+    "backend_polish_merge": "850c6ea",
+    "astra_merge": "e94dfd6",
+    "osm_v2_lod_merge": "57aade5",
+    "demo_bootstrap": "5ff6898",
+    "dependency_override": "da6ef69",
+    "combined_demo_evidence": "431e8c8",
+    "product_readme_and_status": "fcdd343",
+    "multi_part_highlight": "d9d6906",
+    "osm_v2_check_and_card_height": "93033e7",
+    "empty_states": "729e26f",
+    "evidence": "3a09102",
+    "assistant_user_terms": "b4b7075",
+    "presentation": "c20359a"
+  }
+}

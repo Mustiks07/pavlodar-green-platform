@@ -1,0 +1,110 @@
+{
+  "base": "http://localhost:5173",
+  "startedAt": "2026-10-29T22:57:03.527Z",
+  "checks": [
+    {
+      "name": "production build is served (hashed /assets entry)",
+      "pass": true
+    },
+    {
+      "name": "caches: versioned shell, hashed assets and public basemap only",
+      "pass": true,
+      "detail": {
+        "names": [
+          "pg-shell-1.1.0-mvu57kql",
+          "pg-assets",
+          "pg-basemap"
+        ],
+        "assets": 11,
+        "basemap": 33
+      }
+    },
+    {
+      "name": "no platform API, session or published-layer tile is cached",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "going offline shows an explicit offline banner with the last server contact",
+      "pass": true,
+      "detail": "Нет сети Показаны данные, загруженные ранее (последний ответ сервера в 03:57). Сохранение недоступно до восстановления связи; несохранённые контуры остаются на этом устройстве."
+    },
+    {
+      "name": "footer API indicator says \"нет сети\" offline, not the last health answer",
+      "pass": true,
+      "detail": "API: нет сети\n· сборка API foundation-development"
+    },
+    {
+      "name": "data loaded earlier stays on screen offline (zones list)",
+      "pass": true,
+      "detail": {
+        "zoneCountOnline": 28
+      }
+    },
+    {
+      "name": "offline save fails fast with a network message; the contour stays as a local draft",
+      "pass": true,
+      "detail": {
+        "ms": 155,
+        "draft": true
+      }
+    },
+    {
+      "name": "cold start offline: app shell from the cache, offline banner, loading says it waits for the network",
+      "pass": true,
+      "detail": {
+        "shellUp": true,
+        "coldBanner": true,
+        "waiting": true
+      }
+    },
+    {
+      "name": "cold start offline: no API answer came from the cache",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "network back: \"connection restored\", session and map load without a reload; the offline draft is restored",
+      "pass": true,
+      "detail": {
+        "reconnected": true,
+        "mapBack": true,
+        "sessionBack": true,
+        "restored": true
+      }
+    },
+    {
+      "name": "API not answering (browser online): banner says the server does not answer, with a check button",
+      "pass": true
+    },
+    {
+      "name": "server back: banner turns to \"restored\" after \"Проверить связь\"",
+      "pass": true
+    },
+    {
+      "name": "offline banner fits a phone viewport",
+      "pass": true,
+      "detail": {
+        "x": 0,
+        "y": 48,
+        "width": 390,
+        "height": 92.375
+      }
+    },
+    {
+      "name": "no uncaught page errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp02-offline/offline-open-map.png",
+    "docs/evidence/wp02-offline/offline-save-blocked.png",
+    "docs/evidence/wp02-offline/offline-cold-start.png",
+    "docs/evidence/wp02-offline/offline-reconnected.png",
+    "docs/evidence/wp02-offline/offline-unreachable-dark.png",
+    "docs/evidence/wp02-offline/offline-mobile.png"
+  ],
+  "finishedAt": "2026-10-29T22:57:51.019Z",
+  "passed": true
+}

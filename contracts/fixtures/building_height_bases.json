@@ -1,0 +1,47 @@
+{
+  "fixture_only": true,
+  "schema": "MapFeaturePage",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; heights are not Pavlodar measurements",
+  "data": {
+    "items": [
+      {
+        "id": "00000000-0000-4000-8000-000000000501",
+        "dataset_version_id": "00000000-0000-4000-8000-000000000502",
+        "geometry": { "type": "Point", "coordinates": [76.95, 52.28] },
+        "label": "SYNTHETIC measured height",
+        "metrics": [],
+        "source_refs": [],
+        "height_m": 12.4,
+        "height_basis": "measured",
+        "floors": null,
+        "height_source_ref": null
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000503",
+        "dataset_version_id": "00000000-0000-4000-8000-000000000502",
+        "geometry": { "type": "Point", "coordinates": [76.96, 52.28] },
+        "label": "SYNTHETIC floors estimate",
+        "metrics": [],
+        "source_refs": [],
+        "height_m": 9,
+        "height_basis": "floors_estimate",
+        "floors": 3,
+        "height_source_ref": null
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000504",
+        "dataset_version_id": "00000000-0000-4000-8000-000000000502",
+        "geometry": { "type": "Point", "coordinates": [76.97, 52.28] },
+        "label": "SYNTHETIC unknown height",
+        "metrics": [],
+        "source_refs": [],
+        "height_m": null,
+        "height_basis": "unknown",
+        "floors": null,
+        "height_source_ref": null
+      }
+    ],
+    "next_cursor": null
+  }
+}

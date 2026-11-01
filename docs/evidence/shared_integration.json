@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-30",
+  "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
+  "backend_parent": "8d580e3",
+  "claude_ui_parent": "3aa23be7a1102e1595f9dff7059692475aa91524",
+  "contract_version": "1.2.0",
+  "backend_tests": {
+    "passed": 106,
+    "warnings": 23,
+    "elapsed_seconds": 74.01
+  },
+  "web_tests": {
+    "passed": 52,
+    "files": 7
+  },
+  "clean_npm_ci": "passed with npm 10.9.3 after stopping own Vite process to release Windows native module lock",
+  "checks": [
+    "Python DTO drift",
+    "TypeScript client drift (LF normalized)",
+    "TypeScript typecheck",
+    "Vite production build",
+    "Three 0.180 lazy chunk and MapLibre 6 shared-context compatibility evidence (19/19)",
+    "ruff",
+    "real OIDC restart smoke: 7 quality reads and 7 denied publication attempts",
+    "restore: 22 database fingerprints including staging, imports and map manifests; upload bytes excluded",
+    "Historical zone IDOR and immutable-payload tests",
+    "Source readiness grant filtering and explicit research-unverified states",
+    "347 specification assertions, 127 schemas, 87 canonical operations, 45 fixtures",
+    "TypeScript generated schema/types synchronized with canonical 1.1.0",
+    "Live contract 1.1 browser/API checks 15/15 after readiness backfill",
+    "Published map-layer and verified feature-card browser checks 39/39 including upload, publication, version switch, MVT authorization, getMapFeature IDOR and URL persistence",
+    "Local map-ready cold p95 2.118 s after route/chunk splitting",
+    "Authorized MVT p95 25.2 ms at concurrency 4 and 320.9 ms for a 32-request local burst after adding feature UUID properties",
+    "Canonical getMapFeature returns source lineage with dataset authorization and IDOR concealment"
+  ],
+  "dependency_audit": {
+    "before": {
+      "moderate": 1,
+      "high": 4,
+      "critical": 3
+    },
+    "after": {
+      "total": 0
+    },
+    "command": "npm --prefix apps/web audit --audit-level=moderate",
+    "upgraded": {
+      "maplibre-gl": "6.16.0",
+      "react-router": "7.18.5",
+      "@playwright/test": "1.64.1",
+      "vite": "6.4.5",
+      "vitest": "4.1.12"
+    },
+    "maplibre_advisory": "https://github.com/maplibre/maplibre-gl-js/security/advisories/GHSA-jrc7-96c5-q579",
+    "note": "Known npm advisories only; not a proof of application security"
+  },
+  "browser": {
+    "origin": "http://localhost:5175",
+    "api": "http://localhost:8001",
+    "read_only": true,
+    "session": "existing explicit synthetic test specialist; real imported research city",
+    "verified": [
+      "seven persisted source rows",
+      "selected source survives reload",
+      "original receipt source URL and needs_review version",
+      "observed date remains unknown",
+      "quality counts and publication denial",
+      "working boundary renders dashed and labelled unofficial",
+      "DR-01..07 exact content kinds and record counts; DR-06 alone is mixed",
+      "historical zone geometry survives reload and can be hidden",
+      "published MVT layers render with server legends and switch versions without reloading"
+    ],
+    "screenshots": [
+      "docs/evidence/foundation-ui/integrated-source-quality.png",
+      "docs/evidence/foundation-ui/integrated-working-map.png"
+    ],
+    "limitations": [
+      "Zone drawing, scenario revisions and paginated quality issues are integrated from Claude evidence",
+      "WP-06 foundation is software-WebGL evidence; real-device performance acceptance remains pending",
+      "No official published building layer, full calculation or product acceptance"
+    ]
+  },
+  "ci": {
+    "executed": false,
+    "reason": "GitHub account billing/spending limit prevents jobs from starting",
+    "evidence": "docs/evidence/github_ci_blocker.json"
+  },
+  "organizer_data_received": false,
+  "product_accepted": false,
+  "implementation_sha": "95e2746",
+  "typescript_sync": {
+    "state": "synchronized",
+    "canonical_sha": "2b67547",
+    "claude_code_sha": "3aa23be7a1102e1595f9dff7059692475aa91524",
+    "regeneration_sha": "bd9e6f8",
+    "check": "npm --prefix apps/web run check:api passes against canonical 1.2.0"
+  },
+  "readiness_backfill": {
+    "migration": "0007_map_layer_backfill",
+    "correction_sha": "fd5f45ea241333c9ded1aa5abb14aec05f9b9046",
+    "live_check": "15/15",
+    "organizer_data_received": false
+  },
+  "generic_import": {
+    "backend_sha": "d4beb4ae55d576900e4594c6faf6e139e5ba0ed5",
+    "live_smoke": "passed",
+    "supported": ["geojson", "csv", "kml", "shp_zip"],
+    "live_kml_shp_evidence": "docs/evidence/wp03-kml-shp-live.json",
+    "upload_bytes_restored": false,
+    "synthetic_test_input": true
+  },
+  "map_publication": {
+    "backend_sha": "618ee42b0ee5e2ac79db045db045e010418eef24",
+    "tile_delivery_sha": "3cd4c8090f0ab86848182c79a7859f5767f48708",
+    "feature_lineage_sha": "3e0cf2013d00876daed357a17c3d3a1b0441dd10",
+    "client_sha": "2c8575c076ac8ef5200c5bea9c7500400b7048db",
+    "live_smoke": "passed",
+    "browser_checks": "39/39",
+    "backfilled_current_versions": 8,
+    "backfilled_manifests": 8,
+    "mvt_bytes_in_latest_smoke": 105,
+    "authorized_tile_idor": "covered by integration test",
+    "tile_performance": {
+      "api_workers": 4,
+      "client_concurrency_cap": 4,
+      "parallel_4_p95_ms": 25.2,
+      "parallel_32_burst_p95_ms": 320.9,
+      "scope": "local Docker HTTP/1.1; not a production SLA"
+    },
+    "organizer_data_received": false
+  },
+  "map_feature_lineage": {
+    "migration": "0008_map_feature_ids",
+    "canonical_operation": "getMapFeature",
+    "mvt_property": "feature_id",
+    "source_lineage_verified": true,
+    "authorization": "dataset access policy with 403 internal-role denial and 404 IDOR concealment",
+    "invented_metrics_or_heights": false,
+    "client_sha": "2c8575c076ac8ef5200c5bea9c7500400b7048db",
+    "client_verified": "card, server geometry highlight, URL reload, stale-version 404, restricted IDOR and retry states"
+  },
+  "browser_test_isolation": {
+    "state": "implemented",
+    "sha": "73dd3420597267c4d38c74a003fe5a4b2c2552f6",
+    "database": "pavlodar_browser_test",
+    "redis_database": 9,
+    "temporary_upload_storage": true,
+    "failure_path_cleanup_verified": true,
+    "success_path_cleanup_verified": true,
+    "shared_database_counts_before_after": {
+      "datasets": [53, 53],
+      "map_layers": [73, 73]
+    },
+    "integrator_layers_check": "39/39",
+    "viewport_sources": 1,
+    "viewport_settle_ms_range": [3345, 3951],
+    "direct_parallel_32_ms": 395,
+    "browser_vite_parallel_32_ms": 22683,
+    "comparable_performance_evidence": "isolated direct API only; browser/Vite burst remains diagnostic"
+  },
+  "final_contract_1_2_integration": {
+    "merge_sha": "389a045",
+    "client_regeneration_sha": "bd9e6f8",
+    "live_integration_sha": "95e2746",
+    "database_migration": "0012_calculation_snapshots",
+    "docker_services": ["api", "worker", "dispatcher"],
+    "health": "passed on http://localhost:8001/health/ready",
+    "real_oidc": "passed through Keycloak and PostGIS",
+    "restore": "35 durable table fingerprints matched; sessions excluded",
+    "browser_checks": {
+      "placements": "22/22",
+      "scenario_and_fast_calculation": "21/21"
+    },
+    "live_imports": ["kml", "shp_zip"],
+    "fast_calculation_ui": "server snapshot displayed; no client financial/survival/care formulas",
+    "dependency_audits": "npm and Python: 0 known vulnerabilities",
+    "organizer_data_received": false,
+    "product_accepted": false
+  }
+}

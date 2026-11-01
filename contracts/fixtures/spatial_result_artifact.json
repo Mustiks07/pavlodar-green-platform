@@ -1,0 +1,51 @@
+{
+  "schema": "SpatialResultArtifact",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Synthetic contract fixture for the immutable shadow display artifact",
+  "data": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "shadow",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [76.98, 52.28],
+              [76.981, 52.28],
+              [76.981, 52.281],
+              [76.98, 52.281],
+              [76.98, 52.28]
+            ]
+          ]
+        },
+        "properties": { "role": "shadow" }
+      }
+    ],
+    "metadata": {
+      "method_version": "shadow-analytic-1",
+      "datetime": "2026-06-21T11:52:00+05:00",
+      "geometry_mode": "estimated_preview",
+      "sun": {
+        "elevation_deg": 58.2,
+        "azimuth_deg": 181.4
+      },
+      "crs_of_grid": "EPSG:32643",
+      "grid": {
+        "origin": [497000.0, 5793000.0],
+        "resolution_m": 1.0,
+        "rows": 2,
+        "cols": 2,
+        "ground_cells": 4,
+        "shaded_cells": 2
+      },
+      "grid_values": [[1, 1], [0, 0]],
+      "zone_area_m2": 4.0,
+      "open_ground_m2": 4.0,
+      "used_buildings": 1,
+      "used_trees": 0
+    }
+  }
+}

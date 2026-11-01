@@ -1,0 +1,37 @@
+ADR-033 Локальное восстановление БД и файловых артефактов
+Статус: accepted by GPT for the local Compose environment.
+Дата: 2026-10-30. Основа: ADR-026/030/031/032, migration 0017.
+
+ПРОБЛЕМА
+
+Один pg_dump доказывал восстановимость метаданных, но не байтов загрузок и PMTiles.
+После восстановления БД могла ссылаться на отсутствующий либо повреждённый файл. Считать
+такую проверку готовностью восстановления нельзя.
+
+РЕШЕНИЕ
+
+`python -m tools.dev.restore_check` теперь создаёт три независимых локальных артефакта:
+
+- custom-format PostgreSQL dump без web_sessions/login_states;
+- gzip tar загрузок из `/var/lib/pavlodar/uploads`;
+- gzip tar PMTiles из `/var/lib/pavlodar/tiles`.
+
+Источник файлов — worker Compose-контейнер, где оба volume доступны даже во время временной
+остановки API браузерным harness. `.part` и `.synthetic-trash` не входят в backup. БД всегда
+восстанавливается в новый `pavlodar_restore_*`, а файловые архивы — в временные каталоги через
+безопасный tar filter. Затем каждая строка `uploads` в состояниях stored/consumed и каждая строка
+`map_archive_artifacts` проверяется по ожидаемому storage key, размеру и SHA-256. Любое
+расхождение завершает check ошибкой.
+
+ПРОВЕРКА
+
+На migration 0017 совпали fingerprints всех 39 таблиц. Восстановлены и проверены 96 из 96
+upload-файлов. PMTiles-файлов проверено 0, что соответствует пустому registry в общей dev-БД;
+путь для непустого registry использует ту же строгую проверку. Evidence:
+`docs/evidence/foundation_restore.json`.
+
+ГРАНИЦЫ
+
+Это проверка только локального Compose и не production disaster-recovery. Она не реализует
+WAL/PITR, удалённое versioned object storage, шифрование/ротацию backup, cross-host restore,
+автоматическое расписание, RPO/RTO или учения восстановления. Эти пункты остаются в WP-11.

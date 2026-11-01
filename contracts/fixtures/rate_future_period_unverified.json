@@ -1,0 +1,24 @@
+{
+  "fixture_only": true,
+  "schema": "Rate",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; not an official Pavlodar rate",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000401",
+    "version_id": "00000000-0000-4000-8000-000000000402",
+    "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+    "category": "watering",
+    "unit": "m3",
+    "unit_price": "1000.00",
+    "currency": "KZT",
+    "valid_from": "2027-01-01",
+    "tax_mode": "unknown",
+    "source_refs": [],
+    "valid_to": null,
+    "price_observed_at": "2026-10-29",
+    "checked_at": "2026-10-29",
+    "applicability_status": "future",
+    "included": null,
+    "excluded": null
+  }
+}

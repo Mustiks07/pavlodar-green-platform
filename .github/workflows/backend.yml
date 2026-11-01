@@ -1,0 +1,47 @@
+name: Backend foundation
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.20.0
+      - run: npm --prefix apps/web ci --ignore-scripts
+      - run: npm --prefix apps/web run check:api
+      - run: npm --prefix apps/web run typecheck
+      - run: npm --prefix apps/web test
+      - run: npm --prefix apps/web run build
+      - run: npm --prefix apps/web audit --audit-level=moderate
+  foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Pinned runtime and dependencies
+        run: |
+          pipx install uv==0.8.17
+          uv python install 3.12.11
+          uv sync --locked
+      - name: Canonical schemas and generated DTO drift
+        run: |
+          uv run python tools/spec/validate.py
+          uv run python tools/contracts/generate.py
+          git diff --exit-code -- packages/domain/generated.py
+      - name: Isolated test infrastructure
+        run: |
+          uv run python tools/dev/bootstrap.py
+          docker compose --env-file .env -f infra/compose.yml up -d db redis --wait
+          uv run alembic upgrade head
+      - name: Foundation security, persistence and queue tests
+        run: uv run pytest -q --junitxml=.local/pytest.xml
+      - name: Dependency security audit
+        run: uv run pip-audit
+      - name: Check whitespace and merge markers
+        run: |
+          git diff --check
+          uv run python tools/security/check.py

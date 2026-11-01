@@ -1,0 +1,34 @@
+{
+  "task_id": "WP-00",
+  "owner": "GPT",
+  "state": "review_pending",
+  "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
+  "branch": "gpt/WP-00-foundation",
+  "worktree": "team-vtiposhnik-gpt",
+  "initial_worktree_clean": true,
+  "origin": "https://github.com/AIFESTHackathon2026/team-vtiposhnik.git",
+  "github_connector_identity": {
+    "login": "Mustiks07",
+    "id": 232028042
+  },
+  "git_credential_identity": {
+    "login": "Mustiks07",
+    "id": 232028042
+  },
+  "claude_base_sha_observed": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
+  "claude_identity_independently_verified": false,
+  "contract_version": "1.0.0",
+  "notes": [
+    "main remains README-only; shared specification commit is implementation baseline",
+    "Root manifests and canonical contracts are owned by GPT; frontend-owned manifests/client by Claude"
+  ],
+  "runtime": {
+    "python": "3.12.11",
+    "node": "22.20.0",
+    "uv_lock_generator": "0.8.17"
+  },
+  "evidence": [
+    "docs/evidence/foundation_oidc.json",
+    "docs/evidence/foundation-ui/sources.png"
+  ]
+}

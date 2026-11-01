@@ -1,0 +1,349 @@
+{
+  "base": "http://localhost:5173",
+  "browser": "chromium 156.0.4314.42",
+  "startedAt": "2026-10-29T20:58:37.610Z",
+  "shots": [
+    "docs/evidence/wp02/map-desktop-1440.png",
+    "docs/evidence/wp02/problems-desktop-1440.png",
+    "docs/evidence/wp02/catalog-desktop-1440.png",
+    "docs/evidence/wp02/compare-desktop-1440.png",
+    "docs/evidence/wp02/notfound-desktop-1440.png",
+    "docs/evidence/wp02/gallery-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-states-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-errors-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-data-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-progress-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-legend-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-table-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-ready-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-catalog-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-cost-desktop-1440.png",
+    "docs/evidence/wp02/gallery-g-height-desktop-1440.png",
+    "docs/evidence/wp02/map-desktop-1920.png",
+    "docs/evidence/wp02/problems-desktop-1920.png",
+    "docs/evidence/wp02/catalog-desktop-1920.png",
+    "docs/evidence/wp02/compare-desktop-1920.png",
+    "docs/evidence/wp02/notfound-desktop-1920.png",
+    "docs/evidence/wp02/gallery-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-states-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-errors-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-data-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-progress-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-legend-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-table-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-ready-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-catalog-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-cost-desktop-1920.png",
+    "docs/evidence/wp02/gallery-g-height-desktop-1920.png",
+    "docs/evidence/wp02/map-tablet-1024.png",
+    "docs/evidence/wp02/problems-tablet-1024.png",
+    "docs/evidence/wp02/catalog-tablet-1024.png",
+    "docs/evidence/wp02/compare-tablet-1024.png",
+    "docs/evidence/wp02/notfound-tablet-1024.png",
+    "docs/evidence/wp02/gallery-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-states-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-errors-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-data-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-progress-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-legend-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-table-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-ready-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-catalog-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-cost-tablet-1024.png",
+    "docs/evidence/wp02/gallery-g-height-tablet-1024.png",
+    "docs/evidence/wp02/map-mobile-390.png",
+    "docs/evidence/wp02/problems-mobile-390.png",
+    "docs/evidence/wp02/catalog-mobile-390.png",
+    "docs/evidence/wp02/compare-mobile-390.png",
+    "docs/evidence/wp02/notfound-mobile-390.png",
+    "docs/evidence/wp02/gallery-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-states-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-errors-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-data-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-progress-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-legend-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-table-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-ready-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-catalog-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-cost-mobile-390.png",
+    "docs/evidence/wp02/gallery-g-height-mobile-390.png",
+    "docs/evidence/wp02/map-mobile-390-nav-open.png",
+    "docs/evidence/wp02/map-desktop-1440-dark.png",
+    "docs/evidence/wp02/gallery-desktop-1440-dark.png",
+    "docs/evidence/wp02/gallery-g-states-desktop-1440-dark.png",
+    "docs/evidence/wp02/gallery-g-data-desktop-1440-dark.png",
+    "docs/evidence/wp02/problems-desktop-1440-unauthenticated.png",
+    "docs/evidence/wp02/problems-desktop-1440-forbidden.png",
+    "docs/evidence/wp02/gallery-table-keyboard-desktop-1440.png",
+    "docs/evidence/wp02/gallery-assistant-panel-desktop-1440.png"
+  ],
+  "checks": [
+    {
+      "name": "desktop-1440 map: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1440 problems: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1440 catalog: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1440 compare: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1440 notfound: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1440 gallery: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1440: no uncaught console errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "desktop-1920 map: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1920 problems: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1920 catalog: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1920 compare: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1920 notfound: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1920 gallery: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "desktop-1920: no uncaught console errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "tablet-1024 map: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "tablet-1024 problems: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "tablet-1024 catalog: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "tablet-1024 compare: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "tablet-1024 notfound: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "tablet-1024 gallery: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "tablet-1024: no uncaught console errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "mobile-390 map: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "mobile-390 problems: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "mobile-390 catalog: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "mobile-390 compare: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "mobile-390 notfound: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "mobile-390 gallery: no horizontal page scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    },
+    {
+      "name": "mobile drawer closes on Escape",
+      "pass": true
+    },
+    {
+      "name": "mobile-390: no uncaught console errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "reduced motion zeroes transition tokens",
+      "pass": true,
+      "detail": {
+        "--pg-dur": "0ms"
+      }
+    },
+    {
+      "name": "unauthenticated state rendered for HTTP 401",
+      "pass": true
+    },
+    {
+      "name": "deep-link filter kept in URL while signed out",
+      "pass": true,
+      "detail": {
+        "url": "http://localhost:5173/problems?severity=high"
+      }
+    },
+    {
+      "name": "forbidden state rendered for HTTP 403",
+      "pass": true
+    },
+    {
+      "name": "first Tab lands on skip link",
+      "pass": true,
+      "detail": {
+        "first": "Перейти к содержимому"
+      }
+    },
+    {
+      "name": "skip link moves focus to main",
+      "pass": true,
+      "detail": {
+        "focusedMain": "main"
+      }
+    },
+    {
+      "name": "table: arrows + Enter select row",
+      "pass": true,
+      "detail": {
+        "selected": "row-005"
+      }
+    },
+    {
+      "name": "table: End reaches last of 400 windowed rows",
+      "pass": true,
+      "detail": {
+        "lastFocused": "row-400"
+      }
+    },
+    {
+      "name": "table: windowing renders a subset of rows",
+      "pass": true,
+      "detail": {
+        "rendered": 18
+      }
+    },
+    {
+      "name": "panel: keyboard resize changes width",
+      "pass": true,
+      "detail": {
+        "before": 360,
+        "after": 392
+      }
+    },
+    {
+      "name": "panel: collapse button closes panel",
+      "pass": true
+    },
+    {
+      "name": "dialog opens and closes with Escape",
+      "pass": true
+    }
+  ],
+  "finishedAt": "2026-10-29T21:01:17.577Z",
+  "passed": true
+}

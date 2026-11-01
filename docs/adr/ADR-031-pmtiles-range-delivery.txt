@@ -1,0 +1,62 @@
+ADR-031 Неизменяемый реестр PMTiles и авторизованная Range-выдача
+Статус: accepted by GPT (canonical contracts/migrations owner); client handler pending Claude.
+Дата: 2026-10-30. Основа: ADR-016, canonical 1.4.0, migration 0016.
+
+ПРОБЛЕМА
+
+ADR-016 создавал и проверял настоящий PMTiles v3, но файл не имел canonical registry,
+HTTP Range endpoint и согласованного способа появления в MapLayer. Переключать source_type без
+этого означало бы опубликовать несуществующий источник. Нельзя также превращать internal или
+restricted набор в скачиваемый архив: это обходит пообъектную авторизацию и опасно для offline cache.
+
+РЕШЕНИЕ
+
+1. Migration 0017_map_archives добавляет map_archive_artifacts. Каждая строка однозначно связана
+   с immutable MapLayer и DatasetVersion, содержит относительный storage_key, SHA-256, byte_size,
+   число фактических/candidate tiles и точный zoom range. UPDATE/DELETE запрещены DB trigger.
+2. register_archive строит архив только для current published public Dataset, проверяет PMTiles v3
+   официальным reader, атомарно переименовывает файл и затем flush-ит registry row. Повтор той же
+   конфигурации идемпотентен; другой zoom range конфликтует. Произвольный выход storage_key за
+   PAVLODAR_TILE_ROOT запрещён.
+3. Canonical 1.5.0 добавляет GET /v1/map/archives/{layer_id}.pmtiles (getMapArchive). Endpoint:
+   - повторно проверяет session, city grant, public access, current publication и registry/version;
+   - поддерживает полный 200, один RFC byte range 206, suffix/open-ended range, ETag/304 и If-Range;
+   - отклоняет несколько, пустой или выходящий за EOF диапазон как 416 Problem с Content-Range;
+   - отвечает application/vnd.pmtiles, Accept-Ranges: bytes и private immutable browser cache;
+   - отдаёт 503, если immutable registry есть, но volume bytes отсутствуют или не совпадает размер.
+4. listMapLayers динамически сообщает source_type=pmtiles и archive URL только при существующем
+   registry row публичного слоя. Immutable MapLayer.payload не переписывается. Protected layers
+   и слои без архива остаются canonical dynamic MVT.
+5. Реальные слои Павлодара пока не промотируются: Claude должен сначала подключить PMTiles protocol
+   handler и пройти browser acceptance. Поэтому существующая карта продолжает работать через MVT.
+
+ВОССТАНОВЛЕНИЕ И ХРАНЕНИЕ
+
+39-table restore сравнивает registry row, но tile-volume bytes намеренно остаются отдельной частью
+WP-11. Registry без bytes не выдаёт неверный пустой файл: endpoint возвращает 503. Production
+object storage/CDN adapter и восстановление tile volume остаются открытыми; локальная Compose-среда
+использует отдельный tile_data volume. Disposable browser harness теперь выделяет и удаляет также
+отдельный tile root, поэтому smoke не оставляет артефакты в shared среде.
+
+ПРОВЕРКА
+
+- Unit/integration: builder детерминирован, archive tile равен dynamic authorized MVT; protected
+  build запрещён; registry immutable; manifest промотируется только после registry.
+- HTTP: full 200, bytes=0-126 и suffix 206, If-Range fallback 200, ETag 304, EOF 416,
+  outsider 404 и anonymous 401.
+- Disposable real OIDC/import/outbox/Celery/publication/registry/Range smoke прошёл; вход явно
+  SYNTHETIC TEST, shared database не изменена, временные upload/tile directories удалены.
+
+СОВМЕСТИМОСТЬ
+
+Изменение additive, но strict clients должны быть атомарно регенерированы из canonical 1.5.0.
+MapLayer schema уже разрешал source_type=pmtiles. Единственная новая операция binary Range delivery.
+До поддержки 1.5.0 клиентом реальные manifests остаются mvt.
+
+ОГРАНИЧЕНИЯ
+
+- Multi-range/multipart responses не реализуются: библиотеке PMTiles достаточно одиночных ranges.
+- Cache остаётся private из-за обязательной платформенной session/city authorization.
+- Registry хранит checksum, но production tamper detection/object-store immutability и CDN policy
+  требуют WP-11; локальный endpoint сверяет зарегистрированный размер и безопасный путь.
+- Representative large-layer browser benchmark выполняется совместно после Claude protocol handler.

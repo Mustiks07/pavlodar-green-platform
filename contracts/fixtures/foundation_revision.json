@@ -1,0 +1,32 @@
+{
+  "fixture_only": true,
+  "schema": "ScenarioRevision",
+  "expected_valid": true,
+  "origin": "Captured from running API with explicit synthetic test profile; not organizer data",
+  "data": {
+    "id": "17f4fe8e-5472-4ce9-8cce-205e7f5d5d01",
+    "comment": "SYNTHETIC TEST empty draft",
+    "created_at": "2026-10-29T12:39:25.566793Z",
+    "input_hash": "7544c40ad5d10b36660676583acb614981d80a89a99b88afc0d216dd2f25aab9",
+    "placements": [],
+    "scenario_id": "a753dfec-e0d1-4386-bb5b-e6fc1b80ff09",
+    "area_patches": [],
+    "care_strategy": "standard",
+    "capital_budget": null,
+    "diversity_caps": [],
+    "rate_version_id": null,
+    "rate_version_ids": [],
+    "resource_limits": [],
+    "rule_version_id": null,
+    "zone_version_id": "bface4c4-a4fd-4822-92e8-3f3723611e46",
+    "model_version_id": null,
+    "synthetic_inputs": true,
+    "care_horizon_years": 3,
+    "catalog_version_id": null,
+    "excluded_plant_ids": [],
+    "parent_revision_id": null,
+    "dataset_version_ids": [],
+    "coefficient_version_id": null,
+    "custom_care_operations": []
+  }
+}

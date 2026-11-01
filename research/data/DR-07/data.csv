@@ -1,0 +1,6 @@
+record_id,topic,value,status,reason,source_id
+DR-07-hosting,hosting,null,unavailable,Требуется ответ владельца/организаторов; поиском не устанавливается.,PROJECT-TZ
+DR-07-cloud_llm_permission,cloud_llm_permission,null,unavailable,Требуется ответ владельца/организаторов; поиском не устанавливается.,PROJECT-TZ
+DR-07-api_budget,api_budget,null,unavailable,Требуется ответ владельца/организаторов; поиском не устанавливается.,PROJECT-TZ
+DR-07-acceptance_hardware,acceptance_hardware,null,unavailable,Требуется ответ владельца/организаторов; поиском не устанавливается.,PROJECT-TZ
+DR-07-operator_backup_owner,operator_backup_owner,null,unavailable,Требуется ответ владельца/организаторов; поиском не устанавливается.,PROJECT-TZ

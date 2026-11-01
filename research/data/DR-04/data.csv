@@ -1,0 +1,3 @@
+record_id,topic,value,status,reason,source_id
+DR-04-longitudinal_dataset,longitudinal_dataset,null,unavailable,"Связанная открытая выборка исходных когорт, осмотров, ухода и замен в перечисленных проверках не найдена. Это ограниченный результат поиска, не подтверждение несуществования данных.",GREENPVL
+DR-04-absence_certification,absence_certification,null,unavailable,Официального подтверждения отсутствия открытой выборки не получено; обращения не разрешены поручением.,PROJECT-TZ

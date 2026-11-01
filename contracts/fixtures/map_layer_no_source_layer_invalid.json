@@ -1,0 +1,33 @@
+{
+  "fixture_only": true,
+  "schema": "MapLayer",
+  "expected_valid": false,
+  "origin": "Negative fixture: a vector layer cannot omit its tile source-layer name",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000721",
+    "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+    "dataset_id": "00000000-0000-4000-8000-000000000720",
+    "name": "SYNTHETIC invalid vector layer",
+    "kind": "fixture_invalid",
+    "source_type": "mvt",
+    "source_url": "/tiles/synthetic/{z}/{x}/{y}.pbf",
+    "dataset_version_id": "00000000-0000-4000-8000-000000000722",
+    "min_zoom": 8,
+    "max_zoom": 18,
+    "attribution": "SYNTHETIC fixture",
+    "access_level": "internal",
+    "observed_at": null,
+    "category": "building",
+    "source_layer": null,
+    "geometry_type": "polygon",
+    "is_stale": false,
+    "legend": {
+      "mode": "single",
+      "property": null,
+      "unit": null,
+      "period": null,
+      "classes": [],
+      "unknown_class_key": null
+    }
+  }
+}

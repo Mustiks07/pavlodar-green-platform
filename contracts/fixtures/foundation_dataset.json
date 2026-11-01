@@ -1,0 +1,18 @@
+{
+  "fixture_only": true,
+  "schema": "Dataset",
+  "expected_valid": true,
+  "origin": "Captured from running API with explicit synthetic test profile; not organizer data",
+  "data": {
+    "id": "d52d105e-c59b-4c6c-81c8-5de6b7e8af18",
+    "city_id": "10000000-0000-4000-8000-000000000001",
+    "name": "SYNTHETIC TEST source registry",
+    "kind": "zones",
+    "owner": "Synthetic integration test",
+    "license": "CC0-1.0",
+    "access_level": "public",
+    "source_uri": null,
+    "current_version_id": null,
+    "created_at": "2026-10-29T12:39:25.303726Z"
+  }
+}

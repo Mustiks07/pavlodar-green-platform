@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "scope": "Viewer-visible map manifests, MVT and canonical feature cards",
+  "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "dataset_count": 5,
+  "map_layer_count": 6,
+  "record_count": 8735,
+  "results": [
+    {
+      "profile": "roads",
+      "dataset_version_id": "496c5e60-704c-44cd-82e3-e09f56c0ead1",
+      "map_layer_count": 1,
+      "sample_mvt_bytes": 32244,
+      "sample_tile": [
+        14,
+        11693,
+        5389
+      ],
+      "map_feature_id": "609a8e21-9735-f381-61e7-fbf570da14dd"
+    },
+    {
+      "profile": "green",
+      "dataset_version_id": "9f244564-f6dc-400f-8c37-321da755db88",
+      "map_layer_count": 1,
+      "sample_mvt_bytes": 357,
+      "sample_tile": [
+        14,
+        11692,
+        5397
+      ],
+      "map_feature_id": "f65292e3-f00f-1dde-f586-5b6746c061f3"
+    },
+    {
+      "profile": "trees",
+      "dataset_version_id": "5afcc5cb-e722-43b0-ad62-90c49998e634",
+      "map_layer_count": 1,
+      "sample_mvt_bytes": 240,
+      "sample_tile": [
+        14,
+        11693,
+        5390
+      ],
+      "map_feature_id": "defdaa7a-c943-c3b7-4b9a-c138fc5a714a"
+    },
+    {
+      "profile": "water",
+      "dataset_version_id": "d5b298e4-d239-4ff5-9d7b-dfa6f91237e9",
+      "map_layer_count": 2,
+      "sample_mvt_bytes": 853,
+      "sample_tile": [
+        14,
+        11691,
+        5392
+      ],
+      "map_feature_id": "453e4851-b57a-d56b-74eb-82d43b6c988a"
+    },
+    {
+      "profile": "buildings",
+      "dataset_version_id": "786ee7ef-a309-4ea7-a678-d49a07e5ccf1",
+      "map_layer_count": 1,
+      "sample_mvt_bytes": 4522,
+      "sample_tile": [
+        14,
+        11694,
+        5390
+      ],
+      "map_feature_id": "08e7649b-6cc1-36a5-2ef9-3449f297865f",
+      "height_m": 10.0,
+      "height_basis": "recorded_unverified"
+    }
+  ]
+}

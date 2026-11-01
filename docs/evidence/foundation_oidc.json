@@ -1,0 +1,8 @@
+{
+  "scope": "Real HTTP API + Keycloak + PostGIS, explicitly synthetic inputs",
+  "passed": true,
+  "oidc_pkce_state_replay_checked": true,
+  "scenario_id": "94353435-0b66-4074-a57a-d0e808a4dd34",
+  "revision_id": "a0c59621-87e0-4485-8edf-f397b763ab07",
+  "organizer_data_received": false
+}

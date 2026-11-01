@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "scope": "Local Docker HTTP/1.1, real OIDC session and authorized empty/non-empty MVT requests; not a production SLA",
+  "api_workers": 4,
+  "client_concurrency_cap": 4,
+  "parallel_4": {
+    "runs_ms": [
+      21.7,
+      22.0,
+      22.6,
+      22.5,
+      23.9,
+      24.7,
+      25.2
+    ],
+    "p50_ms": 22.6,
+    "p95_ms": 25.2,
+    "max_ms": 25.2
+  },
+  "parallel_32_burst": {
+    "runs_ms": [
+      282.5,
+      225.2,
+      320.9,
+      256.3,
+      233.5
+    ],
+    "p50_ms": 256.3,
+    "p95_ms": 320.9,
+    "max_ms": 320.9
+  },
+  "organizer_data_received": false
+}

@@ -1,0 +1,13 @@
+{
+  "fixture_only": true,
+  "schema": "Point",
+  "expected_valid": false,
+  "data": {
+    "type": "Point",
+    "coordinates": [
+      76.967,
+      52.287,
+      100
+    ]
+  }
+}

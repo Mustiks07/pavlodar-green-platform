@@ -1,0 +1,267 @@
+{
+  "version": "1.1.0",
+  "organizer_data_received": false,
+  "organizer_delivery_expected": false,
+  "organizer_delivery_status": "User confirmed on 2026-10-30 that organizer data will not be supplied. Requests remain open as unmet evidence gates; implementation continues with licensed public inputs and explicitly labelled SYNTHETIC TEST fixtures.",
+  "presentation_policy": "Admitted licensed public/research sources are used in the working product. Primary map, 3D, feature and scenario screens omit unverified/source labels. Provenance remains in API manifests and the administrative data view; blocking gaps remain visible only where safety, approval or authoritative calculations depend on them. Synthetic fixtures remain test-only.",
+  "requests": [
+    {
+      "id": "DR-01",
+      "title": "Граница и исходные слои организаторов",
+      "priority": "P0",
+      "required": [
+        "Городская граница и границы рабочих зон с CRS/назначением",
+        "Карта почв, зелени, каталог и городская основа",
+        "Описание полей, дат, точности, прав и контакта владельца"
+      ],
+      "deliverables": [
+        "GeoJSON/GPKG/SHP zip либо исходный формат + mapping",
+        "README набора, metadata.json, небольшой sample"
+      ],
+      "acceptance": "Официальный контур отделён от OSM; наборы покрывают город, лицензия и CRS известны",
+      "blocks": "Точность городского scope и AC-18 на данных организатора",
+      "fallback": "Открытая OSM-основа с working boundary и маркированными fixtures",
+      "source_owner": "Организаторы / владелец данных",
+      "status": "not_found",
+      "research_checked_at": "2026-10-29",
+      "research_evidence": [
+        "research/data/DR-01/README.txt",
+        "research/data/DR-01/sources.csv",
+        "research/data/DR-01/quality.json",
+        "research/data/DR-01/expert_questions.txt"
+      ],
+      "remaining_gaps": [
+        "Официальное покрытие города неизвестно; рабочий контур не прошел приемку."
+      ],
+      "acceptance_met": false
+    },
+    {
+      "id": "DR-02",
+      "title": "Локальный каталог безопасность и доступность",
+      "priority": "P0",
+      "required": [
+        "Виды/сорта для Павлодара, климат/почва/свет/ветер",
+        "Аллергенность/ядовитость и применимость к школам/больницам",
+        "Рост/крона/корни, сезонный уход, размеры саженцев и наличие"
+      ],
+      "deliverables": [
+        "plants.csv с taxon_id и source_refs",
+        "traits.csv с единицами/диапазонами/unknown",
+        "stock.csv с датой и размером; экспертное заключение"
+      ],
+      "acceptance": "Каждый критичный признак имеет источник; список review/excluded проверен специалистом",
+      "blocks": "Подтверждённый автоматический подбор и approved проект",
+      "fallback": "Неоткалиброванный каталог для разработки с явными неизвестными",
+      "source_owner": "Ботанический/агрономический эксперт и разрешённые открытые каталоги",
+      "status": "partial",
+      "research_checked_at": "2026-10-29",
+      "research_evidence": [
+        "research/data/DR-02/README.txt",
+        "research/data/DR-02/sources.csv",
+        "research/data/DR-02/quality.json",
+        "research/data/DR-02/expert_questions.txt"
+      ],
+      "remaining_gaps": [
+        "Нет местной экспертной подписи, сортов и полных медицинских/корневых характеристик.",
+        "Складские данные — дата проверки сайта, не дата инвентаризации."
+      ],
+      "acceptance_met": false
+    },
+    {
+      "id": "DR-03",
+      "title": "Почвы сети и действующие ограничения",
+      "priority": "P0",
+      "required": [
+        "Пробы почвы с глубиной, датой, pH/EC/методом",
+        "Сети/охранные зоны и точность геометрии",
+        "Актуальные местные/республиканские нормы и конкретные отступы с применимостью"
+      ],
+      "deliverables": [
+        "soil_observations.csv + GeoJSON",
+        "restrictions.geojson с access_level",
+        "rules.csv: пункт, редакция, дата, единицы, applicability, источник"
+      ],
+      "acceptance": "Не смешаны пересчёты EC/солей и глубины; нормы подтверждены; restricted данные защищены",
+      "blocks": "Точные разрешённые посадочные места и нормативное утверждение",
+      "fallback": "Предварительная расстановка требует обследования; SoilGrids только контекст",
+      "source_owner": "Организатор/эксперт; правовые первоисточники",
+      "status": "partial",
+      "research_checked_at": "2026-10-29",
+      "research_evidence": [
+        "research/data/DR-03/README.txt",
+        "research/data/DR-03/sources.csv",
+        "research/data/DR-03/quality.json",
+        "research/data/DR-03/expert_questions.txt"
+      ],
+      "remaining_gaps": [
+        "Нормы не исчерпывающие; сроки ухода требуют толкования.",
+        "Нет открытого слоя сетей и точечных почвенных pH/EC; нельзя считать пустой слой разрешением на посадку."
+      ],
+      "acceptance_met": false
+    },
+    {
+      "id": "DR-04",
+      "title": "Исходы посадок и проверка survival",
+      "priority": "P0",
+      "required": [
+        "Даты/вид/размер/участок посадок",
+        "Датированные осмотры жив/погиб/неизвестно",
+        "Фактический уход/полив и замены",
+        "Ответственный эксперт и протокол подтверждения"
+      ],
+      "deliverables": [
+        "cohorts.csv",
+        "observations.csv",
+        "care_actual.csv",
+        "validation_protocol.txt"
+      ],
+      "acceptance": "Нет подмены исходной когорты заменами; неизвестные исходы сохранены; независимый validation split",
+      "blocks": "Заявления о локальной точности survival",
+      "fallback": "Expert rules с явной uncalibrated меткой; синтетика только pipeline/test",
+      "source_owner": "Организатор/служба озеленения/эксперт",
+      "status": "not_found",
+      "research_checked_at": "2026-10-29",
+      "research_evidence": [
+        "research/data/DR-04/README.txt",
+        "research/data/DR-04/sources.csv",
+        "research/data/DR-04/quality.json",
+        "research/data/DR-04/expert_questions.txt"
+      ],
+      "remaining_gaps": [
+        "0 исходных когорт,0 осмотров,0 записей фактического ухода.",
+        "Нет официального подтверждения отсутствия открытой выборки; только ограниченный поисковый отчет."
+      ],
+      "acceptance_met": false
+    },
+    {
+      "id": "DR-05",
+      "title": "Расценки вода и бригады",
+      "priority": "P0",
+      "required": [
+        "Ставки материала/работ/грунта/доставки/ухода/воды",
+        "Дата, валюта, единицы, налоги и состав",
+        "Бюджет по годам/месяцам, вода, выезды, рабочие часы"
+      ],
+      "deliverables": [
+        "rates.csv",
+        "resources.csv",
+        "stock.csv",
+        "pricing_assumptions.txt"
+      ],
+      "acceptance": "Не смешаны саженцы разных размеров, цена покупки и цена с посадкой; лимиты выполнимы",
+      "blocks": "Фактическая смета и осуществимость программы",
+      "fallback": "Known subtotal + missing rates; отдельно отмеченный сценарный бюджет",
+      "source_owner": "Организатор и официальные прайсы/контракты с правом использования",
+      "status": "partial",
+      "research_checked_at": "2026-10-29",
+      "research_evidence": [
+        "research/data/DR-05/README.txt",
+        "research/data/DR-05/sources.csv",
+        "research/data/DR-05/quality.json",
+        "research/data/DR-05/expert_questions.txt"
+      ],
+      "remaining_gaps": [
+        "Состав работ и налоги питомников неизвестны; нет полной сметы.",
+        "Текущее действие водных ставок после возможных компенсирующих изменений не разрешено."
+      ],
+      "acceptance_met": false
+    },
+    {
+      "id": "DR-06",
+      "title": "Высоты климат и экологические модели",
+      "priority": "P1",
+      "required": [
+        "Официальные либо лицензионно разрешённые контуры зданий с высотой/этажностью и достоверностью каждого признака",
+        "Основание доступа к данным акимата/госоргана/2ГИС: договор, лицензия и разрешение на хранение и производные слои; автоматическое извлечение из публичной карты не допускается",
+        "Погода/радиация/ветер/осадки/ET0 и локальные температуры",
+        "Летние снимки и классификация зелени с quality report",
+        "Локальные или переносимые коэффициенты роста/CO2/пыли/воды с пределами применимости"
+      ],
+      "deliverables": [
+        "buildings.geojson + height_basis (measured/recorded_unverified/floors_estimate/unknown), source_record_id и observed_at",
+        "rights_statement.txt: владелец, лицензия/договор, разрешённые способы использования, публикации и хранения",
+        "GeoTIFF/COG с CRS/resolution",
+        "weather.csv с UTC/единицами",
+        "coefficients.csv и calibration_report.txt"
+      ],
+      "acceptance": "Пространственное/временное разрешение известно, маски облаков проверены, ground truth или границы неопределённости указаны",
+      "blocks": "Точные тени/микроклимат и локально подтверждённый eco effect",
+      "fallback": "Обзорная 3D по footprint; высота unknown без придуманной экструзии, физические метрики unavailable",
+      "source_owner": "Организаторы/акимат/госорган или правообладатель 2ГИС; открытые OSM/Overture/Copernicus/USGS и эксперт",
+      "status": "partial",
+      "research_checked_at": "2026-10-29",
+      "research_evidence": [
+        "research/data/DR-06/README.txt",
+        "research/data/DR-06/sources.csv",
+        "research/data/DR-06/quality.json",
+        "research/data/DR-06/expert_questions.txt"
+      ],
+      "remaining_gaps": [
+        "Bounding box, а не доказанное покрытие официального города.",
+        "Нет DSM/DTM и спутниковых пикселей;82 записи только metadata.",
+        "168 часов ERA5 одной ячейки не климатическая норма и не измеренная станция.",
+        "Full 47,974-building preflight outline delivery requested by Claude is outside the reviewed manifest. Provide an allowlisted artifact with SHA-256, extent, license, source version and per-feature height_basis; the admitted research contains only 110 recorded_unverified buildings.",
+        "Не получены официальные контуры/этажность от акимата и не подтверждено право использовать данные 2ГИС в собственной базе и производных MVT/3D слоях; scraping запрещён как источник проекта."
+      ],
+      "acceptance_met": false
+    },
+    {
+      "id": "DR-07",
+      "title": "Эксплуатация лицензии и внешние сервисы",
+      "priority": "P1",
+      "required": [
+        "Где размещать, пользователи, устройства и интернет",
+        "Допустимость облачного LLM и передачи служебных данных",
+        "Права на наборы/тайлы/модели и бюджет API",
+        "Ответственный за эксплуатацию/backup/экспертное утверждение"
+      ],
+      "deliverables": [
+        "deployment_constraints.txt",
+        "licenses.csv",
+        "provider_policy.json",
+        "acceptance_hardware.txt"
+      ],
+      "acceptance": "Владелец подтвердил условия и ограничения; token/секреты не включены в документы",
+      "blocks": "Production размещение, egress и эксплуатационная приёмка",
+      "fallback": "Локальный Compose и изолированный research/test profile",
+      "source_owner": "Владелец продукта/организаторы и первичные условия сервисов",
+      "status": "partial",
+      "research_checked_at": "2026-10-29",
+      "research_evidence": [
+        "research/data/DR-07/README.txt",
+        "research/data/DR-07/sources.csv",
+        "research/data/DR-07/quality.json",
+        "research/data/DR-07/expert_questions.txt"
+      ],
+      "remaining_gaps": [
+        "Владелец не подтвердил production, egress и API budget."
+      ],
+      "acceptance_met": false
+    },
+    {
+      "id": "DR-08",
+      "title": "Локальный адресный индекс Павлодара",
+      "priority": "P1",
+      "required": [
+        "Адресная точка или геометрия объекта с улицей и номером/полным адресом",
+        "Стабильный source_record_id, версия, дата наблюдения и CRS",
+        "Лицензия на локальное хранение, поиск и отображение результата"
+      ],
+      "deliverables": [
+        "GeoJSON/SHP/CSV с field mapping в full_address либо street + house_number",
+        "README/metadata с полнотой покрытия, provenance и условиями обновления"
+      ],
+      "acceptance": "Адреса ограничены городом, неоднозначные результаты сохраняются выбором, источник каждого результата отображается",
+      "blocks": "Полноценный локальный address autocomplete без массового публичного Nominatim",
+      "fallback": "API возвращает address_index_unavailable; пользователь выбирает участок на карте вручную",
+      "source_owner": "Организатор/акимат/разрешённый адресный реестр",
+      "status": "not_found",
+      "research_checked_at": null,
+      "research_evidence": [],
+      "remaining_gaps": [
+        "Организатор не передал лицензированный адресный реестр; синтетика используется только в тестах."
+      ],
+      "acceptance_met": false
+    }
+  ]
+}

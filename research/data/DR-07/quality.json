@@ -1,0 +1,59 @@
+{
+  "checked_at": "2026-10-29",
+  "research_status": "partial",
+  "acceptance_met": false,
+  "city": "Павлодар",
+  "official_boundary_confirmed": false,
+  "real_world_city_coverage": null,
+  "accuracy": null,
+  "accuracy_reason": "Нет локальной независимой проверки; точность и разрешение не одно и то же.",
+  "tables": {
+    "licenses.csv": {
+      "row_count": 4,
+      "null_count_by_column": {
+        "source_id": 0,
+        "license": 0,
+        "scope": 0,
+        "approval": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "data.csv": {
+      "row_count": 5,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 5,
+        "status": 0,
+        "reason": 0,
+        "source_id": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "sources.csv": {
+      "row_count": 5,
+      "null_count_by_column": {
+        "source_id": 0,
+        "title": 0,
+        "url": 0,
+        "publisher": 0,
+        "checked_at": 0,
+        "observed_at": 3,
+        "license": 0,
+        "method": 0,
+        "note": 0
+      },
+      "duplicate_whole_rows": 0
+    }
+  },
+  "limitations": [
+    "Найденное не равно допущенному к production.",
+    "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+    "Неизвестные и недатированные параметры не заменены нулями.",
+    "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+    "Владелец не подтвердил production, egress и API budget."
+  ],
+  "coverage_basis": "Исследование ограничено городом Павлодаром; внешние справочные/сравнительные данные явно помечены. Доля площади в официальном контуре unknown.",
+  "geometry_files": {},
+  "geometry_validation": {}
+}

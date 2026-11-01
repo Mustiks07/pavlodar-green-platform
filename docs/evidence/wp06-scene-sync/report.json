@@ -1,0 +1,152 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-30T23:26:13.215Z",
+  "checks": [
+    {
+      "name": "synthetic polygon layer published (setup)",
+      "pass": true,
+      "detail": {
+        "layer": "b04f25c8-3a26-5009-9f98-396e488b196f"
+      }
+    },
+    {
+      "name": "2D: object A opened from the server card",
+      "pass": true,
+      "detail": {
+        "featureA": "f0d758f4-5727-dd68-29b0-0566854b62c9"
+      }
+    },
+    {
+      "name": "3D keeps the selected object: card open, URL scene=3d with pitch, feature unchanged",
+      "pass": true,
+      "detail": {
+        "city": "10000000-0000-4000-8000-000000000001",
+        "ll": "77.01000,52.31000",
+        "z": "16.00",
+        "feature": "f0d758f4-5727-dd68-29b0-0566854b62c9",
+        "scene": "3d",
+        "p": "55"
+      }
+    },
+    {
+      "name": "server height_basis unknown -> one flat footprint, nothing extruded, said in the panel",
+      "pass": true,
+      "detail": {
+        "counts": {
+          "measured": 0,
+          "recorded_unverified": 0,
+          "floors_estimate": 0,
+          "visual_placeholder": 0,
+          "unknown": 1
+        },
+        "styles": [
+          {
+            "basis": "unknown",
+            "extruded": false,
+            "fillOpacity": null,
+            "dashedEdges": true
+          }
+        ],
+        "status3d": "SYNTHETIC 3D объект A\n\nВысота не указана сервером — показан плоский контур. Этажи и метры интерфейс не подставляет.\nОснование высот в сцене\nИзмеренная высота · 0\nМожно использовать в аналитике теней\nВ"
+      }
+    },
+    {
+      "name": "2D highlight of the server geometry stays visible in 3D",
+      "pass": true
+    },
+    {
+      "name": "bearing and pitch written to the URL",
+      "pass": true,
+      "detail": {
+        "city": "10000000-0000-4000-8000-000000000001",
+        "ll": "77.01000,52.31000",
+        "z": "16.00",
+        "feature": "f0d758f4-5727-dd68-29b0-0566854b62c9",
+        "scene": "3d",
+        "p": "55",
+        "b": "30"
+      }
+    },
+    {
+      "name": "reload restores 3D, pitch, bearing, the selected object and its flat footprint",
+      "pass": true,
+      "detail": {
+        "before": {
+          "pitch": 55,
+          "bearing": 30,
+          "zoom": 16
+        },
+        "after": {
+          "pitch": 55,
+          "bearing": 30,
+          "zoom": 16
+        },
+        "counts": {
+          "measured": 0,
+          "recorded_unverified": 0,
+          "floors_estimate": 0,
+          "visual_placeholder": 0,
+          "unknown": 1
+        }
+      }
+    },
+    {
+      "name": "3D pick of object B: card and URL follow, camera stays tilted and rotated, scene shows B only",
+      "pass": true,
+      "detail": {
+        "afterPick": {
+          "pitch": 55,
+          "bearing": 30,
+          "zoom": 16
+        },
+        "feature": "2ec6b16b-0b80-18e5-a4de-0f4703e5539f"
+      }
+    },
+    {
+      "name": "exit 3D: pitch and bearing back to 0, object B still selected, URL without scene/p/b",
+      "pass": true,
+      "detail": {
+        "flat": {
+          "pitch": 0,
+          "bearing": 0,
+          "zoom": 16
+        },
+        "params": {
+          "city": "10000000-0000-4000-8000-000000000001",
+          "ll": "77.01000,52.31000",
+          "z": "16.00",
+          "feature": "2ec6b16b-0b80-18e5-a4de-0f4703e5539f"
+        }
+      }
+    },
+    {
+      "name": "phone: card and 3D toggle do not overlap",
+      "pass": true,
+      "detail": {
+        "tb": {
+          "x": 12,
+          "y": 60,
+          "width": 118.453125,
+          "height": 28
+        },
+        "cb": {
+          "x": 16,
+          "y": 458.609375,
+          "width": 358,
+          "height": 265.25
+        }
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp06-scene-sync/3d-selected.png",
+    "docs/evidence/wp06-scene-sync/3d-selected-dark.png",
+    "docs/evidence/wp06-scene-sync/3d-selected-mobile.png"
+  ],
+  "finishedAt": "2026-10-30T23:26:52.873Z",
+  "passed": true,
+  "synthetic": {
+    "dataset": "SYNTHETIC TEST 3D 23:26:18",
+    "version": "47a774fb-7d30-4525-bbc2-a9f654183c0a"
+  }
+}

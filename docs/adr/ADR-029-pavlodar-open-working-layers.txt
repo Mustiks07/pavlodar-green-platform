@@ -1,0 +1,43 @@
+ADR-029 Public Pavlodar working layers are admitted through the canonical import pipeline
+Статус: accepted by GPT (canonical data/import owner); client live verification pending.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / e94ca85.
+
+ПРОБЛЕМА
+
+Карта умела показывать опубликованные MVT, но в реальном городе Павлодаре не было пригодных
+опубликованных векторных слоёв. Старые браузерные прогоны оставили SYNTHETIC наборы, а первый
+прогон нового загрузчика по ошибке использовал UUID тестового города. Успешная публикация сама по
+себе поэтому не доказывала, что слой доступен в UI настоящего города.
+
+РЕШЕНИЕ
+
+- Через bounded Overpass запросы принимаются OSM roads, green areas, tree nodes и water ways в
+  рабочем bbox Павлодара. Relations пока исключены, чтобы не собирать неверные multipolygon.
+- Дополнительно принимаются 110 зданий из проверенного DR-06 файла только с числовым height_m.
+  Этажность не умножается на коэффициент и placeholder-высоты не создаются.
+- Каждый файл проходит тот же HTTP upload, quarantine, outbox, worker validation, quality review и
+  admin publication, что и пользовательский импорт. Публикация возобновляема по имени набора и SHA.
+- Наборы public; лицензия ODbL-1.0 и полный provenance остаются в dataset/version/admin API. Основной
+  интерфейс не обязан показывать служебную маркировку источника на каждой карточке.
+- Canonical city_id берётся из services.api.research.CITY_ID. Smoke обязан войти как viewer и
+  проверить именно этот город, все manifest, sample MVT и feature cards.
+- Повторный import_delivery может явно выдать CityGrant дополнительному активному пользователю даже
+  после уже принятого receipt. Это onboarding, а не неявное расширение доступа к restricted данным.
+- getMapFeature возвращает сохранённые height_m, height_basis, floors и height_source_ref только для
+  конечной неотрицательной числовой высоты. Строки, bool, NaN и неизвестные basis не принимаются.
+
+ПРОВЕРКА
+
+В городе 2de4e9e4-1602-5bdb-b17d-13df22510458 опубликованы 5 наборов / 6 layer families:
+7 873 roads, 512 green features, 144 trees, 96 water features и 110 buildings, всего 8 735.
+Все записи прошли импорт без quality issues. Viewer live smoke прочитал manifests, непустые z14 MVT
+и canonical feature cards; первая карточка здания вернула height_m=10.0 и
+height_basis=recorded_unverified. Повторный publish по тем же SHA не создаёт новую версию.
+
+ОГРАНИЧЕНИЯ
+
+Это рабочие открытые слои, а не данные организатора. Официальность границы, полнота OSM, точность
+сетей и локальная экологическая калибровка не утверждаются. Водные relation/multipolygon, полный
+городской building footprint, raster land cover, DEM и почвы остаются отдельными инкрементами.
+Старые SYNTHETIC наборы не удаляются этим изменением: очистка требует отдельной резервной копии и
+точно ограниченной команды.

@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "scope": "Disposable real OIDC -> import -> publication -> immutable PMTiles registry -> HTTP full/Range/ETag delivery",
+  "synthetic_test_input": true,
+  "shared_database_mutated": false,
+  "dataset_id": "7c4836a0-fb56-40d5-aa8d-a34ebb7e3daa",
+  "layer_id": "85e4fa9d-635c-5430-af67-d67754f45685",
+  "archive_sha256": "247e1aa01f6a7243abcf992e6dd9489b8607af495af15f85e46ef358b9945851",
+  "byte_size": 837,
+  "tile_count": 3,
+  "candidate_tile_count": 3,
+  "range_status": 206,
+  "anonymous_status": 401,
+  "contract_version": "1.5.0"
+}

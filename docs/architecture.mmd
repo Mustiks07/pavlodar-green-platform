@@ -1,0 +1,19 @@
+flowchart TB
+  U[Специалист акимата] --> UI[React UI · карта MapLibre · Three.js]
+  UI --> BFF[FastAPI / BFF · OIDC session · CSRF · grants]
+  IDP[OIDC / Keycloak] <--> BFF
+  BFF --> DOMAIN[Domain use cases · версии · правила]
+  DOMAIN --> CALC[Смета · survival · care · priority · ecosystem]
+  DOMAIN --> DB[(PostgreSQL / PostGIS)]
+  DOMAIN --> OUTBOX[Transactional outbox / Job]
+  OUTBOX --> QUEUE[Redis / Celery queues]
+  QUEUE --> WORKERS[Import · optimization · physical · export workers]
+  WORKERS --> DB
+  WORKERS --> STORE[(Исходники · COG · manifests · отчёты)]
+  DB --> TILES[MVT / authorized feature API]
+  STORE --> BASE[PMTiles / Range / локальные assets]
+  TILES --> UI
+  BASE --> UI
+  BFF --> AI[LLM adapter · RAG ACL · bounded tools]
+  AI --> DOMAIN
+  DOMAIN --> AUDIT[Audit · traces · metrics]

@@ -1,0 +1,28 @@
+{
+  "fixture_only": true,
+  "schema": "StockItem",
+  "expected_valid": false,
+  "origin": "Negative fixture: unknown stock cannot be encoded as zero",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000303",
+    "plant_id": "00000000-0000-4000-8000-000000000201",
+    "supplier": "SYNTHETIC supplier",
+    "size_description": "fixture",
+    "available_quantity": 0,
+    "unit_price": null,
+    "currency": "KZT",
+    "observed_at": null,
+    "source_refs": [],
+    "availability": "unknown",
+    "supplier_city": null,
+    "is_local_supply": null,
+    "height_min_m": null,
+    "height_max_m": null,
+    "container": null,
+    "root_system": null,
+    "tax_mode": "unknown",
+    "stock_counted_at": null,
+    "checked_at": "2026-10-29",
+    "applicability": null
+  }
+}

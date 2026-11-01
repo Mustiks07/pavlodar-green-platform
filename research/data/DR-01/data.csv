@@ -1,0 +1,3 @@
+record_id,topic,value,status,reason,source_id
+DR-01-official_boundary,official_boundary,null,unavailable,Организаторский контур и CRS не переданы; OSM не заменяет официальную границу.,PROJECT-TZ
+DR-01-organizer_layers,organizer_layers,null,unavailable,В текущей поставке нет четырех наборов организатора и прав на них.,PROJECT-TZ

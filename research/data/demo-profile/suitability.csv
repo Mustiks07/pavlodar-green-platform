@@ -1,0 +1,9 @@
+taxon_id,hardiness_fit,moisture_fit,salt_fit,wind_fit,light_fit,mapping_basis
+populus_alba,0.90,0.75,0.70,0.85,0.85,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"
+pinus_sylvestris,0.95,0.55,0.65,0.85,0.95,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"
+tilia_cordata,0.80,0.70,0.45,0.65,0.70,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"
+syringa_vulgaris,0.90,0.65,0.60,0.75,0.85,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"
+picea_obovata,0.90,0.70,0.40,0.70,0.55,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"
+salix_sp,0.85,0.95,0.45,0.65,0.75,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"
+acer_sp,0.80,0.65,0.50,0.65,0.70,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"
+fraxinus_sp,0.80,0.70,0.55,0.70,0.75,"SYNTHETIC TEST: qualitative expert-rule mapping to normalized 0..1"

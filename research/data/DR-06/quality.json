@@ -1,0 +1,127 @@
+{
+  "checked_at": "2026-10-29",
+  "research_status": "partial",
+  "acceptance_met": false,
+  "city": "Павлодар",
+  "official_boundary_confirmed": false,
+  "real_world_city_coverage": null,
+  "accuracy": null,
+  "accuracy_reason": "Нет локальной независимой проверки; точность и разрешение не одно и то же.",
+  "tables": {
+    "weather.csv": {
+      "row_count": 168,
+      "null_count_by_column": {
+        "record_id": 0,
+        "time_utc": 0,
+        "source_id": 0,
+        "method": 0,
+        "grid_latitude": 0,
+        "grid_longitude": 0,
+        "temperature_2m": 0,
+        "relative_humidity_2m": 0,
+        "precipitation": 0,
+        "shortwave_radiation": 0,
+        "wind_speed_10m": 0,
+        "wind_direction_10m": 0,
+        "et0_fao_evapotranspiration": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "imagery_catalog.csv": {
+      "row_count": 82,
+      "null_count_by_column": {
+        "scene_id": 0,
+        "source_id": 0,
+        "observed_at": 0,
+        "cloud_cover_granule_pct": 0,
+        "city_cloud_cover_pct": 82,
+        "red_resolution_m": 0,
+        "nir_resolution_m": 0,
+        "scl_resolution_m": 0,
+        "raster_crs": 0,
+        "metadata_url": 0,
+        "pixels_downloaded": 0,
+        "classification_validated": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "coefficients.csv": {
+      "row_count": 6,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 6,
+        "status": 0,
+        "reason": 0,
+        "source_id": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "data.csv": {
+      "row_count": 5,
+      "null_count_by_column": {
+        "dataset_id": 0,
+        "source_id": 0,
+        "available": 0,
+        "method": 0,
+        "resolution": 2,
+        "resolution_unit": 0,
+        "observed_at": 1,
+        "crs": 2,
+        "applicability": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "search_log.csv": {
+      "row_count": 1,
+      "null_count_by_column": {
+        "search_id": 0,
+        "checked_at": 0,
+        "query_or_access": 0,
+        "method": 0,
+        "result": 0,
+        "limitation": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "sources.csv": {
+      "row_count": 11,
+      "null_count_by_column": {
+        "source_id": 0,
+        "title": 0,
+        "url": 0,
+        "publisher": 0,
+        "checked_at": 0,
+        "observed_at": 6,
+        "license": 0,
+        "method": 0,
+        "note": 0
+      },
+      "duplicate_whole_rows": 0
+    }
+  },
+  "limitations": [
+    "Найденное не равно допущенному к production.",
+    "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+    "Неизвестные и недатированные параметры не заменены нулями.",
+    "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+    "Bounding box, а не доказанное покрытие официального города.",
+    "Нет DSM/DTM и спутниковых пикселей;82 записи только metadata.",
+    "168 часов ERA5 одной ячейки не климатическая норма и не измеренная станция."
+  ],
+  "coverage_basis": "Исследование ограничено городом Павлодаром; внешние справочные/сравнительные данные явно помечены. Доля площади в официальном контуре unknown.",
+  "geometry_files": {
+    "buildings.geojson": {
+      "feature_count": 110,
+      "crs": "EPSG:4326",
+      "metric_accuracy_m": null
+    }
+  },
+  "geometry_validation": {
+    "buildings.geojson": {
+      "feature_count": 110,
+      "invalid_features": [],
+      "topology_repaired": false
+    }
+  }
+}

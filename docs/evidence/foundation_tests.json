@@ -1,0 +1,9 @@
+{
+  "command": "uv run pytest -q",
+  "tests": 81,
+  "failures": 0,
+  "errors": 0,
+  "scope": "Canonical fixtures, PostGIS persistence, auth grants, CSRF, idempotency, concurrent ETag edits, immutable rows, outbox rollback, leases, cancellation and bounded GeoJSON/CSV import; not full product acceptance",
+  "pip_audit": "106 dependencies, no known vulnerabilities after pytest update",
+  "organizer_data_received": false
+}

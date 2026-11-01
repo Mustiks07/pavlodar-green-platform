@@ -1,0 +1,14 @@
+{
+  "fixture_only": true,
+  "schema": "FastCalculationRequest",
+  "expected_valid": true,
+  "data": {
+    "scenario_revision_id": "00000000-0000-0000-0000-000000000005",
+    "mode": "fast",
+    "include_modules": [
+      "suitability",
+      "cost"
+    ],
+    "seed": 42
+  }
+}

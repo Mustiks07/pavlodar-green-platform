@@ -1,0 +1,8 @@
+record_id,topic,value,status,reason,source_id
+DR-05-ground_preparation,ground_preparation,null,unavailable,"Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",null
+DR-05-soil_material,soil_material,null,unavailable,"Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",null
+DR-05-planting_labor,planting_labor,null,unavailable,"Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",null
+DR-05-delivery,delivery,null,unavailable,"Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",null
+DR-05-watering_labor,watering_labor,null,unavailable,"Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",null
+DR-05-annual_care,annual_care,null,unavailable,"Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",null
+DR-05-replacement_labor,replacement_labor,null,unavailable,"Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",null

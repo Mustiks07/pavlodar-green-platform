@@ -1,0 +1,107 @@
+{
+  "schema": "QualityReport",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "id": "c2c1d12a-0d98-591e-be69-8068c7c385a9",
+    "issues": [
+      {
+        "code": "research_not_approved",
+        "message": "Найденное не равно допущенному к production.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-04",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-04",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Неизвестные и недатированные параметры не заменены нулями.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-04",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-04",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "0 исходных когорт,0 осмотров,0 записей фактического ухода.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-04",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Нет официального подтверждения отсутствия открытой выборки; только ограниченный поисковый отчет.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-04",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LOCAL-20260520\", \"title\": \"В Павлодаре продолжается работа по озеленению и обновлению городского зеленого фонда\", \"url\": \"https://www.gov.kz/org/pavlodar/press/news/details/1223959?lang=ru\", \"publisher\": \"Пресс-служба акима Павлодарской области\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-05-20\", \"license\": \"unknown\", \"method\": \"official_report\", \"note\": \"Содержание относится к городу Павлодару; сообщение о посадке и планах, не полевой журнал и не эксперимент.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LOCAL-20260520",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"GREENPVL\", \"title\": \"Портал зеленых насаждений greenpvl.kz\", \"url\": \"https://greenpvl.kz/\", \"publisher\": \"unknown\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"access_attempt\", \"note\": \"При проверке web fetch вернул 502 Bad Gateway; массовый экспорт, лицензия и продольные наблюдения не получены. Это не доказательство отсутствия реестра у владельца.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "GREENPVL",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"PPP-2021\", \"title\": \"Извещение ГЧП «Озеленение территории города Павлодар»\", \"url\": \"https://www.gov.kz/memleket/entities/pavlodar-pvl/press/article/details/46755?lang=ru\", \"publisher\": \"ГУ ОЖКХ, ПТ и АД города Павлодара\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2021-04-16\", \"license\": \"unknown\", \"method\": \"official_plan\", \"note\": \"План 2021–2025, смешанные виды работ. Не исполненный контракт, не исходы и не единичная цена посадки.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "PPP-2021",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LAW-GREEN\", \"title\": \"Правила создания, содержания и защиты зеленых насаждений населенных пунктов Павлодарской области, №52/4 от 11.09.2023\", \"url\": \"https://adilet.zan.kz/rus/docs/G23P000524M\", \"publisher\": \"Павлодарский областной маслихат / ИПС Әділет\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-03-26\", \"license\": \"unknown\", \"method\": \"legal_text\", \"note\": \"Прочитан консолидированный текст и история через браузер. Последняя отображенная редакция 26.03.2026; не подменяет полный набор строительных норм.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LAW-GREEN",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"PROJECT-TZ\", \"title\": \"ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29\", \"url\": \"repo:docs/TZ_DEVELOPMENT.txt\", \"publisher\": \"Проект team-vtiposhnik\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-10-29\", \"license\": \"unknown\", \"method\": \"project_requirement\", \"note\": \"Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "PROJECT-TZ",
+        "suggested_action": null
+      }
+    ],
+    "error_count": 0,
+    "valid_count": 7,
+    "record_count": 7,
+    "warning_count": 11,
+    "publish_allowed": false,
+    "issues_truncated": false,
+    "dataset_version_id": "d21d39f1-931d-52d5-a33c-816a5bb83a5e",
+    "issues_next_cursor": null
+  }
+}

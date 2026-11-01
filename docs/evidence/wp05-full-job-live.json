@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": "Real HTTP API + Keycloak + PostGIS + transactional outbox + dispatcher + Celery worker using an existing explicitly synthetic scenario revision",
+  "contract_version": "1.3.0",
+  "migration": "0015_job_requests",
+  "job_id": "b06523b9-5846-47bc-9c13-84753315c15a",
+  "job_state": "succeeded",
+  "result_ref_id": "72cbbfbe-c0ce-454d-9466-9d18856adb28",
+  "snapshot_status": "partial",
+  "warning_codes": [
+    "calculation_module_unavailable"
+  ],
+  "organizer_data_received": false
+}

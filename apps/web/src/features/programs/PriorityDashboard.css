@@ -1,0 +1,109 @@
+.priority-dashboard {
+  display: grid;
+  gap: var(--pg-space-3);
+  padding: var(--pg-space-4);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius-lg);
+  background: linear-gradient(145deg, var(--pg-accent-soft), var(--pg-surface) 52%);
+}
+
+.priority-dashboard__head,
+.priority-zone header,
+.priority-factor {
+  display: flex;
+  gap: var(--pg-space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.priority-dashboard__head > span,
+.priority-zone header > span {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.priority-dashboard__head small,
+.priority-zone header small,
+.priority-dashboard__intro,
+.priority-factor span {
+  color: var(--pg-text-muted);
+}
+
+.priority-dashboard__head small {
+  color: var(--pg-accent-text);
+  font-size: var(--pg-fs-xs);
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.priority-dashboard__head strong { font-size: var(--pg-fs-lg); }
+.priority-dashboard__intro { margin: 0; }
+.priority-dashboard__list { display: grid; gap: var(--pg-space-3); }
+
+.priority-zone {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: var(--pg-space-3);
+  padding: var(--pg-space-3);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius);
+  background: var(--pg-surface);
+  box-shadow: var(--pg-shadow-1);
+}
+
+.priority-zone__rank {
+  display: grid;
+  place-items: center;
+  align-self: start;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--pg-text-on-accent);
+  font-weight: 800;
+  background: var(--pg-accent);
+  border-radius: 999px;
+}
+
+.priority-zone__body { display: grid; min-width: 0; gap: var(--pg-space-3); }
+.priority-zone__score { height: 0.45rem; overflow: hidden; background: var(--pg-surface-2); border-radius: 999px; }
+.priority-zone__score span { display: block; height: 100%; background: linear-gradient(90deg, var(--pg-positive), var(--pg-warning), var(--pg-negative)); border-radius: inherit; }
+.priority-zone__summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--pg-space-2); margin: 0; }
+.priority-zone__summary div { display: grid; gap: 0.125rem; padding: var(--pg-space-2); background: var(--pg-surface-2); border-radius: var(--pg-radius-sm); }
+.priority-zone__summary dt { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.priority-zone__summary dd { margin: 0; font-weight: 750; }
+.priority-zone__factors { display: grid; gap: var(--pg-space-2); }
+.priority-factor { padding-top: var(--pg-space-2); border-top: 1px solid var(--pg-border); }
+.priority-factor > div { display: grid; gap: 0.125rem; min-width: 0; }
+.priority-factor strong { font-size: var(--pg-fs-sm); }
+.priority-factor span { font-size: var(--pg-fs-xs); }
+.priority-factor__value { flex: 0 0 auto; color: var(--pg-text) !important; font-weight: 750; }
+.priority-zone__map { justify-self: start; color: var(--pg-accent-text); font-weight: 700; }
+
+.priority-weight-panel {
+  display: grid;
+  gap: var(--pg-space-3);
+  padding: var(--pg-space-3);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius);
+  background: var(--pg-surface-2);
+}
+
+.priority-weight-panel__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--pg-space-3); }
+.priority-weight-panel__head span { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.priority-weight { display: grid; gap: var(--pg-space-2); }
+.priority-weight__head { display: flex; align-items: start; justify-content: space-between; gap: var(--pg-space-3); }
+.priority-weight__head > span:first-child { display: grid; gap: 0.125rem; }
+.priority-weight__head small { color: var(--pg-text-muted); }
+.priority-weight__percent { flex: 0 0 auto; min-width: 3.5rem; text-align: right; font-weight: 800; }
+.priority-weight input[type='range'] { width: 100%; accent-color: var(--pg-accent); cursor: pointer; }
+
+@media (max-width: 640px) {
+  .priority-dashboard { padding: var(--pg-space-3); }
+  .priority-zone { grid-template-columns: 1fr; }
+  .priority-zone__rank { width: 2rem; height: 2rem; }
+  .priority-zone header { align-items: flex-start; }
+  .priority-zone__summary { grid-template-columns: 1fr; }
+  .priority-factor { align-items: flex-start; }
+  .priority-weight-panel__head,
+  .priority-weight__head { align-items: flex-start; }
+}

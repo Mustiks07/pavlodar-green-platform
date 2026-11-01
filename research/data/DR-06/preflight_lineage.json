@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-10-29",
+  "reused_files": [
+    {
+      "path": "output/predevelopment/evidence/osm_buildings.geojson",
+      "sha256": "4c16a36e29c1afdf21b117c919e2d71ecc94a78e44ed96cb16ea34bafb1320f7"
+    },
+    {
+      "path": "output/predevelopment/evidence/osm_audit.json",
+      "sha256": "2c469ac11280ad3257bd526b750d2f70e571838786e515615ba2f5d97565caef"
+    },
+    {
+      "path": "output/predevelopment/evidence/city_boundary.geojson",
+      "sha256": "2249e4ee17d876aae9be12dba1318cd6cef9f799e70190cbd4d5df8d4bcbf502"
+    },
+    {
+      "path": "output/predevelopment/evidence/sentinel_summer.json",
+      "sha256": "18dba92de6d6d5ae0d56d59e8c66f090a132de017b774ba8d986f4b6ff5133cc"
+    },
+    {
+      "path": "output/predevelopment/evidence/sentinel_summer_page2.json",
+      "sha256": "3fa7a8cdc01b0fddde55ce02c8766c860a76931ca8d845c640069d90011449b6"
+    }
+  ],
+  "sentinel_duplicates_removed": 0,
+  "buildings_height_records": 110
+}

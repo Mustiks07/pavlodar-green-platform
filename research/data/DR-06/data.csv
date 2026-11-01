@@ -1,0 +1,6 @@
+dataset_id,source_id,available,method,resolution,resolution_unit,observed_at,crs,applicability
+osm_building_heights,OSM,subset_geojson,community_record,null,m,2026-10-28T21:21:02Z,EPSG:4326,"Только здания с числовым тегом height, не measured; нет полной геометрии крыш и деревьев."
+era5_sample,WEATHER-ERA5,csv_and_json,reanalysis,0.25,degree,2025-07-01/2025-07-07,EPSG:4326,Одна ячейка/точка API; не городской температурный градиент и не 30-летняя норма.
+sentinel2_catalog,S2-CATALOG,catalog_only,satellite_processed_metadata,10,m for B04/B08 only,2026-06-01/2026-08-31,EPSG:32643 raster; EPSG:4326 footprint,Метаданные; SCL отдельно 20 м. Нет облачной маски города и проверенной классификации.
+copdem_glo30,COPDEM,documentation_only,radar_derived_dsm,30,m nominal,2011/2015,null,"Не DTM; нет загруженных тайлов, локальная точность и CRS файла не проверены. Для точных теней малых объектов недостаточно."
+landsat_st,LANDSAT,documentation_only,satellite_retrieval,null,m,null,null,Нет выбранной локальной сцены/QA; температура поверхности не температура воздуха.

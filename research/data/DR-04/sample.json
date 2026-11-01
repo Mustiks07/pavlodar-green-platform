@@ -1,0 +1,84 @@
+{
+  "reported_events.csv": [
+    {
+      "event_id": "childhood-square-20260520",
+      "source_id": "LOCAL-20260520",
+      "report_date": "2026-05-20",
+      "place": "Сквер Детства, город Павлодар",
+      "reported_taxon": "липа, вид не указан",
+      "reported_planted": 50,
+      "unit": "piece",
+      "method": "official_report",
+      "planting_date_exact": null,
+      "inspection_date": null,
+      "alive": null,
+      "dead": null,
+      "unknown": null,
+      "training_eligible": false,
+      "reason": "Сообщение о высадке; нет реестра исходных деревьев, даты приемки, осмотра и замен."
+    }
+  ],
+  "cohorts.csv": [],
+  "observations.csv": [],
+  "care_actual.csv": [],
+  "data.csv": [
+    {
+      "record_id": "DR-04-longitudinal_dataset",
+      "topic": "longitudinal_dataset",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Связанная открытая выборка исходных когорт, осмотров, ухода и замен в перечисленных проверках не найдена. Это ограниченный результат поиска, не подтверждение несуществования данных.",
+      "source_id": "GREENPVL"
+    },
+    {
+      "record_id": "DR-04-absence_certification",
+      "topic": "absence_certification",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Официального подтверждения отсутствия открытой выборки не получено; обращения не разрешены поручением.",
+      "source_id": "PROJECT-TZ"
+    }
+  ],
+  "search_log.csv": [
+    {
+      "search_id": "DR-04-search-6",
+      "checked_at": "2026-10-29",
+      "query_or_access": "site:gov.kz \"Павлодар\" \"приживаемость\" \"2025\"",
+      "method": "read_only_search_and_primary_review",
+      "result": "Связанный датасет когорта–осмотр–уход–замена не найден",
+      "limitation": "Поиск индексируемых страниц, не поиск внутри закрытых систем."
+    },
+    {
+      "search_id": "DR-04-search-7",
+      "checked_at": "2026-10-29",
+      "query_or_access": "site:gov.kz \"Павлодар\" \"дендрологический\" план; site:gov.kz \"Павлодар\" \"акт приживаемости\"",
+      "method": "read_only_search_and_primary_review",
+      "result": "Нормативное требование актов, но не заполненные акты/реестр",
+      "limitation": "Форма документа не является набором исходов."
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "LOCAL-20260520",
+      "title": "В Павлодаре продолжается работа по озеленению и обновлению городского зеленого фонда",
+      "url": "https://www.gov.kz/org/pavlodar/press/news/details/1223959?lang=ru",
+      "publisher": "Пресс-служба акима Павлодарской области",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-05-20",
+      "license": "unknown",
+      "method": "official_report",
+      "note": "Содержание относится к городу Павлодару; сообщение о посадке и планах, не полевой журнал и не эксперимент."
+    },
+    {
+      "source_id": "GREENPVL",
+      "title": "Портал зеленых насаждений greenpvl.kz",
+      "url": "https://greenpvl.kz/",
+      "publisher": "unknown",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "unknown",
+      "method": "access_attempt",
+      "note": "При проверке web fetch вернул 502 Bad Gateway; массовый экспорт, лицензия и продольные наблюдения не получены. Это не доказательство отсутствия реестра у владельца."
+    }
+  ]
+}

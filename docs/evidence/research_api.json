@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "version_ids": [
+    "19368e08-9339-594d-9f4a-3195619e8569",
+    "946d3ce6-8761-50af-b76e-4c5db99de190",
+    "6d72643a-cf67-503d-bb49-67b1a1326c94",
+    "731dd97b-4a34-5ce2-bab2-ab5326045cbd",
+    "25296ca4-b183-5fea-82f5-d14e84ca0226",
+    "d21d39f1-931d-52d5-a33c-816a5bb83a5e",
+    "6db8cbb3-51b8-5363-b941-15186deafdf4"
+  ],
+  "real_http_oidc": true,
+  "quality_reports_read": 7,
+  "publication_denials": 7,
+  "source_readiness_rows": 7,
+  "source_readiness_requests": {
+    "DR-01": {
+      "content_kind": "vector",
+      "record_count": 2
+    },
+    "DR-02": {
+      "content_kind": "table",
+      "record_count": 159
+    },
+    "DR-03": {
+      "content_kind": "legal_text",
+      "record_count": 33
+    },
+    "DR-04": {
+      "content_kind": "table",
+      "record_count": 7
+    },
+    "DR-05": {
+      "content_kind": "table",
+      "record_count": 30
+    },
+    "DR-06": {
+      "content_kind": "mixed",
+      "record_count": 262
+    },
+    "DR-07": {
+      "content_kind": "table",
+      "record_count": 9
+    }
+  },
+  "organizer_data_received": false,
+  "acceptance_met": false,
+  "contract_version": "1.1.0"
+}

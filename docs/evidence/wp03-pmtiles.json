@@ -1,0 +1,28 @@
+{
+  "captured_at": "2026-10-30T03:40:00+05:00",
+  "commit": "5712504dd570cb24e626b897872777db1ee52b78",
+  "synthetic_input": true,
+  "organizer_data_used": false,
+  "checks": {
+    "backend_tests": "94 passed",
+    "ruff": "passed",
+    "specification": "358 checks; 132 schemas; 91 operations; 45 fixtures",
+    "pip_audit": "no known vulnerabilities",
+    "compose_config": "valid"
+  },
+  "archive_acceptance": {
+    "format": "PMTiles v3 / MVT",
+    "official_reader_verification": true,
+    "two_builds_byte_identical": true,
+    "sha256_reproducible": true,
+    "z12_tile_matches_authorized_dynamic_mvt": true,
+    "candidate_limit_precedes_destination_write": true,
+    "protected_dataset_rejected": true
+  },
+  "not_claimed": [
+    "organizer-data acceptance",
+    "HTTP Range delivery",
+    "client PMTiles rendering",
+    "representative large-layer performance"
+  ]
+}

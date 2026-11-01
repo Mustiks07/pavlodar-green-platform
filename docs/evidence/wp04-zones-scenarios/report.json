@@ -1,0 +1,173 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:18:47.642Z",
+  "checks": [
+    {
+      "name": "specialist: city from API",
+      "pass": true,
+      "detail": {
+        "name": "Павлодар — СИНТЕТИЧЕСКИЙ ТЕСТОВЫЙ КОНТУР",
+        "boundary_status": "working"
+      }
+    },
+    {
+      "name": "specialist: synthetic test zone created through API",
+      "pass": true,
+      "detail": {
+        "status": 201
+      }
+    },
+    {
+      "name": "map: zones from listZones rendered",
+      "pass": true,
+      "detail": {
+        "rendered": 1
+      }
+    },
+    {
+      "name": "zone card: area from server with unit and version",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "zone card: empty restrictions not presented as \"none on the ground\"",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "reload keeps selected zone",
+      "pass": true,
+      "detail": {
+        "url": "http://localhost:5174/?city=10000000-0000-4000-8000-000000000001&ll=77.00000%2C52.30000&z=16.32&zone=e2d4b8b1-191a-4c12-8865-23e299f53f46"
+      }
+    },
+    {
+      "name": "draft created via createScenario and opened",
+      "pass": true,
+      "detail": {
+        "header": "SYNTHETIC TEST сценарий 08:18:55",
+        "scenarioId": "a7ecbe9b-de14-4f9b-a27d-2b49f5838758"
+      }
+    },
+    {
+      "name": "budget validates Money format before sending",
+      "pass": true
+    },
+    {
+      "name": "save creates new revision and reports it",
+      "pass": true,
+      "detail": {
+        "savedText": "Сохранено, ревизия …78e9"
+      }
+    },
+    {
+      "name": "server has 2 revisions after save",
+      "pass": true,
+      "detail": {
+        "count": 2
+      }
+    },
+    {
+      "name": "unsaved edits restored after reload and labelled as local",
+      "pass": true,
+      "detail": {
+        "restoredValue": "SYNTHETIC TEST: несохранённая правка"
+      }
+    },
+    {
+      "name": "concurrent revision accepted by server",
+      "pass": true,
+      "detail": {
+        "status": 201
+      }
+    },
+    {
+      "name": "stale If-Match -> 412 conflict shown, edits kept",
+      "pass": true,
+      "detail": {
+        "keptValue": "SYNTHETIC TEST: несохранённая правка"
+      }
+    },
+    {
+      "name": "after rebase the save succeeds as a 4th revision (no lost update)",
+      "pass": true,
+      "detail": {
+        "count": 4
+      }
+    },
+    {
+      "name": "reload shows saved budget from server",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "reload keeps the selected (old, immutable) revision",
+      "pass": true,
+      "detail": {
+        "url": "http://localhost:5174/projects/a7ecbe9b-de14-4f9b-a27d-2b49f5838758?city=10000000-0000-4000-8000-000000000001&ll=77.00000%2C52.30000&z=16.32&revision=d54f2d94-304f-4bed-bffc-452260e678e9"
+      }
+    },
+    {
+      "name": "calculateFast is connected: immutable server snapshot and honest partial state are shown",
+      "pass": true,
+      "detail": {
+        "calculationId": "fdc4b148-bdc7-4628-9fb8-35ab93a31af4",
+        "text": "Неполный расчёт\nсинтетические входы\nИзвестная сумма\n0,00 ₸\nИтог\n0,00 ₸\nРассчитано\n31.10.2026, 13:19\nСнимок расчёта\nfdc4b148\nСтроки серверной сметы\nПосадочный материал\n\nстрок нет в результате сервера — статья не рассчитана\n\nПодготовка и поса"
+      }
+    },
+    {
+      "name": "calculation card: server cost breakdown with tax state, unknown total not shown as zero, manifest link, no source/unverified lines",
+      "pass": true,
+      "detail": {
+        "manifestHref": "/v1/calculations/fdc4b148-bdc7-4628-9fb8-35ab93a31af4/manifest",
+        "text": "Неполный расчёт\nсинтетические входы\nИзвестная сумма\n0,00 ₸\nИтог\n0,00 ₸\nРассчитано\n31.10.2026, 13:19\nСнимок расчёта\nfdc4b148\nСтроки серверной сметы\nПосадочный материал\n\nстрок нет в результате сервера — статья не рассчитана\n\nПодготовка и посадочные работы\n\nстрок нет в результате сервера — статья не рассчитана\n\nДоставка\n\nстрок нет в результате сервера — статья не рассчитана\n\nУход\n\nстрок нет в результ"
+      }
+    },
+    {
+      "name": "transition: server result shown (status changed, or refusal with reasons)",
+      "pass": true,
+      "detail": {
+        "afterStatus": "in_review",
+        "dialog": ""
+      }
+    },
+    {
+      "name": "non-draft scenario locks the editor with an explanation",
+      "pass": true,
+      "detail": {
+        "afterStatus": "in_review"
+      }
+    },
+    {
+      "name": "viewer: no create-draft action, role hint shown instead",
+      "pass": true,
+      "detail": {
+        "main": "Участок\nSYNTHETIC TEST участок (UI check)\n\nсквер\n\nПлощадь\n68 294 м² (расчёт сервера в EPSG:32643)\nВерсия геометрии\n356cfdb8\nОбновлено\n31.10.2026, 13:18\n\nSoil, utilities and expert restrictions have not been verified · блокирует расчёт\n\nНужны входные данные: DR-03\n\nПоказатели участка\nПлощадь зоны\nСИН"
+      }
+    },
+    {
+      "name": "viewer: draft scenario is read-only or denied by server with a clear state",
+      "pass": true,
+      "detail": {
+        "apiStatus": 404,
+        "readOnly": false,
+        "denied": true
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp04-zones-scenarios/map-zones-specialist.png",
+    "docs/evidence/wp04-zones-scenarios/zone-card-specialist.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-create-dialog.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-draft.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-conflict-412.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-after-rebase.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-old-revision.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-calculation.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-transition.png",
+    "docs/evidence/wp04-zones-scenarios/zone-card-viewer.png",
+    "docs/evidence/wp04-zones-scenarios/scenario-viewer.png"
+  ],
+  "finishedAt": "2026-10-31T08:19:07.465Z",
+  "passed": true
+}

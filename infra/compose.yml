@@ -1,0 +1,126 @@
+name: ${COMPOSE_PROJECT_NAME:-pavlodar-gpt}
+services:
+  db:
+    image: postgis/postgis:17-3.5@sha256:01a6a70e41e6c4467c8f55f6063555ed72db2d6662cd0d571040d42eadaeb6f6
+    environment:
+      POSTGRES_DB: pavlodar
+      POSTGRES_USER: pavlodar
+      POSTGRES_PASSWORD: ${PAVLODAR_DB_PASSWORD:?Run tools/dev/bootstrap.py first}
+    ports: ["127.0.0.1:${DB_PORT:-5433}:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pavlodar -d pavlodar"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7.4.2-alpine@sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952
+    ports: ["127.0.0.1:${REDIS_PORT:-6381}:6379"]
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["redis_data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  migrate:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    env_file: ../.env
+    environment:
+      PAVLODAR_DATABASE_URL: postgresql+psycopg://pavlodar:${PAVLODAR_DB_PASSWORD}@db:5432/pavlodar
+    command: ["uv", "run", "--locked", "--no-dev", "alembic", "upgrade", "head"]
+    depends_on:
+      db: {condition: service_healthy}
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    env_file: ../.env
+    environment:
+      PAVLODAR_DATABASE_URL: postgresql+psycopg://pavlodar:${PAVLODAR_DB_PASSWORD}@db:5432/pavlodar
+      PAVLODAR_REDIS_URL: redis://redis:6379/0
+      PAVLODAR_OIDC_INTERNAL_ORIGIN: http://keycloak:8080
+      PAVLODAR_UPLOAD_ROOT: /var/lib/pavlodar/uploads
+      PAVLODAR_TILE_ROOT: /var/lib/pavlodar/tiles
+      PAVLODAR_EXPORT_ROOT: /var/lib/pavlodar/exports
+    ports: ["127.0.0.1:${API_PORT:-8001}:8000"]
+    volumes:
+      - "upload_data:/var/lib/pavlodar/uploads"
+      - "tile_data:/var/lib/pavlodar/tiles"
+      - "export_data:/var/lib/pavlodar/exports"
+    healthcheck:
+      test: ["CMD", "/app/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+    command: ["uv", "run", "--locked", "--no-dev", "uvicorn", "services.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "${API_WORKERS:-4}", "--no-access-log"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    env_file: ../.env
+    environment:
+      PAVLODAR_DATABASE_URL: postgresql+psycopg://pavlodar:${PAVLODAR_DB_PASSWORD}@db:5432/pavlodar
+      PAVLODAR_REDIS_URL: redis://redis:6379/0
+      PAVLODAR_OIDC_INTERNAL_ORIGIN: http://keycloak:8080
+      PAVLODAR_UPLOAD_ROOT: /var/lib/pavlodar/uploads
+      PAVLODAR_TILE_ROOT: /var/lib/pavlodar/tiles
+      PAVLODAR_EXPORT_ROOT: /var/lib/pavlodar/exports
+      PAVLODAR_LLM_PROVIDER: ${PAVLODAR_LLM_PROVIDER:-disabled}
+      PAVLODAR_LLM_MODEL: ${PAVLODAR_LLM_MODEL:-}
+      PAVLODAR_LLM_FALLBACK_PROVIDERS: ${PAVLODAR_LLM_FALLBACK_PROVIDERS:-}
+      PAVLODAR_LLM_TIMEOUT_SECONDS: ${PAVLODAR_LLM_TIMEOUT_SECONDS:-20}
+      PAVLODAR_LLM_MAX_OUTPUT_TOKENS: ${PAVLODAR_LLM_MAX_OUTPUT_TOKENS:-800}
+      PAVLODAR_GEMINI_MODEL: ${PAVLODAR_GEMINI_MODEL:-gemini-3.5-flash-lite}
+      PAVLODAR_GEMINI_API_KEY: ${PAVLODAR_GEMINI_API_KEY:-}
+      PAVLODAR_GROQ_MODEL: ${PAVLODAR_GROQ_MODEL:-openai/gpt-oss-20b}
+      PAVLODAR_GROQ_API_KEY: ${PAVLODAR_GROQ_API_KEY:-}
+      PAVLODAR_OPENROUTER_API_KEY: ${PAVLODAR_OPENROUTER_API_KEY:-}
+    volumes:
+      - "upload_data:/var/lib/pavlodar/uploads"
+      - "tile_data:/var/lib/pavlodar/tiles"
+      - "export_data:/var/lib/pavlodar/exports"
+    command: ["uv", "run", "--locked", "--no-dev", "celery", "-A", "services.worker.main:celery", "worker", "-Q", "import,analysis,export,physical", "--concurrency=2", "--loglevel=warning"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+  dispatcher:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    env_file: ../.env
+    environment:
+      PAVLODAR_DATABASE_URL: postgresql+psycopg://pavlodar:${PAVLODAR_DB_PASSWORD}@db:5432/pavlodar
+      PAVLODAR_REDIS_URL: redis://redis:6379/0
+      PAVLODAR_OIDC_INTERNAL_ORIGIN: http://keycloak:8080
+    command: ["uv", "run", "--locked", "--no-dev", "python", "-m", "services.worker.main"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  keycloak:
+    profiles: ["test"]
+    image: quay.io/keycloak/keycloak:26.3.5@sha256:357829ec7c4693397533035092ad13b0644bcc95ded311f33a3738c4d9e9bdba
+    ports: ["127.0.0.1:${OIDC_PORT:-8081}:8080"]
+    environment:
+      KC_HOSTNAME: http://localhost:${OIDC_PORT:-8081}
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - "exec 3<>/dev/tcp/127.0.0.1/8080; printf 'GET /realms/pavlodar-test/.well-known/openid-configuration HTTP/1.0\r\nHost: localhost\r\n\r\n' >&3; read -r first <&3; [[ \"$$first\" == *'200'* ]]"
+      interval: 5s
+      timeout: 4s
+      retries: 40
+    command: ["start-dev", "--import-realm", "--http-access-log-enabled=false"]
+    volumes: ["./keycloak-test-realm.json:/opt/keycloak/data/import/pavlodar.json:ro", "keycloak_data:/opt/keycloak/data"]
+volumes:
+  postgres_data:
+  redis_data:
+  keycloak_data:
+  upload_data:
+  tile_data:
+  export_data:

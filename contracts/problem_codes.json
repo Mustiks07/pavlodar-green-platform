@@ -1,0 +1,1075 @@
+{
+  "version": "1.13.0",
+  "codes": [
+    {
+      "code": "account_not_provisioned",
+      "status": 403,
+      "title_ru": "Учётная запись не подготовлена"
+    },
+    {
+      "code": "address_dataset_missing",
+      "status": null,
+      "title_ru": "Нет принятого локального адресного набора"
+    },
+    {
+      "code": "address_index_unavailable",
+      "status": 503,
+      "title_ru": "Локальный адресный индекс недоступен"
+    },
+    {
+      "code": "admin_required",
+      "status": 403,
+      "title_ru": "Нужны права администратора"
+    },
+    {
+      "code": "approval_input_missing",
+      "status": null,
+      "title_ru": "Отсутствует вход для утверждения"
+    },
+    {
+      "code": "approval_synthetic_inputs",
+      "status": null,
+      "title_ru": "Синтетические входы нельзя утвердить"
+    },
+    {
+      "code": "approved_calculation_incomplete",
+      "status": null,
+      "title_ru": "Полный расчёт не завершён"
+    },
+    {
+      "code": "approved_calculation_missing",
+      "status": null,
+      "title_ru": "Нет проверенного полного расчёта"
+    },
+    {
+      "code": "approved_calculation_modules_missing",
+      "status": null,
+      "title_ru": "В полном расчёте нет обязательных модулей"
+    },
+    {
+      "code": "archive_storage_invalid",
+      "status": 503,
+      "title_ru": "Путь архива недопустим"
+    },
+    {
+      "code": "archive_storage_unavailable",
+      "status": 503,
+      "title_ru": "Архив временно недоступен"
+    },
+    {
+      "code": "authentication_required",
+      "status": 401,
+      "title_ru": "Требуется вход"
+    },
+    {
+      "code": "body_too_large",
+      "status": 413,
+      "title_ru": "Тело запроса слишком большое"
+    },
+    {
+      "code": "building_heights_missing",
+      "status": null,
+      "title_ru": "Нет пригодных высот зданий"
+    },
+    {
+      "code": "buildings_dataset_missing",
+      "status": null,
+      "title_ru": "Нет принятого набора зданий"
+    },
+    {
+      "code": "calculation_module_unavailable",
+      "status": null,
+      "title_ru": "Модуль расчёта не запрошен или недоступен"
+    },
+    {
+      "code": "calculation_request_invalid",
+      "status": 422,
+      "title_ru": "Запрос расчёта недопустим"
+    },
+    {
+      "code": "care_calendar_invalid",
+      "status": 422,
+      "title_ru": "Некорректный календарь ухода"
+    },
+    {
+      "code": "care_resource_exceeded",
+      "status": 422,
+      "title_ru": "Превышен ресурс ухода"
+    },
+    {
+      "code": "care_rule_unavailable",
+      "status": null,
+      "title_ru": "Нет принятого правила ухода"
+    },
+    {
+      "code": "catalog_source_required",
+      "status": 422,
+      "title_ru": "Нужен опубликованный источник каталога"
+    },
+    {
+      "code": "catalog_version_unavailable",
+      "status": 422,
+      "title_ru": "Версия каталога недоступна"
+    },
+    {
+      "code": "city_mismatch",
+      "status": 422,
+      "title_ru": "Город не совпадает"
+    },
+    {
+      "code": "cohort_placement_invalid",
+      "status": 422,
+      "title_ru": "Размещение когорты недопустимо"
+    },
+    {
+      "code": "cohort_planting_date_invalid",
+      "status": 422,
+      "title_ru": "Дата посадки не подтверждена выполнением"
+    },
+    {
+      "code": "cohort_quantity_invalid",
+      "status": 422,
+      "title_ru": "Количество когорты недопустимо"
+    },
+    {
+      "code": "cohort_work_order_invalid",
+      "status": 422,
+      "title_ru": "Наряд не подходит для создания когорты"
+    },
+    {
+      "code": "cohort_work_order_used",
+      "status": 409,
+      "title_ru": "По наряду уже создана когорта"
+    },
+    {
+      "code": "comparison_calculation_missing",
+      "status": null,
+      "title_ru": "Для сравнения отсутствует расчёт"
+    },
+    {
+      "code": "comparison_forecast_unavailable",
+      "status": null,
+      "title_ru": "Прогноз выживаемости недоступен"
+    },
+    {
+      "code": "comparison_input_profiles_differ",
+      "status": null,
+      "title_ru": "Профили входов сравнения различаются"
+    },
+    {
+      "code": "comparison_input_versions_differ",
+      "status": null,
+      "title_ru": "Версии входов сравнения различаются"
+    },
+    {
+      "code": "comparison_lineage_mismatch",
+      "status": 422,
+      "title_ru": "Прогноз и когорта относятся к разным версиям"
+    },
+    {
+      "code": "comparison_observation_coverage",
+      "status": null,
+      "title_ru": "Осмотр охватывает не всю исходную когорту"
+    },
+    {
+      "code": "comparison_observation_unknown",
+      "status": null,
+      "title_ru": "В осмотре есть растения с неизвестным исходом"
+    },
+    {
+      "code": "comparison_snapshot_incomplete",
+      "status": null,
+      "title_ru": "Расчёт прогноза неполон"
+    },
+    {
+      "code": "comparison_snapshot_partial",
+      "status": null,
+      "title_ru": "Один из сравниваемых расчётов частичный"
+    },
+    {
+      "code": "comparison_snapshot_stale",
+      "status": null,
+      "title_ru": "Один из сравниваемых расчётов устарел"
+    },
+    {
+      "code": "comparison_time_mismatch",
+      "status": null,
+      "title_ru": "Дата осмотра не совпадает с горизонтом прогноза"
+    },
+    {
+      "code": "comparison_zone_versions_differ",
+      "status": null,
+      "title_ru": "Версии геометрии зон различаются"
+    },
+    {
+      "code": "coordinate_range",
+      "status": 422,
+      "title_ru": "Координаты вне допустимого диапазона"
+    },
+    {
+      "code": "csrf_rejected",
+      "status": 403,
+      "title_ru": "Проверка CSRF не пройдена"
+    },
+    {
+      "code": "dataset_publication_blocked",
+      "status": 422,
+      "title_ru": "Публикация версии заблокирована"
+    },
+    {
+      "code": "dataset_version_unavailable",
+      "status": 422,
+      "title_ru": "Версия набора недоступна"
+    },
+    {
+      "code": "duplicate_version",
+      "status": 422,
+      "title_ru": "Версия уже существует"
+    },
+    {
+      "code": "export_artifact_corrupt",
+      "status": 503,
+      "title_ru": "Файл отчёта повреждён"
+    },
+    {
+      "code": "export_artifact_too_large",
+      "status": 503,
+      "title_ru": "Файл отчёта превышает допустимый размер"
+    },
+    {
+      "code": "export_download_expired",
+      "status": 410,
+      "title_ru": "Ссылка на отчёт истекла"
+    },
+    {
+      "code": "export_download_invalid",
+      "status": 403,
+      "title_ru": "Ссылка на отчёт недействительна"
+    },
+    {
+      "code": "export_generation_failed",
+      "status": 503,
+      "title_ru": "Не удалось сформировать отчёт"
+    },
+    {
+      "code": "export_target_invalid",
+      "status": 422,
+      "title_ru": "Цель отчёта недоступна для экспорта"
+    },
+    {
+      "code": "geometry_too_complex",
+      "status": 422,
+      "title_ru": "Геометрия слишком сложная"
+    },
+    {
+      "code": "grant_city_mismatch",
+      "status": 422,
+      "title_ru": "Получатель доступа не относится к городу набора"
+    },
+    {
+      "code": "grant_exists",
+      "status": 409,
+      "title_ru": "Доступ к набору уже выдан"
+    },
+    {
+      "code": "grant_not_applicable",
+      "status": 422,
+      "title_ru": "Набор не является закрытым"
+    },
+    {
+      "code": "green_inventory_missing",
+      "status": null,
+      "title_ru": "Нет принятой инвентаризации зелени"
+    },
+    {
+      "code": "http_error",
+      "status": 404,
+      "title_ru": "Ресурс или метод недоступен"
+    },
+    {
+      "code": "idempotency_conflict",
+      "status": 409,
+      "title_ru": "Ключ идемпотентности уже использован"
+    },
+    {
+      "code": "import_review_required",
+      "status": null,
+      "title_ru": "Импорт ожидает проверки"
+    },
+    {
+      "code": "import_validation_failed",
+      "status": null,
+      "title_ru": "Импорт не прошёл проверку"
+    },
+    {
+      "code": "inspection_counts_invalid",
+      "status": 422,
+      "title_ru": "Количество наблюдений недопустимо"
+    },
+    {
+      "code": "inspection_date_invalid",
+      "status": 422,
+      "title_ru": "Дата осмотра недопустима"
+    },
+    {
+      "code": "inspection_source_invalid",
+      "status": 422,
+      "title_ru": "Источник осмотра недоступен"
+    },
+    {
+      "code": "inspection_target_invalid",
+      "status": 422,
+      "title_ru": "Цель осмотра не совпадает с когортой"
+    },
+    {
+      "code": "internal_error",
+      "status": 500,
+      "title_ru": "Внутренняя ошибка"
+    },
+    {
+      "code": "invalid_area",
+      "status": 422,
+      "title_ru": "Площадь геометрии недопустима"
+    },
+    {
+      "code": "invalid_bbox",
+      "status": 422,
+      "title_ru": "Границы карты недопустимы"
+    },
+    {
+      "code": "invalid_body",
+      "status": 422,
+      "title_ru": "Тело запроса не соответствует контракту"
+    },
+    {
+      "code": "invalid_cursor",
+      "status": 422,
+      "title_ru": "Курсор не соответствует запросу"
+    },
+    {
+      "code": "invalid_geometry",
+      "status": 422,
+      "title_ru": "Геометрия недопустима"
+    },
+    {
+      "code": "invalid_json",
+      "status": 422,
+      "title_ru": "Ожидается корректный JSON UTF-8"
+    },
+    {
+      "code": "invalid_parameter",
+      "status": 422,
+      "title_ru": "Параметр запроса недопустим"
+    },
+    {
+      "code": "invalid_transition",
+      "status": 409,
+      "title_ru": "Переход состояния недопустим"
+    },
+    {
+      "code": "job_access_revoked",
+      "status": 403,
+      "title_ru": "Доступ к задаче отозван"
+    },
+    {
+      "code": "job_input_invalid",
+      "status": 500,
+      "title_ru": "Вход фоновой задачи недопустим"
+    },
+    {
+      "code": "job_timeout",
+      "status": 503,
+      "title_ru": "Фоновый расчёт превысил лимит времени"
+    },
+    {
+      "code": "lease_lost",
+      "status": 409,
+      "title_ru": "Аренда фоновой задачи потеряна"
+    },
+    {
+      "code": "license_review_required",
+      "status": null,
+      "title_ru": "Лицензия требует проверки"
+    },
+    {
+      "code": "migration_required",
+      "status": 503,
+      "title_ru": "Требуется миграция базы данных"
+    },
+    {
+      "code": "missing_parameter",
+      "status": 422,
+      "title_ru": "Отсутствует обязательный параметр"
+    },
+    {
+      "code": "missing_rate",
+      "status": null,
+      "title_ru": "Не найдена применимая ставка"
+    },
+    {
+      "code": "missing_registry",
+      "status": null,
+      "title_ru": "Реестр входных данных недоступен"
+    },
+    {
+      "code": "model_version_unavailable",
+      "status": null,
+      "title_ru": "Нет принятой версии модели"
+    },
+    {
+      "code": "not_found",
+      "status": 404,
+      "title_ru": "Объект не найден"
+    },
+    {
+      "code": "oidc_callback_invalid",
+      "status": 422,
+      "title_ru": "Ответ провайдера входа неполон"
+    },
+    {
+      "code": "oidc_endpoint_invalid",
+      "status": 503,
+      "title_ru": "Адрес провайдера входа недопустим"
+    },
+    {
+      "code": "oidc_not_configured",
+      "status": 503,
+      "title_ru": "Провайдер входа не настроен"
+    },
+    {
+      "code": "oidc_state_invalid",
+      "status": 401,
+      "title_ru": "Сеанс входа истёк или не совпадает"
+    },
+    {
+      "code": "oidc_token_invalid",
+      "status": 401,
+      "title_ru": "Ответ провайдера входа не прошёл проверку"
+    },
+    {
+      "code": "oidc_unavailable",
+      "status": 503,
+      "title_ru": "Провайдер входа недоступен"
+    },
+    {
+      "code": "open_ring",
+      "status": 422,
+      "title_ru": "Контур полигона не замкнут"
+    },
+    {
+      "code": "operation_not_implemented",
+      "status": 503,
+      "title_ru": "Операция пока недоступна"
+    },
+    {
+      "code": "origin_rejected",
+      "status": 403,
+      "title_ru": "Источник запроса не разрешён"
+    },
+    {
+      "code": "outside_city",
+      "status": 422,
+      "title_ru": "Геометрия выходит за границу города"
+    },
+    {
+      "code": "placement_outside_zone",
+      "status": 422,
+      "title_ru": "Посадка выходит за границу зоны"
+    },
+    {
+      "code": "placement_plant_excluded",
+      "status": 422,
+      "title_ru": "Исключённое растение нельзя разместить"
+    },
+    {
+      "code": "plant_expert_rejected",
+      "status": null,
+      "title_ru": "Растение отклонено экспертом"
+    },
+    {
+      "code": "plant_expert_review_required",
+      "status": null,
+      "title_ru": "Нужна экспертная проверка растения"
+    },
+    {
+      "code": "plant_explicitly_excluded",
+      "status": null,
+      "title_ru": "Растение исключено пользователем"
+    },
+    {
+      "code": "plant_input_invalid",
+      "status": 422,
+      "title_ru": "Карточка растения недопустима"
+    },
+    {
+      "code": "plant_local_evidence_missing",
+      "status": null,
+      "title_ru": "Нет локального подтверждения растения"
+    },
+    {
+      "code": "plant_reference_invalid",
+      "status": 422,
+      "title_ru": "Источник признака растения недопустим"
+    },
+    {
+      "code": "plant_safety_unknown",
+      "status": null,
+      "title_ru": "Безопасность растения не подтверждена"
+    },
+    {
+      "code": "plant_sensitive_site_excluded",
+      "status": null,
+      "title_ru": "Растение исключено для чувствительной территории"
+    },
+    {
+      "code": "plant_sensitive_site_review",
+      "status": null,
+      "title_ru": "Нужна проверка для чувствительной территории"
+    },
+    {
+      "code": "plant_taxon_requires_review",
+      "status": null,
+      "title_ru": "Таксон требует уточнения вида или сорта"
+    },
+    {
+      "code": "plant_trait_missing",
+      "status": null,
+      "title_ru": "Нет проверенного признака растения"
+    },
+    {
+      "code": "priority_normalization_unavailable",
+      "status": 422,
+      "title_ru": "Версия нормализации приоритетов недоступна"
+    },
+    {
+      "code": "priority_weights_invalid",
+      "status": 422,
+      "title_ru": "Веса приоритетов недопустимы"
+    },
+    {
+      "code": "priority_zones_invalid",
+      "status": 422,
+      "title_ru": "Список зон приоритетов недопустим"
+    },
+    {
+      "code": "program_approval_synthetic",
+      "status": null,
+      "title_ru": "Синтетические сценарии программы нельзя утвердить"
+    },
+    {
+      "code": "program_calculation_incomplete",
+      "status": null,
+      "title_ru": "Расчёт кандидата городской программы неполон"
+    },
+    {
+      "code": "program_candidates_invalid",
+      "status": 422,
+      "title_ru": "Кандидаты городской программы недопустимы"
+    },
+    {
+      "code": "program_coverage_invalid",
+      "status": 422,
+      "title_ru": "Требования охвата городской программы недопустимы"
+    },
+    {
+      "code": "program_diversity_invalid",
+      "status": 422,
+      "title_ru": "Ограничения разнообразия городской программы недопустимы"
+    },
+    {
+      "code": "program_infeasible",
+      "status": null,
+      "title_ru": "Ограничения городской программы несовместимы"
+    },
+    {
+      "code": "program_not_draft",
+      "status": 409,
+      "title_ru": "Городская программа не является черновиком"
+    },
+    {
+      "code": "program_priority_incomplete",
+      "status": null,
+      "title_ru": "Приоритет кандидата рассчитан не полностью"
+    },
+    {
+      "code": "program_priority_invalid",
+      "status": 422,
+      "title_ru": "Результат приоритетов программы недопустим"
+    },
+    {
+      "code": "program_resources_invalid",
+      "status": 422,
+      "title_ru": "Ресурсные лимиты городской программы недопустимы"
+    },
+    {
+      "code": "program_revalidation_failed",
+      "status": null,
+      "title_ru": "Решение программы не прошло повторную проверку"
+    },
+    {
+      "code": "program_revision_stale",
+      "status": null,
+      "title_ru": "Версия программы устарела"
+    },
+    {
+      "code": "program_scenario_not_approved",
+      "status": null,
+      "title_ru": "Выбранный сценарий программы не утверждён"
+    },
+    {
+      "code": "program_selection_empty",
+      "status": null,
+      "title_ru": "В программе ничего не выбрано"
+    },
+    {
+      "code": "program_stock_unavailable",
+      "status": null,
+      "title_ru": "Точный складской остаток кандидата недоступен"
+    },
+    {
+      "code": "program_taxonomy_unavailable",
+      "status": null,
+      "title_ru": "Таксономические данные кандидата недоступны"
+    },
+    {
+      "code": "program_transition_blocked",
+      "status": 422,
+      "title_ru": "Переход городской программы заблокирован"
+    },
+    {
+      "code": "program_weights_invalid",
+      "status": 422,
+      "title_ru": "Веса городской программы недопустимы"
+    },
+    {
+      "code": "program_zones_invalid",
+      "status": 422,
+      "title_ru": "Зоны городской программы недопустимы"
+    },
+    {
+      "code": "range_not_satisfiable",
+      "status": 416,
+      "title_ru": "Диапазон байтов недоступен"
+    },
+    {
+      "code": "rate_not_applicable",
+      "status": null,
+      "title_ru": "Ставка неприменима к строке сметы"
+    },
+    {
+      "code": "rate_quantity_basis_missing",
+      "status": null,
+      "title_ru": "Нет основания для количества по ставке"
+    },
+    {
+      "code": "rate_source_invalid",
+      "status": 422,
+      "title_ru": "Источник ставки недопустим"
+    },
+    {
+      "code": "rate_version_unavailable",
+      "status": 422,
+      "title_ru": "Версия ставки неприменима"
+    },
+    {
+      "code": "recommendation_selection_invalid",
+      "status": 422,
+      "title_ru": "Выбор растений для подбора недопустим"
+    },
+    {
+      "code": "recommendation_weights_invalid",
+      "status": 422,
+      "title_ru": "Веса подбора недопустимы"
+    },
+    {
+      "code": "registry_inputs_unavailable",
+      "status": 422,
+      "title_ru": "Входы реестра недоступны"
+    },
+    {
+      "code": "replacement_care_basis_missing",
+      "status": null,
+      "title_ru": "Нет базы ухода для когорт замены"
+    },
+    {
+      "code": "replacement_evidence_missing",
+      "status": 422,
+      "title_ru": "Нет подтверждённых потерь для замены"
+    },
+    {
+      "code": "replacement_model_missing",
+      "status": null,
+      "title_ru": "Нет модели для ожидаемых замен"
+    },
+    {
+      "code": "replacement_quantity_exceeded",
+      "status": 422,
+      "title_ru": "Количество замен превышает подтверждённые потери"
+    },
+    {
+      "code": "replacement_target_invalid",
+      "status": 422,
+      "title_ru": "Цель замены не совпадает с исходной когортой"
+    },
+    {
+      "code": "replay_policy_missing",
+      "status": 500,
+      "title_ru": "Не задана политика повтора операции"
+    },
+    {
+      "code": "research_not_approved",
+      "status": null,
+      "title_ru": "Исследовательский источник не принят"
+    },
+    {
+      "code": "research_publication_blocked",
+      "status": 422,
+      "title_ru": "Публикация исследовательских данных заблокирована"
+    },
+    {
+      "code": "restriction_clearance_unverified",
+      "status": null,
+      "title_ru": "Отсутствие ограничений не подтверждено"
+    },
+    {
+      "code": "restriction_data_missing",
+      "status": null,
+      "title_ru": "Нет принятого слоя ограничений"
+    },
+    {
+      "code": "restriction_geometry_too_complex",
+      "status": null,
+      "title_ru": "Геометрия ограничения слишком подробна для карточки"
+    },
+    {
+      "code": "restriction_results_truncated",
+      "status": null,
+      "title_ru": "Список ограничений сокращён"
+    },
+    {
+      "code": "restriction_rule_missing",
+      "status": null,
+      "title_ru": "У ограничения нет версии правила"
+    },
+    {
+      "code": "revision_conflict",
+      "status": 412,
+      "title_ru": "Версия объекта изменилась"
+    },
+    {
+      "code": "risk_reserve_rate_missing",
+      "status": null,
+      "title_ru": "Нет ставки резерва риска"
+    },
+    {
+      "code": "role_required",
+      "status": 403,
+      "title_ru": "Недостаточно прав"
+    },
+    {
+      "code": "rule_record_invalid",
+      "status": 422,
+      "title_ru": "Запись версии правила недопустима"
+    },
+    {
+      "code": "rule_version_conflict",
+      "status": 409,
+      "title_ru": "Идентификатор версии правила уже используется"
+    },
+    {
+      "code": "rule_version_unavailable",
+      "status": 422,
+      "title_ru": "Версия правила недоступна"
+    },
+    {
+      "code": "safety_inputs_missing",
+      "status": null,
+      "title_ru": "Не хватает входов безопасности"
+    },
+    {
+      "code": "scenario_approval_blocked",
+      "status": 422,
+      "title_ru": "Утверждение сценария заблокировано"
+    },
+    {
+      "code": "scenario_comparison_invalid",
+      "status": 422,
+      "title_ru": "Набор сценариев для сравнения недопустим"
+    },
+    {
+      "code": "scenario_comparison_unavailable",
+      "status": 422,
+      "title_ru": "Сравнение сценариев пока недоступно"
+    },
+    {
+      "code": "scenario_not_draft",
+      "status": 409,
+      "title_ru": "Сценарий не является черновиком"
+    },
+    {
+      "code": "session_revoked",
+      "status": 401,
+      "title_ru": "Сеанс отозван"
+    },
+    {
+      "code": "shadow_datetime_naive",
+      "status": 422,
+      "title_ru": "Для момента тени нужен часовой пояс"
+    },
+    {
+      "code": "shadow_grid_invalid",
+      "status": 422,
+      "title_ru": "Шаг сетки тени недопустим"
+    },
+    {
+      "code": "shadow_grid_too_large",
+      "status": 422,
+      "title_ru": "Сетка тени слишком велика"
+    },
+    {
+      "code": "shadow_inputs_too_large",
+      "status": 422,
+      "title_ru": "Слишком много входных объектов для тени"
+    },
+    {
+      "code": "shadow_length_capped",
+      "status": null,
+      "title_ru": "Длина тени ограничена расчётным пределом"
+    },
+    {
+      "code": "shadow_location_invalid",
+      "status": 422,
+      "title_ru": "Координаты расчёта тени недопустимы"
+    },
+    {
+      "code": "shadow_mode_invalid",
+      "status": 422,
+      "title_ru": "Режим геометрии тени недопустим"
+    },
+    {
+      "code": "shadow_timeout",
+      "status": 503,
+      "title_ru": "Расчёт тени превысил лимит времени"
+    },
+    {
+      "code": "shadow_zone_invalid",
+      "status": 422,
+      "title_ru": "Геометрия зоны для тени недопустима"
+    },
+    {
+      "code": "soil_data_missing",
+      "status": null,
+      "title_ru": "Нет принятого слоя почв"
+    },
+    {
+      "code": "soil_partial_coverage",
+      "status": null,
+      "title_ru": "Почвенные данные покрывают часть зоны"
+    },
+    {
+      "code": "source_quality_warning",
+      "status": null,
+      "title_ru": "Источник имеет предупреждения качества"
+    },
+    {
+      "code": "stock_item_unavailable",
+      "status": 422,
+      "title_ru": "Складская позиция недоступна"
+    },
+    {
+      "code": "stock_record_invalid",
+      "status": 422,
+      "title_ru": "Некорректная запись склада"
+    },
+    {
+      "code": "storage_unavailable",
+      "status": 503,
+      "title_ru": "Хранилище временно недоступно"
+    },
+    {
+      "code": "suitability_weights_missing",
+      "status": null,
+      "title_ru": "Не сохранены веса пригодности"
+    },
+    {
+      "code": "sun_below_horizon",
+      "status": 422,
+      "title_ru": "Солнце ниже горизонта"
+    },
+    {
+      "code": "tax_unresolved",
+      "status": null,
+      "title_ru": "Налоговый режим не учтён полностью"
+    },
+    {
+      "code": "unsupported_content_type",
+      "status": 415,
+      "title_ru": "Тип содержимого не поддерживается"
+    },
+    {
+      "code": "upload_checksum_mismatch",
+      "status": 422,
+      "title_ru": "Контрольная сумма файла не совпадает"
+    },
+    {
+      "code": "upload_content_type_mismatch",
+      "status": 415,
+      "title_ru": "Тип файла не совпадает с заявкой"
+    },
+    {
+      "code": "upload_content_type_rejected",
+      "status": 415,
+      "title_ru": "Тип файла не разрешён"
+    },
+    {
+      "code": "upload_filename_invalid",
+      "status": 422,
+      "title_ru": "Имя файла недопустимо"
+    },
+    {
+      "code": "upload_format_mismatch",
+      "status": 422,
+      "title_ru": "Формат импорта не совпадает с файлом"
+    },
+    {
+      "code": "upload_not_ready",
+      "status": 409,
+      "title_ru": "Файл не готов к импорту"
+    },
+    {
+      "code": "upload_size_mismatch",
+      "status": 422,
+      "title_ru": "Размер файла не совпадает с заявкой"
+    },
+    {
+      "code": "upload_storage_corrupt",
+      "status": 503,
+      "title_ru": "Файл в хранилище повреждён"
+    },
+    {
+      "code": "upload_storage_invalid",
+      "status": 500,
+      "title_ru": "Путь хранилища недопустим"
+    },
+    {
+      "code": "upload_storage_missing",
+      "status": 503,
+      "title_ru": "Файл отсутствует в хранилище"
+    },
+    {
+      "code": "upload_ticket_expired",
+      "status": 410,
+      "title_ru": "Срок загрузки файла истёк"
+    },
+    {
+      "code": "utility_network_data_missing",
+      "status": null,
+      "title_ru": "Нет разрешённого слоя инженерных сетей"
+    },
+    {
+      "code": "version_rejected",
+      "status": null,
+      "title_ru": "Версия отклонена"
+    },
+    {
+      "code": "work_calendar_ambiguous",
+      "status": 422,
+      "title_ru": "Календарь ухода неоднозначен"
+    },
+    {
+      "code": "work_calendar_mismatch",
+      "status": 422,
+      "title_ru": "Дата выполнения не совпадает с календарём ухода"
+    },
+    {
+      "code": "work_care_operation_invalid",
+      "status": 422,
+      "title_ru": "Операция наряда не совпадает с планом ухода"
+    },
+    {
+      "code": "work_care_operation_used",
+      "status": 409,
+      "title_ru": "Для операции ухода уже создан наряд"
+    },
+    {
+      "code": "work_completion_already_corrected",
+      "status": 409,
+      "title_ru": "Выполнение уже исправлено"
+    },
+    {
+      "code": "work_order_execution_blocked",
+      "status": 422,
+      "title_ru": "Исполнение наряда заблокировано"
+    },
+    {
+      "code": "work_order_quantity_exceeded",
+      "status": 422,
+      "title_ru": "Выполненный объём превышает план"
+    },
+    {
+      "code": "work_order_target_invalid",
+      "status": 422,
+      "title_ru": "Цель наряда не согласована со сценарием"
+    },
+    {
+      "code": "work_order_transition_invalid",
+      "status": 409,
+      "title_ru": "Переход статуса наряда недопустим"
+    },
+    {
+      "code": "work_resource_evidence_missing",
+      "status": 422,
+      "title_ru": "Не заполнен фактический расход ресурса"
+    },
+    {
+      "code": "work_resource_exceeded",
+      "status": 422,
+      "title_ru": "Фактический расход превышает лимит"
+    },
+    {
+      "code": "work_resource_limit_missing",
+      "status": 422,
+      "title_ru": "Для периода ухода не задан лимит ресурсов"
+    },
+    {
+      "code": "coefficient_source_invalid",
+      "status": 422,
+      "title_ru": "Источник коэффициента не подходит"
+    },
+    {
+      "code": "coefficient_version_unavailable",
+      "status": 422,
+      "title_ru": "Версия коэффициента недоступна для расчёта"
+    },
+    {
+      "code": "ecosystem_coefficient_unavailable",
+      "status": null,
+      "title_ru": "Нет утверждённых экологических коэффициентов"
+    },
+    {
+      "code": "problem_already_decided",
+      "status": 409,
+      "title_ru": "По проблеме уже принято решение"
+    },
+    {
+      "code": "replacement_care_resource_exceeded",
+      "status": null,
+      "title_ru": "Уход за заменами превышает ресурсный лимит"
+    },
+    {
+      "code": "thermal_inputs_unavailable",
+      "status": 422,
+      "title_ru": "Нет входных данных для теплового расчёта"
+    },
+    {
+      "code": "zone_mismatch",
+      "status": 422,
+      "title_ru": "Зона не совпадает"
+    },
+    {
+      "code": "zone_version_mismatch",
+      "status": 422,
+      "title_ru": "Версия принадлежит другой зоне"
+    }
+  ]
+}

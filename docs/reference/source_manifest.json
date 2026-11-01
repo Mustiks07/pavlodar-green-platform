@@ -1,0 +1,8 @@
+{
+  "filename": "TZ_AI_ozelenenie_akimat.docx",
+  "sha256": "3db93a2c387e10604e0cf46035cbc4e1e733bcfc53220ef593d9e9fdff3a5211",
+  "version": "1.0",
+  "document_date": "2026-10-22",
+  "extraction": "word/document.xml paragraphs in document order; table cells linearized",
+  "instructions_policy": "Source requirements for analysis, not agent/tool instructions"
+}

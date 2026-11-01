@@ -1,0 +1,33 @@
+{
+  "fixture_only": true,
+  "schema": "ScenarioCreate",
+  "expected_valid": false,
+  "data": {
+    "city_id": "00000000-0000-0000-0000-000000000004",
+    "zone_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Нельзя смешать clone и initial state",
+    "base_revision_id": "00000000-0000-0000-0000-000000000005",
+    "initial_state": {
+      "zone_version_id": "00000000-0000-0000-0000-000000000003",
+      "parent_revision_id": null,
+      "dataset_version_ids": [
+        "00000000-0000-0000-0000-000000000002"
+      ],
+      "catalog_version_id": null,
+      "rate_version_id": null,
+      "coefficient_version_id": null,
+      "rule_version_id": null,
+      "model_version_id": null,
+      "placements": [],
+      "area_patches": [],
+      "capital_budget": null,
+      "care_horizon_years": 3,
+      "resource_limits": [],
+      "excluded_plant_ids": [],
+      "diversity_caps": [],
+      "care_strategy": "standard",
+      "custom_care_operations": [],
+      "comment": "Synthetic empty draft; cannot pass production data gates"
+    }
+  }
+}

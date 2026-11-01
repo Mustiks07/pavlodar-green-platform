@@ -1,0 +1,33 @@
+{
+  "task_id": "WP-01",
+  "owner": "GPT",
+  "state": "integration_verified",
+  "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
+  "branch": "gpt/WP-00-foundation",
+  "depends_on": [
+    "WP-00"
+  ],
+  "contract_version": "1.5.0",
+  "migration": "0017_map_archives",
+  "latest_backend_sha": "8f9e6a9c4c3bc9e33ad02a6857033931a6d12f53",
+  "production_ready": false,
+  "data_gates_open": [
+    "DR-01",
+    "DR-02",
+    "DR-03",
+    "DR-04",
+    "DR-05",
+    "DR-06",
+    "DR-07"
+  ],
+  "implemented": [
+    "OIDC session, role/city/dataset authorization, CSRF and idempotency",
+    "durable Job/outbox/events with fenced retry, cancellation and recovery",
+    "authorized resumable streamJobEvents SSE with Last-Event-ID/query cursor",
+    "audit and resource-concealing 404 policy"
+  ],
+  "pending": [
+    "production concurrent SSE load and reverse-proxy idle-timeout acceptance",
+    "switch Claude job hook from polling to SSE with fallback"
+  ]
+}

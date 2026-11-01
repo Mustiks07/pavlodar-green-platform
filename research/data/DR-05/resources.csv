@@ -1,0 +1,5 @@
+record_id,topic,value,status,reason,source_id
+DR-05-monthly_budget,monthly_budget,null,unavailable,Организатор не передал лимиты бюджета по месяцам/годам.,PROJECT-TZ
+DR-05-water_capacity,water_capacity,null,unavailable,Нет лимита воды и доступных точек забора.,PROJECT-TZ
+DR-05-crew_hours,crew_hours,null,unavailable,"Нет бригад, календарей и доступных человеко-часов.",PROJECT-TZ
+DR-05-vehicle_capacity,vehicle_capacity,null,unavailable,"Нет автоцистерн, маршрутов и числа рейсов.",PROJECT-TZ

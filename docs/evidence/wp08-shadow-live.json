@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "scope": "Real OIDC -> HTTP -> PostgreSQL outbox -> Redis/Celery worker -> immutable SpatialResult -> authorized GeoJSON artifact",
+  "contract_version": "1.4.0",
+  "migration": "0016_spatial_results",
+  "city_id": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "dataset_version_id": "786ee7ef-a309-4ea7-a678-d49a07e5ccf1",
+  "zone_id": "cf1bc1d8-c599-4f56-b064-e6075476bdb5",
+  "scenario_revision_id": "89fbfb88-5e5b-4964-8322-28effc70d315",
+  "job_id": "88b449d1-0209-45fe-a464-0f20f36a7c6f",
+  "result_id": "fa12aa0a-374a-50a1-a6ca-f76a705135da",
+  "status": "complete",
+  "shade_area_m2": 573.8,
+  "used_buildings": 1,
+  "artifact_geometry_type": "Polygon",
+  "synthetic_test_zone": true,
+  "real_published_building_inputs": true
+}

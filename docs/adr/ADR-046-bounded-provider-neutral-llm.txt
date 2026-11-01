@@ -1,0 +1,27 @@
+ADR-046: Ограниченная provider-neutral граница LLM
+Статус: принято для первого инкремента WP-10
+Дата: 2026-10-31
+
+Контекст
+Canonical 1.11.0 уже содержит chat sessions, messages, facts и proposals. Экспорт не зависит
+от LLM. Для реализации чата нельзя давать модели прямой SQL/HTTP-доступ, передавать секреты
+в сообщения или переключать провайдера после safety-refusal ради обхода его политики.
+
+Решение
+1. Внутренний transport поддерживает OpenRouter/Groq как OpenAI-compatible API и Gemini
+   как отдельный adapter. Canonical chat contract на этом шаге не меняется.
+2. Primary/fallback задаются только окружением. Ключи являются SecretStr, не логируются и
+   не записываются в БД. Production по умолчанию имеет provider=disabled.
+3. До сети ограничиваются 32 сообщения, 50 000 символов, 12 allowlisted tools, размер JSON
+   schema и arguments. Выход провайдера считается недоверенным.
+4. Fallback разрешён для timeout/network/429/5xx/auth/model-unavailable. Некорректный запрос,
+   недопустимый tool, плохой JSON и safety-refusal завершаются без другого провайдера.
+5. Adapter возвращает provider/model/token usage, но не вычисляет стоимость и не исполняет
+   tools. ACL retrieval, immutable facts/proposals и durable chat job реализуются отдельно.
+
+Следствия
+- Локальный hackathon smoke может использовать бесплатный provider, но доступность/лимиты
+  не становятся свойством продукта.
+- Следующий инкремент обязан применить dataset/city/revision ACL до формирования prompt и
+  повторить доступ при выполнении каждого tool.
+- Перед публикацией локальные тестовые ключи перевыпускаются; значения не входят в Git.

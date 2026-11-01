@@ -1,0 +1,26 @@
+{
+  "fixture_only": true,
+  "schema": "RuleVersion",
+  "expected_valid": true,
+  "origin": "SYNTHETIC conflict fixture; not an official legal interpretation",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000601",
+    "source": {
+      "dataset_version_id": "00000000-0000-4000-8000-000000000602",
+      "source_record_id": "synthetic-clause",
+      "label": "SYNTHETIC legal text fixture",
+      "uri": null
+    },
+    "act_number": "SYNTHETIC-1",
+    "clause": "1.1",
+    "revision_date": "2026-10-29",
+    "parameter": "planting_allowed",
+    "value": null,
+    "unit": null,
+    "applicability": "Только проверка формы контракта",
+    "condition": "Источники противоречат друг другу",
+    "review_status": "conflict_requires_review",
+    "source_status": "research_unverified",
+    "superseded_by": null
+  }
+}

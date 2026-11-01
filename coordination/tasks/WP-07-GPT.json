@@ -1,0 +1,23 @@
+{
+  "task_id": "WP-07",
+  "owner": "GPT",
+  "integration_partner": "Claude",
+  "state": "in_progress",
+  "branch": "gpt/WP-00-foundation",
+  "contract_version": "1.6.2",
+  "migration": "0018_programs,0019_priority_results,0020_program_priority_reference,0021_program_jobs,0022_program_calc_lineage",
+  "latest_backend_sha": "5dbc4608e73fd3da25e1f08d2c39c47151a07929",
+  "implemented_backend": [
+    "immutable ProgramInputVersion history with normalized exact ScenarioRevision candidates",
+    "create/get/list/update Program API with ETag conflict handling and idempotent replay",
+    "city/input authorization and draft owner/admin concealment",
+    "validation for candidate, weight, resource, zone, diversity and coverage invariants",
+    "discoverable immutable priority normalization and authoritative source-aware PriorityResult",
+    "normalized ProgramInputVersion priority reference and deterministic tested CP-SAT constraint core",
+    "durable optimizeProgram job, authoritative complete-calculation candidate assembly and immutable calculation lineage"
+  ],
+  "pending_backend": [
+    "transition/approval gates, diff and manual revalidation"
+  ],
+  "production_ready": false
+}

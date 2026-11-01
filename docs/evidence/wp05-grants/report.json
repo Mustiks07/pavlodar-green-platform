@@ -1,0 +1,159 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T07:24:08.530Z",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC restricted and public datasets created by the specialist",
+      "pass": true,
+      "detail": {
+        "restricted": "7bfe6628-831d-4b92-b158-20b11adfbd44",
+        "open": "d032923d-33d2-4477-9801-939f5a42b995"
+      }
+    },
+    {
+      "name": "admin without a grant: server returns 404 for content and the dataset is not listed",
+      "pass": true,
+      "detail": {
+        "contentStatus": 404,
+        "listedForAdmin": 0
+      }
+    },
+    {
+      "name": "opened by id: name hidden, \"management only\" stated, policy shown, creator listed",
+      "pass": true,
+      "detail": {
+        "invalidShown": true,
+        "hiddenName": true,
+        "adminOnly": true,
+        "policy": true,
+        "creatorListed": true
+      }
+    },
+    {
+      "name": "URL keeps the opened dataset",
+      "pass": true
+    },
+    {
+      "name": "grant: candidates exclude existing grants; reason required; confirmation names user and reason",
+      "pass": true,
+      "detail": {
+        "candidatesOk": true,
+        "blockedNoReason": true
+      }
+    },
+    {
+      "name": "grant saved: viewer in the list and the viewer now sees the dataset (server)",
+      "pass": true,
+      "detail": {
+        "rowsAfterGrant": [
+          "SYNTHETIC TEST specialist\t\nспециалист\n\t\nОтозвать…",
+          "SYNTHETIC TEST viewer\t\nпросмотр\n\t\nОтозвать…"
+        ],
+        "viewerSees": true
+      }
+    },
+    {
+      "name": "audit history shows the decision with author and reason",
+      "pass": true,
+      "detail": "История решений по набору\nвыдан доступ 31.10.2026, 12:24 · решение: SYNTHETIC TEST admin — «SYNTHETIC TEST: проверка выдачи доступа»\n\nПолучатель решения в журнале сервера не указывается — только набор, автор, время и причина.\n\nПросмотрен весь журнал, событий: 2."
+    },
+    {
+      "name": "409 grant_exists: explained, list refreshed, admin now marked as explicitly granted",
+      "pass": true,
+      "detail": {
+        "pre": 201,
+        "existsShown": true,
+        "selfGranted": true
+      }
+    },
+    {
+      "name": "revoke: reason required; 404 when already revoked is explained and the list refreshed",
+      "pass": true,
+      "detail": {
+        "revokeBlocked": true,
+        "pre": 200,
+        "goneShown": true,
+        "viewerGone": true
+      }
+    },
+    {
+      "name": "self revoke: warning shown, state back to \"management only\", server hides content again",
+      "pass": true,
+      "detail": {
+        "selfWarn": true,
+        "backToAdminOnly": true,
+        "contentAfter": 404
+      }
+    },
+    {
+      "name": "reload restores the dataset panel from the URL",
+      "pass": true
+    },
+    {
+      "name": "public dataset: grants not applicable; unknown id: not found",
+      "pass": true,
+      "detail": {
+        "notRestricted": true,
+        "notFound": true
+      }
+    },
+    {
+      "name": "city users: roles listed with the \"role is not dataset access\" note",
+      "pass": true
+    },
+    {
+      "name": "audit log shows actor names for grant decisions",
+      "pass": true
+    },
+    {
+      "name": "specialist: admin section forbidden; server answers 403",
+      "pass": true,
+      "detail": {
+        "spForbidden": true,
+        "spApi": 403
+      }
+    },
+    {
+      "name": "imports detail: no access-management link for the specialist",
+      "pass": true,
+      "detail": {
+        "spLink": 0
+      }
+    },
+    {
+      "name": "phone (dark): no horizontal scroll, panel fits 390 px",
+      "pass": true,
+      "detail": {
+        "overflow": 0,
+        "pb": {
+          "x": 29,
+          "y": 47.578125,
+          "width": 332,
+          "height": 1198.046875
+        }
+      }
+    },
+    {
+      "name": "no page errors in the admin session",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp05-grants/grants-admin-only.png",
+    "docs/evidence/wp05-grants/grants-confirm.png",
+    "docs/evidence/wp05-grants/grants-granted.png",
+    "docs/evidence/wp05-grants/grants-409.png",
+    "docs/evidence/wp05-grants/grants-revoke-self.png",
+    "docs/evidence/wp05-grants/grants-not-found.png",
+    "docs/evidence/wp05-grants/grants-forbidden.png",
+    "docs/evidence/wp05-grants/grants-mobile-dark.png"
+  ],
+  "finishedAt": "2026-10-31T07:24:29.207Z",
+  "passed": true,
+  "synthetic": {
+    "restricted": "7bfe6628-831d-4b92-b158-20b11adfbd44",
+    "public": "d032923d-33d2-4477-9801-939f5a42b995",
+    "specialist": "00000000-0000-4000-8000-000000000002"
+  }
+}

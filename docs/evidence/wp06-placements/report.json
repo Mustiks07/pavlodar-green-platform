@@ -1,0 +1,192 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T07:30:52.470Z",
+  "checks": [
+    {
+      "name": "synthetic restrictions record promoted to an expert-confirmed rule version (setup)",
+      "pass": true,
+      "detail": {
+        "ruleStatus": 200
+      }
+    },
+    {
+      "name": "synthetic catalog published and two plants created (setup)",
+      "pass": true,
+      "detail": {
+        "s": [
+          201,
+          201
+        ]
+      }
+    },
+    {
+      "name": "synthetic stock published: null, 0 and 5 kept apart (setup)",
+      "pass": true,
+      "detail": {
+        "n": 3
+      }
+    },
+    {
+      "name": "synthetic zone and empty draft scenario created (setup)",
+      "pass": true,
+      "detail": {
+        "s": [
+          201,
+          201
+        ]
+      }
+    },
+    {
+      "name": "editor shows an empty state and the zone plan",
+      "pass": true
+    },
+    {
+      "name": "selected placement shows supplier offers: unknown stock is not zero, zero is explicit, no source line",
+      "pass": true,
+      "detail": "Предложения поставщиков\nSYNTHETIC TEST питомник\nSYNTHETIC TEST контейнер\nнет в наличии\nПавлодар\nЦена материала\nнет цены\nОстаток\nнет в наличии (0) на 30.10.2026\nРазмер\n1,0–1,5 м · контейнер C10 · container\nЦена наблюдалась\n30.10.2026, 05:00\nПроверено\n30.10.2026\nПрименимость\nSYNTHETIC TEST only\nSYNTHE"
+    },
+    {
+      "name": "three placements added on the plan with fresh stable UUIDs",
+      "pass": true,
+      "detail": [
+        "6cd30aff",
+        "b6b7b9f9",
+        "58f8f225"
+      ]
+    },
+    {
+      "name": "drag moves the placement and keeps its id",
+      "pass": true
+    },
+    {
+      "name": "undo restores the position, redo re-applies it",
+      "pass": true
+    },
+    {
+      "name": "quantity and lock edited; a locked placement does not move",
+      "pass": true
+    },
+    {
+      "name": "keyboard: arrows nudge 5 px per press, Delete removes, Ctrl+Z restores",
+      "pass": true,
+      "detail": {
+        "dxPx": 10,
+        "afterDel": 2
+      }
+    },
+    {
+      "name": "a placement outside the zone is flagged before sending; undo removes it",
+      "pass": true
+    },
+    {
+      "name": "editor shows no money or survival numbers",
+      "pass": true
+    },
+    {
+      "name": "catalog version taken from the chosen plant; saving blocked until a rule version is set",
+      "pass": true,
+      "detail": {
+        "blockedNoRule": true,
+        "ruleMsg": true,
+        "catalogShown": true
+      }
+    },
+    {
+      "name": "rule picker: nothing preselected; rule needing an expert listed with status and not selectable",
+      "pass": true,
+      "detail": {
+        "preselected": "",
+        "pendingDisabled": true,
+        "pendingLabel": "synthetic_pending · SYNTHETIC-ACT-2, п. 2 · редакция 01.01.2026 — текст проверен, нужен эксперт"
+      }
+    },
+    {
+      "name": "rule chosen from listRuleVersions: expert status and act shown, saving unblocked",
+      "pass": true,
+      "detail": {
+        "ruleOk": true,
+        "ruleAct": true
+      }
+    },
+    {
+      "name": "manual id fallback shows the chosen id",
+      "pass": true
+    },
+    {
+      "name": "saved via If-Match as a new revision; server kept the client placement ids",
+      "pass": true,
+      "detail": {
+        "n": 3,
+        "revision": "633f917a"
+      }
+    },
+    {
+      "name": "reload restores the unsaved placement edit (local draft)",
+      "pass": true
+    },
+    {
+      "name": "concurrent revision accepted (setup)",
+      "pass": true,
+      "detail": {
+        "status": 201
+      }
+    },
+    {
+      "name": "stale If-Match -> 412 explained; my draft kept",
+      "pass": true
+    },
+    {
+      "name": "three-way merge: their new placement kept, my edit wins on the shared one, the collision is listed",
+      "pass": true,
+      "detail": {
+        "n": 4,
+        "mergeText": "6cd30aff — изменена и вами, и другим пользователем — оставлена ваша версия"
+      }
+    },
+    {
+      "name": "merged revision saved: 4 placements, theirs included, my quantity on placement 1",
+      "pass": true,
+      "detail": {
+        "n": 4
+      }
+    },
+    {
+      "name": "no uncaught page errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "phone: finger drag moves an unlocked placement (draft), id unchanged",
+      "pass": true
+    },
+    {
+      "name": "phone: editor fits the viewport width",
+      "pass": true,
+      "detail": {
+        "x": 33,
+        "y": -276,
+        "width": 324,
+        "height": 2860.78125
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp06-placements/placements-outside-warning.png",
+    "docs/evidence/wp06-placements/placements-rule-picker.png",
+    "docs/evidence/wp06-placements/placements-saved.png",
+    "docs/evidence/wp06-placements/placements-conflict-412.png",
+    "docs/evidence/wp06-placements/placements-merged.png",
+    "docs/evidence/wp06-placements/placements-dark.png",
+    "docs/evidence/wp06-placements/placements-mobile.png"
+  ],
+  "finishedAt": "2026-10-31T07:31:39.889Z",
+  "passed": true,
+  "synthetic": {
+    "scenario": "24d0e8b9-239a-4848-b18e-0e4efcb2a917",
+    "zone": "447c0696-09db-47e5-867d-1a03f9a039cd",
+    "plants": [
+      "e3658a3c-7065-46c8-8e8b-5f7ecc2621a2",
+      "6f26f9aa-6bb7-4a88-b1ee-43b9639c2e81"
+    ]
+  }
+}

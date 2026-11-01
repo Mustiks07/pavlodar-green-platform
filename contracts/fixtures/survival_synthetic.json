@@ -1,0 +1,41 @@
+{
+  "fixture_only": true,
+  "schema": "SurvivalResult",
+  "expected_valid": true,
+  "data": {
+    "placement_id": "00000000-0000-0000-0000-00000000000b",
+    "model_kind": "expert_rules",
+    "calibration_status": "uncalibrated",
+    "points": [
+      {
+        "year": 1,
+        "probability": 0.8,
+        "lower": null,
+        "upper": null
+      },
+      {
+        "year": 2,
+        "probability": 0.72,
+        "lower": null,
+        "upper": null
+      },
+      {
+        "year": 3,
+        "probability": 0.684,
+        "lower": null,
+        "upper": null
+      }
+    ],
+    "risks": [],
+    "data_gaps": [
+      {
+        "code": "MISSING_MEASUREMENTS",
+        "message": "Нет подтверждённых измерений",
+        "required_inputs": [
+          "air_temperature_observations"
+        ],
+        "blocking": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "licenses.csv": [
+    {
+      "source_id": "OSM-LICENSE",
+      "license": "ODbL-1.0",
+      "scope": "База геоданных; атрибуция и ODbL, не разрешение на массовую загрузку публичных тайлов.",
+      "approval": "not_product_owner_approved"
+    },
+    {
+      "source_id": "WEATHER-LICENSE",
+      "license": "CC-BY-4.0 data; separate API service terms",
+      "scope": "Данные CC BY 4.0; бесплатный API отдельно ограничен некоммерческим использованием.",
+      "approval": "not_product_owner_approved"
+    },
+    {
+      "source_id": "COPDEM",
+      "license": "Copernicus DEM licence (not generic CC-BY)",
+      "scope": "Применять собственную лицензию Copernicus DEM; generic CC BY не подставлять.",
+      "approval": "not_product_owner_approved"
+    },
+    {
+      "source_id": "S2-DOC",
+      "license": "Copernicus Sentinel data terms",
+      "scope": "Copernicus Sentinel data terms; требования доступа к сервисам отдельны.",
+      "approval": "not_product_owner_approved"
+    }
+  ],
+  "data.csv": [
+    {
+      "record_id": "DR-07-hosting",
+      "topic": "hosting",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Требуется ответ владельца/организаторов; поиском не устанавливается.",
+      "source_id": "PROJECT-TZ"
+    },
+    {
+      "record_id": "DR-07-cloud_llm_permission",
+      "topic": "cloud_llm_permission",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Требуется ответ владельца/организаторов; поиском не устанавливается.",
+      "source_id": "PROJECT-TZ"
+    },
+    {
+      "record_id": "DR-07-api_budget",
+      "topic": "api_budget",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Требуется ответ владельца/организаторов; поиском не устанавливается.",
+      "source_id": "PROJECT-TZ"
+    },
+    {
+      "record_id": "DR-07-acceptance_hardware",
+      "topic": "acceptance_hardware",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Требуется ответ владельца/организаторов; поиском не устанавливается.",
+      "source_id": "PROJECT-TZ"
+    },
+    {
+      "record_id": "DR-07-operator_backup_owner",
+      "topic": "operator_backup_owner",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Требуется ответ владельца/организаторов; поиском не устанавливается.",
+      "source_id": "PROJECT-TZ"
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "PROJECT-TZ",
+      "title": "ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29",
+      "url": "repo:docs/TZ_DEVELOPMENT.txt",
+      "publisher": "Проект team-vtiposhnik",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-10-29",
+      "license": "unknown",
+      "method": "project_requirement",
+      "note": "Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке."
+    },
+    {
+      "source_id": "OSM-LICENSE",
+      "title": "OpenStreetMap copyright and licence",
+      "url": "https://www.openstreetmap.org/copyright",
+      "publisher": "OpenStreetMap Foundation",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "ODbL-1.0",
+      "method": "license_terms",
+      "note": ""
+    },
+    {
+      "source_id": "WEATHER-LICENSE",
+      "title": "Open-Meteo Terms & Privacy",
+      "url": "https://open-meteo.com/en/terms",
+      "publisher": "Open-Meteo",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "CC-BY-4.0 data; separate API service terms",
+      "method": "license_terms",
+      "note": ""
+    },
+    {
+      "source_id": "COPDEM",
+      "title": "Copernicus DEM GLO-30 / GLO-90",
+      "url": "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM",
+      "publisher": "Copernicus Data Space Ecosystem",
+      "checked_at": "2026-10-29",
+      "observed_at": "2011/2015",
+      "license": "Copernicus DEM licence (not generic CC-BY)",
+      "method": "product_documentation",
+      "note": "DSM включает здания и растительность; это не DTM. Для города нет выгруженного и проверенного растра в пакете."
+    },
+    {
+      "source_id": "S2-DOC",
+      "title": "Sentinel-2 data collection",
+      "url": "https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2",
+      "publisher": "Copernicus Data Space Ecosystem",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "Copernicus Sentinel data terms",
+      "method": "product_documentation",
+      "note": ""
+    }
+  ]
+}

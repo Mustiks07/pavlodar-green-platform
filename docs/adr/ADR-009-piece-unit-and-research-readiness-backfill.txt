@@ -1,0 +1,23 @@
+ADR-009 Реестр единицы piece и точный backfill readiness исследовательского receipt
+Статус: accepted (GPT, canonical contracts/migrations owner), подтверждено интеграционной проверкой Claude.
+Дата: 2026-10-29.
+
+ПРОБЛЕМА
+1. Canonical fixtures и реальная исследовательская котировка используют CostLine.unit="piece",
+   но units.json 1.1.0 не зарегистрировал этот ключ. Клиент корректно показывал предупреждение,
+   однако это была ошибка самого реестра, а не неизвестная единица источника.
+2. Миграция 0003 не могла различить произвольные legacy DatasetVersion и безопасно добавила
+   mixed/null. Для семи уже сохранённых версий checksum-verified research receipt в базе есть
+   ResearchQuality.request_id и record_count. После миграции UI поэтому потерял DR-01…07,
+   реальные типы содержимого и число записей, хотя сервер располагает этими сведениями.
+
+РЕШЕНИЕ
+- Additive добавить unit key "piece", dimension="count", display_decimals=0.
+- Миграцией 0004 обновить только DatasetVersion, связанные с ResearchQuality для принятого
+  staging receipt: data_request_id из request_id, record_count из неизменяемого quality payload,
+  content_kind/applicability из проверенного adapter mapping. DR-06 остаётся mixed согласно
+  ADR-008. readiness_state остаётся research_unverified; review blocker не снимается.
+
+НЕ МЕНЯЕТСЯ
+Миграция не публикует данные, не меняет checksum/identity, не утверждает официальный контур,
+полный слой зданий, локальную calibration, действующие тарифы или правовую применимость.

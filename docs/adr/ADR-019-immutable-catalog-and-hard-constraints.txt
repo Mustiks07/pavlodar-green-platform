@@ -1,0 +1,56 @@
+ADR-019 Immutable catalog snapshots and fail-closed plant constraints
+Статус: accepted by GPT (canonical backend/data owner); client integration pending Claude.
+Дата: 2026-10-30. Основа: canonical 1.2.0, backend 11ab08e.
+
+ПРОБЛЕМА
+
+Контракт уже описывает Plant, RuleVersion, recommendation и ссылки ScenarioRevision на версии,
+но сервер их не сохранял. Нельзя рассчитывать подбор из изменяемой строки растения, принимать
+неподтверждённое правило или подставлять средние коэффициенты вместо отсутствующих признаков.
+Глобальный каталог также не должен раскрывать restricted source provenance между городами.
+
+РЕШЕНИЕ
+
+- Любое создание/изменение растения создаёт полный immutable CatalogVersion snapshot. Все Plant
+  в ответе текущего каталога имеют один version_id, а старые снимки остаются адресуемыми для
+  сохранённых сценариев. Точка current хранится отдельно и защищена от удаления/смены identity.
+- Известный trait обязан иметь ровно одно значение, единицу для числа и хотя бы один SourceRef.
+  SourceRef канонизируется сервером только на реально published public dataset/version/record.
+  Restricted источник нельзя включить в глобальный каталог и случайно раскрыть через Plant.
+- RuleVersion создаётся только при публикации restrictions dataset из явно типизированной записи
+  record_type=rule_version, проходит canonical schema, сохраняет dataset lineage и immutable id.
+  Для подбора/размещения разрешено только expert_confirmed и не superseded правило того же города.
+- Hard constraints выполняются до scoring. Expert rejected, явное исключение и sensitive-site
+  exclusion дают excluded. Неодобренный expert status, genus вместо вида/сорта, неизвестная
+  безопасность, отсутствие local evidence или blocking review reason дают requires_review.
+- Score считается только из запрошенных уникальных positive weights и sourced numeric trait с
+  unit=1 в диапазоне 0..1. Нет значения — contribution.score=null, явный blocker и общий score=null;
+  сервер не масштабирует и не нормализует неизвестные величины. Locked/excluded ids проверяются.
+- ScenarioRevision проверяет принадлежность plant точному catalog snapshot, containment геометрии,
+  запрет excluded plant и dimension provenance. Stock id отклоняется, пока versioned stock registry
+  не реализован. Синтетичность источников переносится в synthetic_inputs.
+
+КОНТРАКТ
+
+OpenAPI/domain 1.2.0 не меняются: операции и DTO уже canonical. Добавлены только стабильные
+Problem.code. createPlant/createPlantVersion возвращают ETag; update требует If-Match текущего
+Plant snapshot. Клиент должен хранить и отправлять catalog_version_id/rule_version_id, показывать
+eligibility, blockers, contribution sources и никогда не пересчитывать score самостоятельно.
+
+ПРОВЕРКА
+
+- Три последовательных изменения создают разные snapshot ids, но каждый current response ссылается
+  на один snapshot; старый snapshot остаётся доступен серверной проверке ScenarioRevision.
+- If-Match защищает от lost update; повтор mutation с idempotency key возвращает тот же результат.
+- Expert-confirmed synthetic rule с полной lineage доступно только по dataset grant/city policy.
+- Eligible plant получает sourced score; pending plant требует review; sensitive excluded не получает
+  score и не может быть размещён. Placement вне ZoneVersion отклоняется.
+- Полный backend regression, lint, canonical spec validation, dependency audit и tracked-secret scan
+  проходят. Тестовые растения/правила явно SYNTHETIC и не являются данными Павлодара.
+
+ОГРАНИЧЕНИЯ
+
+Организатор не передал принятые DR-02/03. Production catalog/rules пусты до экспертной публикации;
+исследовательские 9 taxa и нормы не активированы автоматически. Stock/rates/survival/care ещё не
+реализованы. Подбор проверяет только явно закодированные Plant exclusions и selected RuleVersion
+lineage; он не выводит нормативные расстояния из текста и не заявляет локальную калибровку.

@@ -1,0 +1,155 @@
+{
+  "schema": "QualityReport",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "id": "f3dbddc6-a882-595e-930a-26375e9f0618",
+    "issues": [
+      {
+        "code": "research_not_approved",
+        "message": "Найденное не равно допущенному к production.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-02",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-02",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Неизвестные и недатированные параметры не заменены нулями.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-02",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-02",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Нет местной экспертной подписи, сортов и полных медицинских/корневых характеристик.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-02",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Складские данные — дата проверки сайта, не дата инвентаризации.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-02",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LOCAL-20260520\", \"title\": \"В Павлодаре продолжается работа по озеленению и обновлению городского зеленого фонда\", \"url\": \"https://www.gov.kz/org/pavlodar/press/news/details/1223959?lang=ru\", \"publisher\": \"Пресс-служба акима Павлодарской области\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-05-20\", \"license\": \"unknown\", \"method\": \"official_report\", \"note\": \"Содержание относится к городу Павлодару; сообщение о посадке и планах, не полевой журнал и не эксперимент.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LOCAL-20260520",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"BIOSAD-STOCK\", \"title\": \"Ель сибирская: варианты товара и наличие по городам\", \"url\": \"https://biosad.kz/el.html/nid/1267\", \"publisher\": \"Садовый центр БИОСАД\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"vendor_listing\", \"note\": \"Проверены HTML и живой интерфейс; дата инвентаризации склада не опубликована. Цены в ₸ подтверждены интерфейсом. Отзывы не используются.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "BIOSAD-STOCK",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"BIOSAD-TERMS\", \"title\": \"Покупателям: корневая система и пункты продаж\", \"url\": \"https://biosad.kz/pokupatelyam.html\", \"publisher\": \"Садовый центр БИОСАД\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"vendor_listing\", \"note\": \"Общее заявление о ЗКС не является паспортом конкретной партии.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "BIOSAD-TERMS",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"BIOSAD-HOME\", \"title\": \"Каталог БИОСАД: семена клещевины, a_1566\", \"url\": \"https://biosad.kz/\", \"publisher\": \"Садовый центр БИОСАД\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"vendor_listing\", \"note\": \"Наличие в интернет-каталоге не доказывает пригодность для школ.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "BIOSAD-HOME",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"GREENMAX-PINE\", \"title\": \"Сосна обыкновенная C3, 20–40 см\", \"url\": \"https://www.greenmax.kz/index.php/assortiment/coniferous/pinus/pinus-sylvestris-c3\", \"publisher\": \"Питомник GreenMax.kz\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"vendor_listing\", \"note\": \"Алматинская область; доставка и наличие в Павлодаре не подтверждены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "GREENMAX-PINE",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"NC-PINE\", \"title\": \"pinus-sylvestris — Extension Gardener Plant Toolbox\", \"url\": \"https://plants.ces.ncsu.edu/plants/pinus-sylvestris/\", \"publisher\": \"North Carolina State University / NC Cooperative Extension\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"expert_reference\", \"note\": \"Авторский справочник extension; не испытание в Павлодаре. Числа типового взрослого растения не являются кривой роста. Лицензии фотографий не переносятся на текст; фотографии не включены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "NC-PINE",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"NC-POPLAR\", \"title\": \"populus-alba — Extension Gardener Plant Toolbox\", \"url\": \"https://plants.ces.ncsu.edu/plants/populus-alba/\", \"publisher\": \"North Carolina State University / NC Cooperative Extension\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"expert_reference\", \"note\": \"Авторский справочник extension; не испытание в Павлодаре. Числа типового взрослого растения не являются кривой роста. Лицензии фотографий не переносятся на текст; фотографии не включены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "NC-POPLAR",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"NC-LINDEN\", \"title\": \"tilia-cordata — Extension Gardener Plant Toolbox\", \"url\": \"https://plants.ces.ncsu.edu/plants/tilia-cordata/\", \"publisher\": \"North Carolina State University / NC Cooperative Extension\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"expert_reference\", \"note\": \"Авторский справочник extension; не испытание в Павлодаре. Числа типового взрослого растения не являются кривой роста. Лицензии фотографий не переносятся на текст; фотографии не включены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "NC-LINDEN",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"NC-LILAC\", \"title\": \"syringa-vulgaris — Extension Gardener Plant Toolbox\", \"url\": \"https://plants.ces.ncsu.edu/plants/syringa-vulgaris/\", \"publisher\": \"North Carolina State University / NC Cooperative Extension\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"expert_reference\", \"note\": \"Авторский справочник extension; не испытание в Павлодаре. Числа типового взрослого растения не являются кривой роста. Лицензии фотографий не переносятся на текст; фотографии не включены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "NC-LILAC",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"NC-CASTOR\", \"title\": \"ricinus-communis — Extension Gardener Plant Toolbox\", \"url\": \"https://plants.ces.ncsu.edu/plants/ricinus-communis/\", \"publisher\": \"North Carolina State University / NC Cooperative Extension\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"expert_reference\", \"note\": \"Авторский справочник extension; не испытание в Павлодаре. Числа типового взрослого растения не являются кривой роста. Лицензии фотографий не переносятся на текст; фотографии не включены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "NC-CASTOR",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"RHS-SPRUCE\", \"title\": \"Picea obovata — Siberian spruce\", \"url\": \"https://www.rhs.org.uk/plants/12965/picea-obovata/details\", \"publisher\": \"Royal Horticultural Society\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"expert_reference\", \"note\": \"Использовано только ботаническое имя. Не подтверждение параметров павлодарской партии.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "RHS-SPRUCE",
+        "suggested_action": null
+      }
+    ],
+    "error_count": 0,
+    "valid_count": 159,
+    "record_count": 159,
+    "warning_count": 17,
+    "publish_allowed": false,
+    "issues_truncated": false,
+    "dataset_version_id": "6d72643a-cf67-503d-bb49-67b1a1326c94",
+    "issues_next_cursor": null
+  }
+}

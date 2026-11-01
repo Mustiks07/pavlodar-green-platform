@@ -1,0 +1,354 @@
+{
+  "base": "http://localhost:5173",
+  "city": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "startedAt": "2026-10-31T07:36:13.784Z",
+  "checks": [
+    {
+      "name": "viewer sees the real city and its published datasets/layers",
+      "pass": true,
+      "detail": {
+        "viewer_roles": [
+          "viewer"
+        ],
+        "city": "Павлодар — рабочий контур OSM",
+        "datasets": 5,
+        "layers": 6,
+        "records": 8735,
+        "per_dataset": [
+          {
+            "name": "Здания Павлодара с высотой",
+            "kind": "buildings",
+            "records": 110,
+            "layers": 1
+          },
+          {
+            "name": "Дороги Павлодара",
+            "kind": "roads",
+            "records": 7873,
+            "layers": 1
+          },
+          {
+            "name": "Зелёные территории Павлодара",
+            "kind": "green_inventory",
+            "records": 512,
+            "layers": 1
+          },
+          {
+            "name": "Водные объекты Павлодара",
+            "kind": "water",
+            "records": 96,
+            "layers": 2
+          },
+          {
+            "name": "Деревья Павлодара",
+            "kind": "green_inventory",
+            "records": 144,
+            "layers": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "API totals match GPT live smoke (datasets / layer manifests / records)",
+      "pass": true,
+      "detail": {
+        "api": [
+          5,
+          6,
+          8735
+        ],
+        "smoke": [
+          5,
+          6,
+          8735
+        ]
+      }
+    },
+    {
+      "name": "layer panel: count and every layer name come from listMapLayers",
+      "pass": true,
+      "detail": {
+        "countLine": "6",
+        "namesShown": true
+      }
+    },
+    {
+      "name": "every layer has a legend",
+      "pass": true,
+      "detail": {
+        "legends": 6
+      }
+    },
+    {
+      "name": "main map panel has no \"Источник\"/\"не проверено\" lines",
+      "pass": true
+    },
+    {
+      "name": "layer families have distinct colours (server category identity)",
+      "pass": true,
+      "detail": [
+        {
+          "category": "building",
+          "name": "Здания Павлодара с высотой",
+          "paint": "#8a4b32"
+        },
+        {
+          "category": "existing_green",
+          "name": "Деревья Павлодара",
+          "paint": "#2f7a46"
+        },
+        {
+          "category": "water",
+          "name": "Водные объекты Павлодара — линии",
+          "paint": "#1f5aa6"
+        },
+        {
+          "category": "road",
+          "name": "Дороги Павлодара",
+          "paint": "#6b5a48"
+        },
+        {
+          "category": "existing_green",
+          "name": "Зелёные территории Павлодара",
+          "paint": "#2f7a46"
+        },
+        {
+          "category": "water",
+          "name": "Водные объекты Павлодара — полигоны",
+          "paint": "#1f5aa6"
+        }
+      ]
+    },
+    {
+      "name": "legend swatches are coloured (not all one grey)",
+      "pass": true,
+      "detail": [
+        "rgb(138, 75, 50)",
+        "rgb(47, 122, 70)",
+        "rgb(31, 90, 166)",
+        "rgb(107, 90, 72)",
+        "rgb(47, 122, 70)",
+        "rgb(31, 90, 166)"
+      ]
+    },
+    {
+      "name": "roads: features render at the sampled place (1 layer(s))",
+      "pass": true,
+      "detail": [
+        {
+          "layer": "Дороги Павлодара",
+          "onMap": true,
+          "n": 269,
+          "distinct": 250
+        }
+      ]
+    },
+    {
+      "name": "green: features render at the sampled place (1 layer(s))",
+      "pass": true,
+      "detail": [
+        {
+          "layer": "Зелёные территории Павлодара",
+          "onMap": true,
+          "n": 8,
+          "distinct": 2
+        }
+      ]
+    },
+    {
+      "name": "trees: features render at the sampled place (1 layer(s))",
+      "pass": true,
+      "detail": [
+        {
+          "layer": "Деревья Павлодара",
+          "onMap": true,
+          "n": 2,
+          "distinct": 2
+        }
+      ]
+    },
+    {
+      "name": "water: features render at the sampled place (2 layer(s))",
+      "pass": true,
+      "detail": [
+        {
+          "layer": "Водные объекты Павлодара — линии",
+          "onMap": true,
+          "n": 8,
+          "distinct": 5
+        },
+        {
+          "layer": "Водные объекты Павлодара — полигоны",
+          "onMap": true,
+          "n": 4,
+          "distinct": 1
+        }
+      ]
+    },
+    {
+      "name": "buildings: features render at the sampled place (1 layer(s))",
+      "pass": true,
+      "detail": [
+        {
+          "layer": "Здания Павлодара с высотой",
+          "onMap": true,
+          "n": 42,
+          "distinct": 20
+        }
+      ]
+    },
+    {
+      "name": "roads toggle hides and restores the layer",
+      "pass": true,
+      "detail": {
+        "hiddenNow": {
+          "onMap": false,
+          "n": 0,
+          "distinct": 0
+        },
+        "shownAgain": {
+          "onMap": true,
+          "n": 542,
+          "distinct": 500
+        }
+      }
+    },
+    {
+      "name": "building card: server height with its basis, readable title, no source/unverified lines",
+      "pass": true,
+      "detail": {
+        "title": "Здания Павлодара с высотой",
+        "height": 10,
+        "basis": "recorded_unverified",
+        "text": "Здания Павлодара с высотой\nВерсия набора\n786ee7ef\nГеометрия\nполигоны\nДоступ\nоткрытый\nВысота\n10,0 м · по данным набора\nПОКАЗАТЕЛИ\n\nСервер не рассчитывает показатели для объектов этого набора."
+      }
+    },
+    {
+      "name": "3D: buildings extruded from tile heights only; the selected one comes from its card",
+      "pass": true,
+      "detail": {
+        "extruded": 27,
+        "valid": 28,
+        "selectedInFrame": true,
+        "selectedNotDoubled": true,
+        "sameHeights": true,
+        "heights": [
+          63,
+          63,
+          63,
+          63,
+          2.5
+        ]
+      }
+    },
+    {
+      "name": "3D legend counts what is in the frame (not a constant)",
+      "pass": true,
+      "detail": {
+        "recordedCount": 28,
+        "scene": {
+          "extruded": 27,
+          "valid": 28,
+          "selectedInFrame": true,
+          "selectedNotDoubled": true,
+          "sameHeights": true,
+          "heights": [
+            63,
+            63,
+            63,
+            63,
+            2.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "3D panel has no \"Источник\"/\"не проверено\" lines",
+      "pass": true,
+      "detail": "Здания Павлодара с высотой\n\nВысота 10,0 м по данным сервера (по данным набора).\nОснование высот в сцене\nИзмеренная высота · 0\nМожно использовать в аналитике теней\nВысота по данным набора · 28\nЗначение из опубликованного набора\nОценка по этажности · 0\nЭтажность × принятая высота этажа; допущение\nУсло"
+    },
+    {
+      "name": "no page errors in the viewer session",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "sources page: record counts per dataset equal the API, total included",
+      "pass": true,
+      "detail": {
+        "shownRecords": [
+          110,
+          7873,
+          512,
+          96,
+          144
+        ],
+        "shownTotal": 8735,
+        "records": 8735
+      }
+    },
+    {
+      "name": "phone (dark): layers on the map, no horizontal scroll",
+      "pass": true,
+      "detail": {
+        "phoneLayers": 9,
+        "overflow": 0
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp03-open-data/open-overview.png",
+    "docs/evidence/wp03-open-data/open-roads.png",
+    "docs/evidence/wp03-open-data/open-green.png",
+    "docs/evidence/wp03-open-data/open-trees.png",
+    "docs/evidence/wp03-open-data/open-water.png",
+    "docs/evidence/wp03-open-data/open-buildings.png",
+    "docs/evidence/wp03-open-data/open-building-card.png",
+    "docs/evidence/wp03-open-data/open-buildings-3d.png",
+    "docs/evidence/wp03-open-data/open-sources.png",
+    "docs/evidence/wp03-open-data/open-mobile-dark.png"
+  ],
+  "facts": {
+    "viewer_roles": [
+      "viewer"
+    ],
+    "city": "Павлодар — рабочий контур OSM",
+    "datasets": 5,
+    "layers": 6,
+    "records": 8735,
+    "per_dataset": [
+      {
+        "name": "Здания Павлодара с высотой",
+        "kind": "buildings",
+        "records": 110,
+        "layers": 1
+      },
+      {
+        "name": "Дороги Павлодара",
+        "kind": "roads",
+        "records": 7873,
+        "layers": 1
+      },
+      {
+        "name": "Зелёные территории Павлодара",
+        "kind": "green_inventory",
+        "records": 512,
+        "layers": 1
+      },
+      {
+        "name": "Водные объекты Павлодара",
+        "kind": "water",
+        "records": 96,
+        "layers": 2
+      },
+      {
+        "name": "Деревья Павлодара",
+        "kind": "green_inventory",
+        "records": 144,
+        "layers": 1
+      }
+    ]
+  },
+  "finishedAt": "2026-10-31T07:37:02.773Z",
+  "passed": true
+}

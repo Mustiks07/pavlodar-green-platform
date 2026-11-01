@@ -1,0 +1,28 @@
+{
+  "scope": "WP-05 immutable catalog, source-backed rules and hard plant constraints",
+  "date": "2026-10-30",
+  "contract_version": "1.2.0",
+  "migration": "0011_catalog_rules",
+  "organizer_data_received": false,
+  "synthetic_test_inputs_only": true,
+  "checks": {
+    "targeted_integration": "3 passed",
+    "backend_regression": "103 passed",
+    "ruff": "passed",
+    "specification": "358 checks; 132 schemas; 91 operations; 45 fixtures",
+    "pip_audit": "no known vulnerabilities",
+    "tracked_credential_scan": "passed"
+  },
+  "verified": [
+    "immutable full catalog snapshots with ETag and idempotency",
+    "published public source-record provenance for known traits",
+    "published restrictions record promotion into immutable expert rule versions",
+    "fail-closed eligibility and no inferred trait normalization",
+    "scenario placement catalog membership, exclusion and geometry containment"
+  ],
+  "not_claimed": [
+    "official Pavlodar catalog or locally accepted plant suitability",
+    "approved legal rules or exact utility clearances",
+    "stock availability, prices, survival calibration or ecosystem coefficients"
+  ]
+}

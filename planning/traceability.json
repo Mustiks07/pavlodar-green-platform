@@ -1,0 +1,27 @@
+{
+  "source": "docs/reference/ORGANIZER_REQUIREMENTS.txt",
+  "source_document_version": "1.0 2026-10-22",
+  "specification": "docs/TZ_DEVELOPMENT.txt",
+  "status": "planned_coverage_not_implementation_acceptance",
+  "mapping": [
+    {"source_section":"3.1","requirements":"Импорт GeoJSON/SHP/KML/CSV, город/почвы/зелень/каталог, слои, выбор участка/адреса, качество","spec_sections":[6,7,8,9],"acceptance_ids":["AC-01","AC-02"],"work_packages":["WP-01","WP-03","WP-04"]},
+    {"source_section":"3.2","requirements":"Проблемы дефицита/состояния/почв/тепла/защитных полос, severity, карта и таблица","spec_sections":[9,10],"acceptance_ids":["AC-02","AC-09"],"work_packages":["WP-03","WP-04"]},
+    {"source_section":"3.3","requirements":"Климат/почвы/свет/загрязнение/назначение/габариты/безопасность, hard filters, score 0-100, ярусы, diversity, locks","spec_sections":[11,12,18],"acceptance_ids":["AC-03","AC-04","AC-10"],"work_packages":["WP-05","WP-06"]},
+    {"source_section":"3.4","requirements":"Материал, подготовка, работы/доставка, уход 1-3 года, резерв замен, ставки, сравнение","spec_sections":[12,13],"acceptance_ids":["AC-04","AC-05"],"work_packages":["WP-05","WP-06"]},
+    {"source_section":"3.5","requirements":"Приживаемость 1/2/3, признаки, допустимый экспертный/ML метод, риски/уверенность, меры и пересчёт","spec_sections":[14,19,29],"acceptance_ids":["AC-06","AC-11"],"work_packages":["WP-05","WP-09"]},
+    {"source_section":"3.6","requirements":"Полив, подкормки, обрезка, мульча, защита, календарь, бюджет и выезды","spec_sections":[15,19,21],"acceptance_ids":["AC-07","AC-11","AC-13"],"work_packages":["WP-05","WP-09","WP-10"]},
+    {"source_section":"3.7","requirements":"Приоритет 0-100, факторы/веса/объяснения, программа под бюджет","spec_sections":[16],"acceptance_ids":["AC-08"],"work_packages":["WP-07"]},
+    {"source_section":"3.8","requirements":"5/10/20: CO2/пыль/кислород/температура воздуха/осадки/площадь и на жителя, коэффициенты/до-после/стоимость эффекта","spec_sections":[13,17,18],"acceptance_ids":["AC-09","AC-10"],"work_packages":["WP-08"]},
+    {"source_section":"3.9","requirements":"Бюджетная персонализация, dashboards, PDF/Excel, история, интеграция, диалог, дополнительные функции","spec_sections":[12,16,18,19,20,21,22],"acceptance_ids":["AC-04","AC-08","AC-10","AC-11","AC-12","AC-13","AC-16"],"work_packages":["WP-06","WP-07","WP-08","WP-09","WP-10"]},
+    {"source_section":"3.10-3.11","requirements":"RAG/tools без выдуманных данных; карта/панель, проблемы, приоритеты, каталог, чат, сравнение, русский adaptive UI","spec_sections":[20,22],"acceptance_ids":["AC-12","AC-16"],"work_packages":["WP-02","WP-04","WP-06","WP-10"]},
+    {"source_section":"4","requirements":"<=5с карта и подбор/смета, масштабирование, эксперт/метрика, HTTPS/роли, объяснения, Docker/README, инструкция <=1стр","spec_sections":[4,14,23,24,25,26,27,30],"acceptance_ids":["AC-06","AC-14","AC-15","AC-16","AC-17","AC-18"],"work_packages":["WP-00","WP-01","WP-11"]},
+    {"source_section":"5","requirements":"Источники/маркированная синтетика, рекомендательный характер, справочники коэффициентов, без ПД граждан, явные пропуски","spec_sections":[1,6,7,8,13,14,17,20,25,29],"acceptance_ids":["AC-01","AC-05","AC-06","AC-09","AC-12","AC-14"],"work_packages":["WP-03","WP-05","WP-08","WP-10","WP-11"]},
+    {"source_section":"8-9","requirements":"Приёмка по всем основным модулям, дополнительные функции, данные организатора, исходники/README/пример отчёта/архитектура","spec_sections":[27,28,29,30],"acceptance_ids":["AC-18"],"work_packages":["WP-11"]}
+  ],
+  "clarifications": [
+    "Чат назван дополнительным в 3.9, но описан отдельно в 3.10/3.11: включён в основной продукт.",
+    "Deadline прототипа не используется для уменьшения объёма по прямому указанию пользователя.",
+    "3D, исполнение, outbox, версии, дополнительные эксплуатационные проверки - требования целевого продукта пользователя, не буквальная цитата заказчика.",
+    "Конкретные местные коэффициенты/нормы/цены не выдумываются: перечислены data gates."
+  ]
+}

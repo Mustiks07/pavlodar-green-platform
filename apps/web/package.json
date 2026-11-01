@@ -1,0 +1,50 @@
+{
+  "name": "@pg/web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Pavlodar greening platform web client (WP-02). Root workspace manifest is owned by WP-00.",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "gen:api": "openapi-typescript ../../contracts/openapi.json -o ../../packages/api-client/src/generated/schema.ts && node scripts/gen-types.mjs",
+    "check:api": "node scripts/check-api-client.mjs && node scripts/gen-types.mjs --check",
+    "evidence": "node scripts/capture-evidence.mjs"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "5.80.7",
+    "maplibre-gl": "6.16.0",
+    "openapi-fetch": "0.14.0",
+    "pmtiles": "4.5.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-router": "7.18.5",
+    "three": "0.180.0",
+    "zustand": "5.0.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@testing-library/react": "16.3.0",
+    "@types/geojson": "7946.0.16",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "@types/three": "0.180.0",
+    "@vitejs/plugin-react": "4.5.2",
+    "jsdom": "26.1.0",
+    "openapi-typescript": "7.8.0",
+    "typescript": "5.8.3",
+    "vite": "6.4.5",
+    "vitest": "4.1.12"
+  },
+  "overrides": {
+    "@redocly/openapi-core": {
+      "minimatch": "11.0.3"
+    }
+  }
+}

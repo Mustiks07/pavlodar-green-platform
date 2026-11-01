@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DR-07 research staging package",
+  "type": "object",
+  "properties": {
+    "licenses.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "license",
+          "scope",
+          "approval"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "license": {
+            "type": [
+              "string"
+            ]
+          },
+          "scope": {
+            "type": [
+              "string"
+            ]
+          },
+          "approval": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "data.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_id",
+          "topic",
+          "value",
+          "status",
+          "reason",
+          "source_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "topic": {
+            "type": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "sources.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "title",
+          "url",
+          "publisher",
+          "checked_at",
+          "observed_at",
+          "license",
+          "method",
+          "note"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "string"
+            ]
+          },
+          "publisher": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "license": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "note": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "checked_at — дата проверки; observed_at — дата/период источника, null если не указан. unknown лицензия не разрешает перепубликацию полного текста."
+    }
+  },
+  "required": [
+    "licenses.csv",
+    "data.csv",
+    "sources.csv"
+  ],
+  "additionalProperties": false,
+  "x-csv": {
+    "encoding": "UTF-8",
+    "delimiter": ",",
+    "null_literal": "null",
+    "decimal_separator": ".",
+    "money": "decimal string, KZT",
+    "source_refs_separator": ";"
+  },
+  "x-crs": {
+    "GeoJSON": "EPSG:4326, [longitude,latitude]",
+    "distance_calculation": "EPSG:32643; no distances calculated here"
+  },
+  "x-import": "Staging only; map external identifiers to canonical UUIDs. No auto publish or approval."
+}

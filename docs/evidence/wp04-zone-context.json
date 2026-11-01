@@ -1,0 +1,30 @@
+{
+  "captured_at": "2026-10-30T04:25:00+05:00",
+  "synthetic_input": true,
+  "organizer_data_used": false,
+  "method_version": "zone-context-postgis-1",
+  "targeted_checks": {
+    "zone_context_tests": "3 passed",
+    "zone_context_plus_import_tests": "11 passed",
+    "ruff": "passed",
+    "specification": "358 checks passed"
+  },
+  "acceptance": {
+    "utm_zone_area_from_server": true,
+    "soil_union_intersection_fraction": true,
+    "partial_soil_gap": true,
+    "green_polygon_area_without_point_radius_guess": true,
+    "restriction_rule_lineage_required": true,
+    "empty_restrictions_not_clearance": true,
+    "utility_gap_explicit": true,
+    "restricted_dataset_excluded_for_viewer": true,
+    "response_geometry_bounded": true
+  },
+  "not_claimed": [
+    "official soil coverage",
+    "exact utility networks",
+    "approved legal setbacks",
+    "raster zonal statistics",
+    "production p95"
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "checked_at": "2026-10-29",
+  "research_status": "not_found",
+  "acceptance_met": false,
+  "city": "Павлодар",
+  "official_boundary_confirmed": false,
+  "real_world_city_coverage": null,
+  "accuracy": null,
+  "accuracy_reason": "Нет локальной независимой проверки; точность и разрешение не одно и то же.",
+  "tables": {
+    "reported_events.csv": {
+      "row_count": 1,
+      "null_count_by_column": {
+        "event_id": 0,
+        "source_id": 0,
+        "report_date": 0,
+        "place": 0,
+        "reported_taxon": 0,
+        "reported_planted": 0,
+        "unit": 0,
+        "method": 0,
+        "planting_date_exact": 1,
+        "inspection_date": 1,
+        "alive": 1,
+        "dead": 1,
+        "unknown": 1,
+        "training_eligible": 0,
+        "reason": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "cohorts.csv": {
+      "row_count": 0,
+      "null_count_by_column": {
+        "cohort_id": 0,
+        "source_id": 0,
+        "planting_date": 0,
+        "taxon_id": 0,
+        "stock_id": 0,
+        "site_id": 0,
+        "original_count": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "observations.csv": {
+      "row_count": 0,
+      "null_count_by_column": {
+        "observation_id": 0,
+        "cohort_id": 0,
+        "source_id": 0,
+        "observed_at": 0,
+        "alive": 0,
+        "dead": 0,
+        "unknown": 0,
+        "method": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "care_actual.csv": {
+      "row_count": 0,
+      "null_count_by_column": {
+        "operation_id": 0,
+        "cohort_id": 0,
+        "source_id": 0,
+        "performed_at": 0,
+        "operation": 0,
+        "quantity": 0,
+        "unit": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "data.csv": {
+      "row_count": 2,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 2,
+        "status": 0,
+        "reason": 0,
+        "source_id": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "search_log.csv": {
+      "row_count": 4,
+      "null_count_by_column": {
+        "search_id": 0,
+        "checked_at": 0,
+        "query_or_access": 0,
+        "method": 0,
+        "result": 0,
+        "limitation": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "sources.csv": {
+      "row_count": 5,
+      "null_count_by_column": {
+        "source_id": 0,
+        "title": 0,
+        "url": 0,
+        "publisher": 0,
+        "checked_at": 0,
+        "observed_at": 1,
+        "license": 0,
+        "method": 0,
+        "note": 0
+      },
+      "duplicate_whole_rows": 0
+    }
+  },
+  "limitations": [
+    "Найденное не равно допущенному к production.",
+    "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+    "Неизвестные и недатированные параметры не заменены нулями.",
+    "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+    "0 исходных когорт,0 осмотров,0 записей фактического ухода.",
+    "Нет официального подтверждения отсутствия открытой выборки; только ограниченный поисковый отчет."
+  ],
+  "coverage_basis": "Исследование ограничено городом Павлодаром; внешние справочные/сравнительные данные явно помечены. Доля площади в официальном контуре unknown.",
+  "geometry_files": {},
+  "geometry_validation": {}
+}

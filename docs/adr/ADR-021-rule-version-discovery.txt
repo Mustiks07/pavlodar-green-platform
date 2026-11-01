@@ -1,0 +1,53 @@
+ADR-021 Discover authorized usable rule versions without copying rule ids
+Статус: proposed by GPT (canonical contract/backend owner); acknowledgement and client integration requested from Claude.
+Дата: 2026-10-30. Основа: canonical 1.2.0 / d58fe8c.
+
+ПРОБЛЕМА
+
+getRuleVersion проверяет один уже известный UUID. Из-за отсутствия list operation интерфейс
+вынужден просить пользователя вставить id вручную. Это неустойчиво и позволяет выбрать правило,
+которое требует экспертной проверки, конфликтует или уже заменено. Выдавать все rule records без
+повторной dataset authorization также нельзя: restricted dataset требует явного grant.
+
+РЕШЕНИЕ
+
+- Добавить GET /v1/rule-versions?city_id=&usable=&cursor=&limit= как listRuleVersions.
+- Всегда сначала проверять city grant, затем для каждой строки повторять dataset authorization;
+  недоступные restricted records не раскрываются и не влияют на пользовательский результат.
+- usable=true оставляет только review_status=expert_confirmed и superseded_by=null. Это фильтр
+  пригодности записи, а не заявление об официальности источника или локальной калибровке.
+- Стабильная пагинация использует существующий подписанный контекстом keyset cursor. Контекст
+  включает пользователя и фильтры, поэтому cursor нельзя перенести между grants/городами/фильтрами.
+- Неактивные, конфликтные и superseded записи доступны при usable=false для прозрачного review,
+  если пользователь имеет доступ к исходному dataset.
+
+КОНТРАКТ
+
+Canonical minor version становится 1.3.0. Добавлены additive operation listRuleVersions и
+RuleVersionPage; существующий getRuleVersion и RuleVersion не изменяются. TypeScript-клиент должен
+быть регенерирован атомарно после точного SHA. Старый 1.2 client продолжает работать, поскольку
+существующие paths и schemas не удалены и не изменены.
+
+ДО/ПОСЛЕ
+
+До: GET /v1/rule-versions/{uuid} -> RuleVersion, UUID вводится вручную.
+После: GET /v1/rule-versions?city_id=<uuid>&usable=true ->
+{"items":[RuleVersion],"next_cursor":null}.
+
+МИГРАЦИЯ
+
+Миграция БД не нужна: rule_versions уже immutable, dataset_id и dataset_version_id индексированы.
+При росте production-набора проверяется план join с datasets; новый индекс добавляется только по
+измерению, а не предположению.
+
+ПРОВЕРКА
+
+- Canonical schema/OpenAPI/operation inventory и generated Python DTO проходят validation.
+- expert-confirmed non-superseded правило присутствует при usable=true.
+- неверный boolean даёт 422, а не truthy fallback.
+- Полная backend regression, auth/IDOR и generated-client integration фиксируются до main.
+
+ОГРАНИЧЕНИЯ
+
+Организаторские правила не получены и не приняты. Тест использует явно SYNTHETIC TEST rule.
+Endpoint не превращает исследовательский материал в официальное правило и не снимает approval gate.

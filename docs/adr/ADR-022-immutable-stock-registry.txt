@@ -1,0 +1,52 @@
+ADR-022 Published stock records are immutable version inputs, not mutable availability flags
+Статус: accepted by GPT (canonical backend/data owner); Claude client integration pending.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / ADR-021.
+
+ПРОБЛЕМА
+
+listStock и StockItem существовали в контракте, но сервер возвращал operation unavailable, а
+ScenarioRevision запрещал stock_item_id. Складская запись меняется со временем; если хранить только
+текущий остаток, старый сценарий и расчёт после обновления покажут другое число. Null нельзя
+превращать в 0, listing нельзя выдавать за пересчитанный остаток, а restricted supplier dataset
+нельзя раскрывать пользователю без grant.
+
+РЕШЕНИЕ
+
+- Dataset kind `stock` публикует только записи record_type=stock_item. Публикация атомарно
+  проверяет полный canonical StockItem и создаёт immutable stock_item_versions.
+- StockItem.id детерминирован от dataset version и source record. Новая публикация создаёт новые
+  ids; старые записи не переписываются. Placement.stock_item_id поэтому ссылается на точную версию.
+- listStock использует bounded keyset pagination и повторную dataset authorization на каждой
+  возвращаемой записи. Фильтр plant_id не ослабляет grant.
+- unknown/listing_only требует available_quantity=null; not_in_stock требует 0; in_stock требует
+  положительное число. Известный остаток требует stock_counted_at, сообщённая доступность — checked_at.
+- ScenarioRevision принимает stock item только для того же plant/city и требует включить точный
+  dataset_version_id в frozen dataset_version_ids. Явно нулевой или недостаточный остаток блокирует
+  placement; неизвестный остаток остаётся неизвестным и не превращается в разрешение на approval.
+- Calculation input registry и manifest включают точные stock payload/source refs, поэтому старый
+  snapshot воспроизводим после новых публикаций.
+
+КОНТРАКТ
+
+Существующие listStock и StockItem реализованы без изменения их формы. В Dataset/DatasetCreate
+additive добавлен kind=stock. Canonical остаётся 1.3.0 до совместной атомарной регенерации клиента.
+
+МИГРАЦИЯ
+
+0013_stock_registry создаёт stock_item_versions с FK на plant/city/dataset/dataset_version,
+индексами для plant/city/access paths и reject_immutable_write trigger. Downgrade запрещён, потому
+что опубликованные ссылки сценариев являются историей домена. Restore fingerprint включает таблицу.
+
+ПРОВЕРКА
+
+- SYNTHETIC TEST publication создаёт listing_only/null, not_in_stock/0 и in_stock/5 как разные
+  значения; StockItemPage проходит schema validation.
+- Placement без frozen stock dataset version получает 422; с точной версией сохраняет исходный id.
+- Invalid quantity/date/range/plant отклоняет всю publication transaction.
+- Полная regression, restore и live worker/browser integration фиксируются перед main.
+
+ОГРАНИЧЕНИЯ
+
+Организаторские складские данные не будут предоставлены. Реестр готов принимать открытые или
+операторские версии, но SYNTHETIC TEST не становится фактическим остатком и не открывает approval.
+Резервирование/списание, поставки и замены относятся к WP-07/WP-09.

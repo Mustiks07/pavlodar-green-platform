@@ -1,0 +1,6 @@
+{
+  "fixture_only": true,
+  "schema": "Money",
+  "expected_valid": false,
+  "data": 12500.0
+}

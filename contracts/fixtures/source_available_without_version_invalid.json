@@ -1,0 +1,19 @@
+{
+  "fixture_only": true,
+  "schema": "SourceReadiness",
+  "expected_valid": false,
+  "origin": "Negative fixture: available data must identify an immutable version",
+  "data": {
+    "dataset_id": "00000000-0000-4000-8000-000000000101",
+    "dataset_version_id": null,
+    "readiness_state": "available",
+    "content_kind": "table",
+    "record_count": 1,
+    "checked_at": "2026-10-29",
+    "observed_from": null,
+    "observed_to": null,
+    "applicability": "SYNTHETIC negative fixture",
+    "data_request_id": "DR-05",
+    "review_reasons": []
+  }
+}

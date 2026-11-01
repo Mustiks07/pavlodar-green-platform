@@ -1,0 +1,10 @@
+{
+  "scope": "Specification integrity only; no application functionality or scientific accuracy tested",
+  "passed": true,
+  "schema_count": 150,
+  "operation_count": 102,
+  "fixture_count": 53,
+  "checks_executed": 398,
+  "work_packages": 12,
+  "acceptance_criteria": 18
+}

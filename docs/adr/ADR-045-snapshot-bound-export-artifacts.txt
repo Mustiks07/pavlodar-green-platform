@@ -1,0 +1,39 @@
+ADR-045: Неизменяемые PDF/XLSX из calculation snapshot и ProgramRevision
+Статус: принято и реализовано
+Дата: 2026-10-31
+
+Контекст
+
+Контракт уже объявлял startExport/getExport, но не определял безопасную выдачу байтов и
+сервер не реализовывал ни очередь, ни хранилище. Прямая сборка отчёта в HTTP-процессе нарушила
+бы ограничения фоновых задач. Экспорт из текущего mutable-состояния мог бы расходиться с
+карточкой расчёта и городской программой.
+
+Решение
+
+1. Canonical contract 1.11.0 сохраняет startExport/getExport и аддитивно добавляет
+   downloadExport. Короткоживущий HMAC-token связан с artifact id, но не заменяет сессию:
+   при каждом скачивании заново проверяются роль, город и доступ к исходной immutable цели.
+2. Migration 0028 добавляет input kinds calculation/program_revision для durable Job и
+   неизменяемый export_artifacts registry. Байты атомарно сохраняются в отдельный export volume;
+   PostgreSQL хранит SHA-256, размер, MIME, storage key и точную цель.
+3. Worker строит PDF/XLSX только из CalculationSnapshot или ProgramRevision и их frozen lineage.
+   Повтор после сбоя использует стабильный artifact id и путь. Неизвестные значения остаются
+   пустыми/обозначенными, а синтетические входы и ограничения не теряются.
+4. PDF использует встроенный DejaVu Sans, схему immutable контура/посадок, смету,
+   survival 1/2/3, ограничения и источники. XLSX содержит ровно summary, quantities, rates,
+   costs, care, survival, ecosystem, sources; числа и даты типизированы, формул нет.
+5. Пользовательский текст всегда записывается как строка. Префиксы =,+,-,@, tab и CR
+   дополнительно нейтрализуются, поэтому formula injection не выполняется.
+6. XlsxWriter выбран для production worker, потому что desktop artifact-tool отсутствует в
+   контейнере приложения. Файл повторно открыт и отрендерен artifact-tool только как независимая
+   QA-проверка; PDF проверен pypdf и визуальным Poppler render.
+
+Последствия
+
+- Карточка, PDF и Excel ссылаются на один и тот же immutable target id.
+- Redis не хранит единственный статус или результат; outbox/Job/artifact остаются в PostgreSQL.
+- Старые клиенты не ломаются: существующие схемы startExport/getExport не изменены.
+- Shared API не перезапускается до завершения текущего browser increment Claude; migration 0028
+  проверяется только на disposable test database.
+- LLM/чат не являются зависимостью экспорта и остаются следующим отдельным инкрементом WP-10.

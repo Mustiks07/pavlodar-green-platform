@@ -1,0 +1,91 @@
+{
+  "rules.csv": [
+    {
+      "rule_id": "GREEN-SCOPE",
+      "source_id": "LAW-GREEN",
+      "clause": "1",
+      "revision_date": "2026-03-26",
+      "parameter": "territorial_scope",
+      "value": null,
+      "unit": null,
+      "applicability": "Населенные пункты Павлодарской области, включая город Павлодар; исключения п.1: гослесфонд, ООПТ, индивидуальные жилые дома и дачи.",
+      "condition": "Областной правовой акт применяется к городу по предмету регулирования; областная статистика в город не переносится.",
+      "status": "verified_text_requires_expert",
+      "checked_at": "2026-10-29"
+    },
+    {
+      "rule_id": "GREEN-TREE-PIT",
+      "source_id": "LAW-GREEN",
+      "clause": "32",
+      "revision_date": "2026-03-26",
+      "parameter": "minimum_unpaved_circle_diameter",
+      "value": 1.2,
+      "unit": "m",
+      "applicability": "Населенные пункты Павлодарской области, включая город Павлодар; исключения п.1: гослесфонд, ООПТ, индивидуальные жилые дома и дачи. Асфальтирование/мощение вокруг существующего дерева.",
+      "condition": "Диаметр, не радиус; не отступ от здания.",
+      "status": "verified_text_requires_expert",
+      "checked_at": "2026-10-29"
+    }
+  ],
+  "soil_observations.csv": [],
+  "data.csv": [
+    {
+      "record_id": "DR-03-soil_ph_ec",
+      "topic": "soil_ph_ec",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Есть исследование редкоземельных металлов 2023 года; нет точечных pH/EC с координатами и методом.",
+      "source_id": "SOIL-NNC"
+    },
+    {
+      "record_id": "DR-03-utility_geometry",
+      "topic": "utility_geometry",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Открытый разрешенный к распространению слой сетей и охранных зон с точностью не получен.",
+      "source_id": "PROJECT-TZ"
+    }
+  ],
+  "search_log.csv": [
+    {
+      "search_id": "DR-03-search-2",
+      "checked_at": "2026-10-29",
+      "query_or_access": "Әділет G23P000524M: текст, история; G26P025729M: текст, карточка",
+      "method": "read_only_search_and_primary_review",
+      "result": "Редакция 26.03.2026, изменения 39/58/59; публикация 09.04.2026",
+      "limitation": "Полный набор строительных отступов не установлен."
+    },
+    {
+      "search_id": "DR-03-search-3",
+      "checked_at": "2026-10-29",
+      "query_or_access": "Әділет G24P013414M -> G26P029933M: текст, карточка, история",
+      "method": "read_only_search_and_primary_review",
+      "result": "Старый акт отменен; новый №299/33 от21.08.2026, опубликован01.09.2026, действующий",
+      "limitation": "История отображает одну редакцию; по состоянию проверки позднейших редакций не показано."
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "LAW-GREEN",
+      "title": "Правила создания, содержания и защиты зеленых насаждений населенных пунктов Павлодарской области, №52/4 от 11.09.2023",
+      "url": "https://adilet.zan.kz/rus/docs/G23P000524M",
+      "publisher": "Павлодарский областной маслихат / ИПС Әділет",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-03-26",
+      "license": "unknown",
+      "method": "legal_text",
+      "note": "Прочитан консолидированный текст и история через браузер. Последняя отображенная редакция 26.03.2026; не подменяет полный набор строительных норм."
+    },
+    {
+      "source_id": "LAW-GREEN-AMEND",
+      "title": "Изменения №257/29 от 26.03.2026",
+      "url": "https://adilet.zan.kz/rus/docs/G26P025729M",
+      "publisher": "Павлодарский областной маслихат / ИПС Әділет",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-03-26",
+      "license": "unknown",
+      "method": "legal_text",
+      "note": "Изменены пп.39,58,59. Карточка указывает официальную публикацию 09.04.2026; вступление через десять календарных дней после публикации. Точную календарную дату не подменяем датой принятия."
+    }
+  ]
+}

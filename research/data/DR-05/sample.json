@@ -1,0 +1,174 @@
+{
+  "stock.csv": [
+    {
+      "stock_id": "biosad-1267-2.0",
+      "taxon_id": "picea_obovata",
+      "supplier": "БИОСАД",
+      "supplier_city": "Павлодар",
+      "height_m": 2.0,
+      "age_years": null,
+      "container": null,
+      "root_system": null,
+      "quantity": 9,
+      "unit": "piece",
+      "price": "50000.00",
+      "currency": "KZT",
+      "tax_status": "unknown",
+      "checked_at": "2026-10-29",
+      "stock_count_date": null,
+      "availability": "vendor_reported",
+      "source_id": "BIOSAD-STOCK",
+      "applicability": "Карточка товара; склад и партия не подтверждены. Только материал, состав работ/доставка не указан.",
+      "height_min_m": 2.0,
+      "height_max_m": 2.0
+    },
+    {
+      "stock_id": "biosad-1267-3.0",
+      "taxon_id": "picea_obovata",
+      "supplier": "БИОСАД",
+      "supplier_city": "Павлодар",
+      "height_m": 3.0,
+      "age_years": null,
+      "container": null,
+      "root_system": null,
+      "quantity": 0,
+      "unit": "piece",
+      "price": "75000.00",
+      "currency": "KZT",
+      "tax_status": "unknown",
+      "checked_at": "2026-10-29",
+      "stock_count_date": null,
+      "availability": "not_in_stock",
+      "source_id": "BIOSAD-STOCK",
+      "applicability": "Карточка товара; склад и партия не подтверждены. Только материал, состав работ/доставка не указан.",
+      "height_min_m": 3.0,
+      "height_max_m": 3.0
+    }
+  ],
+  "rates.csv": [
+    {
+      "rate_id": "biosad-1267-2.0-material",
+      "category": "plant_material",
+      "stock_id": "biosad-1267-2.0",
+      "amount": "50000.00",
+      "currency": "KZT",
+      "unit": "piece",
+      "tax_status": "unknown",
+      "valid_from": null,
+      "valid_to": null,
+      "price_observed_at": "2026-10-29",
+      "source_id": "BIOSAD-STOCK",
+      "source_locator": "Карточка товара / варианты",
+      "applicability": "Карточка товара; склад и партия не подтверждены. Только материал, состав работ/доставка не указан.",
+      "included": "Посадочный материал; дополнительные услуги не заявлены",
+      "excluded": "Посадка, доставка и уход не подтверждены",
+      "current_applicability": "requires_quote"
+    },
+    {
+      "rate_id": "biosad-1267-3.0-material",
+      "category": "plant_material",
+      "stock_id": "biosad-1267-3.0",
+      "amount": "75000.00",
+      "currency": "KZT",
+      "unit": "piece",
+      "tax_status": "unknown",
+      "valid_from": null,
+      "valid_to": null,
+      "price_observed_at": "2026-10-29",
+      "source_id": "BIOSAD-STOCK",
+      "source_locator": "Карточка товара / варианты",
+      "applicability": "Карточка товара; склад и партия не подтверждены. Только материал, состав работ/доставка не указан.",
+      "included": "Посадочный материал; дополнительные услуги не заявлены",
+      "excluded": "Посадка, доставка и уход не подтверждены",
+      "current_applicability": "requires_quote"
+    }
+  ],
+  "resources.csv": [
+    {
+      "record_id": "DR-05-monthly_budget",
+      "topic": "monthly_budget",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Организатор не передал лимиты бюджета по месяцам/годам.",
+      "source_id": "PROJECT-TZ"
+    },
+    {
+      "record_id": "DR-05-water_capacity",
+      "topic": "water_capacity",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Нет лимита воды и доступных точек забора.",
+      "source_id": "PROJECT-TZ"
+    }
+  ],
+  "missing_rates.csv": [
+    {
+      "record_id": "DR-05-ground_preparation",
+      "topic": "ground_preparation",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",
+      "source_id": null
+    },
+    {
+      "record_id": "DR-05-soil_material",
+      "topic": "soil_material",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",
+      "source_id": null
+    }
+  ],
+  "data.csv": [
+    {
+      "record_id": "DR-05-ground_preparation",
+      "topic": "ground_preparation",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",
+      "source_id": null
+    },
+    {
+      "record_id": "DR-05-soil_material",
+      "topic": "soil_material",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Подтвержденная локальная единичная ставка с датой, составом, налогами и условиями не найдена.",
+      "source_id": null
+    }
+  ],
+  "search_log.csv": [
+    {
+      "search_id": "DR-05-search-10",
+      "checked_at": "2026-10-29",
+      "query_or_access": "БИОСАД ель сибирская; gov.kz/krem приказ Павлодар-Водоканал 2026; сайт водоканала тарифы",
+      "method": "read_only_search_and_primary_review",
+      "result": "Размерные цены и приказ54-ОД; январское уведомление историческое",
+      "limitation": "Полной местной сметы работ нет. Более поздний компенсирующий тариф не подтвержден первичным документом."
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "BIOSAD-STOCK",
+      "title": "Ель сибирская: варианты товара и наличие по городам",
+      "url": "https://biosad.kz/el.html/nid/1267",
+      "publisher": "Садовый центр БИОСАД",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "unknown",
+      "method": "vendor_listing",
+      "note": "Проверены HTML и живой интерфейс; дата инвентаризации склада не опубликована. Цены в ₸ подтверждены интерфейсом. Отзывы не используются."
+    },
+    {
+      "source_id": "GREENMAX-PINE",
+      "title": "Сосна обыкновенная C3, 20–40 см",
+      "url": "https://www.greenmax.kz/index.php/assortiment/coniferous/pinus/pinus-sylvestris-c3",
+      "publisher": "Питомник GreenMax.kz",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "unknown",
+      "method": "vendor_listing",
+      "note": "Алматинская область; доставка и наличие в Павлодаре не подтверждены."
+    }
+  ]
+}

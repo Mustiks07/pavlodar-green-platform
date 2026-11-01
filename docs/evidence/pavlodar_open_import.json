@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "scope": "Real public Pavlodar working layers through HTTP/outbox/worker/review/publication",
+  "organizer_data_received": false,
+  "official_boundary_claimed": false,
+  "datasets": [
+    {
+      "profile": "roads",
+      "dataset_id": "2497da6a-2b1b-40e7-bff3-8917e4dca0b3",
+      "dataset_version_id": "496c5e60-704c-44cd-82e3-e09f56c0ead1",
+      "sha256": "9ffd08183d0a6b9e585ac0b1944728418e26077b802c47ba0ade819caf516ed2",
+      "record_count": 7873,
+      "status": "published"
+    },
+    {
+      "profile": "green",
+      "dataset_id": "8f5c801a-944c-45d5-ae23-30a42411f24f",
+      "dataset_version_id": "9f244564-f6dc-400f-8c37-321da755db88",
+      "sha256": "2ecb7bb5d03bd6aba64b148f533b434b9b72c191322ed276668d617dfe2af97b",
+      "record_count": 512,
+      "status": "published"
+    },
+    {
+      "profile": "trees",
+      "dataset_id": "d39620c1-f5dd-441c-b852-9ba7af1bb998",
+      "dataset_version_id": "5afcc5cb-e722-43b0-ad62-90c49998e634",
+      "sha256": "f7d87c1db576ad86cce00cd1a168e44a9b9c4ab09f4dd4e4392cc78c529ee670",
+      "record_count": 144,
+      "status": "published"
+    },
+    {
+      "profile": "water",
+      "dataset_id": "94f4261d-8612-4e7b-bc00-7238aeca123f",
+      "dataset_version_id": "d5b298e4-d239-4ff5-9d7b-dfa6f91237e9",
+      "sha256": "f00b4d2bb6af1080a9936bf2604f8e025a37fcfd257c5b3d2babf415d5dbdf56",
+      "record_count": 96,
+      "status": "published"
+    },
+    {
+      "profile": "buildings",
+      "dataset_id": "1542935c-9dcb-45a6-ab87-c02b5c35b492",
+      "dataset_version_id": "786ee7ef-a309-4ea7-a678-d49a07e5ccf1",
+      "sha256": "2f4440385761bcd273e95404ec6d1ca77c52342d8d4d1147337c1b221124497b",
+      "record_count": 110,
+      "status": "published"
+    }
+  ],
+  "published_map_layer_count": 6
+}

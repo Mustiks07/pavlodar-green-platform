@@ -1,0 +1,18 @@
+ADR-053: Source-backed immutable coefficient registry
+Status: accepted
+Date: 2026-11-01
+
+Context
+The canonical API exposed coefficient operations and ScenarioRevision.coefficient_version_id,
+but the server rejected every non-null selection. Ecological values must not be entered as
+untraceable constants or silently changed after a calculation.
+
+Decision
+Store coefficient identities and immutable versions. A version must cite unique records from one
+published, authorized dataset version. The source dataset determines the city. A scenario may
+freeze only an approved coefficient whose dataset version is also frozen in that revision.
+
+Consequences
+The OpenAPI contract remains 1.13.0. Migration 0031 is required. Registry availability does not
+itself claim that a coefficient is locally calibrated; calculations may still return unavailable
+metrics until an explicit method adapter supports its key and applicability.

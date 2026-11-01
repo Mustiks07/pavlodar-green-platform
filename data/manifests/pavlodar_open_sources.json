@@ -1,0 +1,72 @@
+{
+  "status": "research_sources_not_official_city_inventory",
+  "checked_date": "2026-10-29",
+  "city": "Павлодар",
+  "boundary_osm_id": "way/170089891",
+  "boundary_role": "working_place_polygon",
+  "official_boundary_confirmed": false,
+  "osm": {
+    "url": "https://download.geofabrik.de/asia/kazakhstan-latest.osm.pbf",
+    "snapshot_timestamp": "2026-10-28T21:21:02Z",
+    "sha256": "a39fa18734c7f49b9be8c119bb3983294c8fd7d8223d368c3b13ea5fcd4c6cfa",
+    "bytes": 225268151,
+    "license": "ODbL 1.0",
+    "attribution": "OpenStreetMap contributors",
+    "data_in_repository": false,
+    "caution": "latest URL changes; verify checksum or obtain a newly versioned snapshot; geometry/height completeness is not validated"
+  },
+  "sentinel": {
+    "query_bbox": [
+      76.8599921,
+      52.1931974,
+      77.2048261,
+      52.4503782
+    ],
+    "date_from": "2026-06-01",
+    "date_to": "2026-08-31",
+    "records": 82,
+    "dates": 37,
+    "tile_cloud_cover_lte_20": 32,
+    "catalog_only": true,
+    "pixels_downloaded": false
+  },
+  "preflight_counts": {
+    "address_nodes": 137,
+    "poi_nodes_clinic": 9,
+    "poi_nodes_school": 13,
+    "tree_nodes": 423,
+    "tree_with_species": 0,
+    "tree_with_genus": 0,
+    "tree_with_height": 0,
+    "tree_with_diameter_crown": 0,
+    "tree_with_circumference": 0,
+    "tree_with_start_date": 0,
+    "poi_nodes_kindergarten": 5,
+    "poi_nodes_hospital": 4,
+    "highway_ways": 7360,
+    "building_ways": 47974,
+    "building_with_height": 110,
+    "building_with_building:levels": 15807,
+    "building_with_addr:housenumber": 45242,
+    "building_with_name": 265,
+    "building_numeric_height": 110,
+    "building_numeric_levels": 15806,
+    "6m_visual_placeholder": 32122,
+    "levels_times_3_assumption": 15742,
+    "green_ways": 699,
+    "poi_ways_hospital": 13,
+    "poi_ways_school": 35,
+    "poi_ways_kindergarten": 37,
+    "osm_height_unverified": 110,
+    "candidate_invalid_geometries": 1,
+    "poi_ways_clinic": 11
+  },
+  "limitations": [
+    "No estimate of real-world completeness",
+    "Building ways only; multipolygon relations not merged",
+    "POI nodes and areas may duplicate the same institution",
+    "OSM heights are recorded attributes, not independently verified measurements",
+    "Visual fallback heights are not calculation-grade data",
+    "Current extract date must be read from source header"
+  ]
+}

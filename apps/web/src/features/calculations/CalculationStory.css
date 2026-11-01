@@ -1,0 +1,52 @@
+.calc-story { display: grid; gap: 1rem; }
+.calc-story__hero { display: grid; gap: 1rem; padding: 1rem; border: 1px solid var(--pg-border); border-left: 4px solid var(--pg-accent); border-radius: var(--pg-radius-lg); background: linear-gradient(135deg, var(--pg-accent-soft), var(--pg-surface) 58%); }
+.calc-story__hero.is-partial { border-left-color: var(--pg-warning); background: linear-gradient(135deg, var(--pg-warning-soft), var(--pg-surface) 58%); }
+.calc-story__hero > header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+.calc-story__hero > header span:first-child { display: grid; gap: 0.15rem; }
+.calc-story__hero > header small, .calc-story__section > header small { color: var(--pg-accent-text); font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.calc-story__hero h3, .calc-story__hero p, .calc-story__section h3, .calc-story__section p { margin: 0; }
+.calc-story__hero p, .calc-story__section > header p { color: var(--pg-text-muted); }
+.calc-story__totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; }
+.calc-story__totals article { display: grid; gap: 0.12rem; padding: 0.8rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: color-mix(in srgb, var(--pg-surface) 92%, transparent); }
+.calc-story__totals article small, .calc-story__totals article span { color: var(--pg-text-muted); }
+.calc-story__totals article strong { font-size: var(--pg-fs-lg); }
+.calc-story__technical summary, .calc-story__details summary { cursor: pointer; color: var(--pg-accent-text); font-weight: 650; }
+.calc-story__technical dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 0.8rem; margin: 0.65rem 0 0; }
+.calc-story__technical dt { color: var(--pg-text-muted); }
+.calc-story__technical dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.calc-story__section { display: grid; gap: 0.85rem; padding-top: 0.35rem; }
+.calc-story__section > header { display: grid; gap: 0.18rem; }
+.calc-story .pg-survival { padding: 0.85rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: var(--pg-surface); }
+.pg-survival__title { margin: 0; }
+.pg-survival__risks summary { cursor: pointer; color: var(--pg-accent-text); font-weight: 650; }
+.pg-survival__risks ul { display: grid; gap: 0.4rem; margin: 0.55rem 0 0; padding-left: 1.2rem; }
+.pg-survival__risks li span { display: block; color: var(--pg-text-muted); }
+
+.care-calendar { display: grid; grid-template-columns: repeat(6, minmax(8rem, 1fr)); gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; }
+.care-calendar article { display: grid; align-content: start; gap: 0.35rem; min-height: 7rem; padding: 0.65rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: var(--pg-surface-2); }
+.care-calendar article.is-active { border-color: var(--pg-accent); background: var(--pg-accent-soft); }
+.care-calendar article > strong { font-size: var(--pg-fs-sm); }
+.care-calendar ul { display: grid; gap: 0.45rem; margin: 0; padding: 0; list-style: none; }
+.care-calendar li { display: grid; gap: 0.08rem; font-size: var(--pg-fs-sm); }
+.care-calendar li small, .care-calendar__empty { color: var(--pg-text-muted); }
+.calc-story__details { padding: 0.75rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: var(--pg-surface); }
+.calc-story__table-wrap { overflow-x: auto; margin-top: 0.65rem; }
+
+.ecosystem-horizons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+.ecosystem-horizons > section { display: grid; align-content: start; gap: 0.65rem; padding: 0.75rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius-lg); background: var(--pg-surface-2); }
+.ecosystem-horizons > section > header { display: flex; align-items: baseline; justify-content: space-between; gap: 0.65rem; }
+.ecosystem-horizons > section > header strong { font-size: var(--pg-fs-lg); color: var(--pg-accent-text); }
+.ecosystem-horizons > section > header span { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); text-align: right; }
+.ecosystem-horizons > section > div { display: grid; gap: 0.5rem; }
+.ecosystem-horizons .pg-metric { padding: 0.65rem; }
+
+@media (max-width: 960px) {
+  .calc-story__totals, .ecosystem-horizons { grid-template-columns: 1fr; }
+  .care-calendar { grid-template-columns: repeat(4, minmax(8rem, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .calc-story__hero > header { align-items: stretch; flex-direction: column; }
+  .care-calendar { grid-template-columns: repeat(2, minmax(8rem, 1fr)); }
+  .calc-story .pg-survival__points { grid-template-columns: 1fr; }
+}

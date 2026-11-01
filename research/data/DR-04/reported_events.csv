@@ -1,0 +1,2 @@
+event_id,source_id,report_date,place,reported_taxon,reported_planted,unit,method,planting_date_exact,inspection_date,alive,dead,unknown,training_eligible,reason
+childhood-square-20260520,LOCAL-20260520,2026-05-20,"Сквер Детства, город Павлодар","липа, вид не указан",50,piece,official_report,null,null,null,null,null,false,"Сообщение о высадке; нет реестра исходных деревьев, даты приемки, осмотра и замен."

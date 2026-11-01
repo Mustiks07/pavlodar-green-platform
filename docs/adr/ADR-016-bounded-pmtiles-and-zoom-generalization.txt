@@ -1,0 +1,58 @@
+ADR-016 Ограниченная PMTiles v3 сборка и zoom-зависимая генерализация
+Статус: accepted by GPT (canonical backend/data owner); client promotion pending Claude.
+Дата: 2026-10-30. Основа: canonical 1.2.0, backend c64dc93.
+
+ПРОБЛЕМА
+
+Опубликованные импортированные векторы сейчас отдаются как авторизованные MVT из PostGIS.
+Простая замена source_type на pmtiles была бы ложной: реального архива, checksum, проверки v3,
+HTTP Range delivery и клиентского protocol handler ещё не было. Полный GeoJSON запрещён F-MAP-04,
+а конфиденциальный слой нельзя помещать в скачиваемый или service-worker cached PMTiles (F-MAP-05).
+Кроме того, точная геометрия на каждом zoom создаёт лишний MVT payload.
+
+РЕШЕНИЕ
+
+- Авторизованный MVT request path остаётся canonical для текущих изменяемых публикаций. Для line и
+  polygon на z<15 PostGIS применяет ST_SimplifyPreserveTopology с допуском ровно один экранный
+  пиксель в Web Mercator; на z>=15 сохраняется исходная опубликованная геометрия. Bbox/zoom
+  filtering выполняется до transform и генерализации.
+- Добавлен воспроизводимый offline builder на официальной Python-библиотеке pmtiles 3.8.1.
+  Он строит настоящий PMTiles spec v3 с MVT TileType, gzip directories/metadata, bounds,
+  attribution и vector layer `features`, затем повторно читает header и metadata до atomic rename.
+- Zoom range задаётся оператором явно. До SQL rendering заранее считается число candidate tiles;
+  default limit 20 000 предотвращает случайное развёртывание огромной пирамиды в памяти/БД.
+  Пустой archive и не-current/unpublished layer отклоняются.
+- Builder принимает только dataset.access_level=public. internal/restricted слои остаются за
+  per-request authorization; администратор не может случайно сделать из них общий файл.
+- Артефакт сначала пишется во временный файл, получает SHA-256 и byte size и только затем
+  атомарно публикуется. Docker использует отдельный tile_data volume; upload quarantine не смешан
+  с производными тайлами.
+
+КОНТРАКТ И СОВМЕСТИМОСТЬ
+
+OpenAPI/Domain 1.2.0 не меняются. Существующие manifests продолжают честно объявлять `mvt`.
+Команда:
+`uv run python -m tools.data.build_pmtiles --layer-id UUID --min-zoom 5 --max-zoom 14`
+создаёт проверенный артефакт, но не меняет immutable MapLayer. Promotion в `source_type=pmtiles`
+разрешён только отдельным согласованным контрактом после Range endpoint, access/cache policy и
+client protocol acceptance; текущий UI прямо сообщает, что PMTiles пока не отображает.
+
+ПРОВЕРКА
+
+- Синтетическая public publication проходит import -> review -> MVT -> PMTiles; tile bytes из
+  archive на z12 совпадают с авторизованным dynamic MVT.
+- Два независимых build дают byte-identical archive и одинаковый SHA-256.
+- Header version=3, TileType=MVT, zoom bounds и vector layer повторно читаются official Reader.
+- Candidate limit срабатывает до создания destination; перевод dataset в internal блокирует build.
+- Organizer data не использованы; тестовый point явно SYNTHETIC.
+
+ОГРАНИЧЕНИЯ
+
+Это подготовка, не заявление о production PMTiles delivery. Ещё нужны: immutable artifact registry,
+Range endpoint/object-storage adapter, recovery/retention, CDN/cache policy, client protocol handler
+и representative large-layer benchmark. Point clustering также остаётся отдельным WP-04 шагом.
+
+ИСТОЧНИКИ РЕШЕНИЯ
+
+- PMTiles v3 specification: https://github.com/protomaps/PMTiles/blob/main/spec/v3/spec.md
+- Official PMTiles repository/Python package: https://github.com/protomaps/PMTiles

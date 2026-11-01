@@ -1,0 +1,182 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T07:39:51.779Z",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC scenario with a server calculation snapshot",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "start error is shown with retry; nothing is exported",
+      "pass": true
+    },
+    {
+      "name": "calculation PDF: job -> getExport -> signed download; %PDF, Content-Type, filename, server byte_size/media_type = file, SHA-256",
+      "pass": true,
+      "detail": {
+        "artifactId": "fb6dbcfb-5f6e-5011-a2b4-51ed1cb9029b",
+        "bytes": 53780,
+        "byte_size": 53780,
+        "media_type": "application/pdf",
+        "uiSize": "53780",
+        "filename": "pavlodar_calculation_60c1982f-6f8a-4310-a39b-16ba1ebdf51c.pdf",
+        "http": {
+          "status": 200,
+          "type": "application/pdf",
+          "disposition": "attachment; filename=\"pavlodar_calculation_60c1982f-6f8a-4310-a39b-16ba1ebdf51c.pdf\""
+        },
+        "okStatus": true
+      }
+    },
+    {
+      "name": "calculation XLSX: PK zip, Content-Type, filename, size, SHA-256",
+      "pass": true,
+      "detail": {
+        "artifactId": "550b47cc-8ef7-5b02-9cfe-dee05d2029e5",
+        "bytes": 11223,
+        "byte_size": 11223,
+        "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "uiSize": "11223",
+        "filename": "pavlodar_calculation_60c1982f-6f8a-4310-a39b-16ba1ebdf51c.xlsx",
+        "http": {
+          "status": 200,
+          "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "disposition": "attachment; filename=\"pavlodar_calculation_60c1982f-6f8a-4310-a39b-16ba1ebdf51c.xlsx\""
+        },
+        "okStatus": true
+      }
+    },
+    {
+      "name": "expired link: getExport renews it and the download succeeds without a new startExport",
+      "pass": true,
+      "detail": {
+        "gets": 1,
+        "starts": 0
+      }
+    },
+    {
+      "name": "a past expires_at is shown as an expired link (reload keeps the artifacts from the URL)",
+      "pass": true
+    },
+    {
+      "name": "tampered token: 403 export_download_invalid",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "code": "export_download_invalid"
+      }
+    },
+    {
+      "name": "cancel: the row ends in the server state (cancelled offers a new export; finished first shows the artifact)",
+      "pass": true,
+      "detail": {
+        "couldCancel": true,
+        "cancelState": "cancelled"
+      }
+    },
+    {
+      "name": "reload during an export resumes the job from the URL and lands on its artifact",
+      "pass": true
+    },
+    {
+      "name": "setup: SYNTHETIC program optimized into a ProgramRevision (disposable DB only)",
+      "pass": true,
+      "detail": {
+        "status": 0,
+        "err": ""
+      }
+    },
+    {
+      "name": "program revision PDF exported for the selected revision",
+      "pass": true,
+      "detail": {
+        "target": "b8bd9579-3c0d-4e7c-9b37-9c2debffdf92",
+        "artifactId": "10cb7af1-8c33-50ce-b7d2-0668e24a1357",
+        "bytes": 55041,
+        "byte_size": 55041,
+        "media_type": "application/pdf",
+        "uiSize": "55041",
+        "filename": "pavlodar_program_revision_b8bd9579-3c0d-4e7c-9b37-9c2debffdf92.pdf",
+        "http": {
+          "status": 200,
+          "type": "application/pdf",
+          "disposition": "attachment; filename=\"pavlodar_program_revision_b8bd9579-3c0d-4e7c-9b37-9c2debffdf92.pdf\""
+        },
+        "okStatus": true
+      }
+    },
+    {
+      "name": "program revision XLSX exported",
+      "pass": true,
+      "detail": {
+        "artifactId": "e0f5cb6f-b3aa-50cd-aa81-d456fbbf8e3f",
+        "bytes": 11360,
+        "byte_size": 11360,
+        "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "uiSize": "11360",
+        "filename": "pavlodar_program_revision_b8bd9579-3c0d-4e7c-9b37-9c2debffdf92.xlsx",
+        "http": {
+          "status": 200,
+          "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "disposition": "attachment; filename=\"pavlodar_program_revision_b8bd9579-3c0d-4e7c-9b37-9c2debffdf92.xlsx\""
+        },
+        "okStatus": true
+      }
+    },
+    {
+      "name": "no page errors in the specialist session",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "IDOR: viewer gets 404 for metadata and download of a draft scenario export; unknown id 404; anonymous 401",
+      "pass": true,
+      "detail": {
+        "idorMeta": 404,
+        "idorDownload": 404,
+        "unknown": 404,
+        "anonymous": 401
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp10-export-ui/export-calculation.png",
+    "docs/evidence/wp10-export-ui/export-program.png",
+    "docs/evidence/wp10-export-ui/export-viewer.png"
+  ],
+  "files": [
+    {
+      "label": "calculation",
+      "format": "pdf",
+      "artifactId": "fb6dbcfb-5f6e-5011-a2b4-51ed1cb9029b",
+      "bytes": 53780,
+      "sha256": "4ea777c5077bd3ff232265e0fa74a7fafcdc1ef2850d7041393c573ada074e4d"
+    },
+    {
+      "label": "calculation",
+      "format": "xlsx",
+      "artifactId": "550b47cc-8ef7-5b02-9cfe-dee05d2029e5",
+      "bytes": 11223,
+      "sha256": "952f548c93ad99e7b3f70b5f964adba8415b563964bf70ddab1e54ba8fe0270e"
+    },
+    {
+      "label": "program",
+      "format": "pdf",
+      "artifactId": "10cb7af1-8c33-50ce-b7d2-0668e24a1357",
+      "bytes": 55041,
+      "sha256": "c3f755accb7e5557d28cdebd63a417955736eba44b59c2aaebd89e85e6dfe869"
+    },
+    {
+      "label": "program",
+      "format": "xlsx",
+      "artifactId": "e0f5cb6f-b3aa-50cd-aa81-d456fbbf8e3f",
+      "bytes": 11360,
+      "sha256": "1db37e6ec2a48b550dda3155c375c805567e31ff2acffbeff7752313f948cae0"
+    }
+  ],
+  "finishedAt": "2026-10-31T07:40:52.492Z",
+  "passed": true
+}

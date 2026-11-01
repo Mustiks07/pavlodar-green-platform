@@ -1,0 +1,46 @@
+{
+  "fixture_only": true,
+  "schema": "CostResult",
+  "expected_valid": true,
+  "data": {
+    "currency": "KZT",
+    "status": "incomplete",
+    "known_subtotal": "0.00",
+    "total": null,
+    "lines": [
+      {
+        "id": "00000000-0000-0000-0000-00000000000c",
+        "category": "material",
+        "description": "Синтетическая строка с отсутствующей ставкой",
+        "quantity": 10,
+        "unit": "piece",
+        "unit_price": null,
+        "subtotal": null,
+        "year": 0,
+        "rate_version_id": null,
+        "formula": "quantity * unit_price",
+        "tax_mode": "unknown",
+        "price_observed_at": null,
+        "rate_status": null,
+        "source_refs": [
+          {
+            "dataset_version_id": "00000000-0000-0000-0000-000000000002",
+            "source_record_id": "synthetic-record-1",
+            "label": "SYNTHETIC contract fixture; not Pavlodar measurement",
+            "uri": null
+          }
+        ]
+      }
+    ],
+    "data_gaps": [
+      {
+        "code": "RATE_MISSING",
+        "message": "Цена не предоставлена",
+        "required_inputs": [
+          "material_rate"
+        ],
+        "blocking": true
+      }
+    ]
+  }
+}

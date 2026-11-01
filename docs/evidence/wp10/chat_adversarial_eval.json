@@ -1,0 +1,43 @@
+{
+  "scope": "Deterministic server-side chat proposal policy; no external provider quality or scientific accuracy claim",
+  "date": "2026-10-31",
+  "passed": true,
+  "case_count": 51,
+  "categories": {
+    "untrusted_tool_arguments": {
+      "total": 28,
+      "accepted": 7,
+      "rejected": 21
+    },
+    "retrieval_bound_tool_availability": {
+      "total": 23,
+      "available": 4,
+      "unavailable": 19
+    }
+  },
+  "boundaries": [
+    "exact argument key allowlist",
+    "summary type and length",
+    "UUID parsing",
+    "integer quantity 1..100000 with booleans rejected",
+    "current draft revision required",
+    "at least one explicitly unlocked placement required",
+    "only the first 100 authorized placements may enable the tool",
+    "malformed and instruction-like retrieved values fail closed"
+  ],
+  "commands": [
+    "python -m pytest tests/test_chat_evals.py tests/test_chat.py -q",
+    "python -m pytest -q",
+    "python tools/spec/validate.py",
+    "python -m ruff check services tests tools migrations",
+    "npm --prefix apps/web run check:api",
+    "npm --prefix apps/web run typecheck"
+  ],
+  "results": {
+    "focused_tests": "56 passed",
+    "full_backend": "256 passed, 65 warnings",
+    "contract_checks": 389,
+    "client_contract": "matches canonical 1.11.0",
+    "typescript": "passed"
+  }
+}

@@ -1,0 +1,10 @@
+record_id,topic,value,status,reason,source_id
+populus_alba,taxon_review,Populus alba,requires_review,Назван в городском плане зеленого пояса,LOCAL-20260520
+pinus_sylvestris,taxon_review,Pinus sylvestris,requires_review,"Городской источник называет сосну без вида; вид — кандидат, требует сверки дендроплана",LOCAL-20260520
+tilia_cordata,taxon_review,Tilia cordata,requires_review,Посадки липы в городе подтверждены только до рода; вид требует сверки,LOCAL-20260520
+syringa_vulgaris,taxon_review,Syringa vulgaris,requires_review,Городской источник называет сирень без вида; вид требует сверки,LOCAL-20260520
+picea_obovata,taxon_review,Picea obovata,requires_review,Питомник указывает товар в Павлодаре; не испытание в городе,BIOSAD-STOCK
+ricinus_communis,taxon_review,Ricinus communis,excluded_research_risk,Представлена в интернет-каталоге; исключение из предлагаемых детских/больничных посадок по риску,BIOSAD-HOME
+salix_sp,taxon_review,Salix sp.,requires_review,Названа в городском плане,LOCAL-20260520
+acer_sp,taxon_review,Acer sp.,requires_review,Назван в городском плане,LOCAL-20260520
+fraxinus_sp,taxon_review,Fraxinus sp.,requires_review,Назван в городском плане,LOCAL-20260520

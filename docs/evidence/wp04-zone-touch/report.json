@@ -1,0 +1,186 @@
+{
+  "base": "http://localhost:5173",
+  "startedAt": "2026-10-29T22:23:24.973Z",
+  "checks": [
+    {
+      "name": "synthetic zone created (setup)",
+      "pass": true,
+      "detail": {
+        "status": 201
+      }
+    },
+    {
+      "name": "editing on a phone: compact sheet and the whole contour framed above it",
+      "pass": true,
+      "detail": {
+        "reachable": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "sheetH": 292
+      }
+    },
+    {
+      "name": "finger on empty map pans the map; contour unchanged",
+      "pass": true,
+      "detail": {
+        "c0": [
+          77,
+          52.2991205035421
+        ],
+        "c1": [
+          76.99920875270527,
+          52.299604379626686
+        ]
+      }
+    },
+    {
+      "name": "a vertex is reachable by the finger above the sheet (setup)",
+      "pass": true,
+      "detail": [
+        {
+          "i": 0,
+          "x": 73.23487521211307,
+          "y": 485.18295697371167,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "x": 316.7182588941521,
+          "y": 485.18295697371167,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "x": 316.7182588941521,
+          "y": 86.9968031032218,
+          "ok": true
+        },
+        {
+          "i": 3,
+          "x": 73.23487521211307,
+          "y": 86.9968031032218,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "finger drag on a vertex moves it, keeps the count and does not pan the map",
+      "pass": true,
+      "detail": {
+        "i": 0,
+        "before": [
+          76.99879981577396,
+          52.29879993320108
+        ],
+        "after": [
+          76.99919410049915,
+          52.298619091103006
+        ]
+      }
+    },
+    {
+      "name": "dragged vertex becomes the selected one (on-map toolbar)",
+      "pass": true
+    },
+    {
+      "name": "finger jitter under the slop does not move the vertex; it selects it",
+      "pass": true
+    },
+    {
+      "name": "tap on a midpoint inserts a vertex (5) and selects it",
+      "pass": true,
+      "detail": {
+        "mid": 1,
+        "status": "контур замкнут\nвершин: 5\nВершина 3 из 5"
+      }
+    },
+    {
+      "name": "on-map \"Удалить\" removes the selected vertex (back to 4)",
+      "pass": true,
+      "detail": {
+        "status": "контур замкнут\nвершин: 4\nВершина 3 из 4"
+      }
+    },
+    {
+      "name": "on-map toolbar buttons are at least 44 px tall for fingers",
+      "pass": true,
+      "detail": {
+        "x": 21,
+        "y": 95.84375,
+        "width": 90.078125,
+        "height": 44
+      }
+    },
+    {
+      "name": "two-finger gesture never moves a vertex (pinch is zoom)",
+      "pass": true
+    },
+    {
+      "name": "keyboard: ] selects vertex 1, arrows nudge it 5 px per press, map does not pan",
+      "pass": true,
+      "detail": {
+        "selKb": "Вершина 1 из 4\nУдалить\nВставить\nГотово",
+        "movedPx": 10
+      }
+    },
+    {
+      "name": "keyboard: I inserts after the selected vertex, Delete removes, Ctrl+Z undoes",
+      "pass": true,
+      "detail": {
+        "afterInsert": "контур замкнут\nвершин: 5\nВершина 2 из 5",
+        "afterDelete": "контур замкнут\nвершин: 4\nВершина 2 из 4",
+        "afterUndo": "контур замкнут\nвершин: 5\nВершина 2 из 5"
+      }
+    },
+    {
+      "name": "Esc clears the selection and hides the toolbar",
+      "pass": true
+    },
+    {
+      "name": "reload restores the touched contour (local draft, labelled)",
+      "pass": true,
+      "detail": {
+        "n": 5
+      }
+    },
+    {
+      "name": "concurrent updateZone accepted (setup)",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "stale If-Match -> 412 explained; my touched contour kept",
+      "pass": true
+    },
+    {
+      "name": "after explicit keep: server saved my contour on a new version, concurrent rename preserved",
+      "pass": true,
+      "detail": {
+        "vertices": 5,
+        "name": "SYNTHETIC TEST касание 22:23:39 (параллельно)"
+      }
+    },
+    {
+      "name": "no uncaught page errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp04-zone-touch/touch-edit-start.png",
+    "docs/evidence/wp04-zone-touch/touch-vertex-dragged.png",
+    "docs/evidence/wp04-zone-touch/touch-conflict-412.png",
+    "docs/evidence/wp04-zone-touch/touch-selected-dark.png",
+    "docs/evidence/wp04-zone-touch/touch-selected-light.png"
+  ],
+  "finishedAt": "2026-10-29T22:23:57.939Z",
+  "passed": true,
+  "synthetic": {
+    "zone": "10e8c0bc-423e-4540-beec-da7be57f7afd"
+  }
+}

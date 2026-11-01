@@ -1,0 +1,4 @@
+source_id,title,url,publisher,checked_at,observed_at,license,method,note
+PROJECT-TZ,"ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29",repo:docs/TZ_DEVELOPMENT.txt,Проект team-vtiposhnik,2026-10-29,2026-10-29,unknown,project_requirement,Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке.
+OSM,"Городской срез Geofabrik Kazakhstan, OSM",https://download.geofabrik.de/asia/kazakhstan.html,OpenStreetMap contributors / Geofabrik,2026-10-29,2026-10-28T21:21:02Z,ODbL-1.0,community_record,Повторно использованы готовые preflight файлы с проверкой checksum. Новая загрузка OSM не выполнялась. Рабочий контур way/170089891 не официальный.
+OSM-LICENSE,OpenStreetMap copyright and licence,https://www.openstreetmap.org/copyright,OpenStreetMap Foundation,2026-10-29,null,ODbL-1.0,license_terms,

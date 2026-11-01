@@ -1,0 +1,134 @@
+{
+  "checked_at": "2026-10-29",
+  "research_status": "partial",
+  "acceptance_met": false,
+  "city": "Павлодар",
+  "official_boundary_confirmed": false,
+  "real_world_city_coverage": null,
+  "accuracy": null,
+  "accuracy_reason": "Нет локальной независимой проверки; точность и разрешение не одно и то же.",
+  "tables": {
+    "stock.csv": {
+      "row_count": 4,
+      "null_count_by_column": {
+        "stock_id": 0,
+        "taxon_id": 0,
+        "supplier": 0,
+        "supplier_city": 0,
+        "height_m": 1,
+        "age_years": 4,
+        "container": 3,
+        "root_system": 3,
+        "quantity": 1,
+        "unit": 0,
+        "price": 0,
+        "currency": 0,
+        "tax_status": 0,
+        "checked_at": 0,
+        "stock_count_date": 4,
+        "availability": 0,
+        "source_id": 0,
+        "applicability": 0,
+        "height_min_m": 0,
+        "height_max_m": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "rates.csv": {
+      "row_count": 7,
+      "null_count_by_column": {
+        "rate_id": 0,
+        "category": 0,
+        "stock_id": 3,
+        "amount": 0,
+        "currency": 0,
+        "unit": 0,
+        "tax_status": 0,
+        "valid_from": 4,
+        "valid_to": 4,
+        "price_observed_at": 0,
+        "source_id": 0,
+        "source_locator": 0,
+        "applicability": 0,
+        "included": 0,
+        "excluded": 0,
+        "current_applicability": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "resources.csv": {
+      "row_count": 4,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 4,
+        "status": 0,
+        "reason": 0,
+        "source_id": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "missing_rates.csv": {
+      "row_count": 7,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 7,
+        "status": 0,
+        "reason": 0,
+        "source_id": 7
+      },
+      "duplicate_whole_rows": 0
+    },
+    "data.csv": {
+      "row_count": 7,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 7,
+        "status": 0,
+        "reason": 0,
+        "source_id": 7
+      },
+      "duplicate_whole_rows": 0
+    },
+    "search_log.csv": {
+      "row_count": 1,
+      "null_count_by_column": {
+        "search_id": 0,
+        "checked_at": 0,
+        "query_or_access": 0,
+        "method": 0,
+        "result": 0,
+        "limitation": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "sources.csv": {
+      "row_count": 7,
+      "null_count_by_column": {
+        "source_id": 0,
+        "title": 0,
+        "url": 0,
+        "publisher": 0,
+        "checked_at": 0,
+        "observed_at": 2,
+        "license": 0,
+        "method": 0,
+        "note": 0
+      },
+      "duplicate_whole_rows": 0
+    }
+  },
+  "limitations": [
+    "Найденное не равно допущенному к production.",
+    "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+    "Неизвестные и недатированные параметры не заменены нулями.",
+    "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+    "Состав работ и налоги питомников неизвестны; нет полной сметы.",
+    "Текущее действие водных ставок после возможных компенсирующих изменений не разрешено."
+  ],
+  "coverage_basis": "Исследование ограничено городом Павлодаром; внешние справочные/сравнительные данные явно помечены. Доля площади в официальном контуре unknown.",
+  "geometry_files": {},
+  "geometry_validation": {}
+}

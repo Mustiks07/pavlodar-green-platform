@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "scope": "Real OIDC, HTTP, outbox, Redis/Celery, isolated bounded parsers, publication, MVT and feature lineage",
+  "runs": [
+    {
+      "format": "kml",
+      "dataset_id": "8e00c248-655f-480a-8523-dc39813d48a2",
+      "upload_id": "79f82b5c-f022-479d-9abd-977cb9f79b6e",
+      "job_id": "7551a0a7-0f83-4cc4-8aac-6e91652f442d",
+      "dataset_version_id": "7c20f60a-0797-4747-85b9-3ac941fb878e",
+      "source_record_id": "synthetic-live-kml-1",
+      "map_layer_id": "435a0682-b06b-5b61-9ce4-7308d833e60d",
+      "map_feature_id": "e2a65a3d-992b-22fb-710c-16c5a2295518",
+      "mvt_bytes": 166
+    },
+    {
+      "format": "shp_zip",
+      "dataset_id": "4a4120f6-3137-40ae-bc41-14302df1ddcc",
+      "upload_id": "5e9f07bf-b021-42fa-8077-550ce6030095",
+      "job_id": "459ca20f-b93a-406c-81b2-d09d7f8ffff9",
+      "dataset_version_id": "252a589f-3a8f-4ff1-8d8f-7abe81e175a3",
+      "source_record_id": "0",
+      "map_layer_id": "ad9b8601-97ec-599d-842b-53f29099b3c5",
+      "map_feature_id": "99f57583-0a9f-04b2-9cac-884b340a8f83",
+      "mvt_bytes": 147
+    }
+  ],
+  "organizer_data_received": false,
+  "synthetic_test_inputs": true,
+  "limitations": [
+    "WGS84 only",
+    "one shapefile dataset per archive",
+    "upload-volume disaster recovery remains pending"
+  ]
+}

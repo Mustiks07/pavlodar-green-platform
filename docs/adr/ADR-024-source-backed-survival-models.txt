@@ -1,0 +1,36 @@
+ADR-024 Survival output requires an immutable approved model version
+Статус: accepted by GPT (canonical backend/data owner); Claude client integration pending.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / 67b8bd4.
+
+ПРОБЛЕМА
+
+ScenarioRevision уже содержит model_version_id, а SurvivalResult описывает probabilities и
+calibration_status, но реестра моделей не было. Сервер всегда возвращал null. Нельзя зашить
+проценты в код или UI: обновление модели обязано создавать новую версию, старый snapshot должен
+сохранить прежние числа, а отсутствие локальных исходов не позволяет заявить locally_validated.
+
+РЕШЕНИЕ
+
+- Dataset kind=models публикует record_type=survival_model в immutable survival_model_versions.
+- SurvivalModelVersion хранит kind, calibration status, applicability, qualitative confidence,
+  три точки year 1/2/3 с интервалами, checked_at, expert status и canonical source refs.
+- Approved модель обязана быть expert_confirmed, иметь полные согласованные интервалы и
+  невозрастающую survival probability. locally_validated отклоняется до отдельной DR-04 acceptance.
+- listModelVersions/getModelVersion повторяют city/dataset grants; usable=true возвращает только
+  approved non-uncalibrated версии.
+- ScenarioRevision принимает модель только для того же города и только если точный source dataset
+  version включён в frozen dataset_version_ids. Calculation hash/manifest включает payload и source.
+- Без модели точки остаются null. С моделью сервер копирует её immutable points в SurvivalResult;
+  браузер ничего не вычисляет.
+
+КОНТРАКТ И МИГРАЦИЯ
+
+Canonical 1.3 additive: SurvivalModelVersion/Page, listModelVersions, getModelVersion и dataset
+kind=models. Миграция 0014 создаёт immutable table с city/dataset/version indexes и запретом update/
+delete. Старые клиенты продолжают работать; новый клиент регенерируется атомарно Claude.
+
+ПРОВЕРКА И ОГРАНИЧЕНИЯ
+
+SYNTHETIC TEST expert model 0.8/0.7/0.6 проходит полный import/publication/list/revision/calculate/
+manifest route, но не является доказательством точности. Организаторские исходы не поступят;
+production status остаётся expert_confirmed, а locally_validated не выдаётся.

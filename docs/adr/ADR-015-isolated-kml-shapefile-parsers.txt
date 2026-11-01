@@ -1,0 +1,46 @@
+ADR-015 Изолированный KML/SHP parsing без распаковки архива
+Статус: accepted by GPT (backend/data owner); UI contract 1.2.0 не меняется.
+Дата: 2026-10-30. Основа: canonical/backend 1444142.
+
+ПРОБЛЕМА
+
+Контракт ImportRequest уже объявляет kml и shp_zip, но worker раньше создавал отклонённый
+QualityReport с parser_not_available. XML entities, ZIP traversal/bombs, нативные GIS-библиотеки
+и большие геометрии нельзя безопасно обрабатывать в основном Celery процессе. Требование
+F-DATA-01 запрещает бесконтрольную распаковку и угадывание CRS.
+
+РЕШЕНИЕ
+
+- KML и SHP ZIP читаются в отдельном subprocess с фиксированным Python entrypoint, без shell,
+  stdin/stdout/stderr и без передачи application secrets. Таймаут 65 секунд; production Linux
+  child получает RLIMIT_AS=1 GiB, CPU=60 s, output=250 MB и 64 file descriptors.
+- Вход остаётся в server-owned quarantine. SHP ZIP никогда не извлекается на диск: pyshp читает
+  .shp/.shx/.dbf прямо из ZipExtFile. Требуется ровно один согласованный basename.
+- ZIP: максимум 128 entries, 200 MB uncompressed, 100 MB на entry, ratio <=100; запрещены
+  traversal/absolute/drive paths, case-folded duplicates, encryption и symlinks.
+- KML разбирается defusedxml; DTD/entities/external entities запрещены. Поддерживаются одиночные
+  Point, LineString и Polygon placemarks. Необъявленные MultiGeometry отклоняются, а не угадываются.
+- Оба формата: максимум 100 000 записей, 100 000 координат на объект, 2 000 000 на файл,
+  256 атрибутов и 1 MB JSON properties на объект. Топология и EPSG:4326 bounds проверяются.
+- Пока нет проверенного transform pipeline, принимаются только явно заявленные WGS84 aliases.
+  .prj не используется для молчаливого угадывания. Другой CRS создаёт blocking quality issue.
+- Ошибка parser не делает job ложным success с опубликованными данными: job устойчиво создаёт
+  immutable rejected DatasetVersion и QualityReport; publication остаётся запрещена.
+
+СОВМЕСТИМОСТЬ
+
+OpenAPI/Domain 1.2.0 не меняются: значения kml/shp_zip уже были canonical. Меняется capability
+реализации. UI может убрать подпись «parser недоступен» только после live capability проверки.
+
+ПРОВЕРКА
+
+- Валидные синтетические KML и SHP ZIP проходят upload -> queued job -> isolated parser ->
+  DatasetVersion/QualityReport/ImportRecord с реальной PostGIS geometry.
+- XXE/entity, traversal, duplicate path, symlink, compression bomb и entry flood отклоняются.
+- Full backend regression: 91 tests; targeted ruff; pip-audit без известных уязвимостей.
+
+ОГРАНИЧЕНИЯ
+
+Organizer data не получены. Тестовые геометрии явно SYNTHETIC. CRS transformation, multiple
+shapefiles в одном archive, KML MultiGeometry/styles/NetworkLink и upload-volume restore не входят
+в этот инкремент и не заявляются поддержанными.

@@ -1,0 +1,165 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:26:34.984Z",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC draft scenario with an unlocked placement, catalog and rule (disposable DB only)",
+      "pass": true,
+      "detail": {
+        "err": []
+      }
+    },
+    {
+      "name": "session created for the open project: bound to its zone and exact current revision",
+      "pass": true,
+      "detail": {
+        "levelText": "Сценарий «SYNTHETIC scenario», ревизия c91e7794"
+      }
+    },
+    {
+      "name": "answer through the durable sendChatMessage job is shown exactly as the server stored it",
+      "pass": true,
+      "detail": {
+        "state": "completed"
+      }
+    },
+    {
+      "name": "server facts only: the zone area fact equals the server value; the panel shows it under «Данные сервера»",
+      "pass": true,
+      "detail": {
+        "uiFacts": [
+          {
+            "key": "zone_area",
+            "value": "7591.458720536456"
+          }
+        ],
+        "serverFacts": [
+          {
+            "key": "zone_area",
+            "value": "7591.458720536456"
+          }
+        ]
+      }
+    },
+    {
+      "name": "reload mid-answer: panel reopens on the same session; the pending answer resumes its job over the shared useJob stream",
+      "pass": true,
+      "detail": {
+        "jobBefore": "b702bad5-fd08-4071-9f67-aa4049a7ddeb",
+        "resumedState": "queued",
+        "transport": "stream"
+      }
+    },
+    {
+      "name": "cancel: the job and the assistant message become cancelled on the server",
+      "pass": true,
+      "detail": {
+        "job": "cancelled"
+      }
+    },
+    {
+      "name": "retry re-sends the same question as a new job and completes",
+      "pass": true,
+      "detail": {
+        "count": 6
+      }
+    },
+    {
+      "name": "provider failure: message marked failed with a retry offered, no invented answer",
+      "pass": true,
+      "detail": {
+        "failText": "Ассистент\nответ не получен\n31.10.2026, 13:27\nПовторить вопрос"
+      }
+    },
+    {
+      "name": "proposal opened via getProposal: server quantities shown, scenario unchanged until confirmed",
+      "pass": true,
+      "detail": {
+        "before": "3",
+        "after": "4",
+        "current": "c91e7794-d674-48a2-9b34-97e28a93e4b3"
+      }
+    },
+    {
+      "name": "apply: explicit confirmation, current If-Match and proposal base_revision_id -> one new server revision",
+      "pass": true,
+      "detail": {
+        "applyCalls": [
+          {
+            "ifMatch": "\"50b3cf56dfbd16c766ad87d06618c5859a119d9aa588283359f62658f45282ed\"",
+            "body": {
+              "base_revision_id": "c91e7794-d674-48a2-9b34-97e28a93e4b3"
+            }
+          },
+          {
+            "ifMatch": "\"439976fb7a33890ae3306388264b2ce4c44220b28cf93db7246779ae87e630de\"",
+            "body": {
+              "base_revision_id": "c91e7794-d674-48a2-9b34-97e28a93e4b3"
+            }
+          }
+        ],
+        "appliedId": "56cfe303-2c30-4a4b-8123-42449679767c",
+        "status": "applied"
+      }
+    },
+    {
+      "name": "project page follows the applied revision without phantom unsaved edits",
+      "pass": true,
+      "detail": {
+        "followed": true,
+        "phantom": 0
+      }
+    },
+    {
+      "name": "stale base: 412 keeps the proposal on screen, links the current revision, creates nothing",
+      "pass": true,
+      "detail": {
+        "currentLink": "/projects/4023798b-9b32-45e9-8300-6defedff096b?city=10000000-0000-4000-8000-000000000001&revision=56cfe303-2c30-4a4b-8123-42449679767c"
+      }
+    },
+    {
+      "name": "re-read: the card now states the current revision instead of the conflict",
+      "pass": true
+    },
+    {
+      "name": "reject with a reason: proposal rejected on the server",
+      "pass": true,
+      "detail": {
+        "status": "rejected"
+      }
+    },
+    {
+      "name": "reload restores the conversation and proposal states from the server",
+      "pass": true,
+      "detail": {
+        "restored": 12,
+        "count": 12
+      }
+    },
+    {
+      "name": "no page errors in the specialist session",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "viewer: no chat controls, the role limitation is explained",
+      "pass": true
+    },
+    {
+      "name": "phone (dark): assistant opened from the link without horizontal scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp10-assistant-ui/assistant-answer.png",
+    "docs/evidence/wp10-assistant-ui/assistant-failed.png",
+    "docs/evidence/wp10-assistant-ui/assistant-proposal.png",
+    "docs/evidence/wp10-assistant-ui/assistant-conflict.png",
+    "docs/evidence/wp10-assistant-ui/assistant-mobile-dark.png"
+  ],
+  "finishedAt": "2026-10-31T08:27:42.652Z",
+  "passed": true
+}

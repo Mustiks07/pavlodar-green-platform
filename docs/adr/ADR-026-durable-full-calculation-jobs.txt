@@ -1,0 +1,32 @@
+ADR-026 Full calculation runs as a durable request-backed job
+Статус: accepted by GPT (backend/job/calculation owner); client integration pending.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / 00e49b2.
+
+ПРОБЛЕМА
+
+startCalculation был объявлен, но не реализован: calculate jobs завершались handler_not_available.
+Нельзя держать request только в памяти Celery или пересоздавать его из mutable scenario: после
+рестарта worker обязан продолжить с тем же revision, modules и seed, а redelivery не должен создать
+второй snapshot.
+
+РЕШЕНИЕ
+
+- startCalculation принимает только mode=full, повторно авторизует immutable revision и атомарно
+  сохраняет Job + private canonical request_payload + transactional Outbox.
+- Dispatcher публикует job id; worker с fenced lease повторно проверяет owner/role/revision grants и
+  создаёт CalculationSnapshot и terminal Job event в одной DB transaction.
+- Crash до commit откатывает snapshot и job completion вместе. Expired lease возвращается в queue
+  до трёх попыток; старый token не может завершить job. Idempotency replay возвращает тот же Job.
+- getJob.result_ref_id указывает на immutable snapshot. Недоступные full modules дают partial +
+  calculation_module_unavailable, а не фиктивный успешный результат.
+
+МИГРАЦИЯ
+
+0015_job_requests добавляет nullable JSONB jobs.request_payload. Старые import jobs совместимы;
+новые import/calculate requests сохраняются для recovery. Поле приватное и не включается в Job API.
+
+ПРОВЕРКА
+
+SYNTHETIC TEST full cost+ecosystem request: два одинаковых mutation возвращают один queued Job,
+worker создаёт один partial snapshot, cost=30.03 KZT сохраняется, ecosystem явно unavailable.
+Существующие тесты outage/redelivery/cancel/revoked access/three-attempt recovery остаются зелёными.

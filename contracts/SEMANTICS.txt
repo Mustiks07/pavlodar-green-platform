@@ -1,0 +1,79 @@
+СЕМАНТИКА КОНТРАКТА 1.0.0
+
+OpenAPI описывает стартовые интеграционные операции, а не уже запущенный сервис.
+ТЗ и эта семантика дополняют структурную JSON Schema. Backend обязан проверять
+пространственные, временные, ресурсные и авторизационные инварианты отдельно.
+
+Создание сценария:
+- Новый: base_revision_id=null, initial_state содержит ScenarioRevisionInput,
+  parent_revision_id=null. Начальный черновик может не иметь справочников.
+- Копия: base_revision_id содержит доступную ревизию, initial_state=null.
+- Сохраняемая последующая ревизия: AppendRevisionInput с непустым parent_revision_id,
+  равным текущей ревизии при If-Match. ZoneVersion принадлежит тому же city/zone.
+- Nullable ссылки на каталоги/модели допускаются для сохранения пустого черновика.
+  Они не разрешают расчёт/утверждение без обязательных входов; вернуть blockers.
+
+Изменения и concurrency:
+- ETag opaque; клиент не конструирует его самостоятельно из даты/ID.
+- 412 Problem содержит current_revision_id и request_id. Перечитать объект,
+  показать diff, затем применить намерение к новой версии, не blind retry.
+- Тело OptimizeRequest.program_id совпадает с path program_id.
+- ProposalApply.base_revision_id совпадает с Proposal.base_revision_id и current.
+- WorkCompletion с If-Match проверяет версию WorkOrder, а не несуществующей completion.
+- Редактирование программы сохраняет input version; старый ProgramRevision.input_snapshot
+  не меняется и содержит исходные ограничения/кандидаты/веса.
+- Transition endpoint требует admin для target_status=approved. Указанный в OpenAPI
+  x-required-role - нижняя граница, не разрешение на все переходы этой роли.
+
+Геометрия и числа:
+- Polygon rings замкнуты, валидны, lon/lat в диапазоне; holes учитываются.
+- Point использует [longitude,latitude], Z/высота отдельным полем с происхождением.
+- Площади/длины вычисляются в EPSG:32643, не из градусов координат.
+- AreaPatch используется для трав/покрытий/групп, Placement для точечных объектов.
+  Площадь покрытия определяется геометрией и не приравнивается числу деревьев.
+- Money - неотрицательная decimal string, Python Decimal / DB numeric.
+- Unit strings берутся из единого справочника единиц в foundation. Не переводить
+  машинные ключи (m2, m3, degC, t_CO2_per_year, piece) в локализованном UI DTO.
+- Metric unavailable: value=null и missing_reason. Ноль означает известный нулевой эффект.
+- Cost incomplete: total=null; known_subtotal не является полным бюджетом.
+- SurvivalPoint: годы ровно 1,2,3 без дублей, S1>=S2>=S3 для исходной когорты.
+  lower<=probability<=upper, если интервал есть; null-интервал не превращать в ±10%.
+- Результаты synthetic нельзя использовать для прохождения профессиональных data gates.
+
+Подбор и оптимизация:
+- Excluded-кандидат имеет score=null. Любой critical unknown возвращает requires_review.
+- Веса неотрицательны и не все нулевые; нормализация и reference version неизменяемы.
+- Лимиты и availability проверяются сервером. Не более одной альтернативы на zone.
+- «Optimal» требует соответствующего solver status. Timeout с feasible incumbent
+  не становится доказанным optimum; сохранить bounds/gap где они определены.
+- Недоступная экологическая метрика остаётся unavailable, а не увеличивает полезность
+  за счёт исключения фактора из знаменателя без явной missing-policy версии.
+
+Jobs и ошибки:
+- GET и SSE доступны только пользователю с правом на исходный и результирующий объект.
+- Job progress null, если известны только фазы. Terminal timestamps согласованы со state.
+- result_ref_id интерпретируется по kind: calculate -> CalculationSnapshot,
+  optimize -> ProgramRevision, import -> DatasetVersion, shadow/thermal -> SpatialResult,
+  export -> ExportArtifact, chat -> ChatMessage. Нельзя открыть ID другой сущности.
+- На повторный idempotency key с другим нормализованным телом ответ 409.
+- SSE Last-Event-ID и query after_event_id - альтернативы; если оба заданы и различны,
+  вернуть 422. Для истёкшей истории клиент перечитывает Job и возобновляет наблюдение.
+
+Источник данных и публикация:
+- DatasetVersion публикация требует известной лицензии, CRS, валидной схемы и
+  разрешения ошибок. Unknown license сохраняется в quarantine, не публикуется.
+- Dataset access_level и пользовательские grants применяются до retrieval/LLM,
+  выдачи tiles и генерации signed URL. URL не является обходом прав.
+- Просроченный/недоступный исходник не заменять свежим числом без новой версии.
+
+Fixtures:
+Каждый файл содержит envelope {fixture_only,schema,expected_valid,data}.
+MSW/клиент извлекает data только из expected_valid=true fixtures.
+Отрицательные примеры служат проверкой отклонения, не ответами endpoint.
+Их координаты/цены/проценты синтетические и не подтверждают факты о Павлодаре.
+
+Дальнейшие расширения:
+Canonical contracts владеет GPT. Клиент генерируется; generated output не правится вручную.
+Новые административные детали/поисковые фильтры добавляются сначала в schemas,
+operation inventory, fixtures и checks, затем в обе реализации. Не обходить этот
+процесс произвольным JSON-полем metadata для значимых бизнес-данных.

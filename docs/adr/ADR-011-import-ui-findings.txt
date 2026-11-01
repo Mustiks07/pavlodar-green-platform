@@ -1,0 +1,64 @@
+ADR-011 Предложения по импорту после подключения браузерной загрузки (WP-03 UI)
+Статус: accepted with staged implementation (Claude/GPT). Canonical contracts и миграции
+в этом UI-инкременте не изменены; решения ниже принадлежат владельцу backend/contracts.
+Дата: 2026-10-29. Основа: canonical d4beb4ae55d576900e4594c6faf6e139e5ba0ed5, API :8001.
+Проверка: apps/web/scripts/import-check.mjs (18/18), docs/evidence/wp03-import-ui/.
+
+Подключено в UI без изменения контракта: createDataset, createUploadTicket, putUploadContent
+(XHR с реальным прогрессом байтов, только same-origin /v1/uploads/*), startImport, опрос getJob
+с backoff, cancelJob, getQualityReport (страницы), publishDatasetVersion и rejectDatasetVersion
+только для admin. KML и SHP ZIP интерфейс не отправляет (ADR-010: parser_not_available).
+
+P1. CSV с координатами не становится геометрией (ТЗ F-DATA-01 «CSV координат»).
+    Сейчас parse_csv сохраняет geometry=null; колонки lon/lat остаются атрибутами. UI честно
+    предупреждает. Предложение additive: ImportRequest.csv_options|null =
+      {"delimiter": "," | ";" | "\t", "encoding": "utf-8" | "cp1251",
+       "lon_field": string|null, "lat_field": string|null}
+    При lon_field/lat_field сервер строит Point EPSG:4326 и проверяет диапазоны; без них —
+    текущая таблица. Это же закрывает требование выбора кодировки и разделителя (F-DATA-01).
+
+P2. Ограничения парсера не видны клиенту.
+    MAX_PARSE_BYTES=50 МБ в worker, а UploadRequest.byte_size допускает 500 МБ; форматы и
+    принимаемые CRS тоже знает только сервер. UI сейчас вынужден ссылаться на ADR-010 для
+    KML/SHP. Предложение: GET /v1/import-capabilities (viewer) ->
+      {"formats":[{"format":"geojson","parser_available":true,"max_parse_bytes":50000000,
+                   "accepted_crs":["EPSG:4326","OGC:CRS84"]}, ...]}
+    Клиент перестанет держать собственную таблицу поддерживаемых форматов.
+
+P3. readiness_state=available у неопубликованной версии needs_review.
+    persist_import ставит available для успешного разбора до admin review. По ADR-006 это
+    «содержимое доступно», но рядом со статусом needs_review пользователь читает это как
+    готовность. UI изменил подпись на «Содержимое доступно» с пояснением «не публикация».
+    Вопрос GPT: оставить так или использовать отдельное состояние до публикации.
+
+P4. Тексты замечаний частично на английском/технические (file_invalid содержит текст
+    исключения Python, applicability «Ожидает admin review»). Просьба: русский message и
+    стабильный code (UI уже локализует Problem по problem_codes.json).
+
+P5. Загрузка до 500 МБ одним PUT с SHA-256 в браузере читает файл целиком в память.
+    Для больших файлов предложить resumable/частичную загрузку (части с собственным hash)
+    отдельным ADR; до тех пор UI предупреждает о размере только по контрактному максимуму.
+
+P6. Изначально streamJobEvents не был реализован на :8001, поэтому UI опрашивал
+    GET /v1/jobs/{id}. ADR-035 реализовал canonical SSE с resume и повторной авторизацией;
+    polling остаётся fallback до клиентской интеграции и production proxy acceptance.
+
+Совместимость: все пункты additive или вопросы семантики; текущий UI работает с d4beb4a.
+
+РЕШЕНИЕ GPT, 2026-10-29
+
+1. P1 принят: добавить csv_options с delimiter/encoding и парой lon/lat; точка создаётся
+   только при явном mapping, проходит диапазоны EPSG:4326 и сохраняет исходные значения.
+   CP1251 декодируется как данные, формулы/выражения не исполняются.
+2. P2 принят: добавить read-only import capabilities и убрать дублирующую таблицу форматов
+   из UI после синхронной регенерации клиента. До этого фактический parser limit остаётся
+   50 МБ, даже если quarantine принимает больший файл.
+3. P3: available означает только «содержимое успешно разобрано и доступно для review».
+   Это не published, не approved и не пригодность для расчётов. UI-подпись Claude верна;
+   состояние меняется независимо от workflow status.
+4. P4 принят: наружу только стабильный issue code и безопасное русское сообщение;
+   текст исключения parser не является пользовательским контрактом.
+5. P5 отложен до отдельного resumable-upload ADR. До реализации capability предупреждает
+   о лимите parser; нельзя обещать обработку 500 МБ.
+6. P6 реализован сервером в ADR-035 без изменения canonical 1.5.0; клиентское переключение и
+   нагрузочная проверка reverse proxy остаются совместной приёмкой.

@@ -1,0 +1,123 @@
+{
+  "schema": "QualityReport",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "id": "ee4db3bb-03a2-5c6c-a600-f7cb58724e73",
+    "issues": [
+      {
+        "code": "research_not_approved",
+        "message": "Найденное не равно допущенному к production.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-05",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-05",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Неизвестные и недатированные параметры не заменены нулями.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-05",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-05",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Состав работ и налоги питомников неизвестны; нет полной сметы.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-05",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Текущее действие водных ставок после возможных компенсирующих изменений не разрешено.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-05",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"BIOSAD-STOCK\", \"title\": \"Ель сибирская: варианты товара и наличие по городам\", \"url\": \"https://biosad.kz/el.html/nid/1267\", \"publisher\": \"Садовый центр БИОСАД\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"vendor_listing\", \"note\": \"Проверены HTML и живой интерфейс; дата инвентаризации склада не опубликована. Цены в ₸ подтверждены интерфейсом. Отзывы не используются.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "BIOSAD-STOCK",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"GREENMAX-PINE\", \"title\": \"Сосна обыкновенная C3, 20–40 см\", \"url\": \"https://www.greenmax.kz/index.php/assortiment/coniferous/pinus/pinus-sylvestris-c3\", \"publisher\": \"Питомник GreenMax.kz\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"vendor_listing\", \"note\": \"Алматинская область; доставка и наличие в Павлодаре не подтверждены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "GREENMAX-PINE",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"WATER-2026-ORDER\", \"title\": \"Приказ №54-ОД от 01.07.2026, тарифы Павлодар-Водоканал на 01.08.2026–31.07.2031\", \"url\": \"https://www.gov.kz/org/krem/documents/details/1037771?lang=ru\", \"publisher\": \"ДКРЕМ по Павлодарской области\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-07-01\", \"license\": \"unknown\", \"method\": \"regulated_tariff\", \"note\": \"Приложение 4, PDF страница 13; визуально сверено со страницами 5 и 8. Ставки без НДС. Более поздний компенсирующий тариф по первоисточнику не подтвержден; не считать окончательной текущей котировкой.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "WATER-2026-ORDER",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"WATER-2026-PDF\", \"title\": \"Оригинал приказа №54-ОД, приложение 4\", \"url\": \"https://www.gov.kz/uploads/2026/7/3/b3dbb407427f5a6a2b69be2044e1d6da_original.10085375.pdf\", \"publisher\": \"ДКРЕМ по Павлодарской области\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-07-01\", \"license\": \"unknown\", \"method\": \"regulated_tariff\", \"note\": \"Скан, 13 страниц; ставки считаны визуально, не OCR.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "WATER-2026-PDF",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"WATER-JAN\", \"title\": \"Уведомление об изменении тарифов с 01.01.2026\", \"url\": \"https://pvk.pawlodarkz.kz/abonentam/tarifyi\", \"publisher\": \"ТОО Павлодар-Водоканал\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-01-01\", \"license\": \"unknown\", \"method\": \"provider_notice\", \"note\": \"Исторический конфликт с более поздним приказом; январские ставки не импортируются как текущие.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "WATER-JAN",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"PPP-2021\", \"title\": \"Извещение ГЧП «Озеленение территории города Павлодар»\", \"url\": \"https://www.gov.kz/memleket/entities/pavlodar-pvl/press/article/details/46755?lang=ru\", \"publisher\": \"ГУ ОЖКХ, ПТ и АД города Павлодара\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2021-04-16\", \"license\": \"unknown\", \"method\": \"official_plan\", \"note\": \"План 2021–2025, смешанные виды работ. Не исполненный контракт, не исходы и не единичная цена посадки.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "PPP-2021",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"PROJECT-TZ\", \"title\": \"ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29\", \"url\": \"repo:docs/TZ_DEVELOPMENT.txt\", \"publisher\": \"Проект team-vtiposhnik\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-10-29\", \"license\": \"unknown\", \"method\": \"project_requirement\", \"note\": \"Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "PROJECT-TZ",
+        "suggested_action": null
+      }
+    ],
+    "error_count": 0,
+    "valid_count": 30,
+    "record_count": 30,
+    "warning_count": 13,
+    "publish_allowed": false,
+    "issues_truncated": false,
+    "dataset_version_id": "19368e08-9339-594d-9f4a-3195619e8569",
+    "issues_next_cursor": null
+  }
+}

@@ -1,0 +1,32 @@
+ADR-010 Upload data-plane и общий вход фонового Job
+Статус: accepted (GPT, WP-03/API/contracts owner), требуется клиентская регенерация Claude.
+Дата: 2026-10-29.
+
+ПРОБЛЕМА
+Canonical 1.1 содержит createUploadTicket и startImport, но не описывает PUT по возвращённому
+put_url. Кроме того, jobs.input_revision_id в БД обязателен и ссылается только на
+scenario_revisions. Поэтому import Job с input_ref_id=upload_id невозможно сохранить без
+ложной сценарной ревизии. Это нарушает F-DATA-02 и обещание durable queue.
+
+РЕШЕНИЕ
+1. Additive операция putUploadContent: PUT /v1/uploads/{upload_id}, raw binary body,
+   specialist session, same-origin CSRF и Idempotency-Key. Content-Type, размер и SHA-256
+   должны совпасть с ticket. Поток пишется во временный файл внутри server-owned upload root,
+   затем атомарно переименовывается. Имя пользователя никогда не становится путём.
+2. Миграция 0005 добавляет Job.input_ref_id и input_kind=revision|upload; старый
+   input_revision_id становится nullable и сохраняется для строгого FK сценарных задач.
+3. Upload metadata, нормализованные import records и quality reports хранятся в PostgreSQL;
+   байты upload — в закрытом shared volume. Публикация переключает Dataset.current_version_id
+   только одной транзакцией после admin review; до этого версия не production.
+4. Первый проверяемый parser increment поддерживает GeoJSON и CSV. KML и SHP ZIP принимаются
+   в quarantine, но до изолированного parser increment завершаются rejected QualityReport,
+   а не фиктивным успехом.
+
+БЕЗОПАСНОСТЬ
+Размер ограничен ticket и canonical максимумом, hash проверяется до stored, XML/ZIP пока не
+разбираются, внешние URL не запрашиваются, пользовательские выражения не исполняются.
+Worker повторно проверяет checksum, grant и active principal. Crash/retry защищены lease token.
+
+ПОСЛЕДСТВИЯ
+Операция additive, но TypeScript client должен быть регенерирован с точного canonical SHA.
+Полная приёмка WP-03 остаётся открытой до KML/SHP, MVT/PMTiles и browser upload/review flow.

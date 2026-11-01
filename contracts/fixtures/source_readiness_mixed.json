@@ -1,0 +1,44 @@
+{
+  "fixture_only": true,
+  "schema": "SourceReadinessPage",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; availability states are not organizer delivery claims",
+  "data": {
+    "items": [
+      {
+        "dataset_id": "00000000-0000-4000-8000-000000000101",
+        "dataset_version_id": "00000000-0000-4000-8000-000000000102",
+        "readiness_state": "research_unverified",
+        "content_kind": "vector",
+        "record_count": 110,
+        "checked_at": "2026-10-29",
+        "observed_from": null,
+        "observed_to": null,
+        "applicability": "Исследовательская выборка; не полный слой зданий Павлодара",
+        "data_request_id": "DR-01",
+        "review_reasons": []
+      },
+      {
+        "dataset_id": null,
+        "dataset_version_id": null,
+        "readiness_state": "not_provided",
+        "content_kind": "model_timeseries",
+        "record_count": null,
+        "checked_at": "2026-10-29",
+        "observed_from": null,
+        "observed_to": null,
+        "applicability": null,
+        "data_request_id": "DR-06",
+        "review_reasons": [
+          {
+            "code": "SOURCE_NOT_PROVIDED",
+            "message": "Организатор не предоставил временной ряд",
+            "required_inputs": ["DR-06"],
+            "blocking": true
+          }
+        ]
+      }
+    ],
+    "next_cursor": null
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "fixture_only": true,
+  "schema": "StockItem",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; listing is not confirmed stock",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000304",
+    "plant_id": "00000000-0000-4000-8000-000000000201",
+    "supplier": "SYNTHETIC external supplier",
+    "size_description": "fixture",
+    "available_quantity": null,
+    "unit_price": "1000.00",
+    "currency": "KZT",
+    "observed_at": "2026-10-29T00:00:00Z",
+    "source_refs": [],
+    "availability": "listing_only",
+    "supplier_city": "Другой город",
+    "is_local_supply": false,
+    "height_min_m": 1,
+    "height_max_m": 2,
+    "container": "C10",
+    "root_system": "container",
+    "tax_mode": "unknown",
+    "stock_counted_at": null,
+    "checked_at": "2026-10-29",
+    "applicability": "Требуется запрос поставщику"
+  }
+}

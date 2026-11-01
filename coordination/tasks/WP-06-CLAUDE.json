@@ -1,0 +1,56 @@
+{
+  "task_id": "WP-02/WP-05/WP-06 frontend continuation",
+  "owner": "Claude",
+  "integration_partner": "GPT",
+  "base_sha": "d58fe8c2d5e457a7caacf627772e5455f0672141",
+  "branch": "claude/WP-02-design-system",
+  "api_url": "http://localhost:8001",
+  "contract_version": "1.2.0 until GPT publishes the next atomic regeneration",
+  "state": "assigned",
+  "sequence": [
+    {
+      "id": "C1",
+      "title": "Restricted dataset access administration",
+      "scope": "Use listCityPrincipals/listDatasetGrants/grantDatasetAccess/revokeDatasetAccess to build the admin flow with reason, confirmation, forbidden/404/409 states, audit-friendly wording and live tests. Admin city access must not be presented as content access."
+    },
+    {
+      "id": "C2",
+      "title": "Rule-version picker",
+      "scope": "Keep the current verified-id fallback, then consume GPT's canonical listRuleVersions operation after the coordinated client regeneration. Show source, expert confirmation, superseded/conflict state and never select an unusable rule silently."
+    },
+    {
+      "id": "C3",
+      "title": "Stock and complete cost transparency",
+      "scope": "Render server StockItem and calculation cost lines with unknown distinct from zero, checked-at/source provenance, tax state, incomplete totals and stale snapshots. Do not add client formulas or infer prices."
+    },
+    {
+      "id": "C4",
+      "title": "Background full-calculation UX",
+      "scope": "Wire startCalculation/getJob/SSE/cancel/getCalculation/getCalculationManifest when GPT enables them. Cover queued/running/retry/recovered/cancelled/partial/failed states and reload without losing the job."
+    },
+    {
+      "id": "C5",
+      "title": "Scenario comparison",
+      "scope": "Compare immutable server snapshots only. Show differing input versions, stale flags, known/unknown totals, survival/care gaps and provenance; never compare mutable editor state as a result."
+    },
+    {
+      "id": "C6",
+      "title": "3D building and planting acceptance",
+      "scope": "Extend the existing 2D/3D scene using only server-provided geometry, height_m and height_basis. Missing height stays footprint/empty, not an invented extrusion. Add LOD/context-loss/touch/reduced-motion and representative real-device evidence."
+    },
+    {
+      "id": "C7",
+      "title": "Frontend regression and handoff",
+      "scope": "Keep generated client drift, typecheck, unit/build/audit, visual desktop/mobile/dark and disposable live API checks green; update CLAUDE handoff and shared STATUS after every integration-ready increment."
+    }
+  ],
+  "ownership_rules": [
+    "Claude does not edit canonical contracts, migrations or server formulas.",
+    "GPT announces an exact contract SHA before Claude regenerates the client.",
+    "All synthetic browser inputs remain explicitly labelled SYNTHETIC TEST.",
+    "Use all admitted licensed public/research sources in the working map and 3D scene. Primary map, 3D, feature and scenario screens do not show unverified/source labels. Preserve provenance in API manifests and the administrative data view; show a blocking gap only when safety, approval or an authoritative calculation depends on it.",
+    "Do not claim official boundaries, exact networks, local calibration or accepted ecological coefficients before organizer data passes intake."
+  ],
+  "first_unblocked_task": "C1",
+  "production_ready": false
+}

@@ -1,0 +1,25 @@
+{
+  "fixture_only": true,
+  "schema": "Metric",
+  "expected_valid": false,
+  "data": {
+    "key": "air_cooling",
+    "value": 0,
+    "unit": "degC",
+    "horizon_year": 10,
+    "status": "unavailable",
+    "lower": null,
+    "upper": null,
+    "qualitative_confidence": "unknown",
+    "method_version": "not-calibrated",
+    "source_refs": [],
+    "missing_reason": {
+      "code": "MISSING_MEASUREMENTS",
+      "message": "Нет подтверждённых измерений",
+      "required_inputs": [
+        "air_temperature_observations"
+      ],
+      "blocking": true
+    }
+  }
+}

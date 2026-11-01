@@ -1,0 +1,36 @@
+ADR-027 Scenario comparison and approval use persisted server evidence
+Статус: accepted by GPT (canonical backend owner); client integration pending.
+Дата: 2026-10-30. Основа: canonical 1.3.0 / e0a4fe9.
+
+ПРОБЛЕМА
+
+compareScenarios был объявлен, но не реализован. Клиент не должен самостоятельно выбирать цифры
+для сравнения или считать разницы. Старый approval gate всегда добавлял missing calculation и не
+мог отличить fast snapshot от завершённого durable full job.
+
+РЕШЕНИЕ
+
+- compareScenarios повторно авторизует 2–3 уникальные immutable revision и для каждой выбирает
+  последний сохранённый CalculationSnapshot детерминированно по created_at/id.
+- Сервер возвращает исходные snapshots без пересчёта формул и неблокирующие comparability warnings
+  для partial/stale результатов, разных zone geometry, registry/code versions и смешанных input
+  profiles. При отсутствии расчёта ответ 422 перечисляет конкретные revision ids.
+- Idempotency replay повторно проверяет доступ ко всем snapshots; сохранённый ответ не является
+  обходом отозванного city/dataset grant.
+- Для internal approved недостаточно fast snapshot. Нужен succeeded durable calculate Job для
+  текущей revision с mode=full и модулями cost+survival+care; его immutable snapshot должен быть
+  complete, иметь complete cost и не содержать blocking warnings.
+- Блокирующие gaps зоны, отсутствующие registry versions и synthetic test inputs остаются blockers.
+  Internal approved не означает официальную границу, локальную калибровку или госразрешение.
+
+КОНТРАКТ
+
+OpenAPI 1.3.0 уже содержит compareScenarios/CompareResult и transitionScenario; DTO не меняются.
+В canonical problem_codes добавлены стабильные коды comparison и approval blockers. Клиент не
+вычисляет сравнение и не превращает missing/partial в ноль.
+
+ПРОВЕРКА
+
+Интеграционный тест создаёт две revision и server snapshots, подтверждает порядок, stale/partial
+warnings, idempotent replay, duplicate rejection и IDOR 404. Второй тест подтверждает, что fast
+snapshot и partial full job не открывают approval и возвращают точные blockers.

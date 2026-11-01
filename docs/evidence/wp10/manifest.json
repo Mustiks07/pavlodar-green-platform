@@ -1,0 +1,14 @@
+{
+  "fixture": "tests.test_exports.sample_context",
+  "classification": "SYNTHETIC TEST EVIDENCE",
+  "files": {
+    "sample_calculation_synthetic.pdf": {
+      "byte_size": 53872,
+      "sha256": "be9e5820694b025362c74b0e8d45f0a4beff86dffa2980278ae5da9daebfcb67"
+    },
+    "sample_calculation_synthetic.xlsx": {
+      "byte_size": 11663,
+      "sha256": "32249dc74d3c1c037b9ea7a455ed5882b3ca5545093173b19a56d855d81f0ea3"
+    }
+  }
+}

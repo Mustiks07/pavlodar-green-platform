@@ -1,0 +1,38 @@
+{
+  "fixture_only": true,
+  "schema": "CostResult",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; not a Pavlodar estimate",
+  "data": {
+    "currency": "KZT",
+    "status": "incomplete",
+    "known_subtotal": "0.00",
+    "total": null,
+    "lines": [
+      {
+        "id": "00000000-0000-4000-8000-000000000411",
+        "category": "water",
+        "description": "Стоимость воды неизвестна",
+        "quantity": 10,
+        "unit": "m3",
+        "unit_price": null,
+        "subtotal": null,
+        "year": 1,
+        "rate_version_id": null,
+        "formula": "quantity * unit_price",
+        "source_refs": [],
+        "tax_mode": "unknown",
+        "price_observed_at": null,
+        "rate_status": "requires_quote"
+      }
+    ],
+    "data_gaps": [
+      {
+        "code": "WATER_RATE_MISSING",
+        "message": "Тариф или коммерческое предложение на воду не предоставлены",
+        "required_inputs": ["DR-05"],
+        "blocking": true
+      }
+    ]
+  }
+}

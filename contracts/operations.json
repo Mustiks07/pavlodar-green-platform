@@ -1,0 +1,920 @@
+[
+  {
+    "operation_id": "getReadiness",
+    "method": "GET",
+    "path": "/health/ready",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "Health",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getCurrentUser",
+    "method": "GET",
+    "path": "/v1/me",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "User",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listCities",
+    "method": "GET",
+    "path": "/v1/cities",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "CityPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getCity",
+    "method": "GET",
+    "path": "/v1/cities/{city_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "City",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listDatasets",
+    "method": "GET",
+    "path": "/v1/datasets",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "DatasetPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createDataset",
+    "method": "POST",
+    "path": "/v1/datasets",
+    "minimum_role": "specialist",
+    "request_schema": "DatasetCreate",
+    "response_schema": "Dataset",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listCityPrincipals",
+    "method": "GET",
+    "path": "/v1/cities/{city_id}/principals",
+    "minimum_role": "admin",
+    "request_schema": null,
+    "response_schema": "UserSummaryPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listDatasetGrants",
+    "method": "GET",
+    "path": "/v1/datasets/{dataset_id}/grants",
+    "minimum_role": "admin",
+    "request_schema": null,
+    "response_schema": "DatasetGrantPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "grantDatasetAccess",
+    "method": "POST",
+    "path": "/v1/datasets/{dataset_id}/grants",
+    "minimum_role": "admin",
+    "request_schema": "DatasetGrantInput",
+    "response_schema": "DatasetGrant",
+    "success_status": 201
+  },
+  {
+    "operation_id": "revokeDatasetAccess",
+    "method": "DELETE",
+    "path": "/v1/datasets/{dataset_id}/grants/{user_id}",
+    "minimum_role": "admin",
+    "request_schema": "Reason",
+    "response_schema": "DatasetGrant",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createUploadTicket",
+    "method": "POST",
+    "path": "/v1/datasets/{dataset_id}/uploads",
+    "minimum_role": "specialist",
+    "request_schema": "UploadRequest",
+    "response_schema": "UploadTicket",
+    "success_status": 201
+  },
+  {
+    "operation_id": "startImport",
+    "method": "POST",
+    "path": "/v1/datasets/{dataset_id}/imports",
+    "minimum_role": "specialist",
+    "request_schema": "ImportRequest",
+    "response_schema": "Job",
+    "success_status": 202
+  },
+  {
+    "operation_id": "listDatasetVersions",
+    "method": "GET",
+    "path": "/v1/datasets/{dataset_id}/versions",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "DatasetVersionPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getQualityReport",
+    "method": "GET",
+    "path": "/v1/dataset-versions/{version_id}/quality",
+    "minimum_role": "specialist",
+    "request_schema": null,
+    "response_schema": "QualityReport",
+    "success_status": 200
+  },
+  {
+    "operation_id": "publishDatasetVersion",
+    "method": "POST",
+    "path": "/v1/dataset-versions/{version_id}/publish",
+    "minimum_role": "admin",
+    "request_schema": "Reason",
+    "response_schema": "DatasetVersion",
+    "success_status": 200
+  },
+  {
+    "operation_id": "rejectDatasetVersion",
+    "method": "POST",
+    "path": "/v1/dataset-versions/{version_id}/reject",
+    "minimum_role": "admin",
+    "request_schema": "Reason",
+    "response_schema": "DatasetVersion",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listZones",
+    "method": "GET",
+    "path": "/v1/zones",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ZonePage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createZone",
+    "method": "POST",
+    "path": "/v1/zones",
+    "minimum_role": "specialist",
+    "request_schema": "ZoneCreate",
+    "response_schema": "Zone",
+    "success_status": 201
+  },
+  {
+    "operation_id": "getZone",
+    "method": "GET",
+    "path": "/v1/zones/{zone_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "Zone",
+    "success_status": 200
+  },
+  {
+    "operation_id": "updateZone",
+    "method": "PUT",
+    "path": "/v1/zones/{zone_id}",
+    "minimum_role": "specialist",
+    "request_schema": "ZoneCreate",
+    "response_schema": "Zone",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getZoneContext",
+    "method": "GET",
+    "path": "/v1/zones/{zone_id}/context",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ZoneContext",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listMapLayers",
+    "method": "GET",
+    "path": "/v1/map/layers",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "MapLayerPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getMapTile",
+    "method": "GET",
+    "path": "/v1/map/tiles/{layer_id}/{z}/{x}/{y}.mvt",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 200
+  },
+  {
+    "operation_id": "getMapArchive",
+    "method": "GET",
+    "path": "/v1/map/archives/{layer_id}.pmtiles",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 200
+  },
+  {
+    "operation_id": "getMapFeature",
+    "method": "GET",
+    "path": "/v1/map/features/{feature_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "MapFeature",
+    "success_status": 200
+  },
+  {
+    "operation_id": "searchAddresses",
+    "method": "GET",
+    "path": "/v1/addresses",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "AddressResultPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listProblems",
+    "method": "GET",
+    "path": "/v1/problems",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "DetectedProblemPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "dismissProblem",
+    "method": "POST",
+    "path": "/v1/problems/{problem_id}/dismiss",
+    "minimum_role": "specialist",
+    "request_schema": "Reason",
+    "response_schema": "DetectedProblem",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listPlants",
+    "method": "GET",
+    "path": "/v1/plants",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "PlantPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getPlant",
+    "method": "GET",
+    "path": "/v1/plants/{plant_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "Plant",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createPlant",
+    "method": "POST",
+    "path": "/v1/plants",
+    "minimum_role": "admin",
+    "request_schema": "PlantInput",
+    "response_schema": "Plant",
+    "success_status": 201
+  },
+  {
+    "operation_id": "createPlantVersion",
+    "method": "PUT",
+    "path": "/v1/plants/{plant_id}",
+    "minimum_role": "admin",
+    "request_schema": "PlantInput",
+    "response_schema": "Plant",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listStock",
+    "method": "GET",
+    "path": "/v1/stock",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "StockItemPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "recommendPlants",
+    "method": "POST",
+    "path": "/v1/recommendations",
+    "minimum_role": "specialist",
+    "request_schema": "RecommendationRequest",
+    "response_schema": "RecommendationResult",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createScenario",
+    "method": "POST",
+    "path": "/v1/scenarios",
+    "minimum_role": "specialist",
+    "request_schema": "ScenarioCreate",
+    "response_schema": "Scenario",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listScenarios",
+    "method": "GET",
+    "path": "/v1/scenarios",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ScenarioPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getScenario",
+    "method": "GET",
+    "path": "/v1/scenarios/{scenario_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "Scenario",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createScenarioRevision",
+    "method": "POST",
+    "path": "/v1/scenarios/{scenario_id}/revisions",
+    "minimum_role": "specialist",
+    "request_schema": "AppendRevisionInput",
+    "response_schema": "ScenarioRevision",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listScenarioRevisions",
+    "method": "GET",
+    "path": "/v1/scenarios/{scenario_id}/revisions",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ScenarioRevisionPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getScenarioRevision",
+    "method": "GET",
+    "path": "/v1/scenario-revisions/{revision_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ScenarioRevision",
+    "success_status": 200
+  },
+  {
+    "operation_id": "transitionScenario",
+    "method": "POST",
+    "path": "/v1/scenarios/{scenario_id}/transitions",
+    "minimum_role": "specialist",
+    "request_schema": "TransitionRequest",
+    "response_schema": "Scenario",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listModelVersions",
+    "method": "GET",
+    "path": "/v1/model-versions",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "SurvivalModelVersionPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getModelVersion",
+    "method": "GET",
+    "path": "/v1/model-versions/{model_version_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "SurvivalModelVersion",
+    "success_status": 200
+  },
+  {
+    "operation_id": "calculateFast",
+    "method": "POST",
+    "path": "/v1/calculations/fast",
+    "minimum_role": "specialist",
+    "request_schema": "FastCalculationRequest",
+    "response_schema": "FastCalculationResponse",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listCalculations",
+    "method": "GET",
+    "path": "/v1/calculations",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "CalculationSnapshotPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "startCalculation",
+    "method": "POST",
+    "path": "/v1/calculations",
+    "minimum_role": "specialist",
+    "request_schema": "CalculationRequest",
+    "response_schema": "Job",
+    "success_status": 202
+  },
+  {
+    "operation_id": "getCalculation",
+    "method": "GET",
+    "path": "/v1/calculations/{calculation_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "CalculationSnapshot",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getCalculationManifest",
+    "method": "GET",
+    "path": "/v1/calculations/{calculation_id}/manifest",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "SourceManifest",
+    "success_status": 200
+  },
+  {
+    "operation_id": "compareScenarios",
+    "method": "POST",
+    "path": "/v1/comparisons",
+    "minimum_role": "specialist",
+    "request_schema": "CompareRequest",
+    "response_schema": "CompareResult",
+    "success_status": 200
+  },
+  {
+    "operation_id": "calculatePriorities",
+    "method": "POST",
+    "path": "/v1/priorities",
+    "minimum_role": "specialist",
+    "request_schema": "PriorityRequest",
+    "response_schema": "PriorityResult",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getPriorityResult",
+    "method": "GET",
+    "path": "/v1/priorities/{priority_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "PriorityResult",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createProgram",
+    "method": "POST",
+    "path": "/v1/programs",
+    "minimum_role": "specialist",
+    "request_schema": "ProgramCreate",
+    "response_schema": "Program",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listPrograms",
+    "method": "GET",
+    "path": "/v1/programs",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ProgramPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getProgram",
+    "method": "GET",
+    "path": "/v1/programs/{program_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "Program",
+    "success_status": 200
+  },
+  {
+    "operation_id": "updateProgramDraft",
+    "method": "PUT",
+    "path": "/v1/programs/{program_id}",
+    "minimum_role": "specialist",
+    "request_schema": "ProgramCreate",
+    "response_schema": "Program",
+    "success_status": 200
+  },
+  {
+    "operation_id": "optimizeProgram",
+    "method": "POST",
+    "path": "/v1/programs/{program_id}/optimize",
+    "minimum_role": "specialist",
+    "request_schema": "OptimizeRequest",
+    "response_schema": "Job",
+    "success_status": 202
+  },
+  {
+    "operation_id": "listProgramRevisions",
+    "method": "GET",
+    "path": "/v1/programs/{program_id}/revisions",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ProgramRevisionPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getProgramRevision",
+    "method": "GET",
+    "path": "/v1/program-revisions/{revision_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ProgramRevision",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getProgramRevisionDiff",
+    "method": "GET",
+    "path": "/v1/programs/{program_id}/revisions/{base_revision_id}/diff/{target_revision_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ProgramRevisionDiff",
+    "success_status": 200
+  },
+  {
+    "operation_id": "transitionProgram",
+    "method": "POST",
+    "path": "/v1/programs/{program_id}/transitions",
+    "minimum_role": "specialist",
+    "request_schema": "TransitionRequest",
+    "response_schema": "Program",
+    "success_status": 200
+  },
+  {
+    "operation_id": "startShadowRun",
+    "method": "POST",
+    "path": "/v1/shadow-runs",
+    "minimum_role": "specialist",
+    "request_schema": "ShadowRequest",
+    "response_schema": "Job",
+    "success_status": 202
+  },
+  {
+    "operation_id": "startThermalRun",
+    "method": "POST",
+    "path": "/v1/thermal-runs",
+    "minimum_role": "specialist",
+    "request_schema": "ThermalRequest",
+    "response_schema": "Job",
+    "success_status": 202
+  },
+  {
+    "operation_id": "getSpatialResult",
+    "method": "GET",
+    "path": "/v1/spatial-results/{result_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "SpatialResult",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getSpatialResultArtifact",
+    "method": "GET",
+    "path": "/v1/spatial-results/{result_id}/artifact",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "SpatialResultArtifact",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getJob",
+    "method": "GET",
+    "path": "/v1/jobs/{job_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "Job",
+    "success_status": 200
+  },
+  {
+    "operation_id": "cancelJob",
+    "method": "POST",
+    "path": "/v1/jobs/{job_id}/cancel",
+    "minimum_role": "specialist",
+    "request_schema": "Reason",
+    "response_schema": "Job",
+    "success_status": 200
+  },
+  {
+    "operation_id": "streamJobEvents",
+    "method": "GET",
+    "path": "/v1/jobs/{job_id}/events",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 200
+  },
+  {
+    "operation_id": "createWorkOrder",
+    "method": "POST",
+    "path": "/v1/work-orders",
+    "minimum_role": "specialist",
+    "request_schema": "WorkOrderCreate",
+    "response_schema": "WorkOrder",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listWorkOrders",
+    "method": "GET",
+    "path": "/v1/work-orders",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "WorkOrderPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getWorkOrder",
+    "method": "GET",
+    "path": "/v1/work-orders/{work_order_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "WorkOrder",
+    "success_status": 200
+  },
+  {
+    "operation_id": "transitionWorkOrder",
+    "method": "POST",
+    "path": "/v1/work-orders/{work_order_id}/transitions",
+    "minimum_role": "specialist",
+    "request_schema": "WorkTransition",
+    "response_schema": "WorkOrder",
+    "success_status": 200
+  },
+  {
+    "operation_id": "recordWorkCompletion",
+    "method": "POST",
+    "path": "/v1/work-orders/{work_order_id}/completions",
+    "minimum_role": "specialist",
+    "request_schema": "WorkCompletionCreate",
+    "response_schema": "WorkCompletion",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listWorkCompletions",
+    "method": "GET",
+    "path": "/v1/work-orders/{work_order_id}/completions",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "WorkCompletionPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createInspection",
+    "method": "POST",
+    "path": "/v1/inspections",
+    "minimum_role": "specialist",
+    "request_schema": "InspectionCreate",
+    "response_schema": "Inspection",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listInspections",
+    "method": "GET",
+    "path": "/v1/inspections",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "InspectionPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createCohort",
+    "method": "POST",
+    "path": "/v1/cohorts",
+    "minimum_role": "specialist",
+    "request_schema": "CohortCreate",
+    "response_schema": "Cohort",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listCohorts",
+    "method": "GET",
+    "path": "/v1/cohorts",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "CohortPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "recordReplacement",
+    "method": "POST",
+    "path": "/v1/replacements",
+    "minimum_role": "specialist",
+    "request_schema": "ReplacementCreate",
+    "response_schema": "Cohort",
+    "success_status": 201
+  },
+  {
+    "operation_id": "compareForecastObserved",
+    "method": "POST",
+    "path": "/v1/forecast-observed",
+    "minimum_role": "specialist",
+    "request_schema": "ForecastObservedRequest",
+    "response_schema": "ForecastObservedResult",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createChatSession",
+    "method": "POST",
+    "path": "/v1/chat/sessions",
+    "minimum_role": "specialist",
+    "request_schema": "ChatCreate",
+    "response_schema": "ChatSession",
+    "success_status": 201
+  },
+  {
+    "operation_id": "sendChatMessage",
+    "method": "POST",
+    "path": "/v1/chat/sessions/{session_id}/messages",
+    "minimum_role": "specialist",
+    "request_schema": "ChatInput",
+    "response_schema": "Job",
+    "success_status": 202
+  },
+  {
+    "operation_id": "listChatMessages",
+    "method": "GET",
+    "path": "/v1/chat/sessions/{session_id}/messages",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ChatMessagePage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getProposal",
+    "method": "GET",
+    "path": "/v1/proposals/{proposal_id}",
+    "minimum_role": "specialist",
+    "request_schema": null,
+    "response_schema": "Proposal",
+    "success_status": 200
+  },
+  {
+    "operation_id": "applyProposal",
+    "method": "POST",
+    "path": "/v1/proposals/{proposal_id}/apply",
+    "minimum_role": "specialist",
+    "request_schema": "ProposalApply",
+    "response_schema": "ScenarioRevision",
+    "success_status": 201
+  },
+  {
+    "operation_id": "rejectProposal",
+    "method": "POST",
+    "path": "/v1/proposals/{proposal_id}/reject",
+    "minimum_role": "specialist",
+    "request_schema": "Reason",
+    "response_schema": "Proposal",
+    "success_status": 200
+  },
+  {
+    "operation_id": "startExport",
+    "method": "POST",
+    "path": "/v1/exports",
+    "minimum_role": "specialist",
+    "request_schema": "ExportRequest",
+    "response_schema": "Job",
+    "success_status": 202
+  },
+  {
+    "operation_id": "getExport",
+    "method": "GET",
+    "path": "/v1/exports/{export_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "ExportArtifact",
+    "success_status": 200
+  },
+  {
+    "operation_id": "downloadExport",
+    "method": "GET",
+    "path": "/v1/exports/{export_id}/download",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 200
+  },
+  {
+    "operation_id": "listRates",
+    "method": "GET",
+    "path": "/v1/rates",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "RatePage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createRateVersion",
+    "method": "POST",
+    "path": "/v1/rates",
+    "minimum_role": "admin",
+    "request_schema": "RateInput",
+    "response_schema": "Rate",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listCoefficients",
+    "method": "GET",
+    "path": "/v1/coefficients",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "CoefficientPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "createCoefficientVersion",
+    "method": "POST",
+    "path": "/v1/coefficients",
+    "minimum_role": "admin",
+    "request_schema": "CoefficientInput",
+    "response_schema": "Coefficient",
+    "success_status": 201
+  },
+  {
+    "operation_id": "listAuditEvents",
+    "method": "GET",
+    "path": "/v1/audit",
+    "minimum_role": "admin",
+    "request_schema": null,
+    "response_schema": "AuditEventPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "startOidcLogin",
+    "method": "GET",
+    "path": "/auth/login",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 302
+  },
+  {
+    "operation_id": "completeOidcLogin",
+    "method": "GET",
+    "path": "/auth/callback",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 302
+  },
+  {
+    "operation_id": "logout",
+    "method": "POST",
+    "path": "/auth/logout",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 204
+  },
+  {
+    "operation_id": "getZoneVersion",
+    "method": "GET",
+    "path": "/v1/zone-versions/{version_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "Zone",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listSourceReadiness",
+    "method": "GET",
+    "path": "/v1/source-readiness",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "SourceReadinessPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "listRuleVersions",
+    "method": "GET",
+    "path": "/v1/rule-versions",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "RuleVersionPage",
+    "success_status": 200
+  },
+  {
+    "operation_id": "getRuleVersion",
+    "method": "GET",
+    "path": "/v1/rule-versions/{rule_version_id}",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "RuleVersion",
+    "success_status": 200
+  },
+  {
+    "operation_id": "putUploadContent",
+    "method": "PUT",
+    "path": "/v1/uploads/{upload_id}",
+    "minimum_role": "specialist",
+    "request_schema": null,
+    "response_schema": null,
+    "success_status": 204
+  },
+  {
+    "operation_id": "listPriorityNormalizations",
+    "method": "GET",
+    "path": "/v1/priority-normalizations",
+    "minimum_role": "viewer",
+    "request_schema": null,
+    "response_schema": "PriorityNormalizationPage",
+    "success_status": 200
+  }
+]

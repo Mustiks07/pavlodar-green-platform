@@ -1,0 +1,46 @@
+{
+  "checked_at": "2026-10-29",
+  "method": "Browser read-only: consolidated text, information card and revision history",
+  "documents": [
+    {
+      "source_id": "LAW-GREEN",
+      "revisions_displayed": [
+        "2023-09-11",
+        "2024-10-21",
+        "2026-03-26"
+      ],
+      "later_revision_displayed": false
+    },
+    {
+      "source_id": "LAW-GREEN-AMEND",
+      "adopted_at": "2026-03-26",
+      "published_at": "2026-04-09",
+      "effective_rule": "after ten calendar days following first official publication",
+      "effective_date": null
+    },
+    {
+      "source_id": "LAW-IMPROVEMENT-OLD",
+      "status": "cancelled",
+      "replaced_by": "LAW-IMPROVEMENT-2026"
+    },
+    {
+      "source_id": "LAW-IMPROVEMENT-2026",
+      "adopted_at": "2026-08-21",
+      "published_at": "2026-09-01",
+      "status_displayed": "ДЕЙСТВУЮЩИЙ",
+      "revisions_displayed": [
+        "2026-08-21"
+      ],
+      "effective_rule": "after ten calendar days following first official publication",
+      "effective_date": null
+    },
+    {
+      "source_id": "LAW-SCHOOL",
+      "latest_revision_displayed": "2026-07-24"
+    },
+    {
+      "source_id": "LAW-HEALTH",
+      "latest_revision_displayed": "2023-04-05"
+    }
+  ]
+}

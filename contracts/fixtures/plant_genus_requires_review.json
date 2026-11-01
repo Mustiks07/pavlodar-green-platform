@@ -1,0 +1,31 @@
+{
+  "fixture_only": true,
+  "schema": "Plant",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; not a planting recommendation",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000201",
+    "version_id": "00000000-0000-4000-8000-000000000202",
+    "latin_name": "Acer",
+    "russian_name": "Клён, род",
+    "cultivar": null,
+    "stratum": "tree",
+    "traits": [],
+    "allergy_risk": "unknown",
+    "toxicity_risk": "unknown",
+    "expert_status": "pending",
+    "taxon_rank": "genus",
+    "local_evidence": null,
+    "sensitive_site_status": "requires_review",
+    "exclusion_reason": null,
+    "exclusion_basis": null,
+    "review_reasons": [
+      {
+        "code": "TAXON_TOO_BROAD",
+        "message": "Для решения нужен вид или сорт и локальная экспертиза",
+        "required_inputs": ["DR-02"],
+        "blocking": true
+      }
+    ]
+  }
+}

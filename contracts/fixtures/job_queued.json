@@ -1,0 +1,19 @@
+{
+  "fixture_only": true,
+  "schema": "Job",
+  "expected_valid": true,
+  "data": {
+    "id": "00000000-0000-0000-0000-00000000000a",
+    "kind": "calculate",
+    "state": "queued",
+    "phase": null,
+    "progress": null,
+    "input_ref_id": "00000000-0000-0000-0000-000000000005",
+    "result_ref_id": null,
+    "attempt": 0,
+    "created_at": "2026-10-29T08:00:00Z",
+    "started_at": null,
+    "completed_at": null,
+    "error": null
+  }
+}

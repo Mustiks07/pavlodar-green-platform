@@ -1,0 +1,210 @@
+{
+  "base": "http://localhost:5173",
+  "city": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "startedAt": "2026-10-31T13:39:28.020Z",
+  "checks": [
+    {
+      "name": "viewer: catalog shows the 9 DR-02 plants with Russian and Latin names",
+      "pass": true,
+      "detail": {
+        "plants": 9
+      }
+    },
+    {
+      "name": "viewer: the 3 demo zones are on the map and open their card",
+      "pass": true,
+      "detail": {
+        "zones": [
+          "Демо-участок 2 · двор (условная граница)",
+          "Демо-участок 1 · сквер (условная граница)",
+          "Демо-участок 3 · улица (условная граница)"
+        ]
+      }
+    },
+    {
+      "name": "viewer: draft variants stay hidden (server rule); the projects page does not fail",
+      "pass": true,
+      "detail": {
+        "scenarios": 0
+      }
+    },
+    {
+      "name": "viewer: empty program explains budget and full calculation, links to projects",
+      "pass": true,
+      "detail": {
+        "programLink": 1
+      }
+    },
+    {
+      "name": "viewer: empty execution explains approval and full calculation, links to projects",
+      "pass": true,
+      "detail": {
+        "executionLink": 1
+      }
+    },
+    {
+      "name": "viewer: no 5xx and no page errors",
+      "pass": true,
+      "detail": {
+        "failures": [],
+        "errors": []
+      }
+    },
+    {
+      "name": "specialist: catalog shows the 9 DR-02 plants with Russian and Latin names",
+      "pass": true,
+      "detail": {
+        "plants": 9
+      }
+    },
+    {
+      "name": "specialist: the 3 demo zones are on the map and open their card",
+      "pass": true,
+      "detail": {
+        "zones": [
+          "Демо-участок 2 · двор (условная граница)",
+          "Демо-участок 1 · сквер (условная граница)",
+          "Демо-участок 3 · улица (условная граница)"
+        ]
+      }
+    },
+    {
+      "name": "specialist: 6 draft demo variants listed",
+      "pass": true,
+      "detail": {
+        "scenarios": 6
+      }
+    },
+    {
+      "name": "specialist: every variant has a server calculation, all honestly partial",
+      "pass": true,
+      "detail": [
+        "partial",
+        "partial",
+        "partial",
+        "partial",
+        "partial",
+        "partial"
+      ]
+    },
+    {
+      "name": "specialist: comparing A and B shows both partial calculations side by side",
+      "pass": true,
+      "detail": {
+        "pair": [
+          "Вариант B · экономия воды",
+          "Вариант A · стандартный уход"
+        ]
+      }
+    },
+    {
+      "name": "specialist: empty program explains budget and full calculation, links to projects",
+      "pass": true,
+      "detail": {
+        "programLink": 1
+      }
+    },
+    {
+      "name": "specialist: empty execution explains approval and full calculation, links to projects",
+      "pass": true,
+      "detail": {
+        "executionLink": 1
+      }
+    },
+    {
+      "name": "specialist: no 5xx and no page errors",
+      "pass": true,
+      "detail": {
+        "failures": [],
+        "errors": []
+      }
+    },
+    {
+      "name": "admin: catalog shows the 9 DR-02 plants with Russian and Latin names",
+      "pass": true,
+      "detail": {
+        "plants": 9
+      }
+    },
+    {
+      "name": "admin: the 3 demo zones are on the map and open their card",
+      "pass": true,
+      "detail": {
+        "zones": [
+          "Демо-участок 2 · двор (условная граница)",
+          "Демо-участок 1 · сквер (условная граница)",
+          "Демо-участок 3 · улица (условная граница)"
+        ]
+      }
+    },
+    {
+      "name": "admin: 6 draft demo variants listed",
+      "pass": true,
+      "detail": {
+        "scenarios": 6
+      }
+    },
+    {
+      "name": "admin: every variant has a server calculation, all honestly partial",
+      "pass": true,
+      "detail": [
+        "partial",
+        "partial",
+        "partial",
+        "partial",
+        "partial",
+        "partial"
+      ]
+    },
+    {
+      "name": "admin: comparing A and B shows both partial calculations side by side",
+      "pass": true,
+      "detail": {
+        "pair": [
+          "Вариант B · экономия воды",
+          "Вариант A · стандартный уход"
+        ]
+      }
+    },
+    {
+      "name": "admin: empty program explains budget and full calculation, links to projects",
+      "pass": true,
+      "detail": {
+        "programLink": 1
+      }
+    },
+    {
+      "name": "admin: empty execution explains approval and full calculation, links to projects",
+      "pass": true,
+      "detail": {
+        "executionLink": 1
+      }
+    },
+    {
+      "name": "admin: no 5xx and no page errors",
+      "pass": true,
+      "detail": {
+        "failures": [],
+        "errors": []
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/demo-contour/viewer-catalog.png",
+    "docs/evidence/demo-contour/viewer-map-zone.png",
+    "docs/evidence/demo-contour/viewer-program.png",
+    "docs/evidence/demo-contour/viewer-execution.png",
+    "docs/evidence/demo-contour/specialist-catalog.png",
+    "docs/evidence/demo-contour/specialist-map-zone.png",
+    "docs/evidence/demo-contour/specialist-compare.png",
+    "docs/evidence/demo-contour/specialist-program.png",
+    "docs/evidence/demo-contour/specialist-execution.png",
+    "docs/evidence/demo-contour/admin-catalog.png",
+    "docs/evidence/demo-contour/admin-map-zone.png",
+    "docs/evidence/demo-contour/admin-compare.png",
+    "docs/evidence/demo-contour/admin-program.png",
+    "docs/evidence/demo-contour/admin-execution.png"
+  ],
+  "finishedAt": "2026-10-31T13:40:52.583Z",
+  "passed": true
+}

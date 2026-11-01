@@ -1,0 +1,303 @@
+{
+  "version": "1.0.0",
+  "all_states_initial": "not_started",
+  "status_note": "Поле status обновляется интегратором; детальное доказательство и отложенные проверки находятся в coordination/STATUS.json.",
+  "packages": [
+    {
+      "id": "WP-00",
+      "title": "Общий baseline и проверка контрактов",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [],
+      "deliverables": [
+        "Подтвердить remote и Mustiks07 на обеих машинах; отдельные рабочие каталоги",
+        "Проверить ТЗ обоими агентами, оформить замечания ADR",
+        "Зафиксировать версии runtime/lockfiles и image tags",
+        "Сгенерировать клиент и DTO, проверить compatibility OpenAPI",
+        "Создать workspace manifests, CI contract checks и dev commands"
+      ],
+      "acceptance_ids": [
+        "AC-04",
+        "AC-14",
+        "AC-15"
+      ],
+      "integration_evidence": "Оба агента используют один baseline SHA, один schema version и валидные fixtures",
+      "status": "integration_verified"
+    },
+    {
+      "id": "WP-01",
+      "title": "Backend foundation и постоянное хранение",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-00"
+      ],
+      "deliverables": [
+        "FastAPI/Pydantic/SQLAlchemy, PostGIS и migrations",
+        "OIDC BFF, session cookie, CSRF, role+dataset grants",
+        "City, ZoneVersion, DatasetVersion, ScenarioRevision, jobs/outbox",
+        "Health/readiness и structured errors",
+        "Compose с отдельными dev-окружениями и seed только test profile"
+      ],
+      "acceptance_ids": [
+        "AC-02",
+        "AC-04",
+        "AC-14",
+        "AC-15"
+      ],
+      "integration_evidence": "Созданная зона и сценарий читаются после restart из БД; права реально проверяются",
+      "status": "integration_verified"
+    },
+    {
+      "id": "WP-02",
+      "title": "Дизайн система и рабочий интерфейс",
+      "owner": "Claude",
+      "integration_partner": "GPT",
+      "depends_on": [],
+      "deliverables": [
+        "Информационная архитектура всех экранов и UX flow",
+        "Дизайн tokens, controls, таблицы, легенды и ошибки",
+        "Loading/empty/partial/stale/forbidden/conflict states",
+        "Desktop/tablet/mobile, keyboard и reduced motion",
+        "После WP-00 generated client; после WP-01 реальная auth/зона"
+      ],
+      "acceptance_ids": [
+        "AC-16"
+      ],
+      "integration_evidence": "Согласованный UX и визуальные evidence; интеграция auth зависит от WP-01",
+      "status": "integration_verified"
+    },
+    {
+      "id": "WP-03",
+      "title": "Импорт источники и качество",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-01"
+      ],
+      "deliverables": [
+        "GeoJSON/SHP/KML/CSV pipelines и mapping",
+        "Upload quarantine, лимиты ZIP/парсеров, report",
+        "Immutable publication, provenance, license, conflicts",
+        "MVT/PMTiles подготовка и published manifests",
+        "Stale invalidation и audit"
+      ],
+      "acceptance_ids": [
+        "AC-01",
+        "AC-02",
+        "AC-14"
+      ],
+      "integration_evidence": "Claude подключает upload/review UI; реальный опубликованный набор появляется на карте",
+      "status": "integration_verified"
+    },
+    {
+      "id": "WP-04",
+      "title": "Городская карта и проблемы",
+      "owner": "Claude",
+      "integration_partner": "GPT",
+      "depends_on": [
+        "WP-01",
+        "WP-02",
+        "WP-03"
+      ],
+      "deliverables": [
+        "MapLibre adapter, выбор/рисование зоны и адресный поиск",
+        "Легенды/слои/качество, таблицы и deep links",
+        "MVT/PMTiles viewport loading, clustering, tile cache",
+        "Карточка контекста, проблемы и data gaps из API",
+        "Offline-city cold-start и адаптивный просмотр"
+      ],
+      "acceptance_ids": [
+        "AC-02",
+        "AC-16"
+      ],
+      "integration_evidence": "Городские признаки из серверного context; GPT реализует spatial/problem use cases в этом инкременте",
+      "status": "integration_verified"
+    },
+    {
+      "id": "WP-05",
+      "title": "Подбор сценарии стоимость survival и уход",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-01",
+        "WP-03"
+      ],
+      "deliverables": [
+        "Каталог, hard constraints и scoring contributions",
+        "Immutable revisions, ETag, idempotency",
+        "Cost Decimal, неизвестные цены, replacement cohorts",
+        "Expert survival/model registry и care calendar",
+        "Fast calculation snapshots, manifests и evidence тестов"
+      ],
+      "acceptance_ids": [
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07"
+      ],
+      "integration_evidence": "Первый полный маршрут участок -> сохранённый план -> расчёт -> reload с теми же числами",
+      "status": "implementation_complete_pending_verification"
+    },
+    {
+      "id": "WP-06",
+      "title": "Редактор участка 3D и сравнение",
+      "owner": "Claude",
+      "integration_partner": "GPT",
+      "depends_on": [
+        "WP-04",
+        "WP-05"
+      ],
+      "deliverables": [
+        "Three.js shared context, stable IDs, instancing и LOD",
+        "Placement editing, locks, undo/redo, server validation",
+        "Рост отдельно от даты/часа, height provenance",
+        "Synchronized before/after и human viewpoint",
+        "Scenario comparison из frozen snapshots, saving/conflict states"
+      ],
+      "acceptance_ids": [
+        "AC-04",
+        "AC-10",
+        "AC-16"
+      ],
+      "integration_evidence": "2D/3D не расходятся; запрет сервера виден в редакторе; нет собственных финансовых формул UI",
+      "status": "implementation_complete_pending_physical_device_verification"
+    },
+    {
+      "id": "WP-07",
+      "title": "Приоритет и городская программа",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-05"
+      ],
+      "deliverables": [
+        "Normalized factors/weights, coverage и explanations",
+        "Candidate alternatives и OR-Tools constraints",
+        "Budget/water/crew/stock/diversity/social coverage",
+        "Optimal/feasible/timeout/infeasible с bounds",
+        "Program versions, diff и ручная перепроверка"
+      ],
+      "acceptance_ids": [
+        "AC-07",
+        "AC-08"
+      ],
+      "integration_evidence": "Claude подключает program UI; изменение воды меняет реальный допустимый набор",
+      "status": "implementation_complete_pending_data_verification"
+    },
+    {
+      "id": "WP-08",
+      "title": "Тени рост и экосистемные услуги",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-05",
+        "WP-06"
+      ],
+      "deliverables": [
+        "Геометрические analytical shadows и known fixtures",
+        "Growth/phenology registry, 5/10/20 outputs",
+        "CO2/пыль/кислород/вода/площадь без двойного учёта",
+        "InVEST air и SOLWEIG adapters по data gates",
+        "Фоновые physical jobs, uncertainty и источники"
+      ],
+      "acceptance_ids": [
+        "AC-09",
+        "AC-10"
+      ],
+      "integration_evidence": "Claude подключает слои и temporal UI; точность подтверждается отдельно по DR-06",
+      "status": "implementation_complete_pending_local_calibration"
+    },
+    {
+      "id": "WP-09",
+      "title": "Исполнение осмотры и сравнение с фактом",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-05",
+        "WP-07"
+      ],
+      "deliverables": [
+        "Work orders, частичные completions, correction history",
+        "Inspections и observation coverage",
+        "Cohorts и replacement links",
+        "Forecast vs observed на сопоставимом наборе",
+        "Audit/permissions и календарные resource checks"
+      ],
+      "acceptance_ids": [
+        "AC-07",
+        "AC-11"
+      ],
+      "integration_evidence": "Claude подключает календарь/осмотры; замены не исправляют исходную survival",
+      "status": "integration_verified"
+    },
+    {
+      "id": "WP-10",
+      "title": "Чат отчёты и целостность контекста",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-05",
+        "WP-07"
+      ],
+      "deliverables": [
+        "LLM adapter, bounded tools и retrieval ACL",
+        "Structured facts, proposals и stale revision rejection",
+        "Evaluation set 40+ заданий и недоверенные документы",
+        "PDF/XLSX из snapshot, signed downloads",
+        "Provider failure fallback и стоимость запросов"
+      ],
+      "acceptance_ids": [
+        "AC-12",
+        "AC-13",
+        "AC-14"
+      ],
+      "integration_evidence": "Claude подключает чат/экспорт; один snapshot в карте, сообщении и отчёте",
+      "status": "integration_verified"
+    },
+    {
+      "id": "WP-11",
+      "title": "Интеграция эксплуатация и выпуск",
+      "owner": "GPT",
+      "integration_partner": "Claude",
+      "depends_on": [
+        "WP-04",
+        "WP-06",
+        "WP-07",
+        "WP-08",
+        "WP-09",
+        "WP-10"
+      ],
+      "deliverables": [
+        "Сквозные сценарии на реальных и marked test inputs",
+        "Performance P-01..P-05 на зафиксированном стенде",
+        "Crash/retry/cancel/provider/Redis outage tests",
+        "Backup restore, migration, clean Compose launch",
+        "Совместный UX review, документы и organizer acceptance"
+      ],
+      "acceptance_ids": [
+        "AC-01",
+        "AC-02",
+        "AC-03",
+        "AC-04",
+        "AC-05",
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-09",
+        "AC-10",
+        "AC-11",
+        "AC-12",
+        "AC-13",
+        "AC-14",
+        "AC-15",
+        "AC-16",
+        "AC-17",
+        "AC-18"
+      ],
+      "integration_evidence": "Release checklist с явными data gates; не объявлять весь продукт завершённым при открытых blockers",
+      "status": "local_restore_verified_pending_production_drill"
+    }
+  ]
+}

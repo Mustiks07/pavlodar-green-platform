@@ -1,0 +1,178 @@
+{
+  "base": "http://localhost:5173",
+  "startedAt": "2026-10-30T17:58:02.995Z",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC TEST revision of the live smoke is readable by its specialist",
+      "pass": true,
+      "detail": {
+        "revision": "89fbfb88-5e5b-4964-8322-28effc70d315",
+        "scenarioId": "02271cb4-5168-4a6b-b563-bfe924fa8b09"
+      }
+    },
+    {
+      "name": "retry: start 503 shown with retry, poll 503s recovered, the run completes",
+      "pass": true,
+      "detail": {
+        "startError": true,
+        "pollFails": 2,
+        "day": {
+          "jobId": "3dc65cb3-f964-491d-8848-fc9aea2e3977",
+          "resultId": "85c6d0c4-c885-56f0-8ee1-0a5c1f72d42e"
+        }
+      }
+    },
+    {
+      "name": "complete: status, shaded area, moment and sun come from getSpatialResult/artifact",
+      "pass": true,
+      "detail": {
+        "status": "complete",
+        "area": 573.8,
+        "areaText": "574",
+        "sun": {
+          "azimuth_deg": 179.08945312152332,
+          "elevation_deg": 61.159728530401225
+        },
+        "text": "Рассчитано\nПредварительно: высоты по данным наборов\nМомент\n21.06.2026, 11:52\nСолнце\nвысота 61,2°, азимут 179°\nУчтено\nзданий: 1, посадок: 0\nПлощадь тени\nОценка\n\n574 м²\n\nтекущее состояние · уверенность: низкая\n\nПоказать в 3D"
+      }
+    },
+    {
+      "name": "progress: job states were tracked until a terminal state",
+      "pass": true,
+      "detail": [
+        {
+          "id": "3dc65cb3-f964-491d-8848-fc9aea2e3977",
+          "state": "succeeded",
+          "progress": 0.1,
+          "phase": "computing"
+        }
+      ]
+    },
+    {
+      "name": "this API does not serve streamJobEvents: the client polls getJob and opens no stream",
+      "pass": true,
+      "detail": {
+        "sseServed": false,
+        "streams": [],
+        "getJobReads": 1
+      }
+    },
+    {
+      "name": "stream unavailable: polling fallback tracks the job to its result",
+      "pass": true,
+      "detail": {
+        "polled": 3,
+        "last": {
+          "id": "7283fb6e-36da-4ea2-aa59-634c1040b2bc",
+          "state": "succeeded",
+          "progress": 0.1,
+          "phase": "computing"
+        }
+      }
+    },
+    {
+      "name": "reload restores the result from the URL",
+      "pass": true
+    },
+    {
+      "name": "reload during a run resumes tracking the same job and lands on its result",
+      "pass": true,
+      "detail": {
+        "pendingJob": "521272c1-c7f2-43df-a165-56c149614fbb",
+        "afterReload": "65be3327-cac3-55b0-8804-9d777a432856",
+        "state": "succeeded"
+      }
+    },
+    {
+      "name": "night: unavailable with the server reason, no 3D link, not shown as zero",
+      "pass": true,
+      "detail": {
+        "status": "unavailable",
+        "text": "Нет результата\nПлощадь тени\nНет данных\n\nНет данных\n\nтекущее состояние\n\nСолнце ниже горизонта в выбранный момент · блокирует расчёт"
+      }
+    },
+    {
+      "name": "3D: shadow geometry drawn exactly as the artifact, tilted scene, panel without source/unverified lines",
+      "pass": true,
+      "detail": {
+        "drawn": {
+          "layer": true,
+          "pitch": 55.00000000000001,
+          "geometryType": "Polygon",
+          "rings": 1417
+        },
+        "artifactRings": 1417
+      }
+    },
+    {
+      "name": "reload of the 3D link restores the shadow layer",
+      "pass": true
+    },
+    {
+      "name": "3D date/time control starts a new run and redraws for the new moment",
+      "pass": true,
+      "detail": {
+        "pmId": "3694bdcc-20cd-5aaf-967f-9a98e1b27a71",
+        "sun": {
+          "azimuth_deg": 262.73056134837407,
+          "elevation_deg": 35.63921573271287
+        },
+        "noon": {
+          "azimuth_deg": 179.08945312152332,
+          "elevation_deg": 61.159728530401225
+        }
+      }
+    },
+    {
+      "name": "no page errors in the specialist session",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "IDOR: viewer gets 404 for result and artifact; UI says not found and draws nothing",
+      "pass": true,
+      "detail": {
+        "idor": 404,
+        "artifact": 404,
+        "idorUi": true,
+        "noLayer": true,
+        "unknownUi": true
+      }
+    },
+    {
+      "name": "phone (dark): shadow layer drawn, no horizontal scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp08-shadow-ui/shadow-start-503.png",
+    "docs/evidence/wp08-shadow-ui/shadow-complete.png",
+    "docs/evidence/wp08-shadow-ui/shadow-night.png",
+    "docs/evidence/wp08-shadow-ui/shadow-3d.png",
+    "docs/evidence/wp08-shadow-ui/shadow-3d-afternoon.png",
+    "docs/evidence/wp08-shadow-ui/shadow-viewer-404.png",
+    "docs/evidence/wp08-shadow-ui/shadow-mobile-dark.png"
+  ],
+  "runs": [
+    {
+      "label": "day",
+      "jobId": "3dc65cb3-f964-491d-8848-fc9aea2e3977",
+      "resultId": "85c6d0c4-c885-56f0-8ee1-0a5c1f72d42e"
+    },
+    {
+      "label": "polling-fallback",
+      "jobId": "7283fb6e-36da-4ea2-aa59-634c1040b2bc",
+      "resultId": "817b78c4-a4ec-56f0-8889-be31ff0b99c5"
+    },
+    {
+      "label": "night",
+      "jobId": "6eb2cf9a-0b5c-4bc9-8005-1466de66d832",
+      "resultId": "b4a13ed6-2b2b-5082-8fe3-e6335f8c4afc"
+    }
+  ],
+  "finishedAt": "2026-10-30T17:58:54.078Z",
+  "passed": true
+}

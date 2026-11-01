@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-10-29",
+  "official_boundary": null,
+  "working_boundary_source_id": "OSM",
+  "working_boundary_osm_id": "way/170089891",
+  "crs": "EPSG:4326",
+  "license": "ODbL-1.0",
+  "accuracy_m": null,
+  "acceptance_met": false
+}

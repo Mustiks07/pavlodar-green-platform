@@ -1,0 +1,262 @@
+{
+  "base": "http://localhost:5175",
+  "city": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "startedAt": "2026-10-31T11:07:50.399Z",
+  "checks": [
+    {
+      "name": "viewer sees the published public layers of the city",
+      "pass": true,
+      "detail": {
+        "layers": [
+          "Предложения питомника БИОСАД, Павлодар (DR-02) (point)",
+          "Водные объекты Павлодара — линии (line)",
+          "Здания Павлодара с высотой (polygon)",
+          "Деревья Павлодара (point)",
+          "Дороги Павлодара (line)",
+          "Зелёные территории Павлодара (polygon)",
+          "Социальные и городские объекты Павлодара — точки (point)",
+          "Социальные и городские объекты Павлодара — полигоны (polygon)",
+          "Водные объекты Павлодара — полигоны (polygon)"
+        ]
+      }
+    },
+    {
+      "name": "roads are drawn, MultiLineString parts included",
+      "pass": true,
+      "detail": {
+        "LineString": 179,
+        "MultiLineString": 2
+      }
+    },
+    {
+      "name": "roads layer toggles off and back on",
+      "pass": true,
+      "detail": {
+        "before": true,
+        "hidden": true,
+        "shown": true
+      }
+    },
+    {
+      "name": "click on a road stored as MultiLineString opens the canonical card and highlights it",
+      "pass": true,
+      "detail": {
+        "target": "dc466173-8ba7-9d49-cd99-0158c9cc7946",
+        "featureParam": "dc466173-8ba7-9d49-cd99-0158c9cc7946",
+        "serverGeometry": "MultiLineString",
+        "highlight": 4
+      }
+    },
+    {
+      "name": "reload and a deep link in a new session keep the selected road with its card and highlight",
+      "pass": true,
+      "detail": {
+        "afterReload": true,
+        "sameFeature": true,
+        "deepOk": true,
+        "deepHighlight": true
+      }
+    },
+    {
+      "name": "every public OSM layer: a click opens the canonical card (getMapFeature 200) with the server geometry",
+      "pass": true,
+      "detail": [
+        {
+          "layer": "Водные объекты Павлодара — линии",
+          "status": 200,
+          "geometry": "LineString",
+          "opened": true,
+          "titled": true
+        },
+        {
+          "layer": "Здания Павлодара с высотой",
+          "status": 200,
+          "geometry": "Polygon",
+          "opened": true,
+          "titled": true
+        },
+        {
+          "layer": "Деревья Павлодара",
+          "status": 200,
+          "geometry": "Point",
+          "opened": true,
+          "titled": true
+        },
+        {
+          "layer": "Дороги Павлодара",
+          "status": 200,
+          "geometry": "LineString",
+          "opened": true,
+          "titled": true
+        },
+        {
+          "layer": "Зелёные территории Павлодара",
+          "status": 200,
+          "geometry": "Polygon",
+          "opened": true,
+          "titled": true
+        },
+        {
+          "layer": "Социальные и городские объекты Павлодара — точки",
+          "status": 200,
+          "geometry": "Point",
+          "opened": true,
+          "titled": true
+        },
+        {
+          "layer": "Социальные и городские объекты Павлодара — полигоны",
+          "status": 200,
+          "geometry": "Polygon",
+          "opened": true,
+          "titled": true
+        },
+        {
+          "layer": "Водные объекты Павлодара — полигоны",
+          "status": 200,
+          "geometry": "Polygon",
+          "opened": true,
+          "titled": true
+        }
+      ]
+    },
+    {
+      "name": "viewer: no 4xx/5xx from the API while browsing public layers",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "no page errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "cold map readiness with 60 144 public objects, dev server median <= 5 s (P-01 verdict: p01-bench)",
+      "pass": true,
+      "detail": {
+        "medianMs": 3821,
+        "readyMs": [
+          3771,
+          3633,
+          3821,
+          4840,
+          3864
+        ],
+        "fps": [
+          53,
+          57,
+          59,
+          51,
+          58
+        ]
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp03-osm-v2/road-card.png",
+    "docs/evidence/wp03-osm-v2/last-card.png",
+    "docs/evidence/wp03-osm-v2/city-center.png"
+  ],
+  "measurements": {
+    "roads": {
+      "ids": [
+        "pgl-644f68ea-1296-5665-baae-000fe775ab2a-line"
+      ],
+      "rendered": 181,
+      "types": {
+        "LineString": 179,
+        "MultiLineString": 2
+      }
+    },
+    "multiLineSearch": {
+      "candidates": 600,
+      "found": "dc466173-8ba7-9d49-cd99-0158c9cc7946"
+    },
+    "cards": [
+      {
+        "layer": "Водные объекты Павлодара — линии",
+        "status": 200,
+        "geometry": "LineString",
+        "opened": true,
+        "titled": true
+      },
+      {
+        "layer": "Здания Павлодара с высотой",
+        "status": 200,
+        "geometry": "Polygon",
+        "opened": true,
+        "titled": true
+      },
+      {
+        "layer": "Деревья Павлодара",
+        "status": 200,
+        "geometry": "Point",
+        "opened": true,
+        "titled": true
+      },
+      {
+        "layer": "Дороги Павлодара",
+        "status": 200,
+        "geometry": "LineString",
+        "opened": true,
+        "titled": true
+      },
+      {
+        "layer": "Зелёные территории Павлодара",
+        "status": 200,
+        "geometry": "Polygon",
+        "opened": true,
+        "titled": true
+      },
+      {
+        "layer": "Социальные и городские объекты Павлодара — точки",
+        "status": 200,
+        "geometry": "Point",
+        "opened": true,
+        "titled": true
+      },
+      {
+        "layer": "Социальные и городские объекты Павлодара — полигоны",
+        "status": 200,
+        "geometry": "Polygon",
+        "opened": true,
+        "titled": true
+      },
+      {
+        "layer": "Водные объекты Павлодара — полигоны",
+        "status": 200,
+        "geometry": "Polygon",
+        "opened": true,
+        "titled": true
+      }
+    ],
+    "cold": [
+      {
+        "readyMs": 3771,
+        "wallMs": 5830,
+        "fps": 53
+      },
+      {
+        "readyMs": 3633,
+        "wallMs": 5691,
+        "fps": 57
+      },
+      {
+        "readyMs": 3821,
+        "wallMs": 5870,
+        "fps": 59
+      },
+      {
+        "readyMs": 4840,
+        "wallMs": 6908,
+        "fps": 51
+      },
+      {
+        "readyMs": 3864,
+        "wallMs": 5915,
+        "fps": 58
+      }
+    ]
+  },
+  "finishedAt": "2026-10-31T11:09:31.289Z",
+  "passed": true
+}

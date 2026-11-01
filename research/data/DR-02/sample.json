@@ -1,0 +1,152 @@
+{
+  "plants.csv": [
+    {
+      "taxon_id": "populus_alba",
+      "scientific_name": "Populus alba",
+      "name_ru": "Тополь белый",
+      "rank": "species",
+      "cultivar": null,
+      "local_evidence": "Назван в городском плане зеленого пояса",
+      "school_hospital_status": "requires_review",
+      "expert_approved": false,
+      "source_refs": "LOCAL-20260520;NC-POPLAR"
+    },
+    {
+      "taxon_id": "pinus_sylvestris",
+      "scientific_name": "Pinus sylvestris",
+      "name_ru": "Сосна обыкновенная",
+      "rank": "species",
+      "cultivar": null,
+      "local_evidence": "Городской источник называет сосну без вида; вид — кандидат, требует сверки дендроплана",
+      "school_hospital_status": "requires_review",
+      "expert_approved": false,
+      "source_refs": "LOCAL-20260520;NC-PINE"
+    }
+  ],
+  "traits.csv": [
+    {
+      "record_id": "pinus_sylvestris:adult_height",
+      "taxon_id": "pinus_sylvestris",
+      "trait": "adult_height",
+      "value": null,
+      "lower": 30,
+      "upper": 60,
+      "unit": "ft",
+      "source_id": "NC-PINE",
+      "method": "expert_reference",
+      "applicability": "Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",
+      "reason": null
+    },
+    {
+      "record_id": "pinus_sylvestris:adult_crown_width",
+      "taxon_id": "pinus_sylvestris",
+      "trait": "adult_crown_width",
+      "value": null,
+      "lower": 30,
+      "upper": 40,
+      "unit": "ft",
+      "source_id": "NC-PINE",
+      "method": "expert_reference",
+      "applicability": "Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",
+      "reason": null
+    }
+  ],
+  "stock.csv": [
+    {
+      "stock_id": "biosad-1267-2.0",
+      "taxon_id": "picea_obovata",
+      "supplier": "БИОСАД",
+      "supplier_city": "Павлодар",
+      "height_m": 2.0,
+      "age_years": null,
+      "container": null,
+      "root_system": null,
+      "quantity": 9,
+      "unit": "piece",
+      "price": "50000.00",
+      "currency": "KZT",
+      "tax_status": "unknown",
+      "checked_at": "2026-10-29",
+      "stock_count_date": null,
+      "availability": "vendor_reported",
+      "source_id": "BIOSAD-STOCK",
+      "applicability": "Карточка товара; склад и партия не подтверждены. Только материал, состав работ/доставка не указан.",
+      "height_min_m": 2.0,
+      "height_max_m": 2.0
+    },
+    {
+      "stock_id": "biosad-1267-3.0",
+      "taxon_id": "picea_obovata",
+      "supplier": "БИОСАД",
+      "supplier_city": "Павлодар",
+      "height_m": 3.0,
+      "age_years": null,
+      "container": null,
+      "root_system": null,
+      "quantity": 0,
+      "unit": "piece",
+      "price": "75000.00",
+      "currency": "KZT",
+      "tax_status": "unknown",
+      "checked_at": "2026-10-29",
+      "stock_count_date": null,
+      "availability": "not_in_stock",
+      "source_id": "BIOSAD-STOCK",
+      "applicability": "Карточка товара; склад и партия не подтверждены. Только материал, состав работ/доставка не указан.",
+      "height_min_m": 3.0,
+      "height_max_m": 3.0
+    }
+  ],
+  "data.csv": [
+    {
+      "record_id": "populus_alba",
+      "topic": "taxon_review",
+      "value": "Populus alba",
+      "status": "requires_review",
+      "reason": "Назван в городском плане зеленого пояса",
+      "source_id": "LOCAL-20260520"
+    },
+    {
+      "record_id": "pinus_sylvestris",
+      "topic": "taxon_review",
+      "value": "Pinus sylvestris",
+      "status": "requires_review",
+      "reason": "Городской источник называет сосну без вида; вид — кандидат, требует сверки дендроплана",
+      "source_id": "LOCAL-20260520"
+    }
+  ],
+  "search_log.csv": [
+    {
+      "search_id": "DR-02-search-1",
+      "checked_at": "2026-10-29",
+      "query_or_access": "site:gov.kz Павлодар озеленение 2026; БИОСАД ель сибирская; NC Extension taxa",
+      "method": "read_only_search_and_primary_review",
+      "result": "Городское сообщение и карточки питомников/авторские ботанические справочники",
+      "limitation": "Нет локальных испытаний всех сортов, радиусов корней и медицинского разрешения."
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "LOCAL-20260520",
+      "title": "В Павлодаре продолжается работа по озеленению и обновлению городского зеленого фонда",
+      "url": "https://www.gov.kz/org/pavlodar/press/news/details/1223959?lang=ru",
+      "publisher": "Пресс-служба акима Павлодарской области",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-05-20",
+      "license": "unknown",
+      "method": "official_report",
+      "note": "Содержание относится к городу Павлодару; сообщение о посадке и планах, не полевой журнал и не эксперимент."
+    },
+    {
+      "source_id": "BIOSAD-STOCK",
+      "title": "Ель сибирская: варианты товара и наличие по городам",
+      "url": "https://biosad.kz/el.html/nid/1267",
+      "publisher": "Садовый центр БИОСАД",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "unknown",
+      "method": "vendor_listing",
+      "note": "Проверены HTML и живой интерфейс; дата инвентаризации склада не опубликована. Цены в ₸ подтверждены интерфейсом. Отзывы не используются."
+    }
+  ]
+}

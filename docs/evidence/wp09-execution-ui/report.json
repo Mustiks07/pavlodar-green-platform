@@ -1,0 +1,144 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:23:35.394Z",
+  "checks": [
+    {
+      "name": "setup: SYNTHETIC approved scenario with placements and a complete snapshot (disposable DB only)",
+      "pass": true,
+      "detail": {
+        "err": ""
+      }
+    },
+    {
+      "name": "work order created for the approved revision and opened from the URL",
+      "pass": true,
+      "detail": {
+        "orderId": "55aa0d35-6aca-463d-bb71-80d5d06da88f"
+      }
+    },
+    {
+      "name": "transitions assigned -> in_progress through the server",
+      "pass": true
+    },
+    {
+      "name": "stale If-Match: 412 explained, server state reloaded (total 1), nothing written",
+      "pass": true,
+      "detail": {
+        "other": 201,
+        "conflict": true
+      }
+    },
+    {
+      "name": "partial completions: server total 1 + 3 = 4 shown as the server value",
+      "pass": true,
+      "detail": {
+        "server": 4
+      }
+    },
+    {
+      "name": "correction: original kept and marked superseded; server total still 4 (leaves only)",
+      "pass": true,
+      "detail": {
+        "server": 4
+      }
+    },
+    {
+      "name": "completed order -> cohort with the server initial quantity (4) for the exact placement",
+      "pass": true,
+      "detail": {
+        "cohort": {
+          "id": "62dea27c-8086-4cfb-8840-5d66dcf0635a",
+          "city_id": "10000000-0000-4000-8000-000000000001",
+          "zone_id": "e9910260-583a-4fcb-a920-b5a172bc8c00",
+          "plant_id": "9023954e-fad3-471a-8b15-6bd5c1819908",
+          "placement_id": "779d2385-8520-457a-b279-f0377fdf0055",
+          "initial_quantity": 4,
+          "planting_date": "2026-10-31",
+          "replaces_cohort_id": null,
+          "source_work_order_id": "55aa0d35-6aca-463d-bb71-80d5d06da88f",
+          "latest_inspection_id": null
+        }
+      }
+    },
+    {
+      "name": "inspection recorded; the server marks it as the latest",
+      "pass": true,
+      "detail": {
+        "latest": "f13b408b-7481-4b3b-8295-da9706d43479"
+      }
+    },
+    {
+      "name": "replacement: placement chosen from the revision (quantity taken from it) -> new cohort linked to the original",
+      "pass": true,
+      "detail": {
+        "qtyFilled": "1",
+        "lineage": {
+          "id": "3288b021-4b21-47f4-aaef-dfac5ad85d44",
+          "city_id": "10000000-0000-4000-8000-000000000001",
+          "zone_id": "e9910260-583a-4fcb-a920-b5a172bc8c00",
+          "plant_id": "dd8275f9-c32f-4e3e-a1db-963fe7dcda9e",
+          "placement_id": "40617bec-6510-4868-91a2-609c35e834b0",
+          "initial_quantity": 1,
+          "planting_date": "2026-10-31",
+          "replaces_cohort_id": "62dea27c-8086-4cfb-8840-5d66dcf0635a",
+          "source_work_order_id": "26571cd4-9919-4e86-b800-b63e5b4c9e4e",
+          "latest_inspection_id": null
+        }
+      }
+    },
+    {
+      "name": "forecast vs observed: snapshots offered from listCalculations for the exact cohort revision, no manual id input",
+      "pass": true,
+      "detail": {
+        "offered": 1,
+        "listed": 1
+      }
+    },
+    {
+      "name": "forecast vs observed: comparability, probabilities and delta are the server result; a non-comparable delta stays unknown",
+      "pass": true,
+      "detail": {
+        "comparable": false,
+        "delta": null,
+        "offset": 365,
+        "gaps": [
+          "comparison_time_mismatch"
+        ]
+      }
+    },
+    {
+      "name": "reload restores the selected cohort from the URL",
+      "pass": true
+    },
+    {
+      "name": "no page errors in the specialist session",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "viewer: only completed orders listed; completion details withheld",
+      "pass": true,
+      "detail": {
+        "statuses": [
+          "completed",
+          "completed"
+        ]
+      }
+    },
+    {
+      "name": "phone (dark): execution page without horizontal scroll",
+      "pass": true,
+      "detail": {
+        "overflow": 0
+      }
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp09-execution-ui/execution-completions.png",
+    "docs/evidence/wp09-execution-ui/execution-cohort.png",
+    "docs/evidence/wp09-execution-ui/execution-viewer.png",
+    "docs/evidence/wp09-execution-ui/execution-mobile-dark.png"
+  ],
+  "finishedAt": "2026-10-31T08:23:53.760Z",
+  "passed": true
+}

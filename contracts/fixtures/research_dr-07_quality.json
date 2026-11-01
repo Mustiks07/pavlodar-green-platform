@@ -1,0 +1,99 @@
+{
+  "schema": "QualityReport",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "id": "27d420a2-f428-57bd-8fad-2715b148d119",
+    "issues": [
+      {
+        "code": "research_not_approved",
+        "message": "Найденное не равно допущенному к production.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-07",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-07",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Неизвестные и недатированные параметры не заменены нулями.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-07",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-07",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Владелец не подтвердил production, egress и API budget.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-07",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"PROJECT-TZ\", \"title\": \"ТЗ разработки 1.0.0, разделы 06–08, 11–19, 29\", \"url\": \"repo:docs/TZ_DEVELOPMENT.txt\", \"publisher\": \"Проект team-vtiposhnik\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-10-29\", \"license\": \"unknown\", \"method\": \"project_requirement\", \"note\": \"Не первичный источник внешних измерений; подтверждает требования и отсутствие переданных организаторских данных в этой поставке.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "PROJECT-TZ",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"OSM-LICENSE\", \"title\": \"OpenStreetMap copyright and licence\", \"url\": \"https://www.openstreetmap.org/copyright\", \"publisher\": \"OpenStreetMap Foundation\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"ODbL-1.0\", \"method\": \"license_terms\", \"note\": \"\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "OSM-LICENSE",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"WEATHER-LICENSE\", \"title\": \"Open-Meteo Terms & Privacy\", \"url\": \"https://open-meteo.com/en/terms\", \"publisher\": \"Open-Meteo\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"CC-BY-4.0 data; separate API service terms\", \"method\": \"license_terms\", \"note\": \"\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "WEATHER-LICENSE",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"COPDEM\", \"title\": \"Copernicus DEM GLO-30 / GLO-90\", \"url\": \"https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM\", \"publisher\": \"Copernicus Data Space Ecosystem\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2011/2015\", \"license\": \"Copernicus DEM licence (not generic CC-BY)\", \"method\": \"product_documentation\", \"note\": \"DSM включает здания и растительность; это не DTM. Для города нет выгруженного и проверенного растра в пакете.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "COPDEM",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"S2-DOC\", \"title\": \"Sentinel-2 data collection\", \"url\": \"https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2\", \"publisher\": \"Copernicus Data Space Ecosystem\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"Copernicus Sentinel data terms\", \"method\": \"product_documentation\", \"note\": \"\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "S2-DOC",
+        "suggested_action": null
+      }
+    ],
+    "error_count": 0,
+    "valid_count": 9,
+    "record_count": 9,
+    "warning_count": 10,
+    "publish_allowed": false,
+    "issues_truncated": false,
+    "dataset_version_id": "731dd97b-4a34-5ce2-bab2-ab5326045cbd",
+    "issues_next_cursor": null
+  }
+}

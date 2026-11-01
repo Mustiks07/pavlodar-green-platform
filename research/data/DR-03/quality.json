@@ -1,0 +1,118 @@
+{
+  "checked_at": "2026-10-29",
+  "research_status": "partial",
+  "acceptance_met": false,
+  "city": "Павлодар",
+  "official_boundary_confirmed": false,
+  "real_world_city_coverage": null,
+  "accuracy": null,
+  "accuracy_reason": "Нет локальной независимой проверки; точность и разрешение не одно и то же.",
+  "tables": {
+    "rules.csv": {
+      "row_count": 25,
+      "null_count_by_column": {
+        "rule_id": 0,
+        "source_id": 0,
+        "clause": 0,
+        "revision_date": 0,
+        "parameter": 0,
+        "value": 6,
+        "unit": 11,
+        "applicability": 0,
+        "condition": 5,
+        "status": 0,
+        "checked_at": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "soil_observations.csv": {
+      "row_count": 0,
+      "null_count_by_column": {
+        "observation_id": 0,
+        "source_id": 0,
+        "observed_at": 0,
+        "depth_top_cm": 0,
+        "depth_bottom_cm": 0,
+        "analyte": 0,
+        "value": 0,
+        "unit": 0,
+        "method": 0,
+        "longitude": 0,
+        "latitude": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "data.csv": {
+      "row_count": 4,
+      "null_count_by_column": {
+        "record_id": 0,
+        "topic": 0,
+        "value": 4,
+        "status": 0,
+        "reason": 0,
+        "source_id": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "search_log.csv": {
+      "row_count": 4,
+      "null_count_by_column": {
+        "search_id": 0,
+        "checked_at": 0,
+        "query_or_access": 0,
+        "method": 0,
+        "result": 0,
+        "limitation": 0
+      },
+      "duplicate_whole_rows": 0
+    },
+    "sources.csv": {
+      "row_count": 9,
+      "null_count_by_column": {
+        "source_id": 0,
+        "title": 0,
+        "url": 0,
+        "publisher": 0,
+        "checked_at": 0,
+        "observed_at": 1,
+        "license": 0,
+        "method": 0,
+        "note": 0
+      },
+      "duplicate_whole_rows": 0
+    }
+  },
+  "limitations": [
+    "Найденное не равно допущенному к production.",
+    "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+    "Неизвестные и недатированные параметры не заменены нулями.",
+    "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+    "Нормы не исчерпывающие; сроки ухода требуют толкования.",
+    "Нет открытого слоя сетей и точечных почвенных pH/EC; нельзя считать пустой слой разрешением на посадку."
+  ],
+  "coverage_basis": "Исследование ограничено городом Павлодаром; внешние справочные/сравнительные данные явно помечены. Доля площади в официальном контуре unknown.",
+  "geometry_files": {
+    "restrictions.geojson": {
+      "feature_count": 0,
+      "crs": "EPSG:4326",
+      "metric_accuracy_m": null
+    },
+    "soil_observations.geojson": {
+      "feature_count": 0,
+      "crs": "EPSG:4326",
+      "metric_accuracy_m": null
+    }
+  },
+  "geometry_validation": {
+    "restrictions.geojson": {
+      "feature_count": 0,
+      "invalid_features": [],
+      "topology_repaired": false
+    },
+    "soil_observations.geojson": {
+      "feature_count": 0,
+      "invalid_features": [],
+      "topology_repaired": false
+    }
+  }
+}

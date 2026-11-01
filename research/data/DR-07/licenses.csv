@@ -1,0 +1,5 @@
+source_id,license,scope,approval
+OSM-LICENSE,ODbL-1.0,"База геоданных; атрибуция и ODbL, не разрешение на массовую загрузку публичных тайлов.",not_product_owner_approved
+WEATHER-LICENSE,CC-BY-4.0 data; separate API service terms,Данные CC BY 4.0; бесплатный API отдельно ограничен некоммерческим использованием.,not_product_owner_approved
+COPDEM,Copernicus DEM licence (not generic CC-BY),Применять собственную лицензию Copernicus DEM; generic CC BY не подставлять.,not_product_owner_approved
+S2-DOC,Copernicus Sentinel data terms,Copernicus Sentinel data terms; требования доступа к сервисам отдельны.,not_product_owner_approved

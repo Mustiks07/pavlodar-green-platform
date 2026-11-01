@@ -1,0 +1,158 @@
+{
+  "base": "http://localhost:5174",
+  "startedAt": "2026-10-31T08:31:25.782Z",
+  "checks": [
+    {
+      "name": "mouse: 4 vertices placed and ring closed by clicking the first vertex",
+      "pass": true,
+      "detail": {
+        "status1": "контур замкнут\nвершин: 4\nВершина 1 из 4"
+      }
+    },
+    {
+      "name": "reload restores the unsaved contour with a local-only label",
+      "pass": true,
+      "detail": {
+        "status2": "контур замкнут\nвершин: 4\nвершина не выбрана"
+      }
+    },
+    {
+      "name": "createZone persisted the drawn polygon; card shows server area",
+      "pass": true,
+      "detail": {
+        "area_m2": 23076.504064206034,
+        "vertices": 5
+      }
+    },
+    {
+      "name": "local draft cleared after save",
+      "pass": true
+    },
+    {
+      "name": "scenario created on geometry v1 (setup)",
+      "pass": true,
+      "detail": {
+        "status": 201
+      }
+    },
+    {
+      "name": "keyboard: Enter adds vertices at the crosshair, toolbar closes the ring",
+      "pass": true,
+      "detail": {
+        "status3": "контур замкнут\nвершин: 3\nвершина не выбрана"
+      }
+    },
+    {
+      "name": "Ctrl+Z undoes the close",
+      "pass": true,
+      "detail": {
+        "status3b": "контур не замкнут\nвершин: 3\nвершина не выбрана"
+      }
+    },
+    {
+      "name": "self-intersecting contour is explained and cannot be sent",
+      "pass": true
+    },
+    {
+      "name": "edit starts from the server ring without the closing duplicate",
+      "pass": true,
+      "detail": {
+        "statusEditStart": "контур замкнут\nвершин: 4\nвершина не выбрана",
+        "serverRing": [
+          [
+            76.99863444210774,
+            52.299239146828796
+          ],
+          [
+            77.00136555789089,
+            52.299239146828796
+          ],
+          [
+            77.00136555789089,
+            52.29812567959928
+          ],
+          [
+            76.99863444210774,
+            52.29812567959928
+          ],
+          [
+            76.99863444210774,
+            52.299239146828796
+          ]
+        ]
+      }
+    },
+    {
+      "name": "edit: vertex drag keeps the vertex count",
+      "pass": true,
+      "detail": {
+        "afterVertexDrag": "контур замкнут\nвершин: 4\nВершина 2 из 4"
+      }
+    },
+    {
+      "name": "edit: drag moved a vertex and midpoint drag inserted one (5 vertices)",
+      "pass": true,
+      "detail": {
+        "status4": "контур замкнут\nвершин: 5\nВершина 4 из 5"
+      }
+    },
+    {
+      "name": "updateZone with If-Match created a new geometry version",
+      "pass": true,
+      "detail": {
+        "v1": "4dc86d62",
+        "v2": "1ff2ddc0",
+        "area_before": 23076.504064206034,
+        "area_after": 25316.27042835635
+      }
+    },
+    {
+      "name": "concurrent updateZone accepted by server (setup)",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "stale If-Match -> 412 shown, my contour kept",
+      "pass": true
+    },
+    {
+      "name": "after explicit keep: my geometry saved on the new version, the concurrent rename preserved",
+      "pass": true,
+      "detail": {
+        "v3": "59641ea6",
+        "name": "SYNTHETIC TEST участок 08:31:33 (параллельно)",
+        "ring": 6
+      }
+    },
+    {
+      "name": "scenario on old geometry shows version notice and re-bind option",
+      "pass": true
+    },
+    {
+      "name": "new revision is bound to the current geometry only after explicit opt-in",
+      "pass": true,
+      "detail": {
+        "revision_zone_version": "59641ea6",
+        "current": "59641ea6"
+      }
+    },
+    {
+      "name": "no uncaught page errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "shots": [
+    "docs/evidence/wp04-zone-drawing/draw-closed.png",
+    "docs/evidence/wp04-zone-drawing/zone-created.png",
+    "docs/evidence/wp04-zone-drawing/draw-keyboard.png",
+    "docs/evidence/wp04-zone-drawing/draw-self-intersection.png",
+    "docs/evidence/wp04-zone-drawing/edit-dragged.png",
+    "docs/evidence/wp04-zone-drawing/edit-conflict-412.png",
+    "docs/evidence/wp04-zone-drawing/scenario-rebound.png"
+  ],
+  "finishedAt": "2026-10-31T08:31:44.599Z",
+  "passed": true
+}

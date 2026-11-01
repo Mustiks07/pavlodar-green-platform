@@ -1,0 +1,57 @@
+ADR-020 Reproducible fast calculation uses exact rate versions and immutable snapshots
+Статус: accepted by GPT (canonical backend/data owner); client integration pending Claude.
+Дата: 2026-10-30. Основа: canonical 1.2.0, backend dea308c.
+
+ПРОБЛЕМА
+
+calculateFast/getCalculation/getCalculationManifest и rate operations были описаны контрактом, но
+не реализованы. Клиент не должен считать деньги, а сервер не может превращать отсутствующую цену,
+survival-модель или правило ухода в ноль/среднее значение. Результат обязан переживать reload и
+изменение сценария без пересчёта старых чисел.
+
+РЕШЕНИЕ
+
+- RateInput становится отдельной immutable RateVersion. Сервер принимает её только с published
+  rates dataset того же города и существующими source_record_id, канонизирует SourceRef и сохраняет
+  dataset lineage. current требует observed/checked dates и непросроченный declared interval.
+- ScenarioRevision может ссылаться на одну точную rate_version_id. Эта версия в текущем быстром
+  маршруте применима только к явно названной категории plant_material с unit=piece и status=current.
+  Иные категории не угадываются и дают rate_not_applicable/missing_rate.
+- Стоимость считается на сервере Decimal + per-line ROUND_HALF_UP до 0.01 KZT. Каждая Placement
+  создаёт material line. Если ставка отсутствует/неприменима, unit_price и subtotal равны null,
+  known_subtotal содержит только известные строки, total=null и status=incomplete. Налог excluded/
+  unknown создаёт отдельный blocking gap и не выдаёт subtotal за полный итог.
+- calculateFast сохраняет immutable CalculationSnapshot и SourceManifest в одной транзакции. Hash
+  покрывает запрос, полный ScenarioRevision, ZoneVersion, выбранные catalog plants, rule/rate,
+  dataset-version payloads, source refs и code revision. Manifest хранит source refs, registry ids,
+  seed, input/output hashes. Повтор mutation защищён общей idempotency policy.
+- getCalculation возвращает сохранённые результаты и вычисляет только is_stale относительно current
+  ScenarioRevision. Старые cost/survival/care/warnings не переписываются. Доступ повторно проверяет
+  сценарий, dataset versions, rule и rate grants; отозванный restricted grant скрывает snapshot.
+- Без принятой ModelVersion survival points остаются null с uncalibrated и gap. Без принятого care
+  rule операции не создаются. Suitability без сохранённых weights не пересчитывается и возвращает
+  null score/gap. Fast snapshot не считается достаточным evidence для approval/full calculation.
+
+КОНТРАКТ
+
+Форма canonical OpenAPI/domain 1.2.0 не меняется; реализованы уже объявленные listRates,
+createRateVersion, calculateFast, getCalculation и getCalculationManifest. Добавлены стабильные
+Problem/DataGap codes. Миграция 0012 добавляет append-only rate identities/versions и snapshots.
+Клиент показывает server strings и null/gaps; локальные финансовые, survival и care формулы запрещены.
+
+ПРОВЕРКА
+
+- Ставка 10.01 KZT/piece и quantity=3 дают line/known/total 30.03 точно как Decimal.
+- Без ставки unit_price/subtotal/total остаются null; 0.00 — только known subtotal пустого набора.
+- Idempotency replay возвращает тот же snapshot; конфликт payload на том же key обрабатывается общей
+  политикой. Manifest hashes и exact rate id совпадают со snapshot input.
+- После новой ScenarioRevision get старого snapshot даёт is_stale=true при неизменных cost lines.
+- UPDATE snapshot блокируется DB trigger; outsider получает 404.
+- Full backend regression, lint/spec/audit/security checks фиксируются в evidence.
+
+ОГРАНИЧЕНИЯ
+
+DR-04/05 не приняты организатором. Production rates/models/care registry пусты; тестовые ставка,
+каталог и правило явно SYNTHETIC. Реализован material-only fast cost, а не полная смета: delivery,
+работы, вода, reserve, replacements, taxes, versioned stock, full queue calculation, survival model,
+care feasibility и approval evidence остаются следующими WP-05 инкрементами.

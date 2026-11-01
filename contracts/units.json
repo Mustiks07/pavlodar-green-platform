@@ -1,0 +1,60 @@
+{
+  "version": "1.13.0",
+  "units": [
+    {
+      "key": "1",
+      "dimension": "ratio",
+      "display_decimals": 2
+    },
+    {
+      "key": "percent",
+      "dimension": "ratio",
+      "display_decimals": 1
+    },
+    {
+      "key": "m",
+      "dimension": "length",
+      "display_decimals": 1
+    },
+    {
+      "key": "m2",
+      "dimension": "area",
+      "display_decimals": 0
+    },
+    {
+      "key": "m3",
+      "dimension": "volume",
+      "display_decimals": 1
+    },
+    {
+      "key": "degC",
+      "dimension": "temperature_delta",
+      "display_decimals": 1
+    },
+    {
+      "key": "kg_per_year",
+      "dimension": "mass_flow",
+      "display_decimals": 1
+    },
+    {
+      "key": "t_CO2_per_year",
+      "dimension": "mass_flow",
+      "display_decimals": 2
+    },
+    {
+      "key": "persons",
+      "dimension": "count",
+      "display_decimals": 0
+    },
+    {
+      "key": "piece",
+      "dimension": "count",
+      "display_decimals": 0
+    },
+    {
+      "key": "KZT",
+      "dimension": "currency",
+      "display_decimals": 2
+    }
+  ]
+}

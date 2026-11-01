@@ -1,0 +1,8 @@
+{
+  "command": "uv run pytest -q",
+  "passed": 62,
+  "failed": 0,
+  "warnings": 16,
+  "elapsed_seconds": 49.6,
+  "scope": "contracts, real PostgreSQL/PostGIS, auth/grants, immutable versions, concurrency, outbox, research intake and partial cost; not full product acceptance"
+}

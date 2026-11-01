@@ -1,0 +1,55 @@
+{
+  "fixture_only": true,
+  "schema": "StockItemPage",
+  "expected_valid": true,
+  "origin": "SYNTHETIC contract fixture; not a supplier quotation",
+  "data": {
+    "items": [
+      {
+        "id": "00000000-0000-4000-8000-000000000301",
+        "plant_id": "00000000-0000-4000-8000-000000000201",
+        "supplier": "SYNTHETIC supplier",
+        "size_description": "fixture",
+        "available_quantity": null,
+        "unit_price": null,
+        "currency": "KZT",
+        "observed_at": null,
+        "source_refs": [],
+        "availability": "unknown",
+        "supplier_city": null,
+        "is_local_supply": null,
+        "height_min_m": null,
+        "height_max_m": null,
+        "container": null,
+        "root_system": null,
+        "tax_mode": "unknown",
+        "stock_counted_at": null,
+        "checked_at": "2026-10-29",
+        "applicability": null
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000302",
+        "plant_id": "00000000-0000-4000-8000-000000000201",
+        "supplier": "SYNTHETIC supplier",
+        "size_description": "fixture",
+        "available_quantity": 0,
+        "unit_price": null,
+        "currency": "KZT",
+        "observed_at": "2026-10-29T00:00:00Z",
+        "source_refs": [],
+        "availability": "not_in_stock",
+        "supplier_city": "Павлодар",
+        "is_local_supply": true,
+        "height_min_m": null,
+        "height_max_m": null,
+        "container": null,
+        "root_system": null,
+        "tax_mode": "unknown",
+        "stock_counted_at": "2026-10-29",
+        "checked_at": "2026-10-29",
+        "applicability": "Синтетический пример различия нуля и неизвестности"
+      }
+    ],
+    "next_cursor": null
+  }
+}

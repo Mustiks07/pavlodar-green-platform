@@ -1,0 +1,29 @@
+{
+  "captured_at": "2026-10-30T04:05:00+05:00",
+  "synthetic_input": true,
+  "organizer_data_used": false,
+  "migration": "0010_address_index",
+  "checks": {
+    "backend_tests": "97 passed",
+    "ruff": "passed",
+    "specification": "358 checks; 132 schemas; 91 operations; 45 fixtures",
+    "pip_audit": "no known vulnerabilities",
+    "credential_pattern_scan": "passed"
+  },
+  "acceptance": {
+    "published_version_only": true,
+    "source_record_provenance": true,
+    "fuzzy_returns_candidates": true,
+    "yo_normalization": true,
+    "out_of_city_excluded": true,
+    "restricted_grant_enforced": true,
+    "missing_index_is_structured_503": true,
+    "public_nominatim_used": false
+  },
+  "not_claimed": [
+    "organizer address coverage",
+    "official city boundary",
+    "production p95",
+    "external provider availability"
+  ]
+}

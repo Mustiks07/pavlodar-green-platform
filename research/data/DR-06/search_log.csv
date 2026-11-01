@@ -1,0 +1,2 @@
+search_id,checked_at,query_or_access,method,result,limitation
+DR-06-search-11,2026-10-29,Готовые preflight OSM/STAC; явный models=era5 Open-Meteo; официальные Copernicus/USGS/i-Tree docs,read_only_search_and_primary_review,"Числовые OSM-теги, метаданные сцен, ERA5 sample; описание DSM/ST","Нет измеренной городской температуры, DSM-тайлов и местных коэффициентов."

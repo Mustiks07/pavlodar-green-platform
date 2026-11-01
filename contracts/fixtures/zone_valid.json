@@ -1,0 +1,51 @@
+{
+  "fixture_only": true,
+  "schema": "Zone",
+  "expected_valid": true,
+  "data": {
+    "id": "00000000-0000-0000-0000-000000000001",
+    "version_id": "00000000-0000-0000-0000-000000000003",
+    "city_id": "00000000-0000-0000-0000-000000000004",
+    "name": "Синтетический участок для контракта",
+    "purpose": "school",
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            76.96,
+            52.28
+          ],
+          [
+            76.961,
+            52.28
+          ],
+          [
+            76.961,
+            52.281
+          ],
+          [
+            76.96,
+            52.281
+          ],
+          [
+            76.96,
+            52.28
+          ]
+        ]
+      ]
+    },
+    "area_m2": 7500,
+    "data_gaps": [
+      {
+        "code": "MISSING_MEASUREMENTS",
+        "message": "Нет подтверждённых измерений",
+        "required_inputs": [
+          "air_temperature_observations"
+        ],
+        "blocking": true
+      }
+    ],
+    "updated_at": "2026-10-29T08:00:00Z"
+  }
+}

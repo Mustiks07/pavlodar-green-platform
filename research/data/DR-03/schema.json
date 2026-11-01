@@ -1,0 +1,374 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DR-03 research staging package",
+  "type": "object",
+  "properties": {
+    "rules.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rule_id",
+          "source_id",
+          "clause",
+          "revision_date",
+          "parameter",
+          "value",
+          "unit",
+          "applicability",
+          "condition",
+          "status",
+          "checked_at"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "rule_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "clause": {
+            "type": [
+              "string"
+            ]
+          },
+          "revision_date": {
+            "type": [
+              "string"
+            ]
+          },
+          "parameter": {
+            "type": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": [
+              "boolean",
+              "integer",
+              "null",
+              "number"
+            ]
+          },
+          "unit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "applicability": {
+            "type": [
+              "string"
+            ]
+          },
+          "condition": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "Проверенные фрагменты, а не исчерпывающий юридический движок. Конкретные расстояния до всех типов сетей и зданий еще неизвестны."
+    },
+    "soil_observations.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "observation_id",
+          "source_id",
+          "observed_at",
+          "depth_top_cm",
+          "depth_bottom_cm",
+          "analyte",
+          "value",
+          "unit",
+          "method",
+          "longitude",
+          "latitude"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "observation_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "depth_top_cm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "cm"
+          },
+          "depth_bottom_cm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "cm"
+          },
+          "analyte": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "degree east"
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "degree north"
+          }
+        }
+      },
+      "description": "Ноль подтвержденных локализованных проб pH/EC. Не заполнять данными SoilGrids или чужой статьи."
+    },
+    "data.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "record_id",
+          "topic",
+          "value",
+          "status",
+          "reason",
+          "source_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "topic": {
+            "type": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": [
+              "boolean",
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "search_log.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "search_id",
+          "checked_at",
+          "query_or_access",
+          "method",
+          "result",
+          "limitation"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "search_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "query_or_access": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "result": {
+            "type": [
+              "string"
+            ]
+          },
+          "limitation": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": ""
+    },
+    "sources.csv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "title",
+          "url",
+          "publisher",
+          "checked_at",
+          "observed_at",
+          "license",
+          "method",
+          "note"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": [
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "string"
+            ]
+          },
+          "publisher": {
+            "type": [
+              "string"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "license": {
+            "type": [
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "string"
+            ]
+          },
+          "note": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "description": "checked_at — дата проверки; observed_at — дата/период источника, null если не указан. unknown лицензия не разрешает перепубликацию полного текста."
+    }
+  },
+  "required": [
+    "rules.csv",
+    "soil_observations.csv",
+    "data.csv",
+    "search_log.csv",
+    "sources.csv"
+  ],
+  "additionalProperties": false,
+  "x-csv": {
+    "encoding": "UTF-8",
+    "delimiter": ",",
+    "null_literal": "null",
+    "decimal_separator": ".",
+    "money": "decimal string, KZT",
+    "source_refs_separator": ";"
+  },
+  "x-crs": {
+    "GeoJSON": "EPSG:4326, [longitude,latitude]",
+    "distance_calculation": "EPSG:32643; no distances calculated here"
+  },
+  "x-import": "Staging only; map external identifiers to canonical UUIDs. No auto publish or approval.",
+  "x-other-formats": {
+    "restrictions.geojson": "geojson.schema.json",
+    "soil_observations.geojson": "geojson.schema.json"
+  }
+}

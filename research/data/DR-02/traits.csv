@@ -1,0 +1,137 @@
+record_id,taxon_id,trait,value,lower,upper,unit,source_id,method,applicability,reason
+pinus_sylvestris:adult_height,pinus_sylvestris,adult_height,null,30,60,ft,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:adult_crown_width,pinus_sylvestris,adult_crown_width,null,30,40,ft,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:hardiness_usda,pinus_sylvestris,hardiness_usda,2a–7b,null,null,null,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:light,pinus_sylvestris,light,Полное солнце,null,null,null,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:soil_texture,pinus_sylvestris,soil_texture,Дренированные; переносит бедные и сухие почвы,null,null,null,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:soil_ph_category,pinus_sylvestris,soil_ph_category,"Кислая категория <6.0, не установленный диапазон допустимости",null,null,null,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:moisture,pinus_sylvestris,moisture,Дренированная; влажная или периодически сухая,null,null,null,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:care,pinus_sylvestris,care,"Контроль Diplodia; справочник называет уход низким, местного календаря нет",null,null,null,NC-PINE,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:adult_height,tilia_cordata,adult_height,null,50,60,ft,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:adult_crown_width,tilia_cordata,adult_crown_width,null,35,50,ft,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:hardiness_usda,tilia_cordata,hardiness_usda,3b–7b,null,null,null,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:light,tilia_cordata,light,Солнце или полутень,null,null,null,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:soil_texture,tilia_cordata,soil_texture,"Суглинок, дренированная",null,null,null,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:soil_ph_category,tilia_cordata,soil_ph_category,Нейтральная 6.0–8.0 или щелочная >8.0 — категории справочника,null,null,null,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:moisture,tilia_cordata,moisture,Влажная; не переносит сильную засуху и переувлажнение,null,null,null,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+tilia_cordata:care,tilia_cordata,care,Полив молодых деревьев в сухие периоды,null,null,null,NC-LINDEN,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:adult_height,syringa_vulgaris,adult_height,null,8,16,ft,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:adult_crown_width,syringa_vulgaris,adult_crown_width,null,6,12,ft,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:hardiness_usda,syringa_vulgaris,hardiness_usda,3a–7a,null,null,null,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:light,syringa_vulgaris,light,Солнце или полутень,null,null,null,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:soil_texture,syringa_vulgaris,soil_texture,"Суглинок, глина, органическое вещество; хороший дренаж",null,null,null,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:soil_ph_category,syringa_vulgaris,soil_ph_category,Нейтральная 6.0–8.0 или щелочная >8.0 — категории справочника,null,null,null,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:moisture,syringa_vulgaris,moisture,Влажная; плохо переносит плохой дренаж,null,null,null,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+syringa_vulgaris:care,syringa_vulgaris,care,Удаление поросли подвоя; контроль мучнистой росы,null,null,null,NC-LILAC,expert_reference,"Справочник NC Extension; не калибровано для Павлодара; взрослое типовое растение, возраст достижения неизвестен.",null
+pinus_sylvestris:wind,pinus_sylvestris,wind,Справочник упоминает применение в ветрозащитных посадках; предельная скорость ветра неизвестна,null,null,null,NC-PINE,expert_reference,Нельзя переводить назначение в численную ветроустойчивость.,null
+tilia_cordata:salt,tilia_cordata,salt,Не переносит солевой аэрозоль,null,null,null,NC-LINDEN,expert_reference,"Аэрозоль, не лабораторный порог EC почвы.",null
+syringa_vulgaris:salt,syringa_vulgaris,salt,Указана устойчивость к соли без порога и метода,null,null,null,NC-LILAC,expert_reference,Не использовать как доказательство допустимой EC для посадочной ямы.,null
+syringa_vulgaris:wind,syringa_vulgaris,wind,Рекомендуется защищенное место из-за повреждения почек поздним морозом,null,null,null,NC-LILAC,expert_reference,"Это рекомендация расположения, не измерение устойчивости к ветровалу.",null
+populus_alba:light,populus_alba,light,Полное солнце; плохо переносит тень,null,null,null,NC-POPLAR,expert_reference,"NC Extension, переносимость в Павлодар не проверена.",null
+populus_alba:moisture,populus_alba,moisture,Предпочитает постоянно влажную дренированную почву; переносит некоторую засуху,null,null,null,NC-POPLAR,expert_reference,Не определяет расход воды.,null
+populus_alba:roots,populus_alba,roots,Сильные корни могут повреждать дренажи и фундаменты; образует корневую поросль,null,null,null,NC-POPLAR,expert_reference,Качественный риск; радиус и глубина корней неизвестны.,null
+populus_alba:care,populus_alba,care,Контроль корневой поросли; однополые посадки не устраняют вегетативное распространение,null,null,null,NC-POPLAR,expert_reference,Не заключение по аллергии; пол партии неизвестен.,null
+ricinus_communis:toxicity,ricinus_communis,toxicity,Высокая токсичность для человека; семена и другие части; контактный дерматит,null,null,null,NC-CASTOR,expert_reference,Основание исключения из предлагаемых школам/больницам посадок; не утверждение о специальном запрете Павлодара.,null
+ricinus_communis:allergen,ricinus_communis,allergen,Описана тяжелая контактная аллергическая реакция у некоторых людей,null,null,null,NC-CASTOR,expert_reference,Не шкала пыльцевого риска и не частота в Павлодаре.,null
+populus_alba:hardiness_usda,populus_alba,hardiness_usda,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:soil_texture,populus_alba,soil_texture,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:soil_ph_category,populus_alba,soil_ph_category,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:salt,populus_alba,salt,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:wind,populus_alba,wind,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:adult_height,populus_alba,adult_height,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:adult_crown_width,populus_alba,adult_crown_width,null,null,null,null,null,unavailable,,Карточка NC имеет подозрительную ширину 4–6 ft при высоте 50–75 ft; число в расчет не перенесено.
+populus_alba:root_radius,populus_alba,root_radius,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:root_depth,populus_alba,root_depth,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:allergen,populus_alba,allergen,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:toxicity,populus_alba,toxicity,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+populus_alba:growth_rate_local,populus_alba,growth_rate_local,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+pinus_sylvestris:salt,pinus_sylvestris,salt,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+pinus_sylvestris:root_radius,pinus_sylvestris,root_radius,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+pinus_sylvestris:root_depth,pinus_sylvestris,root_depth,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+pinus_sylvestris:allergen,pinus_sylvestris,allergen,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+pinus_sylvestris:toxicity,pinus_sylvestris,toxicity,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+pinus_sylvestris:growth_rate_local,pinus_sylvestris,growth_rate_local,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+tilia_cordata:wind,tilia_cordata,wind,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+tilia_cordata:root_radius,tilia_cordata,root_radius,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+tilia_cordata:root_depth,tilia_cordata,root_depth,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+tilia_cordata:allergen,tilia_cordata,allergen,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+tilia_cordata:toxicity,tilia_cordata,toxicity,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+tilia_cordata:growth_rate_local,tilia_cordata,growth_rate_local,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+syringa_vulgaris:root_radius,syringa_vulgaris,root_radius,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+syringa_vulgaris:root_depth,syringa_vulgaris,root_depth,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+syringa_vulgaris:allergen,syringa_vulgaris,allergen,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+syringa_vulgaris:toxicity,syringa_vulgaris,toxicity,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+syringa_vulgaris:growth_rate_local,syringa_vulgaris,growth_rate_local,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:hardiness_usda,picea_obovata,hardiness_usda,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:soil_texture,picea_obovata,soil_texture,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:soil_ph_category,picea_obovata,soil_ph_category,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:salt,picea_obovata,salt,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:moisture,picea_obovata,moisture,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:wind,picea_obovata,wind,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:light,picea_obovata,light,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:adult_height,picea_obovata,adult_height,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:adult_crown_width,picea_obovata,adult_crown_width,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:root_radius,picea_obovata,root_radius,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:root_depth,picea_obovata,root_depth,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:allergen,picea_obovata,allergen,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:toxicity,picea_obovata,toxicity,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:care,picea_obovata,care,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+picea_obovata:growth_rate_local,picea_obovata,growth_rate_local,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:hardiness_usda,ricinus_communis,hardiness_usda,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:soil_texture,ricinus_communis,soil_texture,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:soil_ph_category,ricinus_communis,soil_ph_category,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:salt,ricinus_communis,salt,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:moisture,ricinus_communis,moisture,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:wind,ricinus_communis,wind,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:light,ricinus_communis,light,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:adult_height,ricinus_communis,adult_height,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:adult_crown_width,ricinus_communis,adult_crown_width,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:root_radius,ricinus_communis,root_radius,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:root_depth,ricinus_communis,root_depth,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:care,ricinus_communis,care,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+ricinus_communis:growth_rate_local,ricinus_communis,growth_rate_local,null,null,null,null,null,unavailable,,Не найдено подтвержденного значения в проверенных первоисточниках; требуется эксперт/измерение.
+salix_sp:hardiness_usda,salix_sp,hardiness_usda,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:soil_texture,salix_sp,soil_texture,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:soil_ph_category,salix_sp,soil_ph_category,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:salt,salix_sp,salt,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:moisture,salix_sp,moisture,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:wind,salix_sp,wind,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:light,salix_sp,light,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:adult_height,salix_sp,adult_height,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:adult_crown_width,salix_sp,adult_crown_width,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:root_radius,salix_sp,root_radius,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:root_depth,salix_sp,root_depth,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:allergen,salix_sp,allergen,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:toxicity,salix_sp,toxicity,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:care,salix_sp,care,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+salix_sp:growth_rate_local,salix_sp,growth_rate_local,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:hardiness_usda,acer_sp,hardiness_usda,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:soil_texture,acer_sp,soil_texture,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:soil_ph_category,acer_sp,soil_ph_category,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:salt,acer_sp,salt,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:moisture,acer_sp,moisture,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:wind,acer_sp,wind,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:light,acer_sp,light,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:adult_height,acer_sp,adult_height,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:adult_crown_width,acer_sp,adult_crown_width,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:root_radius,acer_sp,root_radius,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:root_depth,acer_sp,root_depth,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:allergen,acer_sp,allergen,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:toxicity,acer_sp,toxicity,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:care,acer_sp,care,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+acer_sp:growth_rate_local,acer_sp,growth_rate_local,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:hardiness_usda,fraxinus_sp,hardiness_usda,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:soil_texture,fraxinus_sp,soil_texture,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:soil_ph_category,fraxinus_sp,soil_ph_category,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:salt,fraxinus_sp,salt,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:moisture,fraxinus_sp,moisture,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:wind,fraxinus_sp,wind,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:light,fraxinus_sp,light,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:adult_height,fraxinus_sp,adult_height,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:adult_crown_width,fraxinus_sp,adult_crown_width,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:root_radius,fraxinus_sp,root_radius,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:root_depth,fraxinus_sp,root_depth,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:allergen,fraxinus_sp,allergen,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:toxicity,fraxinus_sp,toxicity,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:care,fraxinus_sp,care,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.
+fraxinus_sp:growth_rate_local,fraxinus_sp,growth_rate_local,null,null,null,null,null,unavailable,,В местном сообщении не определен вид/сорт; перенос видовых характеристик недопустим.

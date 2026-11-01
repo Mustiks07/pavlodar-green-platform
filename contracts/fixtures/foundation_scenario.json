@@ -1,0 +1,16 @@
+{
+  "fixture_only": true,
+  "schema": "Scenario",
+  "expected_valid": true,
+  "origin": "Captured from running API with explicit synthetic test profile; not organizer data",
+  "data": {
+    "id": "a753dfec-e0d1-4386-bb5b-e6fc1b80ff09",
+    "city_id": "10000000-0000-4000-8000-000000000001",
+    "zone_id": "129ab7a5-2fc9-4a62-9700-3636c5d0391b",
+    "name": "SYNTHETIC OIDC integration",
+    "base_revision_id": null,
+    "status": "draft",
+    "current_revision_id": "17f4fe8e-5472-4ce9-8cce-205e7f5d5d01",
+    "updated_at": "2026-10-29T12:39:25.578999Z"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "job_id": "55a4ee49-9ac1-4261-81ba-f502297b99c5",
+  "broker_outage_preserved_job": true,
+  "api_readiness_during_broker_outage": 200,
+  "redis_restarted": true,
+  "celery_received_job": true,
+  "terminal_state": "failed",
+  "terminal_code": "handler_not_available",
+  "scope": "Real Redis/Celery/PostgreSQL delivery recovery; not a completed domain calculation"
+}

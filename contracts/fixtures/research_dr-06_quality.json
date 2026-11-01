@@ -1,0 +1,163 @@
+{
+  "schema": "QualityReport",
+  "expected_valid": true,
+  "fixture_only": true,
+  "origin": "Actual local API response from checksum-verified public research; not organizer data or approval",
+  "data": {
+    "id": "64d5ea42-c7b7-5af7-94b1-3d62809e6b6a",
+    "issues": [
+      {
+        "code": "research_not_approved",
+        "message": "Найденное не равно допущенному к production.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-06",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "not_found описывает проверенную область поиска; не доказывает отсутствие данных у владельца.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-06",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Неизвестные и недатированные параметры не заменены нулями.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-06",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Права на полные тексты с unknown license не подтверждены; в CSV краткие факты и ссылки.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-06",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Bounding box, а не доказанное покрытие официального города.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-06",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "Нет DSM/DTM и спутниковых пикселей;82 записи только metadata.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-06",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "research_not_approved",
+        "message": "168 часов ERA5 одной ячейки не климатическая норма и не измеренная станция.",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "DR-06",
+        "suggested_action": "Ответ владельца / экспертная проверка"
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"OSM\", \"title\": \"Городской срез Geofabrik Kazakhstan, OSM\", \"url\": \"https://download.geofabrik.de/asia/kazakhstan.html\", \"publisher\": \"OpenStreetMap contributors / Geofabrik\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-10-28T21:21:02Z\", \"license\": \"ODbL-1.0\", \"method\": \"community_record\", \"note\": \"Повторно использованы готовые preflight файлы с проверкой checksum. Новая загрузка OSM не выполнялась. Рабочий контур way/170089891 не официальный.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "OSM",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"OSM-LICENSE\", \"title\": \"OpenStreetMap copyright and licence\", \"url\": \"https://www.openstreetmap.org/copyright\", \"publisher\": \"OpenStreetMap Foundation\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"ODbL-1.0\", \"method\": \"license_terms\", \"note\": \"\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "OSM-LICENSE",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"WEATHER-ERA5\", \"title\": \"ERA5 hourly sample via Open-Meteo, Павлодар\", \"url\": \"https://archive-api.open-meteo.com/v1/archive?latitude=52.287&longitude=76.967&start_date=2025-07-01&end_date=2025-07-07&hourly=temperature_2m,relative_humidity_2m,precipitation,shortwave_radiation,wind_speed_10m,wind_direction_10m,et0_fao_evapotranspiration&models=era5&timezone=UTC&wind_speed_unit=ms\", \"publisher\": \"Open-Meteo / ECMWF ERA5\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2025-07-01/2025-07-07\", \"license\": \"CC-BY-4.0\", \"method\": \"reanalysis\", \"note\": \"Явно models=era5; точка запроса не метеостанция. Координаты возвращенной ячейки сохранены. ET0 — модельный расчет, не измеренный полив.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "WEATHER-ERA5",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"WEATHER-DOC\", \"title\": \"Historical Weather API documentation\", \"url\": \"https://open-meteo.com/en/docs/historical-weather-api\", \"publisher\": \"Open-Meteo\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"model_documentation\", \"note\": \"ERA5 0.25°; почасовой шаг. Не уличный микроклимат и не климатическая норма по семидневной выборке.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "WEATHER-DOC",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"WEATHER-LICENSE\", \"title\": \"Open-Meteo Terms & Privacy\", \"url\": \"https://open-meteo.com/en/terms\", \"publisher\": \"Open-Meteo\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"CC-BY-4.0 data; separate API service terms\", \"method\": \"license_terms\", \"note\": \"\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "WEATHER-LICENSE",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"S2-CATALOG\", \"title\": \"Sentinel-2 L2A летний STAC-каталог по рабочему bbox Павлодара\", \"url\": \"https://stac.opensearch.dataspace.copernicus.eu/v1/\", \"publisher\": \"Copernicus Data Space Ecosystem\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2026-06-01/2026-08-31\", \"license\": \"Copernicus Sentinel data terms\", \"method\": \"catalog_metadata\", \"note\": \"Использованы два сохраненных ответа preflight; только метаданные, не снимки. Облачность относится к грануле, не к городу.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "S2-CATALOG",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"S2-DOC\", \"title\": \"Sentinel-2 data collection\", \"url\": \"https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2\", \"publisher\": \"Copernicus Data Space Ecosystem\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"Copernicus Sentinel data terms\", \"method\": \"product_documentation\", \"note\": \"\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "S2-DOC",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"COPDEM\", \"title\": \"Copernicus DEM GLO-30 / GLO-90\", \"url\": \"https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM\", \"publisher\": \"Copernicus Data Space Ecosystem\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2011/2015\", \"license\": \"Copernicus DEM licence (not generic CC-BY)\", \"method\": \"product_documentation\", \"note\": \"DSM включает здания и растительность; это не DTM. Для города нет выгруженного и проверенного растра в пакете.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "COPDEM",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"COPDEM-AWS\", \"title\": \"Copernicus DEM public COG 2021 release\", \"url\": \"https://registry.opendata.aws/copernicus-dem/\", \"publisher\": \"Sinergise / AWS Open Data\", \"checked_at\": \"2026-10-29\", \"observed_at\": \"2021\", \"license\": \"Copernicus DEM licence\", \"method\": \"product_documentation\", \"note\": \"GLO-30 public имеет исключенные тайлы; доступ к тайлам Павлодара отдельно не проверен.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "COPDEM-AWS",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"LANDSAT\", \"title\": \"Landsat Collection 2 Surface Temperature\", \"url\": \"https://www.usgs.gov/landsat-missions/landsat-collection-2-surface-temperature\", \"publisher\": \"USGS\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"product_documentation\", \"note\": \"Температура поверхности не температура воздуха. Локальные сцены и QA в этой поставке не извлечены.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "LANDSAT",
+        "suggested_action": null
+      },
+      {
+        "code": "source_provenance",
+        "message": "{\"source_id\": \"ITREE\", \"title\": \"i-Tree Eco international\", \"url\": \"https://www.itreetools.org/tools/i-tree-eco/i-tree-eco-international\", \"publisher\": \"i-Tree / USDA Forest Service partners\", \"checked_at\": \"2026-10-29\", \"observed_at\": null, \"license\": \"unknown\", \"method\": \"model_documentation\", \"note\": \"Не источник измеренных павлодарских коэффициентов. Модель требует местных входов и проверки переносимости.\"}",
+        "geometry": null,
+        "severity": "warning",
+        "source_record_id": "ITREE",
+        "suggested_action": null
+      }
+    ],
+    "error_count": 0,
+    "valid_count": 262,
+    "record_count": 262,
+    "warning_count": 18,
+    "publish_allowed": false,
+    "issues_truncated": false,
+    "dataset_version_id": "25296ca4-b183-5fea-82f5-d14e84ca0226",
+    "issues_next_cursor": null
+  }
+}

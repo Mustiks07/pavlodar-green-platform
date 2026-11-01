@@ -1,0 +1,7 @@
+record_id,topic,value,status,reason,source_id
+DR-06-growth_m_per_year,growth_m_per_year,null,unavailable,Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.,ITREE
+DR-06-carbon_annual_sequestration,carbon_annual_sequestration,null,unavailable,Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.,ITREE
+DR-06-dust_deposition,dust_deposition,null,unavailable,Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.,ITREE
+DR-06-oxygen_flow,oxygen_flow,null,unavailable,Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.,ITREE
+DR-06-air_temperature_reduction,air_temperature_reduction,null,unavailable,Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.,ITREE
+DR-06-stormwater_retention,stormwater_retention,null,unavailable,Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.,ITREE

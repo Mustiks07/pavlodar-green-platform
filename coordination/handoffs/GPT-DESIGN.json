@@ -1,0 +1,67 @@
+{
+  "agent": "GPT",
+  "task_id": "Astra desktop redesign v3",
+  "branch": "gpt/astra-design-refresh-20261031",
+  "base_sha": "66da46fdd2e2b25c9eca7bd79d24e5711c4565b8",
+  "head_sha": "e93594e",
+  "state": "core_redesign_browser_verified_pending_independent_audit",
+  "contract_version": "1.12.0",
+  "contract_changed": false,
+  "migrations": [],
+  "implemented": [
+    "Astra v3 shell foundation: permanent forest sidebar, compact top bar, breadcrumbs, city/source/assistant controls and user/status footer",
+    "Responsive navigation drawer verified at 390x844 and desktop shell verified at 1536x1024",
+    "Navigation labels aligned with the v3 information architecture without removing or aliasing any working route",
+    "Dedicated responsive 404 state with a clear map return action and collapsed technical path",
+    "Registry typography and table density aligned with the v3 design while keeping virtualized row measurements consistent",
+    "Problems page rebuilt as a 70/30 registry and inspector workspace with URL-persisted selection and a map handoff",
+    "Claude main b3edfa6 merged without contract or source conflicts; the real assistant panel remains connected to the redesigned shell",
+    "All registry and detail pages use the Astra page hierarchy with semantic eyebrow, dense tables and sticky desktop inspectors that stack on narrow screens",
+    "Map workspace has a dedicated city-context header and real draw/import actions while retaining published layers, feature cards, zone editing, shadows and 3D",
+    "Scenario comparison uses responsive selectable cards and a bounded scrollable server-snapshot table; no client-side metric arithmetic was introduced",
+    "Browser checks were hardened for lazy route headings, async proposal state and the redesigned navigation labels; disposable runs do not pollute the shared city"
+  ],
+  "changed_paths": [
+    "apps/web/scripts/check-contrast.mjs",
+    "apps/web/scripts/assistant-check.mjs",
+    "apps/web/scripts/layers-check.mjs",
+    "apps/web/scripts/scenario-check.mjs",
+    "apps/web/scripts/zone-draw-check.mjs",
+    "apps/web/src/app.css",
+    "apps/web/src/features/calculations/ComparePanel.tsx",
+    "apps/web/src/features/map/MapWorkspace.tsx",
+    "apps/web/src/features/scenarios/ScenarioPage.tsx",
+    "apps/web/src/i18n.ts",
+    "apps/web/src/pages/misc.tsx",
+    "apps/web/src/pages/lists.tsx",
+    "apps/web/src/shell/AppShell.tsx",
+    "packages/ui/src/components.css",
+    "packages/ui/src/components/DataTable.tsx",
+    "packages/ui/src/tokens.css"
+  ],
+  "verification": [
+    "npm --prefix apps/web run check:api: client matches canonical 1.12.0 (148 schemas)",
+    "npm --prefix apps/web run typecheck: passed",
+    "npm --prefix apps/web test -- --run: 67/67 passed",
+    "npm --prefix apps/web run build: passed",
+    "npm --prefix apps/web audit --omit=dev: 0 vulnerabilities",
+    "node apps/web/scripts/check-contrast.mjs: all light/dark and sidebar pairs meet WCAG AA",
+    "In-app browser: desktop shell, route selection, mobile drawer, desktop/mobile 404 and console errors reviewed; no console warnings or errors",
+    "Combined-head browser check: assistant opens inside the redesigned shell at 1536x1024, contract 1.12.0 is visible and the console has no errors",
+    "Live shared OIDC integration against API 1.12.0: 34/34, including role-aware permanent navigation and data-workspace tabs",
+    "Disposable scenario workflow: 22/22; calculate/compare: 15/15; import/publication: 18/18; execution: 15/15",
+    "Disposable assistant/proposals: 18/18; zone drawing/version conflicts: 18/18; Three/WebGL: 19/19; published layers/access/card/version switching: 39/39",
+    "Responsive and accessibility evidence: 41/41 across 1440, 1920, 1024 and 390 px with no horizontal page overflow"
+  ],
+  "integration_notes": [
+    "Merged Claude main b3edfa6, including contract 1.12.0, WP-10 assistant/proposals, WP-09 snapshot discovery and WP-06 height/load/touch fixes",
+    "Shared API/worker/dispatcher were rebuilt from the combined head and now serve contract 1.12.0 healthy on localhost:8001; no migration was required",
+    "The generated mockups are visual references only. Existing server data, authorization, provenance and unknown-value behavior remain authoritative",
+    "Core combined browser regression passes; keep this branch out of main until Claude's independent 13-screen visual audit is reviewed"
+  ],
+  "next_design_increment": [
+    "Claude: compare all 13 reference screens against authenticated viewer/specialist/admin states and fix only clear visual/responsive gaps on a review branch",
+    "GPT: review Claude's visual audit, rerun the complete combined regression and merge the redesign to main if clean",
+    "After design merge, admit and publish the reviewed public-data-v2 package through the canonical import pipeline; do not replace server data with UI fixtures"
+  ]
+}

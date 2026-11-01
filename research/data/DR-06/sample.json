@@ -1,0 +1,140 @@
+{
+  "weather.csv": [
+    {
+      "record_id": "2025-07-01T00:00Z",
+      "time_utc": "2025-07-01T00:00:00Z",
+      "source_id": "WEATHER-ERA5",
+      "method": "reanalysis",
+      "grid_latitude": 52.25,
+      "grid_longitude": 77.0,
+      "temperature_2m": 16.1,
+      "relative_humidity_2m": 91,
+      "precipitation": 0.0,
+      "shortwave_radiation": 52.0,
+      "wind_speed_10m": 2.18,
+      "wind_direction_10m": 261,
+      "et0_fao_evapotranspiration": 0.02
+    },
+    {
+      "record_id": "2025-07-01T01:00Z",
+      "time_utc": "2025-07-01T01:00:00Z",
+      "source_id": "WEATHER-ERA5",
+      "method": "reanalysis",
+      "grid_latitude": 52.25,
+      "grid_longitude": 77.0,
+      "temperature_2m": 16.3,
+      "relative_humidity_2m": 91,
+      "precipitation": 0.0,
+      "shortwave_radiation": 166.0,
+      "wind_speed_10m": 2.1,
+      "wind_direction_10m": 269,
+      "et0_fao_evapotranspiration": 0.08
+    }
+  ],
+  "imagery_catalog.csv": [
+    {
+      "scene_id": "S2C_MSIL2A_20260830T055631_N0512_R091_T43UFU_20260830T092712",
+      "source_id": "S2-CATALOG",
+      "observed_at": "2026-08-30T05:56:31.025000Z",
+      "cloud_cover_granule_pct": 17.84,
+      "city_cloud_cover_pct": null,
+      "red_resolution_m": 10,
+      "nir_resolution_m": 10,
+      "scl_resolution_m": 20,
+      "raster_crs": "EPSG:32643",
+      "metadata_url": "https://stac.opensearch.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a/items/S2C_MSIL2A_20260830T055631_N0512_R091_T43UFU_20260830T092712",
+      "pixels_downloaded": false,
+      "classification_validated": false
+    },
+    {
+      "scene_id": "S2C_MSIL2A_20260830T055631_N0512_R091_T43UFT_20260830T092712",
+      "source_id": "S2-CATALOG",
+      "observed_at": "2026-08-30T05:56:31.025000Z",
+      "cloud_cover_granule_pct": 0.02,
+      "city_cloud_cover_pct": null,
+      "red_resolution_m": 10,
+      "nir_resolution_m": 10,
+      "scl_resolution_m": 20,
+      "raster_crs": "EPSG:32643",
+      "metadata_url": "https://stac.opensearch.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a/items/S2C_MSIL2A_20260830T055631_N0512_R091_T43UFT_20260830T092712",
+      "pixels_downloaded": false,
+      "classification_validated": false
+    }
+  ],
+  "coefficients.csv": [
+    {
+      "record_id": "DR-06-growth_m_per_year",
+      "topic": "growth_m_per_year",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.",
+      "source_id": "ITREE"
+    },
+    {
+      "record_id": "DR-06-carbon_annual_sequestration",
+      "topic": "carbon_annual_sequestration",
+      "value": null,
+      "status": "unavailable",
+      "reason": "Локально измеренный/валидированный коэффициент для города Павлодара не получен; справочный growth rate не превращен в м/год.",
+      "source_id": "ITREE"
+    }
+  ],
+  "data.csv": [
+    {
+      "dataset_id": "osm_building_heights",
+      "source_id": "OSM",
+      "available": "subset_geojson",
+      "method": "community_record",
+      "resolution": null,
+      "resolution_unit": "m",
+      "observed_at": "2026-10-28T21:21:02Z",
+      "crs": "EPSG:4326",
+      "applicability": "Только здания с числовым тегом height, не measured; нет полной геометрии крыш и деревьев."
+    },
+    {
+      "dataset_id": "era5_sample",
+      "source_id": "WEATHER-ERA5",
+      "available": "csv_and_json",
+      "method": "reanalysis",
+      "resolution": 0.25,
+      "resolution_unit": "degree",
+      "observed_at": "2025-07-01/2025-07-07",
+      "crs": "EPSG:4326",
+      "applicability": "Одна ячейка/точка API; не городской температурный градиент и не 30-летняя норма."
+    }
+  ],
+  "search_log.csv": [
+    {
+      "search_id": "DR-06-search-11",
+      "checked_at": "2026-10-29",
+      "query_or_access": "Готовые preflight OSM/STAC; явный models=era5 Open-Meteo; официальные Copernicus/USGS/i-Tree docs",
+      "method": "read_only_search_and_primary_review",
+      "result": "Числовые OSM-теги, метаданные сцен, ERA5 sample; описание DSM/ST",
+      "limitation": "Нет измеренной городской температуры, DSM-тайлов и местных коэффициентов."
+    }
+  ],
+  "sources.csv": [
+    {
+      "source_id": "OSM",
+      "title": "Городской срез Geofabrik Kazakhstan, OSM",
+      "url": "https://download.geofabrik.de/asia/kazakhstan.html",
+      "publisher": "OpenStreetMap contributors / Geofabrik",
+      "checked_at": "2026-10-29",
+      "observed_at": "2026-10-28T21:21:02Z",
+      "license": "ODbL-1.0",
+      "method": "community_record",
+      "note": "Повторно использованы готовые preflight файлы с проверкой checksum. Новая загрузка OSM не выполнялась. Рабочий контур way/170089891 не официальный."
+    },
+    {
+      "source_id": "OSM-LICENSE",
+      "title": "OpenStreetMap copyright and licence",
+      "url": "https://www.openstreetmap.org/copyright",
+      "publisher": "OpenStreetMap Foundation",
+      "checked_at": "2026-10-29",
+      "observed_at": null,
+      "license": "ODbL-1.0",
+      "method": "license_terms",
+      "note": ""
+    }
+  ]
+}

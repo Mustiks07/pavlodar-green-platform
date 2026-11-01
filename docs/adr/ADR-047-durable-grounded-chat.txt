@@ -1,0 +1,37 @@
+ADR-047: Durable read-only chat с server-owned facts
+Статус: принято для второго инкремента WP-10
+Дата: 2026-10-31
+
+Контекст
+Canonical 1.11.0 уже определяет createChatSession, sendChatMessage и listChatMessages.
+До этого операции не были доступны. Модель не должна сама читать БД, выполнять HTTP или
+создавать изменения, а отзыв city/dataset/revision доступа должен действовать и после enqueue.
+
+Решение
+1. Миграция 0029 хранит chat_sessions и chat_messages, связывает assistant message с Job и
+   разрешает jobs.input_kind=chat_session. Сообщения и provider usage переживают restart.
+2. Сессия принадлежит создателю; только admin может читать чужую сессию. City, zone и точная
+   ScenarioRevision проверяются при создании, enqueue, claim, подготовке prompt и сохранении.
+3. User message и пустой queued assistant message записываются атомарно с Job/outbox. Worker
+   вызывает provider вне транзакции; cancel не ждёт сетевой timeout. Повторная доставка не
+   создаёт второй assistant message.
+4. Первый маршрут read-only: сервер заранее собирает ограниченный AUTHORIZED_CONTEXT. В него
+   входят только разрешённые идентификаторы, количество placements, latest exact-revision
+   CalculationSnapshot summary и вычисленная сервером площадь текущей ZoneVersion.
+5. ChatMessage.facts формируются сервером, а не LLM. Сейчас публикуется zone_area с методом
+   utm43n-area-v1. Текст модели не является источником расчётных чисел или выполненным действием.
+6. Proposals/get/apply/reject остаются выключены до отдельной проверки stale base revision,
+   полного AppendRevisionInput и явного подтверждения пользователя.
+
+Совместимость
+Существующие canonical schemas/operations 1.11.0 не меняются. Миграция additive. Клиент может
+использовать уже сгенерированные ChatSession/ChatMessage/Job DTO. Shared API не мигрируется,
+пока Claude не освободит стенд.
+
+Проверка
+- API -> outbox -> worker -> persisted assistant message и Job.result_ref_id;
+- idempotent session/message enqueue;
+- owner/outsider/viewer concealment;
+- queued cancellation synchronizes assistant state;
+- city grant revoked between enqueue and claim fails before provider call;
+- chronological bounded cursor pagination.
