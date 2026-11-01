@@ -1293,5 +1293,29 @@
     ],
     "decision": "ADR-071",
     "limit": "This increment searches existing work; calendar export and authoritative district assignment remain separate capabilities"
+  },
+  "frozen_work_calendar_export_20261102": {
+    "implementation_sha": "d943174",
+    "contract_version": "1.17.0",
+    "migrations": [
+      "0033_work_calendar_exports",
+      "0034_work_calendar_artifacts"
+    ],
+    "implemented": [
+      "startExport accepts work_calendar for a city and the same filters as listWorkOrders",
+      "The API freezes authorized orders, zone labels, completion corrections, status history, actors, filters and capture time when queueing",
+      "The worker renders four Russian XLSX sheets only from the frozen job payload",
+      "The execution page exports its current URL-backed filter set and resumes jobs through the existing URL state",
+      "Specialist and city authorization are repeated for artifact metadata and download",
+      "Exports above 5,000 orders fail explicitly without truncation"
+    ],
+    "verification": [
+      "Canonical 1.17.0 validation passed 399 checks and generated clients match",
+      "Export integration suite passed 8/8 including post-queue mutation freeze and IDOR",
+      "Ruff passed for all changed backend and migration modules",
+      "Frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-072",
+    "limit": "The public demo does not fabricate executed work rows; factual calendars appear after approved projects create real work orders"
   }
 }
