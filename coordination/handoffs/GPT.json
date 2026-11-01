@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "cc2d572",
-  "state": "frozen_building_project_3d_verified",
+  "head_sha": "61c3b7e",
+  "state": "priority_what_if_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1036,5 +1036,32 @@
     ],
     "evidence": "docs/evidence/jury-placement-3d/placement-editor-3d.png",
     "limit": "A historical frozen building version that is no longer published is not substituted with current city data"
+  },
+  "priority_what_if_20261102": {
+    "implementation_sha": "61c3b7e",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "A specialist can reweight only factors exposed by the current frozen normalization",
+      "A new immutable server PriorityResult is compared to the previous result by rank and score",
+      "Explicit apply persists matching weights and priority id in a new ProgramInputVersion",
+      "The exact durable optimize Job is awaited and its result becomes the current ProgramRevision",
+      "Program and map priority queries are invalidated after the version change"
+    ],
+    "live_result": {
+      "admitted_factors": 2,
+      "ranked_territories": 3,
+      "final_scores": [80.0, 65.0, 8.5],
+      "optimize_job_state": "succeeded",
+      "program_revision_id": "2059f96c-8974-4212-9b81-1add39414a2a"
+    },
+    "verification": [
+      "Authenticated priority preview and apply flow passed end to end",
+      "Frontend production build passed",
+      "Tracked credential-pattern scan passed",
+      "No browser errors or API 5xx were observed"
+    ],
+    "evidence": "docs/evidence/jury-program-priority",
+    "limit": "Only green deficit and soil coverage are admitted in the current profile; unavailable social and heat factors are not invented"
   }
 }
