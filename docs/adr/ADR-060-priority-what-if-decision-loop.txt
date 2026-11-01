@@ -1,0 +1,27 @@
+ADR-060: Priority what-if as a versioned municipal decision
+Status: accepted
+Date: 2026-11-02
+
+Context
+The server already created immutable PriorityResults and the city-program optimizer consumed one exact
+result, but weights were editable only while creating a new program. A jury member could see the ranking
+without answering the operational question: what changes if the city values need and implementation
+readiness differently?
+
+Decision
+Allow a specialist to open the current draft program's priority factors, change only the factors exposed
+by its frozen PriorityNormalization, and request a new server PriorityResult. Show its score and rank
+deltas against the previous immutable result. Applying is a separate explicit action: it creates a new
+ProgramInputVersion with the exact returned weights and priority_result_id, then starts the existing
+durable optimizer. The UI waits for that exact optimize Job to succeed; old priorities and solver results
+remain available through their immutable records.
+
+Do not invent unavailable social, population or heat factors. The current public profile exposes only
+green_deficit and soil_coverage. Rank and score deltas are visual comparisons of two server results, not
+a browser calculation of the underlying factors.
+
+Consequences
+The city program now supports an explainable policy what-if in place: reweight, compare, apply and obtain
+a new optimized ProgramRevision. Authenticated acceptance changed the two admitted weights, rendered all
+three territory deltas, persisted the new priority, and completed the exact durable optimize job with its
+result_ref_id. The updated priority is invalidated on the map as well as the program page.

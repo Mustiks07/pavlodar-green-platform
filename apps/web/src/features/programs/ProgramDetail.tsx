@@ -10,6 +10,7 @@ import {
   type ProgramCreate,
   type ProgramRevision,
   type ProgramRevisionDiff,
+  type PriorityNormalization,
   type PriorityResult,
   type Scenario,
   type ScenarioRevision,
@@ -57,6 +58,9 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
   const [careBudget, setCareBudget] = useState('');
   const [baseRevisionId, setBaseRevisionId] = useState('');
   const [targetRevisionId, setTargetRevisionId] = useState('');
+  const [priorityEditOpen, setPriorityEditOpen] = useState(false);
+  const [priorityWeights, setPriorityWeights] = useState<Record<string, string>>({});
+  const [priorityPreview, setPriorityPreview] = useState<PriorityResult | null>(null);
 
   const details = useQuery({
     queryKey: ['program', program.id],
@@ -75,6 +79,27 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
       )
     ).data,
   });
+  const priorityNormalizations = useQuery({
+    queryKey: ['priority-normalizations'],
+    enabled: priorityEditOpen,
+    queryFn: async ({ signal }) => (
+      await unwrap(api.GET('/v1/priority-normalizations', { signal }))
+    ).data.items as PriorityNormalization[],
+  });
+  const priorityNormalization = priorityNormalizations.data?.find(
+    (item) => item.id === priority.data?.normalization_version_id,
+  ) ?? null;
+  const editedBenefitWeights = (priorityNormalization?.factors ?? []).map((factor) => ({
+    factor: factor.factor,
+    weight: Number(priorityWeights[factor.factor] ?? 0),
+  }));
+  const priorityWeightTotal = editedBenefitWeights.reduce(
+    (total, item) => total + (Number.isFinite(item.weight) && item.weight > 0 ? item.weight : 0),
+    0,
+  );
+  const priorityWeightsValid = editedBenefitWeights.length > 0
+    && editedBenefitWeights.some((item) => Number.isFinite(item.weight) && item.weight > 0)
+    && editedBenefitWeights.every((item) => Number.isFinite(item.weight) && item.weight >= 0);
   const priorityZones = useQuery({
     queryKey: ['program-priority-zones', current.city_id],
     enabled: Boolean(current.priority_result_id),
@@ -194,6 +219,66 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
         )
       ).data,
     onSuccess: (nextJob) => qc.setQueryData(['job', nextJob.id], nextJob),
+  });
+
+  const openPriorityEditor = () => {
+    const source = priority.data?.weights ?? current.benefit_weights;
+    setPriorityWeights(Object.fromEntries(source.map((item) => [item.factor, String(item.weight)])));
+    setPriorityPreview(null);
+    setPriorityEditOpen(true);
+  };
+  const calculatePriority = useMutation({
+    mutationFn: async () => (
+      await unwrap<PriorityResult>(
+        api.POST('/v1/priorities', {
+          params: { header: { 'X-CSRF-Token': user?.csrf_token ?? '', 'Idempotency-Key': newIdempotencyKey() } },
+          body: {
+            city_id: current.city_id,
+            zone_ids: priority.data!.zones.map((zone) => zone.zone_id),
+            weights: editedBenefitWeights,
+            normalization_version_id: priorityNormalization!.id,
+          },
+        }),
+      )
+    ).data,
+    onSuccess: setPriorityPreview,
+  });
+  const applyPriority = useMutation({
+    mutationFn: async () => {
+      const fresh = await unwrap<Program>(api.GET('/v1/programs/{program_id}', { params: { path: { program_id: program.id } } }));
+      const source = fresh.data;
+      const body: ProgramCreate = {
+        city_id: source.city_id,
+        name: source.name,
+        capital_budget: source.capital_budget,
+        resource_limits: source.resource_limits,
+        candidate_revision_ids: source.candidate_revision_ids,
+        required_zone_ids: source.required_zone_ids,
+        excluded_zone_ids: source.excluded_zone_ids,
+        benefit_weights: priorityPreview!.weights,
+        diversity_caps: source.diversity_caps,
+        coverage_requirements: source.coverage_requirements,
+        priority_result_id: priorityPreview!.id,
+      };
+      return (
+        await unwrap<Program>(
+          api.PUT('/v1/programs/{program_id}', {
+            params: { path: { program_id: program.id }, header: { 'X-CSRF-Token': user?.csrf_token ?? '', 'Idempotency-Key': newIdempotencyKey(), 'If-Match': fresh.etag ?? '' } },
+            body,
+          }),
+        )
+      ).data;
+    },
+    onSuccess: async () => {
+      setPriorityEditOpen(false);
+      setPriorityPreview(null);
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ['program', program.id] }),
+        qc.invalidateQueries({ queryKey: ['list', 'programs'] }),
+        qc.invalidateQueries({ queryKey: ['map-insights'] }),
+      ]);
+      optimize.mutate();
+    },
   });
 
   const openEditor = (reoptimize = false) => {
@@ -406,7 +491,17 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
         priority.isPending || priorityZones.isPending ? <Skeleton lines={4} />
           : priority.isError ? <ApiErrorView compact error={priority.error} onRetry={() => void priority.refetch()} />
             : priorityZones.isError ? <ApiErrorView compact error={priorityZones.error} onRetry={() => void priorityZones.refetch()} />
-              : priority.data ? <PriorityDashboard result={priority.data} zoneNames={priorityZoneNames} cityId={current.city_id} /> : null
+              : priority.data ? (
+                <section className="program-priority-decision">
+                  <PriorityDashboard result={priority.data} zoneNames={priorityZoneNames} cityId={current.city_id} />
+                  {hasRole('specialist') && current.status === 'draft' ? (
+                    <footer>
+                      <span><strong>Что важнее для города?</strong><small>Измените веса факторов, сравните серверный рейтинг и сохраните новый расчёт программы.</small></span>
+                      <Button variant="primary" icon="target" onClick={openPriorityEditor}>Изменить приоритеты</Button>
+                    </footer>
+                  ) : null}
+                </section>
+              ) : null
       ) : null}
       {optimize.isError ? <ApiErrorView compact error={optimize.error} onRetry={() => optimize.mutate()} /> : null}
       {jobId && job.isPending ? <Skeleton lines={2} /> : null}
@@ -467,6 +562,83 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
           <Field label={t('program.field.careBudget')}>{({ id, describedBy }) => <Input id={id} aria-describedby={describedBy} inputMode="decimal" value={careBudget} onChange={(event) => setCareBudget(event.target.value)} />}</Field>
           {update.isError ? <ApiErrorView compact error={update.error} /> : null}
         </div>
+      </Dialog>
+      <Dialog
+        open={priorityEditOpen}
+        title="Сценарий городских приоритетов"
+        onClose={() => { setPriorityEditOpen(false); setPriorityPreview(null); }}
+        footer={
+          <>
+            <Button onClick={() => { setPriorityEditOpen(false); setPriorityPreview(null); }}>{t('action.cancel')}</Button>
+            <Button
+              variant="primary"
+              busy={applyPriority.isPending}
+              disabled={!priorityPreview || Boolean(activeJob)}
+              onClick={() => applyPriority.mutate()}
+            >
+              Применить и пересчитать программу
+            </Button>
+          </>
+        }
+      >
+        <p className="pg-muted">Рейтинг считает сервер по доступным данным. Прежние веса и результаты программы сохранятся в истории.</p>
+        {priorityNormalizations.isPending ? <Skeleton lines={4} /> : null}
+        {priorityNormalizations.isError ? <ApiErrorView compact error={priorityNormalizations.error} onRetry={() => void priorityNormalizations.refetch()} /> : null}
+        {priorityNormalization ? (
+          <fieldset className="priority-weight-panel">
+            <legend>Что важнее для города</legend>
+            <div className="priority-weight-panel__head">
+              <strong>Баланс потребности и готовности</strong>
+              <span>Сумма автоматически нормализуется до 100%</span>
+            </div>
+            {priorityNormalization.factors.map((factor) => {
+              const raw = Number(priorityWeights[factor.factor] ?? 0);
+              const percent = priorityWeightTotal > 0 ? Math.round(raw / priorityWeightTotal * 100) : 0;
+              return (
+                <label className="priority-weight" key={factor.factor}>
+                  <span className="priority-weight__head">
+                    <span><strong>{factor.label}</strong><small>{factor.group === 'need' ? 'Потребность территории' : 'Готовность к реализации'}</small></span>
+                    <span className="priority-weight__percent">{percent}%</span>
+                  </span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={Number.isFinite(raw) ? raw : 0}
+                    aria-label={`Вес: ${factor.label}`}
+                    onChange={(event) => {
+                      setPriorityWeights((value) => ({ ...value, [factor.factor]: event.target.value }));
+                      setPriorityPreview(null);
+                    }}
+                  />
+                </label>
+              );
+            })}
+            <Button
+              variant="secondary"
+              busy={calculatePriority.isPending}
+              disabled={!priorityWeightsValid || !priority.data}
+              onClick={() => calculatePriority.mutate()}
+            >
+              Пересчитать рейтинг территорий
+            </Button>
+          </fieldset>
+        ) : null}
+        {calculatePriority.isError ? <ApiErrorView compact error={calculatePriority.error} /> : null}
+        {applyPriority.isError ? <ApiErrorView compact error={applyPriority.error} /> : null}
+        {priorityPreview && priority.data ? (
+          <div className="program-priority-preview">
+            <Badge tone="positive">Новый рейтинг рассчитан сервером</Badge>
+            <PriorityDashboard
+              result={priorityPreview}
+              compareTo={priority.data}
+              zoneNames={priorityZoneNames}
+              cityId={current.city_id}
+              factorLabels={new Map(priorityNormalization?.factors.map((factor) => [factor.factor, factor.label]))}
+            />
+          </div>
+        ) : null}
       </Dialog>
       <Dialog open={transitionTarget !== null} title={transitionTarget ? t(`transition.to.${transitionTarget}` as AppKey) : ''} onClose={() => setTransitionTarget(null)} footer={<><Button onClick={() => setTransitionTarget(null)}>{t('action.cancel')}</Button><Button variant="primary" busy={transition.isPending} disabled={reason.trim().length < 3} onClick={() => transition.mutate()}>{t('transition.confirm')}</Button></>}>
         <p>{current.current_revision_id ? 'Подтвердите перевод текущего результата программы на следующий этап.' : 'Сначала выполните оптимизацию программы.'}</p>

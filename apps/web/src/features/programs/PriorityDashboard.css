@@ -65,6 +65,10 @@
 }
 
 .priority-zone__body { display: grid; min-width: 0; gap: var(--pg-space-3); }
+.priority-zone__result { display: grid; justify-items: end; gap: 0.2rem; }
+.priority-zone__result > small { color: var(--pg-text-muted); font-weight: 700; }
+.priority-zone__result > small.is-up { color: var(--pg-positive); }
+.priority-zone__result > small.is-down { color: var(--pg-negative); }
 .priority-zone__score { height: 0.45rem; overflow: hidden; background: var(--pg-surface-2); border-radius: 999px; }
 .priority-zone__score span { display: block; height: 100%; background: linear-gradient(90deg, var(--pg-positive), var(--pg-warning), var(--pg-negative)); border-radius: inherit; }
 .priority-zone__summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--pg-space-2); margin: 0; }
@@ -97,6 +101,22 @@
 .priority-weight__percent { flex: 0 0 auto; min-width: 3.5rem; text-align: right; font-weight: 800; }
 .priority-weight input[type='range'] { width: 100%; accent-color: var(--pg-accent); cursor: pointer; }
 
+.program-priority-decision { display: grid; gap: var(--pg-space-3); }
+.program-priority-decision > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pg-space-3);
+  padding: var(--pg-space-3) var(--pg-space-4);
+  border: 1px solid color-mix(in srgb, var(--pg-accent) 30%, var(--pg-border));
+  border-radius: var(--pg-radius);
+  background: var(--pg-accent-soft);
+}
+.program-priority-decision > footer > span { display: grid; gap: 0.15rem; }
+.program-priority-decision > footer small { color: var(--pg-text-muted); }
+.program-priority-preview { display: grid; gap: var(--pg-space-3); margin-top: var(--pg-space-4); }
+.program-priority-preview > .pg-badge { justify-self: start; }
+
 @media (max-width: 640px) {
   .priority-dashboard { padding: var(--pg-space-3); }
   .priority-zone { grid-template-columns: 1fr; }
@@ -106,4 +126,5 @@
   .priority-factor { align-items: flex-start; }
   .priority-weight-panel__head,
   .priority-weight__head { align-items: flex-start; }
+  .program-priority-decision > footer { align-items: stretch; flex-direction: column; }
 }

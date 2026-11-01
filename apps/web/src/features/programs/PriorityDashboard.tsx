@@ -29,17 +29,26 @@ export function PriorityDashboard({
   zoneNames,
   cityId,
   factorLabels,
+  compareTo,
 }: {
   result: PriorityResult;
   zoneNames: ReadonlyMap<string, string>;
   cityId: string;
   factorLabels?: ReadonlyMap<string, string>;
+  /** Optional previous immutable result; deltas are presentation only, scores stay server-owned. */
+  compareTo?: PriorityResult;
 }) {
   const ranked = [...result.zones].sort((a, b) => {
     if (a.score === null) return b.score === null ? 0 : 1;
     if (b.score === null) return -1;
     return b.score - a.score;
   });
+  const previousRanked = [...(compareTo?.zones ?? [])].sort((a, b) => {
+    if (a.score === null) return b.score === null ? 0 : 1;
+    if (b.score === null) return -1;
+    return b.score - a.score;
+  });
+  const previousByZone = new Map(previousRanked.map((zone, index) => [zone.zone_id, { zone, rank: index + 1 }]));
 
   return (
     <section className="priority-dashboard" aria-labelledby={`priority-title-${result.id}`}>
@@ -57,13 +66,26 @@ export function PriorityDashboard({
         {ranked.map((zone, index) => {
           const coverage = Math.round(zone.data_coverage * 100);
           const name = zoneNames.get(zone.zone_id) ?? 'Территория';
+          const previous = previousByZone.get(zone.zone_id);
+          const rankDelta = previous ? previous.rank - (index + 1) : null;
+          const scoreDelta = previous?.zone.score !== null && previous?.zone.score !== undefined && zone.score !== null
+            ? zone.score - previous.zone.score
+            : null;
           return (
             <article className="priority-zone" key={zone.zone_id}>
               <div className="priority-zone__rank" aria-label={`Место ${index + 1}`}>{index + 1}</div>
               <div className="priority-zone__body">
                 <header>
                   <span><strong>{name}</strong><small>Покрытие данных {coverage}%</small></span>
-                  <Badge tone={scoreTone(zone.score)}>{zone.score === null ? 'нужны данные' : `${zone.score.toFixed(1)} / 100`}</Badge>
+                  <span className="priority-zone__result">
+                    {previous ? (
+                      <small className={rankDelta && rankDelta > 0 ? 'is-up' : rankDelta && rankDelta < 0 ? 'is-down' : undefined}>
+                        {rankDelta === 0 ? 'место сохранилось' : rankDelta && rankDelta > 0 ? `↑ на ${rankDelta}` : `↓ на ${Math.abs(rankDelta ?? 0)}`}
+                        {scoreDelta !== null ? ` · ${scoreDelta >= 0 ? '+' : ''}${scoreDelta.toFixed(1)} балла` : ''}
+                      </small>
+                    ) : null}
+                    <Badge tone={scoreTone(zone.score)}>{zone.score === null ? 'нужны данные' : `${zone.score.toFixed(1)} / 100`}</Badge>
+                  </span>
                 </header>
                 <div className="priority-zone__score" aria-label={`Приоритет ${scoreText(zone.score)} из 100`}>
                   <span style={{ width: `${zone.score ?? 0}%` }} />
