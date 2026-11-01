@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.13.0",
-    "description": "Canonical API contract 1.13.0. GeoJSON MultiPoint and MultiLineString are accepted without splitting source objects; all 1.12.0 operations remain compatible."
+    "version": "1.14.0",
+    "description": "Canonical API contract 1.14.0. Forecast-versus-observed results separate the original cohort from replacement cohorts; all 1.13.0 operations remain compatible."
   },
   "servers": [
     {
@@ -14431,6 +14431,44 @@
               }
             ]
           },
+          "initial_quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "observed_alive_initial": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "replacement_cohort_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "replacements_planted": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "replacements_alive": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total_alive": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "observed_alive": {
             "type": "integer",
             "minimum": 0
@@ -14481,6 +14519,12 @@
           "forecast_probability",
           "forecast_expected_alive",
           "observed_survival_probability",
+          "initial_quantity",
+          "observed_alive_initial",
+          "replacement_cohort_count",
+          "replacements_planted",
+          "replacements_alive",
+          "total_alive",
           "observed_alive",
           "observed_dead",
           "observed_unknown",

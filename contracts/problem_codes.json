@@ -1,5 +1,5 @@
 {
-  "version": "1.13.0",
+  "version": "1.14.0",
   "codes": [
     {
       "code": "account_not_provisioned",
@@ -175,6 +175,11 @@
       "code": "comparison_observation_unknown",
       "status": null,
       "title_ru": "В осмотре есть растения с неизвестным исходом"
+    },
+    {
+      "code": "comparison_replacement_observation_incomplete",
+      "status": null,
+      "title_ru": "Не все замещающие посадки полностью осмотрены"
     },
     {
       "code": "comparison_snapshot_incomplete",

@@ -287,6 +287,12 @@ def test_cohort_inspection_and_replacement_preserve_lineage(clients):
     assert comparison.json()["forecast_probability"] == 0.8
     assert comparison.json()["forecast_expected_alive"] == 4
     assert comparison.json()["observed_survival_probability"] == 0.6
+    assert comparison.json()["initial_quantity"] == 5
+    assert comparison.json()["observed_alive_initial"] == 3
+    assert comparison.json()["replacement_cohort_count"] == 0
+    assert comparison.json()["replacements_planted"] == 0
+    assert comparison.json()["replacements_alive"] == 0
+    assert comparison.json()["total_alive"] == 3
     assert comparison.json()["observation_coverage"] == 1
     assert comparison.json()["probability_delta"] == -0.2
     incomplete = mutation(
@@ -326,6 +332,66 @@ def test_cohort_inspection_and_replacement_preserve_lineage(clients):
     assert replacement.status_code == 201, replacement.text
     assert replacement.json()["replaces_cohort_id"] == created.json()["id"]
     assert replacement.json()["initial_quantity"] == 2
+
+    replacement_unobserved = mutation(
+        clients["specialist"],
+        "POST",
+        "/v1/forecast-observed",
+        {
+            "cohort_id": created.json()["id"],
+            "calculation_id": calculation_id,
+            "inspection_id": later.json()["id"],
+            "horizon_year": 1,
+        },
+    )
+    assert replacement_unobserved.status_code == 200, replacement_unobserved.text
+    validate("ForecastObservedResult", replacement_unobserved.json())
+    assert replacement_unobserved.json()["comparable"] is True
+    assert replacement_unobserved.json()["replacement_cohort_count"] == 1
+    assert replacement_unobserved.json()["replacements_planted"] == 2
+    assert replacement_unobserved.json()["replacements_alive"] is None
+    assert replacement_unobserved.json()["total_alive"] is None
+    assert {
+        item["code"]: item["blocking"]
+        for item in replacement_unobserved.json()["data_gaps"]
+    } == {"comparison_replacement_observation_incomplete": False}
+
+    replacement_inspection = mutation(
+        clients["specialist"],
+        "POST",
+        "/v1/inspections",
+        {
+            "city_id": CITY_ID,
+            "zone_id": zone["id"],
+            "cohort_id": replacement.json()["id"],
+            "observed_at": "2028-11-02T09:00:00Z",
+            "alive_count": 2,
+            "dead_count": 0,
+            "unknown_count": 0,
+            "method": "SYNTHETIC TEST count",
+            "note": "SYNTHETIC TEST full replacement coverage",
+            "source_refs": [],
+        },
+    )
+    assert replacement_inspection.status_code == 201, replacement_inspection.text
+    replacement_observed = mutation(
+        clients["specialist"],
+        "POST",
+        "/v1/forecast-observed",
+        {
+            "cohort_id": created.json()["id"],
+            "calculation_id": calculation_id,
+            "inspection_id": later.json()["id"],
+            "horizon_year": 1,
+        },
+    )
+    assert replacement_observed.status_code == 200, replacement_observed.text
+    validate("ForecastObservedResult", replacement_observed.json())
+    assert replacement_observed.json()["initial_quantity"] == 5
+    assert replacement_observed.json()["observed_alive_initial"] == 3
+    assert replacement_observed.json()["replacements_alive"] == 2
+    assert replacement_observed.json()["total_alive"] == 5
+    assert replacement_observed.json()["observed_survival_probability"] == 0.6
 
     excessive_order = completed_order(
         clients, zone, revision_id, 1, "2027-11-03T11:00:00Z"

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { newIdempotencyKey, unwrap, type CalculationSnapshot, type CalculationSnapshotPage, type City, type Cohort, type ForecastObservedResult, type Inspection, type ScenarioRevision, type WorkOrder } from '@pg/api-client';
-import { Badge, Button, Card, DataGapList, Field, formatDate, formatDateTime, formatNumber, formatProbability, Input, Select, Skeleton, StateView } from '@pg/ui';
+import { Badge, Button, Card, DataGapList, Field, formatDate, formatDateTime, formatNumber, formatProbability, Input, Notice, Select, Skeleton, StateView } from '@pg/ui';
 import { api, useOperationAvailable } from '../../api';
 import { t } from '../../i18n';
 import { ApiErrorView } from '../../shell/ApiErrorView';
@@ -244,6 +244,7 @@ function ForecastObserved({ cohort, inspections }: { cohort: Cohort; inspections
   if (ok === false) return <OperationUnavailable compact operationId="compareForecastObserved" />;
   const r = run.data;
   const blocking = r ? r.data_gaps.filter((g) => g.blocking) : [];
+  const replacementGap = r?.data_gaps.find((g) => g.code === 'comparison_replacement_observation_incomplete');
   return (
     <div className="exec-form">
       <h4>{t('exec.fo.title')}</h4>
@@ -299,6 +300,33 @@ function ForecastObserved({ cohort, inspections }: { cohort: Cohort; inspections
       {r ? (
         <div className="exec-fo" data-comparable={String(r.comparable)}>
           <Badge tone={r.comparable ? 'positive' : 'warning'}>{t(r.comparable ? 'exec.fo.comparable' : 'exec.fo.notComparable')}</Badge>
+          <section className="exec-outcome" aria-label={t('exec.fo.outcome')}>
+            <article>
+              <small>{t('exec.fo.initial')}</small>
+              <strong>{formatNumber(r.initial_quantity, 0)}</strong>
+              <span>{t('exec.fo.initial.note')}</span>
+            </article>
+            <article>
+              <small>{t('exec.fo.initialAlive')}</small>
+              <strong>{formatNumber(r.observed_alive_initial, 0)}</strong>
+              <span>{t('exec.fo.initialAlive.note')}</span>
+            </article>
+            <article>
+              <small>{t('exec.fo.replacementsAlive')}</small>
+              <strong>{r.replacements_alive === null ? <span className="pg-unknown">—</span> : formatNumber(r.replacements_alive, 0)}</strong>
+              <span>{t('exec.fo.replacements.note', { planted: r.replacements_planted, cohorts: r.replacement_cohort_count })}</span>
+            </article>
+            <article>
+              <small>{t('exec.fo.totalAlive')}</small>
+              <strong>{r.total_alive === null ? <span className="pg-unknown">—</span> : formatNumber(r.total_alive, 0)}</strong>
+              <span>{t('exec.fo.totalAlive.note')}</span>
+            </article>
+          </section>
+          {replacementGap ? (
+            <Notice tone="warning" title={t('exec.fo.replacementUnknown')}>
+              {t('exec.fo.replacementUnknown.desc')}
+            </Notice>
+          ) : null}
           <dl className="pg-dl">
             <dt>{t('exec.fo.forecast')}</dt>
             <dd>{r.forecast_probability === null ? <span className="pg-unknown">{t('compare.noData')}</span> : formatProbability(r.forecast_probability)}</dd>

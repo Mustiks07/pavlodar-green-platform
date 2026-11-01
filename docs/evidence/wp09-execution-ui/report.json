@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:5174",
-  "startedAt": "2026-10-31T08:23:35.394Z",
+  "startedAt": "2026-11-01T23:24:22.891Z",
   "checks": [
     {
       "name": "setup: SYNTHETIC approved scenario with placements and a complete snapshot (disposable DB only)",
@@ -13,7 +13,7 @@
       "name": "work order created for the approved revision and opened from the URL",
       "pass": true,
       "detail": {
-        "orderId": "55aa0d35-6aca-463d-bb71-80d5d06da88f"
+        "orderId": "d1ef3717-f0cd-4ccf-8fe9-78ce29180cd9"
       }
     },
     {
@@ -47,15 +47,15 @@
       "pass": true,
       "detail": {
         "cohort": {
-          "id": "62dea27c-8086-4cfb-8840-5d66dcf0635a",
+          "id": "357ab57c-3823-4b41-ad80-0e0b08f8fb5f",
           "city_id": "10000000-0000-4000-8000-000000000001",
-          "zone_id": "e9910260-583a-4fcb-a920-b5a172bc8c00",
-          "plant_id": "9023954e-fad3-471a-8b15-6bd5c1819908",
-          "placement_id": "779d2385-8520-457a-b279-f0377fdf0055",
+          "zone_id": "86c2e157-071a-4814-b28a-2b2f6341bd97",
+          "plant_id": "6c3d4a9c-2ec6-4349-9761-30bcdd04d0cb",
+          "placement_id": "38f843c1-4191-458b-b51a-416f9c70e173",
           "initial_quantity": 4,
-          "planting_date": "2026-10-31",
+          "planting_date": "2026-11-02",
           "replaces_cohort_id": null,
-          "source_work_order_id": "55aa0d35-6aca-463d-bb71-80d5d06da88f",
+          "source_work_order_id": "d1ef3717-f0cd-4ccf-8fe9-78ce29180cd9",
           "latest_inspection_id": null
         }
       }
@@ -64,7 +64,14 @@
       "name": "inspection recorded; the server marks it as the latest",
       "pass": true,
       "detail": {
-        "latest": "f13b408b-7481-4b3b-8295-da9706d43479"
+        "latest": "bcd8be6b-0436-4c59-bab2-f360548243d4"
+      }
+    },
+    {
+      "name": "anniversary inspection is available for comparable forecast-versus-observed",
+      "pass": true,
+      "detail": {
+        "status": 201
       }
     },
     {
@@ -73,17 +80,24 @@
       "detail": {
         "qtyFilled": "1",
         "lineage": {
-          "id": "3288b021-4b21-47f4-aaef-dfac5ad85d44",
+          "id": "9211ba59-5a89-4369-b6fb-8a1720130777",
           "city_id": "10000000-0000-4000-8000-000000000001",
-          "zone_id": "e9910260-583a-4fcb-a920-b5a172bc8c00",
-          "plant_id": "dd8275f9-c32f-4e3e-a1db-963fe7dcda9e",
-          "placement_id": "40617bec-6510-4868-91a2-609c35e834b0",
+          "zone_id": "86c2e157-071a-4814-b28a-2b2f6341bd97",
+          "plant_id": "c98d92aa-0bb6-4a45-a6e7-701b8e94f5fb",
+          "placement_id": "9c55a01c-140f-407f-8b81-7f4836b21944",
           "initial_quantity": 1,
-          "planting_date": "2026-10-31",
-          "replaces_cohort_id": "62dea27c-8086-4cfb-8840-5d66dcf0635a",
-          "source_work_order_id": "26571cd4-9919-4e86-b800-b63e5b4c9e4e",
+          "planting_date": "2026-11-02",
+          "replaces_cohort_id": "357ab57c-3823-4b41-ad80-0e0b08f8fb5f",
+          "source_work_order_id": "f6f1b26f-97ac-4987-b814-3d7ab36bff27",
           "latest_inspection_id": null
         }
+      }
+    },
+    {
+      "name": "replacement cohort has its own complete inspection",
+      "pass": true,
+      "detail": {
+        "status": 201
       }
     },
     {
@@ -98,12 +112,26 @@
       "name": "forecast vs observed: comparability, probabilities and delta are the server result; a non-comparable delta stays unknown",
       "pass": true,
       "detail": {
-        "comparable": false,
-        "delta": null,
-        "offset": 365,
-        "gaps": [
-          "comparison_time_mismatch"
-        ]
+        "comparable": true,
+        "delta": -0.15,
+        "offset": 0,
+        "gaps": []
+      }
+    },
+    {
+      "name": "original deaths remain separate after replacement: initial 4, original alive 3, replacement alive 1, total alive 4",
+      "pass": true,
+      "detail": {
+        "outcomeValues": [
+          "4",
+          "3",
+          "1",
+          "4"
+        ],
+        "initial": 4,
+        "originalAlive": 3,
+        "replacementsAlive": 1,
+        "totalAlive": 4
       }
     },
     {
@@ -135,10 +163,11 @@
   ],
   "shots": [
     "docs/evidence/wp09-execution-ui/execution-completions.png",
+    "docs/evidence/wp09-execution-ui/execution-outcome.png",
     "docs/evidence/wp09-execution-ui/execution-cohort.png",
     "docs/evidence/wp09-execution-ui/execution-viewer.png",
     "docs/evidence/wp09-execution-ui/execution-mobile-dark.png"
   ],
-  "finishedAt": "2026-10-31T08:23:53.760Z",
+  "finishedAt": "2026-11-01T23:24:42.917Z",
   "passed": true
 }

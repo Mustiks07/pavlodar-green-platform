@@ -2976,6 +2976,12 @@ export interface components {
             forecast_probability: number | null;
             forecast_expected_alive: number | null;
             observed_survival_probability: number | null;
+            initial_quantity: number;
+            observed_alive_initial: number;
+            replacement_cohort_count: number;
+            replacements_planted: number;
+            replacements_alive: number | null;
+            total_alive: number | null;
             observed_alive: number;
             observed_dead: number;
             observed_unknown: number;

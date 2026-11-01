@@ -807,7 +807,13 @@ export function ExecutionPage() {
                 <div className="execution-ready__intro">
                   <span className="execution-ready__mark"><Icon name="calendar" size={22} /></span>
                   <span><small>Следующий управленческий шаг</small><strong id="execution-ready-title">Согласуйте один из рассчитанных проектов выше</strong><p>После внутреннего утверждения его календарь превращается в наряды. Только затем платформа принимает фактические объёмы, осмотры и замены — поэтому здесь нет выдуманных результатов выполнения.</p></span>
-                  <Link className="pg-btn pg-btn--primary pg-btn--sm" to={`/projects?city=${city.id}`}>Все проекты</Link>
+                  <span className="execution-ready__actions">
+                    <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={`/projects?city=${city.id}`}>Все проекты</Link>
+                    <CreateWorkOrder city={city} onCreated={(id) => {
+                      setOrder(id);
+                      void orderPresence.refetch();
+                    }} />
+                  </span>
                 </div>
               </section>
             ) : null}

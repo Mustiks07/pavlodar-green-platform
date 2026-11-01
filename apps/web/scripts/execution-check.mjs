@@ -54,6 +54,8 @@ const page = sp.page;
 const pageErrors = [];
 page.on('pageerror', (e) => pageErrors.push(String(e)));
 const city = (await page.evaluate(async () => (await fetch('/v1/cities')).json())).items[0];
+const cityDay = new Intl.DateTimeFormat('en-CA', { timeZone: city.timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(Date.now());
+const anniversaryDay = `${Number(cityDay.slice(0, 4)) + 1}${cityDay.slice(4)}`;
 const detail = () => page.locator('.exec-detail[data-work-order-id]');
 const serverOrder = async (id) => (await api(page, 'GET', `/v1/work-orders/${id}`)).body;
 const transition = async (label, reason) => {
@@ -139,10 +141,22 @@ await insp.getByRole('button', { name: 'Записать осмотр' }).click(
 const latest = await cd.getByText('последний').waitFor({ timeout: 15_000 }).then(() => true).catch(() => false);
 const cohortNow = (await api(page, 'GET', `/v1/cohorts?city_id=${city.id}&limit=200`)).body.items.find((c) => c.id === cohort.id);
 check('inspection recorded; the server marks it as the latest', latest && Boolean(cohortNow.latest_inspection_id), { latest: cohortNow.latest_inspection_id });
+const anniversaryInspection = await api(page, 'POST', '/v1/inspections', {
+  city_id: city.id,
+  zone_id: fx.zone_id,
+  cohort_id: cohort.id,
+  observed_at: `${anniversaryDay}T09:00:00Z`,
+  alive_count: 3,
+  dead_count: 1,
+  unknown_count: 0,
+  method: 'SYNTHETIC TEST годовщина',
+  note: 'SYNTHETIC TEST сопоставимый полный осмотр',
+  source_refs: [],
+});
+check('anniversary inspection is available for comparable forecast-versus-observed', anniversaryInspection.status === 201, { status: anniversaryInspection.status });
 
 // A second completed piece order (API) to plant the replacement, dated on the city's calendar day
 // (the UI's planting date defaults to it; 06:00Z is the same day in Pavlodar).
-const cityDay = new Intl.DateTimeFormat('en-CA', { timeZone: city.timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(Date.now());
 const rep = await api(page, 'POST', '/v1/work-orders', { city_id: city.id, scenario_revision_id: fx.revision_id, zone_id: fx.zone_id, operation: 'SYNTHETIC TEST замена', planned_start: cityDay, planned_end: cityDay, quantity: 1, unit: 'piece', assignee_group: null });
 let etag = rep.etag;
 for (const target of ['assigned', 'in_progress']) etag = (await api(page, 'POST', `/v1/work-orders/${rep.body.id}/transitions`, { target_status: target, reason: 'SYNTHETIC TEST' }, { 'If-Match': etag })).etag;
@@ -160,6 +174,19 @@ await repl.getByRole('button', { name: 'Записать замену' }).click(
 const replaced = await repl.getByText('Замена записана.').waitFor({ timeout: 15_000 }).then(() => true).catch(() => false);
 const lineage = (await api(page, 'GET', `/v1/cohorts?city_id=${city.id}&limit=200`)).body.items.find((c) => c.replaces_cohort_id === cohort.id);
 check('replacement: placement chosen from the revision (quantity taken from it) -> new cohort linked to the original', replaced && qtyFilled === '1' && lineage?.initial_quantity === 1, { qtyFilled, lineage });
+const replacementInspection = await api(page, 'POST', '/v1/inspections', {
+  city_id: city.id,
+  zone_id: fx.zone_id,
+  cohort_id: lineage.id,
+  observed_at: `${cityDay}T09:00:00Z`,
+  alive_count: 1,
+  dead_count: 0,
+  unknown_count: 0,
+  method: 'SYNTHETIC TEST визуальный',
+  note: 'SYNTHETIC TEST полный осмотр замены',
+  source_refs: [],
+});
+check('replacement cohort has its own complete inspection', replacementInspection.status === 201, { status: replacementInspection.status });
 
 const fo = cd.locator('.exec-form').filter({ hasText: 'Прогноз и факт' });
 // Snapshots are discovered for the cohort's exact revision (listCalculations); no typed id.
@@ -188,6 +215,19 @@ check(
   comparableShown && (server.probability_delta === null ? foText.includes('не рассчитана') : true) && foText.includes(server.method_version),
   { comparable: server.comparable, delta: server.probability_delta, offset: server.date_offset_days, gaps: server.data_gaps?.map((g) => g.code) },
 );
+const outcomeValues = await fo.locator('.exec-outcome article strong').allInnerTexts();
+check(
+  'original deaths remain separate after replacement: initial 4, original alive 3, replacement alive 1, total alive 4',
+  server.initial_quantity === 4 &&
+    server.observed_alive_initial === 3 &&
+    server.replacements_alive === 1 &&
+    server.total_alive === 4 &&
+    server.observed_survival_probability === 0.75 &&
+    outcomeValues.join('|') === '4|3|1|4',
+  { outcomeValues, initial: server.initial_quantity, originalAlive: server.observed_alive_initial, replacementsAlive: server.replacements_alive, totalAlive: server.total_alive },
+);
+await fo.locator('.exec-fo').scrollIntoViewIfNeeded();
+await shot(page, 'execution-outcome.png');
 await cd.scrollIntoViewIfNeeded();
 await shot(page, 'execution-cohort.png');
 await page.reload();

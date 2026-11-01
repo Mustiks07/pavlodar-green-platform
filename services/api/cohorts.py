@@ -288,6 +288,56 @@ def compare_forecast_observed(db, access, body):
     known_total = alive + dead
     coverage = Decimal(observed_total) / Decimal(cohort.initial_quantity)
     observed_probability = Decimal(alive) / Decimal(known_total) if known_total else None
+    city_cohorts = list(
+        db.scalars(
+            select(CohortRecord).where(
+                CohortRecord.city_id == cohort.city_id,
+                CohortRecord.zone_id == cohort.zone_id,
+            )
+        )
+    )
+    children = {}
+    for item in city_cohorts:
+        if item.replaces_cohort_id:
+            children.setdefault(item.replaces_cohort_id, []).append(item)
+    replacements = []
+    pending = list(children.get(cohort.id, []))
+    seen = set()
+    while pending:
+        replacement = pending.pop()
+        if replacement.id in seen:
+            continue
+        seen.add(replacement.id)
+        replacements.append(replacement)
+        pending.extend(children.get(replacement.id, []))
+    replacements_planted = sum(item.initial_quantity for item in replacements)
+    replacements_alive = 0
+    replacements_complete = True
+    for replacement in replacements:
+        replacement_inspection = (
+            db.get(InspectionRecord, replacement.latest_inspection_id)
+            if replacement.latest_inspection_id
+            else None
+        )
+        if replacement_inspection is None:
+            replacements_complete = False
+            break
+        payload = replacement_inspection.payload
+        replacement_observed = (
+            payload["alive_count"] + payload["dead_count"] + payload["unknown_count"]
+        )
+        if replacement_observed != replacement.initial_quantity or payload["unknown_count"]:
+            replacements_complete = False
+            break
+        replacements_alive += payload["alive_count"]
+    if replacements and not replacements_complete:
+        replacements_alive = None
+    original_complete = observed_total == cohort.initial_quantity and unknown == 0
+    total_alive = (
+        alive + replacements_alive
+        if original_complete and replacements_alive is not None
+        else None
+    )
     observed_date = inspection.observed_at.date()
     date_offset = abs((observed_date - _anniversary(cohort.planting_date, horizon)).days)
     gaps = []
@@ -333,7 +383,15 @@ def compare_forecast_observed(db, access, body):
                 f"year:{horizon}",
             )
         )
-    comparable = not gaps and observed_probability is not None
+    if replacements and replacements_alive is None:
+        replacement_gap = gap(
+            "comparison_replacement_observation_incomplete",
+            "Not every replacement cohort has a complete known-outcome inspection",
+            *[item.id for item in replacements],
+        )
+        replacement_gap["blocking"] = False
+        gaps.append(replacement_gap)
+    comparable = not any(item["blocking"] for item in gaps) and observed_probability is not None
     forecast_decimal = Decimal(str(probability)) if probability is not None else None
     expected_alive = (
         forecast_decimal * Decimal(cohort.initial_quantity)
@@ -360,6 +418,12 @@ def compare_forecast_observed(db, access, body):
         "forecast_probability": number(forecast_decimal),
         "forecast_expected_alive": number(expected_alive),
         "observed_survival_probability": number(observed_probability),
+        "initial_quantity": cohort.initial_quantity,
+        "observed_alive_initial": alive,
+        "replacement_cohort_count": len(replacements),
+        "replacements_planted": replacements_planted,
+        "replacements_alive": replacements_alive,
+        "total_alive": total_alive,
         "observed_alive": alive,
         "observed_dead": dead,
         "observed_unknown": unknown,

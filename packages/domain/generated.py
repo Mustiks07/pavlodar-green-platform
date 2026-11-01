@@ -2300,6 +2300,14 @@ class ObservedSurvivalProbability(RootModel[float]):
     root: Annotated[float, Field(ge=0.0, le=1.0)]
 
 
+class ReplacementsAlive(RootModel[int]):
+    root: Annotated[int, Field(ge=0)]
+
+
+class TotalAlive(RootModel[int]):
+    root: Annotated[int, Field(ge=0)]
+
+
 class ProbabilityDelta(RootModel[float]):
     root: Annotated[float, Field(ge=-1.0, le=1.0)]
 
@@ -2318,6 +2326,12 @@ class ForecastObservedResult(BaseModel):
     forecast_probability: ForecastProbability | None
     forecast_expected_alive: ForecastExpectedAlive | None
     observed_survival_probability: ObservedSurvivalProbability | None
+    initial_quantity: Annotated[int, Field(ge=1)]
+    observed_alive_initial: Annotated[int, Field(ge=0)]
+    replacement_cohort_count: Annotated[int, Field(ge=0)]
+    replacements_planted: Annotated[int, Field(ge=0)]
+    replacements_alive: ReplacementsAlive | None
+    total_alive: TotalAlive | None
     observed_alive: Annotated[int, Field(ge=0)]
     observed_dead: Annotated[int, Field(ge=0)]
     observed_unknown: Annotated[int, Field(ge=0)]
