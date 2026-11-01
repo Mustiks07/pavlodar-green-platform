@@ -34,6 +34,18 @@ type Period = {
   visits: number;
 };
 
+type LaunchPassportProject = {
+  id: string;
+  scenarioName: string;
+  zoneName: string;
+  operations: number;
+  water: number;
+  crew: number;
+  visits: number;
+  firstYear: number;
+  firstMonth: number;
+};
+
 /** Frozen care operations from the exact calculation snapshots selected by ProgramRevision. */
 export function ProgramCarePlan({ cityId }: { cityId: string }) {
   const [params, setParams] = useSearchParams();
@@ -136,6 +148,37 @@ export function ProgramCarePlan({ cityId }: { cityId: string }) {
     crew: sum.crew + operation.crew_minutes,
     visits: sum.visits + operation.visits,
   }), { water: 0, crew: 0, visits: 0 }), [operations]);
+  const launchPassport = useMemo(() => {
+    const projects = new Map<string, LaunchPassportProject>();
+    for (const operation of operations) {
+      const periodIndex = operation.year_offset * 12 + operation.month;
+      const current = projects.get(operation.scenarioRevisionId);
+      if (!current) {
+        projects.set(operation.scenarioRevisionId, {
+          id: operation.scenarioRevisionId,
+          scenarioName: operation.scenarioName,
+          zoneName: operation.zoneName,
+          operations: 1,
+          water: operation.water_m3,
+          crew: operation.crew_minutes,
+          visits: operation.visits,
+          firstYear: operation.year_offset + 1,
+          firstMonth: operation.month,
+        });
+        continue;
+      }
+      current.operations += 1;
+      current.water += operation.water_m3;
+      current.crew += operation.crew_minutes;
+      current.visits += operation.visits;
+      const currentPeriodIndex = (current.firstYear - 1) * 12 + current.firstMonth;
+      if (periodIndex < currentPeriodIndex) {
+        current.firstYear = operation.year_offset + 1;
+        current.firstMonth = operation.month;
+      }
+    }
+    return [...projects.values()].sort((left, right) => left.zoneName.localeCompare(right.zoneName, 'ru'));
+  }, [operations]);
   const pending = programs.isPending || revision.isPending || snapshots.some((query) => query.isPending)
     || scenarioRevisions.some((query) => query.isPending) || scenarios.isPending || zones.isPending;
   const failed = [programs, revision, scenarios, zones, ...snapshots, ...scenarioRevisions].find((query) => query.isError);
@@ -174,6 +217,35 @@ export function ProgramCarePlan({ cityId }: { cityId: string }) {
             <article><Icon name="clock" size={20} /><span><strong>{formatNumber(totals.crew / 60, 1)} ч</strong><small>работы бригад</small></span></article>
             <article><Icon name="map" size={20} /><span><strong>{formatNumber(totals.visits, 0)}</strong><small>плановых выездов</small></span></article>
           </div>
+          <section className="program-launch-passport" aria-labelledby="program-launch-passport-title">
+            <header>
+              <span>
+                <small>Паспорт запуска программы</small>
+                <h3 id="program-launch-passport-title">Что подготовлено по каждому участку</h3>
+              </span>
+              <Badge tone="accent">Расчётный план сформирован · в наряды ещё не передан</Badge>
+            </header>
+            <div className="program-launch-passport__grid">
+              {launchPassport.map((project) => (
+                <article key={project.id}>
+                  <header>
+                    <span className="program-launch-passport__icon" aria-hidden="true"><Icon name="sprout" size={19} /></span>
+                    <span><small>{project.zoneName}</small><strong>{project.scenarioName}</strong></span>
+                  </header>
+                  <dl>
+                    <div><dt>Операции</dt><dd>{formatNumber(project.operations, 0)}</dd></div>
+                    <div><dt>Вода</dt><dd>{formatNumber(project.water, 1)} м³</dd></div>
+                    <div><dt>Работа бригады</dt><dd>{formatNumber(project.crew / 60, 1)} ч</dd></div>
+                    <div><dt>Выезды</dt><dd>{formatNumber(project.visits, 0)}</dd></div>
+                  </dl>
+                  <footer>
+                    <span><Icon name="calendar" size={16} /> Ближайший период</span>
+                    <strong>{MONTHS[project.firstMonth - 1]} · {project.firstYear}-й год</strong>
+                  </footer>
+                </article>
+              ))}
+            </div>
+          </section>
           <div className="program-care-plan__timeline">
             {periods.map((period) => (
               <article key={period.key}>

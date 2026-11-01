@@ -1,0 +1,22 @@
+ADR-058: Program launch passport without invented execution
+Status: accepted
+Date: 2026-11-02
+
+Context
+The city program already selected exact immutable scenario revisions and calculation snapshots, and
+their server care schedules were visible as a long calendar. A jury member or municipal operator still
+had to reconstruct what was prepared for each territory. Creating factual work orders for draft projects
+would be misleading because approval and real execution evidence do not exist yet.
+
+Decision
+Add a launch passport derived only from the exact care operations in the CalculationSnapshots selected
+by the current ProgramRevision. For every selected territory it groups operation count, planned water,
+crew-hours, visits and the nearest period. The screen explicitly says that the calculated plan is ready
+but has not been transferred to work orders. It performs no client estimate, does not mutate the program
+and never represents planned resources as completed work.
+
+Consequences
+The path from city optimization to operational launch is understandable at a glance while immutable
+server lineage remains unchanged. In the current public demo the passport shows three selected projects,
+36 operations, 27.0 m3 of water, 58.5 crew-hours and 36 visits. Creation and completion of work orders
+remain correctly gated by project approval and factual execution evidence.

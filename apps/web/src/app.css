@@ -495,6 +495,94 @@
 .program-care-plan__metrics article span { display: grid; min-width: 0; color: var(--pg-text); }
 .program-care-plan__metrics strong { overflow: hidden; font-size: var(--pg-fs-md); text-overflow: ellipsis; white-space: nowrap; }
 .program-care-plan__metrics small { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.program-launch-passport {
+  display: grid;
+  gap: var(--pg-space-3);
+  padding: var(--pg-space-4);
+  border: 1px solid color-mix(in srgb, var(--pg-accent) 35%, var(--pg-border));
+  border-radius: var(--pg-radius-lg);
+  background: color-mix(in srgb, var(--pg-accent-soft) 38%, var(--pg-surface));
+}
+.program-launch-passport > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--pg-space-3);
+}
+.program-launch-passport > header > span { display: grid; gap: 0.15rem; }
+.program-launch-passport > header small {
+  color: var(--pg-accent-text);
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.program-launch-passport h3 { margin: 0; font-size: var(--pg-fs-lg); }
+.program-launch-passport > header .pg-badge { max-width: 28rem; text-align: center; white-space: normal; }
+.program-launch-passport__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--pg-space-3);
+}
+.program-launch-passport__grid > article {
+  display: grid;
+  gap: var(--pg-space-3);
+  min-width: 0;
+  padding: var(--pg-space-3);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius);
+  background: var(--pg-surface);
+  box-shadow: var(--pg-shadow-1);
+}
+.program-launch-passport__grid > article > header {
+  display: flex;
+  align-items: center;
+  gap: var(--pg-space-2);
+  min-width: 0;
+}
+.program-launch-passport__grid > article > header > span:last-child { display: grid; min-width: 0; }
+.program-launch-passport__grid > article > header small,
+.program-launch-passport__grid > article > header strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.program-launch-passport__grid > article > header small { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.program-launch-passport__icon {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: none;
+  color: var(--pg-accent-text);
+  background: var(--pg-accent-soft);
+  border-radius: 11px;
+}
+.program-launch-passport dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--pg-space-2);
+  margin: 0;
+}
+.program-launch-passport dl div {
+  display: grid;
+  gap: 0.1rem;
+  padding: var(--pg-space-2);
+  border-radius: var(--pg-radius-sm);
+  background: var(--pg-surface-2);
+}
+.program-launch-passport dt { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.program-launch-passport dd { margin: 0; font-weight: 750; }
+.program-launch-passport article > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pg-space-2);
+  padding-top: var(--pg-space-2);
+  border-top: 1px solid var(--pg-border);
+  font-size: var(--pg-fs-xs);
+}
+.program-launch-passport article > footer span { display: flex; align-items: center; gap: var(--pg-space-1); color: var(--pg-text-muted); }
+.program-launch-passport article > footer strong { color: var(--pg-accent-text); text-align: right; }
 .program-care-plan__timeline {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
@@ -903,6 +991,7 @@
   .execution-ready__features { grid-template-columns: 1fr; }
   .project-showcase__grid { grid-template-columns: 1fr 1fr; }
   .program-care-plan__metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .program-launch-passport__grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .app-overview {
@@ -927,6 +1016,8 @@
   .execution-live-head { display: grid; align-items: start; }
   .program-care-plan__pick { width: 100%; }
   .program-care-plan__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .program-launch-passport { padding: var(--pg-space-3); }
+  .program-launch-passport > header { display: grid; align-items: start; }
   .program-care-plan__timeline { grid-template-columns: 1fr; }
   .program-care-plan > footer .pg-btn { justify-self: stretch; }
 }
