@@ -1104,5 +1104,27 @@
     "decision": "ADR-062",
     "evidence": "docs/evidence/jury-demo-tour",
     "limit": "The tour navigates existing authorized records and creates no presentation-only business data"
+  },
+  "assistant_server_recommendation_20261102": {
+    "implementation_sha": "8278888",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Explicit plant-selection requests route to a typed server tool before any external provider",
+      "Zone, catalog, rule, exclusions, locked plants and weights are reconstructed from the authorized frozen revision",
+      "The server owns the candidate text and Fact cards; the project is never mutated by recommendation",
+      "score_100 is now a registered product unit and candidate scores are displayed as rounded values out of 100",
+      "Scenario rule and coefficient selectors keep internal source fields inside technical disclosures"
+    ],
+    "verification": [
+      "Focused backend chat integration passed 14/14",
+      "Canonical specification validation passed 398 checks",
+      "Authenticated hero-project browser acceptance passed 6/6",
+      "Reviewed screenshot shows five readable named candidates and no internal score_100 label",
+      "No API 5xx occurred and the ScenarioRevision remained unchanged"
+    ],
+    "decision": "ADR-063",
+    "evidence": "docs/evidence/jury-assistant-recommendation",
+    "limit": "Calculation, optimization and export remain separate explicitly confirmed actions"
   }
 }
