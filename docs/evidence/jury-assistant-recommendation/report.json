@@ -1,0 +1,38 @@
+{
+  "base": "http://localhost:5173",
+  "city": "10000000-0000-4000-8000-000000000001",
+  "checks": [
+    {
+      "name": "exact hero project exists",
+      "pass": true
+    },
+    {
+      "name": "assistant returns the server-owned catalog and rule selection",
+      "pass": true,
+      "detail": "Подбор выполнен по версии каталога и правилам текущего участка:\n\nТополь белый — 81/100 · нужна проверка специалиста\nСосна обыкновенная — 77/100 · нужна проверка специалиста\nИва, вид не указан — 76/100 · нужна проверка специалиста\nСирень обыкновенная — 75/100 · нужна проверка специалиста\nЯсень, вид не указан — 70/100 · нужна проверка специалиста\n\nПроект не изменён: выбранный вид можно разместить в редакторе после проверки специалистом."
+    },
+    {
+      "name": "answer is actionable and states that the project remains unchanged",
+      "pass": true
+    },
+    {
+      "name": "candidate names are rendered as a readable list",
+      "pass": true
+    },
+    {
+      "name": "read-only recommendation did not mutate the project",
+      "pass": true,
+      "detail": {
+        "initialRevision": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674",
+        "currentRevision": "d1b3310a-c9f5-489f-b89d-7eac1a2f8674"
+      }
+    },
+    {
+      "name": "no API 5xx occurred",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "passed": true,
+  "screenshot": "docs/evidence/jury-assistant-recommendation/assistant-plant-selection.png"
+}

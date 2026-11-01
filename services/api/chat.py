@@ -1093,7 +1093,7 @@ def _recommend_plants(db, access, job, arguments, facts):
     for item in result["candidates"][:top_n]:
         name = plant_names.get(item["plant_id"], "Растение каталога")
         score = item.get("score")
-        score_text = f" — {score:g}/100" if score is not None else ""
+        score_text = f" — {round(score)}/100" if score is not None else ""
         lines.append(f"• {name}{score_text} · {labels[item['eligibility']]}")
         if score is None:
             continue

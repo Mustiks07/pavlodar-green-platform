@@ -42,6 +42,7 @@ describe('dates', () => {
 describe('unitLabel', () => {
   it('maps machine keys and reports unknown ones', () => {
     expect(unitLabel('m2')).toEqual({ label: 'м²', known: true, decimals: 0 });
+    expect(unitLabel('score_100')).toEqual({ label: 'из 100', known: true, decimals: 0 });
     expect(unitLabel('furlong')).toEqual({ label: 'furlong', known: false, decimals: null });
   });
 });

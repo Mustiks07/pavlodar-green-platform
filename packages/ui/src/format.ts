@@ -68,6 +68,7 @@ export function formatDate(date: string | null | undefined): string | null {
 const UNIT_LABELS: Record<string, string> = {
   '1': 'доля',
   percent: '%',
+  score_100: 'из 100',
   m: 'м',
   m2: 'м²',
   m3: 'м³',

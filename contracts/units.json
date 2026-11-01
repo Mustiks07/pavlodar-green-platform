@@ -12,6 +12,11 @@
       "display_decimals": 1
     },
     {
+      "key": "score_100",
+      "dimension": "score",
+      "display_decimals": 0
+    },
+    {
       "key": "m",
       "dimension": "length",
       "display_decimals": 1
