@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
-import type { SceneBuilding, SceneHandle } from './types';
+import type { SceneBuilding, SceneHandle, ScenePlanting } from './types';
 
 export type Scene3DState = 'off' | 'loading' | 'on' | 'load_failed' | 'context_lost' | 'no_webgl';
 
@@ -40,7 +40,7 @@ function hasWebGL2(): boolean {
  * Owns the 3D layer lifecycle on an existing MapLibre map: lazy load, camera tilt, buildings,
  * context loss/restore and full release on exit or unmount.
  */
-export function useScene3D(getMap: () => MapLibreMap | null, buildings: SceneBuilding[]) {
+export function useScene3D(getMap: () => MapLibreMap | null, buildings: SceneBuilding[], plantings: ScenePlanting[] = []) {
   const [state, setState] = useState<Scene3DState>('off');
   const handle = useRef<SceneHandle | null>(null);
   const prevCamera = useRef<{ pitch: number; bearing: number } | null>(null);
@@ -101,6 +101,10 @@ export function useScene3D(getMap: () => MapLibreMap | null, buildings: SceneBui
   useEffect(() => {
     handle.current?.setBuildings(buildings);
   }, [buildings, state]);
+
+  useEffect(() => {
+    handle.current?.setPlantings(plantings);
+  }, [plantings, state]);
 
   // Loss is observed on the map, not inside the layer: MapLibre destroys its style (and calls
   // our onRemove) before canvas listeners registered by the layer would run.

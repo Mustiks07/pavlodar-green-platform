@@ -739,6 +739,18 @@ def bootstrap(clients, city, license_name):
     sp, admin = clients["specialist"], clients["admin"]
     report = {"city": city["name"], "created": {}, "reused": {}}
 
+    # Reuse the published city building version already admitted by the OSM import. It is frozen
+    # into every prepared project so a later 3D move is checked by the server against the same
+    # geometry the user sees; no building footprint is copied or invented here.
+    building_version_id = next(
+        (
+            item["current_version_id"]
+            for item in sp.pages("/v1/datasets", city_id=city["id"])
+            if item["kind"] == "buildings" and item["current_version_id"]
+        ),
+        None,
+    )
+
     def count(kind, created):
         bucket = report["created" if created else "reused"]
         bucket[kind] = bucket.get(kind, 0) + 1
@@ -1174,6 +1186,8 @@ def bootstrap(clients, city, license_name):
                 versions["demo_suitability"],
                 versions["demo_stock"],
             }
+            if building_version_id:
+                planning_versions.add(building_version_id)
             required_versions = planning_versions | (
                 {versions["demo_ecosystem"], versions["demo_population"]}
                 if is_hero

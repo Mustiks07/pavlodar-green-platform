@@ -9,8 +9,14 @@ import { OperationUnavailable } from '../../shell/OperationUnavailable';
 import { useSession } from '../../shell/session';
 import { isUuid } from '../map/publishedLayers';
 
-/** Usable means expert-confirmed and not superseded: the same condition the server enforces. */
-export const ruleUsable = (r: RuleVersion) => r.review_status === 'expert_confirmed' && r.superseded_by === null;
+/** Mirrors the server gate: an explicit synthetic estimate may drive a draft, never approval. */
+export const ruleUsable = (r: RuleVersion) => (
+  r.superseded_by === null
+  && (
+    r.review_status === 'expert_confirmed'
+    || (r.review_status === 'verified_text_requires_expert' && r.source_status.startsWith('SYNTHETIC TEST'))
+  )
+);
 
 const STATUS_TONE: Record<RuleVersion['review_status'], Tone> = {
   expert_confirmed: 'positive',

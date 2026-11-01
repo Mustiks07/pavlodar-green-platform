@@ -1,0 +1,32 @@
+ADR-056: Server-validated 3D placement decision loop
+Status: accepted
+Date: 2026-11-02
+
+Context
+The jury specification requires a visible end-to-end decision: move a project tree in 3D, reject
+an invalid position, persist a valid immutable revision, recalculate it, and compare before/after
+from the same camera. The existing placement editor only rendered points in 2D, while the 3D city
+scene did not receive ScenarioRevision placements. Scenario validation checked the zone and frozen
+registries but did not reject a moved point inside a frozen published building footprint.
+
+Decision
+Reuse the existing PlacementEditor and Three layer instead of creating a second editor. Render
+project placements as selectable trunk/crown models with stable Placement ids and retain the
+MapLibre point layer as the mouse, touch and keyboard hit target. A moved or new placement is
+checked by the server against building records from the exact building DatasetVersions frozen in
+the candidate revision. ST_Covers produces typed 422 placement_building_conflict field errors;
+unchanged historic placements are grandfathered so an unrelated revision cannot be invalidated
+retroactively.
+
+Saving with recalculation remains two durable canonical operations under one explicit user action:
+append the immutable revision, then enqueue a full calculation for that exact revision. A failed
+enqueue never rolls back or disguises the saved revision. The current revision and its parent are
+shown in two instances of the same 3D renderer. Center, zoom, pitch and bearing are mirrored in
+both directions, and the changed stable Placement id is highlighted.
+
+Consequences
+The required building-conflict, immutable-revision, durable-calculation and same-camera evidence is
+now available without a new contract or migration. Missing underground networks are not treated as
+safe, and no network-clearance claim is made. One 3D model represents a placement group; quantity
+remains authoritative in the server revision. Plant dimensions use recorded placement values when
+available and otherwise remain visibly schematic; no growth curve or measured height is invented.

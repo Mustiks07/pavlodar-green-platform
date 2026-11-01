@@ -472,6 +472,11 @@
       "title_ru": "Геометрия выходит за границу города"
     },
     {
+      "code": "placement_building_conflict",
+      "status": 422,
+      "title_ru": "Посадка пересекает здание"
+    },
+    {
       "code": "placement_outside_zone",
       "status": 422,
       "title_ru": "Посадка выходит за границу зоны"

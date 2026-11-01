@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MercatorCoordinate, type CustomLayerInterface, type Map as MapLibreMap } from 'maplibre-gl';
-import type { BasisStyle, HeightBasis, SceneBuilding, SceneHandle, SceneStats } from './types';
+import type { BasisStyle, HeightBasis, SceneBuilding, SceneHandle, ScenePlanting, SceneStats } from './types';
 
 /**
  * One WebGLRenderer per MapLibre GL context, reused across layer mounts. Three 0.180 creates
@@ -105,6 +105,7 @@ export function createThreeLayer(map: MapLibreMap, options: ThreeLayerOptions): 
 
   let renderer: THREE.WebGLRenderer | null = null;
   let buildings: SceneBuilding[] = [];
+  let plantings: ScenePlanting[] = [];
   let disposed = false;
   let geometriesAfterRelease: number | null = null;
   const owned = new Set<THREE.BufferGeometry | THREE.Material>();
@@ -159,6 +160,40 @@ export function createThreeLayer(map: MapLibreMap, options: ThreeLayerOptions): 
         content.add(lines);
       } else edge.dispose();
     }
+    for (const planting of plantings) {
+      const mercator = MercatorCoordinate.fromLngLat({ lng: planting.position[0], lat: planting.position[1] }, 0);
+      const x = (mercator.x - origin.x) / scale;
+      const y = -(mercator.y - origin.y) / scale;
+      // Missing dimensions remain visibly schematic: these sizes are a map marker, not a claimed
+      // biological measurement. Source-backed dimensions, when present, are used as delivered.
+      const known = planting.height_m !== null && planting.height_m > 0;
+      const height = known ? planting.height_m! : 3;
+      const crownRadius = planting.crown_radius_m && planting.crown_radius_m > 0
+        ? planting.crown_radius_m
+        : known ? Math.max(0.65, height * 0.22) : 0.9;
+      const trunkHeight = Math.max(0.5, height * 0.48);
+      const trunkGeometry = new THREE.CylinderGeometry(Math.max(0.08, crownRadius * 0.14), Math.max(0.1, crownRadius * 0.18), trunkHeight, 8);
+      trunkGeometry.rotateX(Math.PI / 2);
+      trunkGeometry.translate(x, y, trunkHeight / 2);
+      const crownGeometry = new THREE.SphereGeometry(crownRadius, 12, 8);
+      crownGeometry.translate(x, y, Math.max(trunkHeight, height - crownRadius * 0.7));
+      const trunkMaterial = new THREE.MeshLambertMaterial({
+        color: planting.conflict ? 0x9f1d18 : planting.selected ? 0xc77a11 : 0x795548,
+        transparent: !known,
+        opacity: known ? 1 : 0.72,
+      });
+      const crownMaterial = new THREE.MeshLambertMaterial({
+        color: planting.conflict ? 0xd92d20 : planting.selected ? 0xf2a93b : planting.locked ? 0x386b57 : 0x16805f,
+        transparent: !known,
+        opacity: known ? 0.94 : 0.7,
+      });
+      for (const ownedPart of [trunkGeometry, crownGeometry, trunkMaterial, crownMaterial]) owned.add(ownedPart);
+      const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+      const crown = new THREE.Mesh(crownGeometry, crownMaterial);
+      trunk.userData.planting = planting.id;
+      crown.userData.planting = planting.id;
+      content.add(trunk, crown);
+    }
     map.triggerRepaint();
   };
 
@@ -206,11 +241,16 @@ export function createThreeLayer(map: MapLibreMap, options: ThreeLayerOptions): 
       buildings = next;
       if (renderer) build();
     },
+    setPlantings(next) {
+      plantings = next;
+      if (renderer) build();
+    },
     stats(): SceneStats {
       const counts = Object.fromEntries(BASES.map((b) => [b, 0])) as Record<HeightBasis, number>;
       for (const b of buildings) counts[b.height_basis] += 1;
       return {
         buildingsByBasis: counts,
+        plantings: plantings.length,
         geometries: renderer?.info.memory.geometries ?? 0,
         textures: renderer?.info.memory.textures ?? 0,
         programs: renderer?.info.programs?.length ?? 0,

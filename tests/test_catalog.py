@@ -469,17 +469,55 @@ def test_scenario_revision_validates_catalog_placement_and_exclusions(clients):
         etag=created.headers["etag"],
     )
     assert outside.status_code == 422 and outside.json()["code"] == "placement_outside_zone"
+    eligible_placement = placement(eligible_id, [76.9805, 52.2805])
     saved = mutation(
         specialist,
         "POST",
         f"/v1/scenarios/{scenario['id']}/revisions",
-        {**base, "placements": [placement(eligible_id, [76.9805, 52.2805])]},
+        {**base, "placements": [eligible_placement]},
         etag=created.headers["etag"],
     )
     assert saved.status_code == 201, saved.text
     assert saved.json()["catalog_version_id"] == catalog_id
     assert saved.json()["rule_version_id"] == RULE_ID
     assert saved.json()["synthetic_inputs"] is True
+
+    # The exact frozen building version is authoritative for a move: the revision is rejected,
+    # and the placement path lets the editor highlight the conflicting point.
+    from tests.test_zone_context import polygon_feature, publish_features
+
+    buildings = publish_features(
+        clients,
+        "buildings",
+        [polygon_feature("building", 76.9807, 52.2807, 76.9809, 52.2809)],
+    )
+    moved = {
+        **eligible_placement,
+        "position": {"type": "Point", "coordinates": [76.9808, 52.2808]},
+    }
+    conflict = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {
+            **base,
+            "parent_revision_id": saved.json()["id"],
+            "dataset_version_ids": [buildings],
+            "placements": [moved],
+            "comment": "SYNTHETIC TEST move into building",
+        },
+        etag=saved.headers["etag"],
+    )
+    assert conflict.status_code == 422, conflict.text
+    assert conflict.json()["code"] == "placement_building_conflict"
+    assert conflict.json()["field_errors"] == [
+        {
+            "path": "/placements/0/position",
+            "code": "building_conflict",
+            "message": "Посадка пересекает здание",
+        }
+    ]
+    assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()["current_revision_id"] == saved.json()["id"]
 
     planning = mutation(
         specialist,

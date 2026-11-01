@@ -474,8 +474,14 @@ def save_revision(db, access, scenario, body):
         rule_synthetic = db.get(DatasetVersion, rule.dataset_version_id).synthetic
     from services.api.catalog import validate_scenario_registry
 
+    parent = db.get(ScenarioRevision, body["parent_revision_id"]) if body["parent_revision_id"] else None
     catalog_synthetic = validate_scenario_registry(
-        db, access, scenario, zone_version, body
+        db,
+        access,
+        scenario,
+        zone_version,
+        body,
+        parent.payload["placements"] if parent else None,
     )
     model_synthetic = False
     if body["model_version_id"]:

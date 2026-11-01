@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams, useSearchParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -9,6 +9,7 @@ import {
   type Coefficient,
   type Dataset,
   type FastCalculationResponse,
+  type Job,
   type Placement,
   type Plant,
   type Scenario,
@@ -43,6 +44,7 @@ import { useSession } from '../../shell/session';
 import { useRevision, useRevisions, useScenario, useZone, useZoneVersion, zk } from '../zones/queries';
 import { ScenarioTransitions } from './ScenarioTransitions';
 import { PlacementEditor } from './PlacementEditor';
+import { Revision3DCompare } from './Revision3DCompare';
 import { RecommendationPanel } from './RecommendationPanel';
 import { RuleVersionField } from './RuleVersionField';
 import { ShadowSection } from '../shadow/ShadowPanel';
@@ -73,6 +75,7 @@ interface Edits {
 }
 
 const MONEY_RE = /^(0|[1-9][0-9]*)\.[0-9]{2}$/;
+const EMPTY_PLACEMENT_IDS = new Set<string>();
 const APPEND_KEYS: (keyof AppendRevisionInput)[] = [
   'zone_version_id',
   'parent_revision_id',
@@ -198,6 +201,8 @@ function RevisionEditor({
   const restored = stored !== null && stored.baseRevisionId === base.id && baseId === base.id;
   const [key, setKey] = useState(newIdempotencyKey);
   const [saved, setSaved] = useState<string | null>(null);
+  const [editorParams, setEditorParams] = useSearchParams();
+  const calculateAfterSave = useRef(false);
   const canEdit = hasRole('specialist') && scenario.status === 'draft';
   const coefficients = useQuery({
     queryKey: ['coefficients-for-scenario', scenario.city_id],
@@ -295,6 +300,26 @@ function RevisionEditor({
       void qc.invalidateQueries({ queryKey: zk.scenario(scenario.id) });
       void qc.invalidateQueries({ queryKey: zk.revisions(scenario.id) });
       onSaved(data);
+      if (calculateAfterSave.current) {
+        calculateAfterSave.current = false;
+        fullAfterSave.mutate(data.id);
+      }
+    },
+  });
+
+  const fullAfterSave = useMutation({
+    mutationFn: async (revisionId: string) => (
+      await unwrap<Job>(api.POST('/v1/calculations', {
+        params: { header: { 'X-CSRF-Token': user?.csrf_token ?? '', 'Idempotency-Key': newIdempotencyKey() } },
+        body: { scenario_revision_id: revisionId, mode: 'full', include_modules: ['cost', 'survival', 'care', 'ecosystem'], seed: 0 },
+      }))
+    ).data,
+    onSuccess: (job) => {
+      qc.setQueryData(['job', job.id], job);
+      const next = new URLSearchParams(editorParams);
+      next.set(CALC_JOB, job.id);
+      next.delete(CALC_RESULT);
+      setEditorParams(next, { replace: true });
     },
   });
 
@@ -336,6 +361,14 @@ function RevisionEditor({
   const onOtherBase = baseId !== base.id;
 
   const conflict = save.error instanceof ApiError && save.error.category === 'revision_conflict';
+  const buildingConflictIds = useMemo(() => {
+    if (!(save.error instanceof ApiError) || save.error.problem?.code !== 'placement_building_conflict') return EMPTY_PLACEMENT_IDS;
+    return new Set(save.error.problem.field_errors.flatMap((item) => {
+      const match = item.path.match(/^\/placements\/(\d+)\/position$/);
+      const placement = match ? edits.placements[Number(match[1])] : null;
+      return placement ? [placement.id] : [];
+    }));
+  }, [save.error, edits.placements]);
   const state: SaveState = save.isPending
     ? 'saving'
     : conflict
@@ -516,6 +549,7 @@ function RevisionEditor({
             catalogVersionId={edits.catalog_version_id}
             onCatalogVersion={(id) => setEdits((e) => ({ ...e, catalog_version_id: id }))}
             preferredPlant={recommendedPlant}
+            conflictIds={buildingConflictIds}
           />
         </div>
         <RuleVersionField
@@ -576,14 +610,32 @@ function RevisionEditor({
           icon="check"
           busy={save.isPending}
           disabled={!canEdit || !dirty || Boolean(budgetError) || Boolean(commentError) || placementIssues || needsRule || conflict || onOtherBase}
-          onClick={() => save.mutate()}
+          onClick={() => {
+            calculateAfterSave.current = false;
+            save.mutate();
+          }}
         >
           {t('scenario.save')}
         </Button>
-        <Button disabled={!dirty || save.isPending} onClick={resetToBase}>
+        <Button
+          icon="refresh"
+          busy={save.isPending || fullAfterSave.isPending}
+          disabled={!canEdit || !dirty || Boolean(budgetError) || Boolean(commentError) || placementIssues || needsRule || conflict || onOtherBase}
+          onClick={() => {
+            calculateAfterSave.current = true;
+            save.mutate();
+          }}
+        >
+          Сохранить и пересчитать
+        </Button>
+        <Button disabled={!dirty || save.isPending} onClick={() => {
+          calculateAfterSave.current = false;
+          resetToBase();
+        }}>
           {t('scenario.discard')}
         </Button>
       </div>
+      {fullAfterSave.isError ? <ApiErrorView compact error={fullAfterSave.error} onRetry={() => saved && fullAfterSave.mutate(saved)} /> : null}
       <p className="pg-muted">{t('scenario.save.hint')}</p>
     </Card>
   );
@@ -743,8 +795,14 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
   const viewed = params.get('revision');
   const current = useRevision(scenario.data?.data.current_revision_id ?? null);
   const shown = useRevision(viewed && viewed !== scenario.data?.data.current_revision_id ? viewed : null);
+  const parent = useRevision(current.data?.parent_revision_id ?? null);
   const calcOk = useOperationAvailable('calculateFast');
   const zoneQ = useZone(scenario.data?.data.zone_id ?? null);
+  const historicCompareZone = useZoneVersion(
+    current.data && zoneQ.data && current.data.zone_version_id !== zoneQ.data.data.version_id
+      ? current.data.zone_version_id
+      : null,
+  );
   const transitionOk = useOperationAvailable('transitionScenario');
   const peerScenarios = useQuery({
     queryKey: ['scenario-peers', cityId, scenario.data?.data.zone_id ?? ''],
@@ -774,6 +832,10 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
   const calculationRevisionId = isOld ? shown.data?.id ?? null : current.data?.id ?? null;
   const compareRevisions = (peerScenarios.data ?? []).map((item) => item.current_revision_id).slice(0, 3);
   const compareHref = `/compare?city=${encodeURIComponent(cityId)}${compareRevisions.length >= 2 ? `&revisions=${encodeURIComponent(compareRevisions.join(','))}` : ''}`;
+  const currentZone = zoneQ.data?.data;
+  const compareZone = currentZone && current.data?.zone_version_id === currentZone.version_id
+    ? currentZone
+    : historicCompareZone.query.data;
 
   return (
     <>
@@ -818,6 +880,9 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
                 <ZoneVersionNotice zoneId={s.zone_id} revisionZoneVersionId={current.data.zone_version_id} cityId={cityId} />
                 <RevisionSummary rev={current.data} timeZone={timeZone} />
               </Card>
+              {parent.data && compareZone && parent.data.zone_version_id === current.data.zone_version_id ? (
+                <Revision3DCompare before={parent.data} after={current.data} zone={compareZone} />
+              ) : null}
               <RevisionEditor
                 key={s.id}
                 scenario={s}

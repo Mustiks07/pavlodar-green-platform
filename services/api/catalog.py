@@ -5,7 +5,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 
 from jsonschema import ValidationError
 from shapely.geometry import Point, shape
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from packages.domain.contracts import validate
 from packages.domain.errors import DomainError
@@ -736,7 +736,57 @@ def recommend(db, access, body, zone_version):
     }
 
 
-def validate_scenario_registry(db, access, scenario, zone_version, body):
+def _validate_building_conflicts(db, body, previous_placements):
+    """Reject new or moved points covered by a frozen published building footprint.
+
+    Existing unchanged positions are grandfathered: admitting a newly published building version
+    must not make an unrelated scenario edit impossible.  A move, however, is checked by PostGIS
+    against the exact building dataset versions frozen into the proposed revision.
+    """
+    building_versions = []
+    for version_id in body["dataset_version_ids"]:
+        version = db.get(DatasetVersion, version_id)
+        dataset = db.get(Dataset, version.dataset_id) if version else None
+        if version and dataset and dataset.payload.get("kind") == "buildings":
+            building_versions.append(version_id)
+    if not building_versions:
+        return
+    previous = {
+        item["id"]: item["position"]["coordinates"][:2]
+        for item in (previous_placements or [])
+    }
+    for index, placement in enumerate(body["placements"]):
+        coordinates = placement["position"]["coordinates"][:2]
+        if previous.get(placement["id"]) == coordinates:
+            continue
+        point = func.ST_SetSRID(func.ST_Point(coordinates[0], coordinates[1]), 4326)
+        conflict = db.scalar(
+            select(ImportRecord.row_index)
+            .where(
+                ImportRecord.version_id.in_(building_versions),
+                ImportRecord.geometry.is_not(None),
+                func.ST_Covers(ImportRecord.geometry, point),
+            )
+            .limit(1)
+        )
+        if conflict is not None:
+            raise DomainError(
+                422,
+                "placement_building_conflict",
+                "Посадка пересекает контур здания",
+                field_errors=[
+                    {
+                        "path": f"/placements/{index}/position",
+                        "code": "building_conflict",
+                        "message": "Посадка пересекает здание",
+                    }
+                ],
+            )
+
+
+def validate_scenario_registry(
+    db, access, scenario, zone_version, body, previous_placements=None
+):
     catalog_synthetic = False
     catalog = None
     rows = []
@@ -795,6 +845,7 @@ def validate_scenario_registry(db, access, scenario, zone_version, body):
             raise DomainError(
                 422, "plant_input_invalid", "Unknown dimension basis cannot carry dimensions"
             )
+    _validate_building_conflicts(db, body, previous_placements)
     for patch in body["area_patches"]:
         plant = plants.get(patch["plant_id"])
         if plant is None:

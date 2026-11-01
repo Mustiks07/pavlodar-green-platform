@@ -12,11 +12,15 @@ import { useBasemapStyle } from '../map/basemap';
 import { maplibregl } from '../map/maplibre';
 import { useZoneVersion } from '../zones/queries';
 import { plantImage } from '../plants/images';
+import { Scene3DToggle } from '../scene3d/Scene3DPanel';
+import { useScene3D } from '../scene3d/useScene3D';
+import type { ScenePlanting } from '../scene3d/types';
 import { add, insideZone, issuesOf, move, newPlacement, redo, remove, same, undo, update, type LngLat, type PlacementHistory } from './placements';
 
 const coarse = () => window.matchMedia('(pointer: coarse)').matches;
 const HIT = () => (coarse() ? 18 : 8);
 const SLOP_PX = 8;
+const EMPTY_IDS = new Set<string>();
 
 function cssVar(name: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888';
@@ -39,7 +43,7 @@ function boundsOf(g: Zone['geometry']): [number, number, number, number] | null 
 }
 
 /** Plan of the zone version with the placements: select, add, drag (mouse, finger), keyboard nudge. */
-function PlacementMap({
+export function PlacementMap({
   zone,
   placements,
   selectedId,
@@ -49,6 +53,10 @@ function PlacementMap({
   onAdd,
   onMove,
   onDelete,
+  conflictIds,
+  auto3d = false,
+  onMapReady,
+  compareLabel,
 }: {
   zone: Zone;
   placements: Placement[];
@@ -59,27 +67,55 @@ function PlacementMap({
   onAdd: (at: LngLat) => void;
   onMove: (id: string, at: LngLat) => void;
   onDelete: (id: string) => void;
+  conflictIds: Set<string>;
+  /** Opens the existing Three layer as soon as the map is ready (used by immutable revision compare). */
+  auto3d?: boolean;
+  onMapReady?: (map: maplibregl.Map | null) => void;
+  compareLabel?: string;
 }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const basemap = useBasemapStyle();
   const [ready, setReady] = useState(false);
+  const scenePlantings = useMemo<ScenePlanting[]>(() => placements.map((placement) => ({
+    id: placement.id,
+    position: placement.position.coordinates as LngLat,
+    quantity: placement.quantity,
+    height_m: placement.initial_height_m,
+    crown_radius_m: placement.initial_crown_radius_m,
+    selected: placement.id === selectedId,
+    locked: placement.locked,
+    conflict: conflictIds.has(placement.id),
+  })), [placements, selectedId, conflictIds]);
+  const scene3d = useScene3D(() => map.current, [], scenePlantings);
+  const auto3dStarted = useRef(false);
+  if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementScene?: typeof scene3d }).__pgPlacementScene = scene3d;
   const live = useRef({ placements, selectedId, adding, disabled, onSelect, onAdd, onMove });
   live.current = { placements, selectedId, adding, disabled, onSelect, onAdd, onMove };
-  const drag = useRef<{ id: string; start: maplibregl.Point; pos: LngLat | null; touch: boolean } | null>(null);
+  const drag = useRef<{
+    id: string;
+    start: maplibregl.Point;
+    pos: LngLat | null;
+    touch: boolean;
+    restoreRotate: boolean;
+    camera: { center: maplibregl.LngLat; zoom: number; pitch: number; bearing: number };
+    scroll: [number, number];
+    client: [number, number];
+  } | null>(null);
   const suppressClick = useRef(0);
 
   const data = (list: Placement[], dragged: { id: string; pos: LngLat } | null): FeatureCollection => ({
     type: 'FeatureCollection',
     features: list.map((p, i) => ({
       type: 'Feature',
-      properties: { id: p.id, n: i + 1, sel: p.id === live.current.selectedId, locked: p.locked },
+      properties: { id: p.id, n: i + 1, sel: p.id === live.current.selectedId, locked: p.locked, conflict: conflictIds.has(p.id) },
       geometry: { type: 'Point', coordinates: dragged && dragged.id === p.id ? dragged.pos : p.position.coordinates },
     })),
   });
 
   useEffect(() => {
     if (!el.current || basemap.status === 'loading') return;
+    auto3dStarted.current = false;
     const m = new maplibregl.Map({
       container: el.current,
       style: basemap.status === 'ready' ? basemap.style : blankStyle(),
@@ -102,7 +138,7 @@ function PlacementMap({
         source: 'pl',
         paint: {
           'circle-radius': ['case', ['get', 'sel'], r + 3, r],
-          'circle-color': cssVar('--pg-positive'),
+          'circle-color': ['case', ['get', 'conflict'], cssVar('--pg-negative'), cssVar('--pg-positive')],
           // Locked = thick dark ring; selected = focus ring. Shape cues, not colour alone.
           'circle-stroke-color': ['case', ['get', 'sel'], cssVar('--pg-focus'), ['get', 'locked'], cssVar('--pg-text'), cssVar('--pg-surface')],
           'circle-stroke-width': ['case', ['get', 'sel'], 4, ['get', 'locked'], 3, 1.5],
@@ -127,12 +163,24 @@ function PlacementMap({
       }
       return best?.id ?? null;
     };
-    const start = (id: string, pt: maplibregl.Point, touch: boolean) => {
+    const start = (id: string, pt: maplibregl.Point, touch: boolean, client: [number, number]) => {
       const p = live.current.placements.find((x) => x.id === id);
       live.current.onSelect(id);
       if (!p || p.locked || live.current.disabled) return false;
-      drag.current = { id, start: pt, pos: null, touch };
+      const restoreRotate = m.dragRotate.isEnabled();
+      drag.current = {
+        id,
+        start: pt,
+        pos: null,
+        touch,
+        restoreRotate,
+        camera: { center: m.getCenter(), zoom: m.getZoom(), pitch: m.getPitch(), bearing: m.getBearing() },
+        scroll: [window.scrollX, window.scrollY],
+        client,
+      };
+      if (import.meta.env.DEV) (window as unknown as { __pgPlacementDrag?: unknown }).__pgPlacementDrag = { phase: 'started', id };
       m.dragPan.disable();
+      m.dragRotate.disable();
       return true;
     };
     const moveTo = (pt: maplibregl.Point, ll: maplibregl.LngLat) => {
@@ -140,6 +188,7 @@ function PlacementMap({
       if (!d) return;
       if (!d.pos && pt.dist(d.start) < SLOP_PX) return;
       d.pos = [ll.lng, ll.lat];
+      if (import.meta.env.DEV) (window as unknown as { __pgPlacementDrag?: unknown }).__pgPlacementDrag = { phase: 'moving', id: d.id, pos: d.pos };
       (m.getSource('pl') as maplibregl.GeoJSONSource | undefined)?.setData(data(live.current.placements, { id: d.id, pos: d.pos }));
     };
     const end = () => {
@@ -147,18 +196,45 @@ function PlacementMap({
       if (!d) return;
       drag.current = null;
       m.dragPan.enable();
+      if (d.restoreRotate) m.dragRotate.enable();
       if (d.touch) suppressClick.current = performance.now() + 600;
       if (d.pos) {
         suppressClick.current = performance.now() + 300;
         live.current.onMove(d.id, d.pos);
       }
+      if (import.meta.env.DEV) (window as unknown as { __pgPlacementDrag?: unknown }).__pgPlacementDrag = { phase: 'ended', id: d.id, pos: d.pos };
     };
+    // MapLibre's rotate handler can consume map-level mousemove events in a pitched scene.
+    // Track an active mouse drag at window level as well, so the same editor remains draggable
+    // in both plan and 3D modes and keeps working if the pointer briefly leaves the canvas.
+    const moveWindow = (event: MouseEvent) => {
+      if (!drag.current || drag.current.touch) return;
+      event.preventDefault();
+      window.scrollTo(...drag.current.scroll);
+      const camera = drag.current.camera;
+      m.stop();
+      m.jumpTo(camera);
+      const canvas = m.getCanvas();
+      const rect = canvas.getBoundingClientRect();
+      const point = new maplibregl.Point(
+        drag.current.start.x + event.clientX - drag.current.client[0],
+        drag.current.start.y + event.clientY - drag.current.client[1],
+      );
+      moveTo(point, m.unproject(point));
+      if (import.meta.env.DEV) (window as unknown as { __pgPlacementPointer?: unknown }).__pgPlacementPointer = {
+        point: [point.x, point.y], client: [event.clientX, event.clientY], rect: [rect.left, rect.top], targetCanvas: event.target === canvas,
+      };
+    };
+    const endWindow = () => {
+      if (drag.current && !drag.current.touch) end();
+    };
+    window.addEventListener('mousemove', moveWindow, true);
+    window.addEventListener('mouseup', endWindow, true);
     m.on('mousedown', (e) => {
       const id = hitAt(e.point);
-      if (id && start(id, e.point, false)) e.preventDefault();
+      if (id && start(id, e.point, false, [e.originalEvent.clientX, e.originalEvent.clientY])) e.preventDefault();
     });
     m.on('mousemove', (e) => {
-      moveTo(e.point, e.lngLat);
       m.getCanvas().style.cursor = drag.current?.pos ? 'grabbing' : live.current.adding ? 'crosshair' : hitAt(e.point) ? 'pointer' : '';
     });
     m.on('mouseup', end);
@@ -169,7 +245,8 @@ function PlacementMap({
         return;
       }
       const id = hitAt(e.point);
-      if (id && start(id, e.point, true)) e.preventDefault();
+      const touch = e.originalEvent.touches[0];
+      if (id && start(id, e.point, true, [touch?.clientX ?? e.point.x, touch?.clientY ?? e.point.y])) e.preventDefault();
       else if (id) suppressClick.current = performance.now() + 600;
     });
     m.on('touchmove', (e) => {
@@ -191,8 +268,10 @@ function PlacementMap({
       else live.current.onSelect(null);
     });
     map.current = m;
-    if (import.meta.env.DEV) (window as unknown as { __pgPlacementMap?: maplibregl.Map }).__pgPlacementMap = m;
+    if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementMap?: maplibregl.Map }).__pgPlacementMap = m;
     return () => {
+      window.removeEventListener('mousemove', moveWindow, true);
+      window.removeEventListener('mouseup', endWindow, true);
       m.remove();
       map.current = null;
       setReady(false);
@@ -203,10 +282,27 @@ function PlacementMap({
 
   useEffect(() => {
     if (!ready) return;
+    onMapReady?.(map.current);
+    return () => onMapReady?.(null);
+  }, [ready, onMapReady]);
+
+  useEffect(() => {
+    if (!ready || !auto3d || auto3dStarted.current) return;
+    auto3dStarted.current = true;
+    void scene3d.enable().then(() => {
+      const bounds = boundsOf(zone.geometry);
+      if (bounds && map.current) map.current.fitBounds(bounds, { padding: 56, maxZoom: 17, duration: 0 });
+    });
+    // The scene controller is intentionally invoked once per map instance.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, auto3d, zone.version_id]);
+
+  useEffect(() => {
+    if (!ready) return;
     (map.current?.getSource('pl') as maplibregl.GeoJSONSource | undefined)?.setData(data(placements, null));
     // data() reads the selection from live.current
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placements, selectedId, ready]);
+  }, [placements, selectedId, conflictIds, ready]);
 
   return (
     <div className="pl-map-wrap">
@@ -214,7 +310,7 @@ function PlacementMap({
         ref={el}
         className={adding ? 'pl-map is-adding' : 'pl-map'}
         role="region"
-        aria-label={t('placement.map')}
+        aria-label={compareLabel ?? t('placement.map')}
         tabIndex={0}
         onKeyDown={(e) => {
           const m = map.current;
@@ -236,6 +332,19 @@ function PlacementMap({
           e.stopPropagation();
         }}
       />
+      {ready ? (
+        <div className="pl-map__3d">
+          <Scene3DToggle
+            state={scene3d.state}
+            onEnable={() => void scene3d.enable().then(() => {
+              const bounds = boundsOf(zone.geometry);
+              if (bounds && map.current) map.current.fitBounds(bounds, { padding: 72, maxZoom: 17, duration: 250 });
+            })}
+            onDisable={scene3d.disable}
+          />
+          {scene3d.state === 'on' ? <span>{disabled ? 'Объёмное сравнение проектных посадок' : 'Посадки можно перетаскивать прямо в объёмном виде'}</span> : null}
+        </div>
+      ) : null}
       {adding ? <div className="map-crosshair" aria-hidden /> : null}
       {basemap.status === 'failed' ? <p className="pg-muted pl-map__note">{t('basemap.failed')}</p> : null}
     </div>
@@ -425,6 +534,7 @@ export function PlacementEditor({
   catalogVersionId,
   onCatalogVersion,
   preferredPlant,
+  conflictIds = EMPTY_IDS,
 }: {
   value: Placement[];
   onChange: (next: Placement[]) => void;
@@ -435,6 +545,8 @@ export function PlacementEditor({
   onCatalogVersion: (id: string) => void;
   /** Plant selected in the recommendation result; it becomes the active map-placement tool. */
   preferredPlant?: Plant | null;
+  /** Server-rejected positions stay in the local draft and are highlighted. */
+  conflictIds?: Set<string>;
 }) {
   const zone = useZoneVersion(zoneVersionId);
   const [hist, setHist] = useState<Omit<PlacementHistory, 'present'>>({ past: [], future: [] });
@@ -560,6 +672,7 @@ export function PlacementEditor({
             commitChange(remove(value, id));
             setSelectedId(null);
           }}
+          conflictIds={conflictIds}
         />
       )}
       <p className="pg-muted">{t('placement.keys')}</p>
