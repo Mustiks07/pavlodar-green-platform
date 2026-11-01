@@ -50,26 +50,27 @@ def run_job(job_id):
                 persist_chat_reply,
                 prepare_chat_request,
                 presentable_reply,
+                server_owned_tool_reply,
             )
             from services.api.llm import LLMError, ProviderUnavailable, gateway
 
             with session() as db, db.begin():
                 request, facts = prepare_chat_request(db, leased(db, job_id, token))
-            try:
-                reply = gateway().complete(request)
-            except ProviderUnavailable:
-                # The bounded server context and read-only typed tools remain useful when every
-                # external provider is unavailable. They never invent or mutate domain data.
-                reply = grounded_fallback_reply(request)
-            except LLMError:
-                code = (
-                    "operation_not_implemented"
-                )
-                with session() as db, db.begin():
-                    job = db.get(Job, job_id)
-                    if job and job.state in {"running", "cancel_requested"}:
-                        failure(db, job, code)
-                return
+            reply = server_owned_tool_reply(request)
+            if reply is None:
+                try:
+                    reply = gateway().complete(request)
+                except ProviderUnavailable:
+                    # The bounded server context remains useful when every external provider is
+                    # unavailable. It never invents or mutates domain data.
+                    reply = grounded_fallback_reply(request)
+                except LLMError:
+                    code = "operation_not_implemented"
+                    with session() as db, db.begin():
+                        job = db.get(Job, job_id)
+                        if job and job.state in {"running", "cancel_requested"}:
+                            failure(db, job, code)
+                    return
             reply = presentable_reply(request, reply, facts)
             with session() as db, db.begin():
                 complete(

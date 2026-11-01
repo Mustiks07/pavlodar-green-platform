@@ -17,10 +17,11 @@ five documented weights from the authorized revision before calling the existing
 case. The server owns the Russian result text and Fact cards; the model cannot insert plants or change a
 revision through this tool.
 
-When every external provider is unavailable or not configured, keep the bounded authorized-context
-summary active. An explicit Russian request to select/recommend plants routes to the same typed server
-tool. This is deterministic product functionality, not a simulated LLM answer. Quantity changes continue
-to use the separate pending Proposal and require human apply.
+Route an explicit Russian request to select/recommend plants to the typed server tool before contacting an
+external model. When every external provider is unavailable or not configured, keep the bounded
+authorized-context summary active for other questions. This is deterministic product functionality, not a
+simulated LLM answer. Quantity changes continue to use the separate pending Proposal and require human
+apply.
 
 Consequences
 The hero project can answer "Подбери растения для этого участка" with catalog/rule-backed candidates,

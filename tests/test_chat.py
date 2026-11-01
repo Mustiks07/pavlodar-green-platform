@@ -384,7 +384,7 @@ def test_grounded_fallback_routes_explicit_plant_selection_to_server_tool():
         ),
     )
     reply = grounded_fallback_reply(request)
-    assert reply.provider == "grounded-fallback"
+    assert reply.provider == "server-tools"
     assert reply.tool_calls[0].name == "recommend_plants"
     assert reply.tool_calls[0].arguments == {"top_n": 5}
 
@@ -583,23 +583,13 @@ def test_chat_proposal_requires_human_apply_and_current_revision(clients, monkey
 
     class RecommendationGateway:
         def complete(self, request):
-            assert [tool.name for tool in request.tools] == [
-                "recommend_plants",
-                "propose_placement_quantity",
-            ]
-            return LLMReply(
-                provider="test-provider",
-                model="test-model",
-                text="Подбираю растения.",
-                tool_calls=(ToolCall("call-r", "recommend_plants", {"top_n": 2}),),
-                usage=Usage(input_tokens=40, output_tokens=8),
-            )
+            raise AssertionError("explicit server-owned recommendation must bypass the provider")
 
     monkeypatch.setattr("services.api.llm.gateway", lambda: RecommendationGateway())
     recommendation_job = send(
         specialist,
         created_chat["id"],
-        "Подбери два подходящих растения для этого участка",
+        "Подбери растения для этого участка",
         revision_id,
     )
     run_job.run(recommendation_job["id"])

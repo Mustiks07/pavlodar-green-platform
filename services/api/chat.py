@@ -58,6 +58,38 @@ NUMERIC_CLAIM = re.compile(
 )
 
 
+def server_owned_tool_reply(request):
+    """Route explicit deterministic read-only actions before contacting an external model."""
+    question = next(
+        (message.content.lower() for message in reversed(request.messages) if message.role == "user"),
+        "",
+    )
+    recommend_tool = next(
+        (tool for tool in request.tools if tool.name == "recommend_plants"),
+        None,
+    )
+    asks_recommendation = any(
+        phrase in question
+        for phrase in (
+            "подбери раст",
+            "подобрать раст",
+            "рекомендуй раст",
+            "порекомендуй раст",
+            "какие растения посад",
+            "какие виды посад",
+        )
+    )
+    if not recommend_tool or not asks_recommendation:
+        return None
+    return LLMReply(
+        provider="server-tools",
+        model="catalog-rule-recommendation-v1",
+        text="Подбираю растения по закреплённому каталогу и правилам участка.",
+        tool_calls=(ToolCall("server-recommendation", "recommend_plants", {"top_n": 5}),),
+        usage=Usage(input_tokens=None, output_tokens=None),
+    )
+
+
 def grounded_fallback_reply(request):
     """Return a bounded facts-only answer when every configured LLM is unavailable.
 
@@ -78,20 +110,9 @@ def grounded_fallback_reply(request):
         (message.content.lower() for message in reversed(request.messages) if message.role == "user"),
         "",
     )
-    recommend_tool = next(
-        (tool for tool in request.tools if tool.name == "recommend_plants"),
-        None,
-    )
-    if recommend_tool and any(
-        word in question for word in ("подбери", "подобрать", "рекомендуй", "растени", "виды")
-    ):
-        return LLMReply(
-            provider="grounded-fallback",
-            model="authorized-context-summary-v1",
-            text="Подбираю растения по закреплённому каталогу и правилам участка.",
-            tool_calls=(ToolCall("grounded-recommendation", "recommend_plants", {"top_n": 5}),),
-            usage=Usage(input_tokens=None, output_tokens=None),
-        )
+    tool_reply = server_owned_tool_reply(request)
+    if tool_reply:
+        return tool_reply
     asks_area = any(word in question for word in ("площад", "размер", "участ"))
     asks_cost = any(word in question for word in ("стоим", "смет", "бюджет", "цен"))
     asks_survival = any(word in question for word in ("прижив", "выжив", "сохранност"))
