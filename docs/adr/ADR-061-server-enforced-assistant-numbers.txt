@@ -10,9 +10,10 @@ This did not satisfy the requirement that every numerical claim be traceable to 
 
 Decision
 Treat provider prose as untrusted presentation. Extract numerical claims after ignoring ordered-list markers
-and admit only exact or display-rounded values represented by the attached server Facts. Ratios may be shown
-as their exact or rounded percentage; horizons and counts of same-metric fact cards may be described. Any
-other number replaces the entire prose answer with the existing bounded AUTHORIZED_CONTEXT summary.
+and admit only exact or display-rounded values represented by the attached server Facts with the matching
+unit/type. Ratios may be shown as their exact or rounded percentage; horizons and counts of same-metric fact
+cards may be described. Any other number or mismatched unit replaces the entire prose answer with the existing
+bounded AUTHORIZED_CONTEXT summary.
 
 Create Fact cards for a complete canonical scenario cost and the three priority scores the summary can show,
 in addition to area, survival and ecosystem facts. A tool response may mention only its server-validated

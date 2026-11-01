@@ -275,6 +275,48 @@ def test_provider_number_without_server_fact_is_replaced():
     assert "88%" in cleaned.text
 
 
+def test_provider_exact_value_with_wrong_unit_is_replaced():
+    context = {"city": {"name": "Павлодар"}, "zone": {"area_m2": 1250, "purpose": "двор"}}
+    request = LLMRequest(
+        messages=(
+            Message("system", "rules"),
+            Message("system", "AUTHORIZED_CONTEXT=" + __import__("json").dumps(context)),
+            Message("user", "Какова площадь?"),
+        )
+    )
+    facts = [
+        {
+            "id": "99000000-0000-4000-8000-000000000010",
+            "label": "Площадь участка",
+            "metric": {
+                "key": "zone_area",
+                "value": 1250,
+                "unit": "m2",
+                "horizon_year": None,
+                "status": "estimated",
+                "lower": None,
+                "upper": None,
+                "qualitative_confidence": "medium",
+                "method_version": "area-v1",
+                "source_refs": [],
+                "missing_reason": None,
+            },
+            "calculation_id": None,
+            "scenario_revision_id": None,
+        }
+    ]
+    raw = LLMReply(
+        provider="test-provider",
+        model="test-model",
+        text="Площадь участка — 1 250 кг.",
+        tool_calls=(),
+        usage=Usage(input_tokens=10, output_tokens=8),
+    )
+    cleaned = presentable_reply(request, raw, facts)
+    assert "кг" not in cleaned.text
+    assert "1 250 м²" in cleaned.text
+
+
 def test_provider_exact_fact_numbers_and_numbered_list_are_kept():
     request = LLMRequest(messages=(Message("system", "rules"), Message("user", "Результат?")))
     facts = snapshot_facts(

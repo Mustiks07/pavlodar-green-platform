@@ -171,6 +171,31 @@ def _numeric_value(value):
         return None
 
 
+def _claim_unit(text, match):
+    if "%" in match.group():
+        return "%"
+    tail = text[match.end() : match.end() + 24].lstrip().lower()
+    if re.match(r"^[–—-]\s*\d+(?:[.,]\d+)?\s*%", tail):
+        return "%"
+    aliases = (
+        (r"^(?:₸|kzt\b|тг\b|тенге\b)", "KZT"),
+        (r"^(?:м²|м2\b|m2\b)", "m2"),
+        (r"^(?:м³|м3\b|m3\b)", "m3"),
+        (r"^(?:кг\s*co2e|kg\s*co2e)", "kgCO2e"),
+        (r"^(?:кг\b|kg\b)", "kg"),
+        (r"^(?:год(?:а|ов)?\b|лет\b)", "year"),
+        (r"^/\s*100", "score_100"),
+        (r"^(?:групп(?:а|ы)?\b|объект(?:а|ов)?\b|шт\.?\b|штук(?:а|и)?\b)", "count"),
+    )
+    for pattern, unit in aliases:
+        if re.match(pattern, tail, re.IGNORECASE):
+            return unit
+    # A word immediately after a number is an asserted but unknown unit/type, not harmless prose.
+    if re.match(r"^[a-zа-яёµ°]", tail, re.IGNORECASE):
+        return "unsupported"
+    return None
+
+
 def _numeric_claims(text):
     """Extract actual numeric claims while ignoring numbered-list markers."""
     claims = []
@@ -182,13 +207,13 @@ def _numeric_claims(text):
             continue
         value = _numeric_value(match.group().rstrip("% "))
         if value is not None:
-            claims.append((value, "%" in match.group()))
+            claims.append((value, _claim_unit(text, match)))
     return claims
 
 
 def _supported_numeric_values(facts):
     plain = set()
-    percentages = set()
+    by_unit = {"%": set(), "year": set(), "count": set()}
     metric_counts = {}
     for fact in facts or ():
         metric = fact.get("metric") or {}
@@ -201,15 +226,24 @@ def _supported_numeric_values(facts):
                 continue
             plain.add(value)
             plain.add(value.quantize(Decimal(1)))
+            if field == "horizon_year":
+                by_unit["year"].update((value, value.quantize(Decimal(1))))
+            elif field in {"value", "lower", "upper"}:
+                unit = metric.get("unit")
+                if unit:
+                    by_unit.setdefault(unit, set()).update((value, value.quantize(Decimal(1))))
             if field in {"value", "lower", "upper"} and metric.get("unit") == "1":
                 percentage = value * 100
-                percentages.add(percentage)
-                percentages.add(percentage.quantize(Decimal(1)))
+                by_unit["%"].add(percentage)
+                by_unit["%"].add(percentage.quantize(Decimal(1)))
         if metric.get("unit") == "score_100":
             plain.add(Decimal(100))
-    plain.update(Decimal(count) for count in metric_counts.values())
+    counts = {Decimal(count) for count in metric_counts.values()}
+    plain.update(counts)
+    by_unit["count"].update(counts)
     plain.add(Decimal(len(facts or ())))
-    return plain, percentages
+    by_unit["count"].add(Decimal(len(facts or ())))
+    return plain, by_unit
 
 
 def numeric_claims_are_grounded(text, facts):
@@ -217,8 +251,11 @@ def numeric_claims_are_grounded(text, facts):
     claims = _numeric_claims(text)
     if not claims:
         return True
-    plain, percentages = _supported_numeric_values(facts)
-    return all(value in (percentages if is_percentage else plain) for value, is_percentage in claims)
+    plain, by_unit = _supported_numeric_values(facts)
+    return all(
+        value in plain if unit is None else value in by_unit.get(unit, set())
+        for value, unit in claims
+    )
 
 
 def presentable_reply(request, reply, facts=()):
@@ -231,15 +268,19 @@ def presentable_reply(request, reply, facts=()):
             and isinstance(call.arguments.get("quantity"), int)
             and not isinstance(call.arguments.get("quantity"), bool)
         ]
-        plain, _ = _supported_numeric_values(facts)
+        plain, by_unit = _supported_numeric_values(facts)
         plain.update(Decimal(value) for value in quantities)
+        by_unit["count"].update(Decimal(value) for value in quantities)
         text = reply.text.strip()
         claims = _numeric_claims(text)
         safe = (
             text
             and not UUID_IN_TEXT.search(text)
             and not any(marker in text for marker in RAW_CONTEXT_MARKERS)
-            and all(not is_percentage and value in plain for value, is_percentage in claims)
+            and all(
+                value in plain if unit is None else value in by_unit.get(unit, set())
+                for value, unit in claims
+            )
         )
         if safe:
             return reply

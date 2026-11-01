@@ -13,7 +13,7 @@
     {"id":"AC-09","title":"Экоэффект","status":"verified","evidence":["tests/test_ecosystem.py","docs/JURY_ACCEPTANCE_MATRIX.md"]},
     {"id":"AC-10","title":"3D и тени","status":"verified","evidence":["docs/evidence/wp03-open-data/open-buildings-3d.png","docs/assets/readme/platform-3d.png"]},
     {"id":"AC-11","title":"Исполнение","status":"verified","evidence":["docs/evidence/demo-contour/specialist-execution.png","apps/web/scripts/execution-check.mjs"]},
-    {"id":"AC-12","title":"Ассистент","status":"verified","evidence":["tests/test_chat.py","docs/assets/readme/platform-assistant.png"]},
+    {"id":"AC-12","title":"Ассистент","status":"verified","evidence":["docs/evidence/wp10/chat_user_acceptance_20261102.json","tests/test_chat_user_acceptance.py","tests/test_chat.py","docs/assets/readme/platform-assistant.png"]},
     {"id":"AC-13","title":"Экспорт","status":"verified","evidence":["tests/test_exports.py","docs/JURY_ACCEPTANCE_MATRIX.md"]},
     {"id":"AC-14","title":"Безопасность","status":"verified","evidence":["docs/evidence/foundation_oidc.json","docs/evidence/wp02-integration/report.json"]},
     {"id":"AC-15","title":"Эксплуатация","status":"verified_local_stack","evidence":["docs/evidence/foundation_restore.json","docs/evidence/foundation_queue.json","tools/dev/start-demo.ps1"]},

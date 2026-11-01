@@ -1,0 +1,38 @@
+{
+  "scope": "Fixed assistant user-task acceptance plus real chat/job/proposal integration",
+  "date": "2026-11-02",
+  "passed": true,
+  "user_task_count": 40,
+  "categories": {
+    "correct": 12,
+    "missing_inputs": 6,
+    "wrong_units": 6,
+    "hidden_or_other_scope": 5,
+    "malicious_context": 5,
+    "revision_conflict": 3,
+    "timeout": 3
+  },
+  "fixed_set_results": {
+    "passed": 40,
+    "failed": 0,
+    "structured_numeric_claim_reference_accuracy": "100%",
+    "unsupported_numeric_or_unit_claims_reaching_provider_text": 0
+  },
+  "integration_results": {
+    "tests_test_chat_py": "13 passed",
+    "access_scope": "owner-scoped sessions and proposals; inaccessible objects return 403/404",
+    "revision_conflict": "stale proposal apply returns 412 and does not change the current revision",
+    "cancel": "queued chat job reaches cancelled without a completed assistant claim",
+    "human_gate": "tool call creates a pending proposal; a separate current-revision apply is required"
+  },
+  "command": "python -m pytest tests/test_chat_user_acceptance.py tests/test_chat.py -q",
+  "result": "54 passed",
+  "boundaries": [
+    "The set is deterministic and does not claim universal absence of model errors",
+    "Provider prose is untrusted; authoritative numbers remain server Fact values",
+    "The suite does not make unavailable municipal inputs authoritative",
+    "Natural-language quality still benefits from specialist review"
+  ],
+  "decision": "ADR-061",
+  "implementation": "28baaad plus unit-aware follow-up"
+}
