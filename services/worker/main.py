@@ -75,7 +75,7 @@ def run_job(job_id):
                     if job and job.state in {"running", "cancel_requested"}:
                         failure(db, job, code)
                 return
-            reply = presentable_reply(request, reply)
+            reply = presentable_reply(request, reply, facts)
             with session() as db, db.begin():
                 complete(
                     db,

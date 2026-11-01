@@ -234,6 +234,102 @@ def test_raw_provider_context_is_replaced_with_presentable_server_summary():
     assert "99000000" not in cleaned.text
 
 
+def test_provider_number_without_server_fact_is_replaced():
+    context = {
+        "city": {"name": "Павлодар"},
+        "latest_calculation": {
+            "status": "complete",
+            "survival": [{"points": [{"year": 1, "probability": 0.88}]}],
+        },
+    }
+    request = LLMRequest(
+        messages=(
+            Message("system", "rules"),
+            Message("system", "AUTHORIZED_CONTEXT=" + __import__("json").dumps(context)),
+            Message("user", "Какова приживаемость?"),
+        )
+    )
+    facts = snapshot_facts(
+        "99000000-0000-4000-8000-000000000099",
+        "99000000-0000-4000-8000-000000000098",
+        {
+            "survival": [
+                {
+                    "model_kind": "expert_rules",
+                    "calibration_status": "uncalibrated",
+                    "points": [{"year": 1, "probability": 0.88}],
+                    "risks": [],
+                }
+            ]
+        },
+    )
+    raw = LLMReply(
+        provider="test-provider",
+        model="test-model",
+        text="Приживаемость составит 99% через 1 год.",
+        tool_calls=(),
+        usage=Usage(input_tokens=10, output_tokens=8),
+    )
+    cleaned = presentable_reply(request, raw, facts)
+    assert "99%" not in cleaned.text
+    assert "88%" in cleaned.text
+
+
+def test_provider_exact_fact_numbers_and_numbered_list_are_kept():
+    request = LLMRequest(messages=(Message("system", "rules"), Message("user", "Результат?")))
+    facts = snapshot_facts(
+        "99000000-0000-4000-8000-000000000099",
+        "99000000-0000-4000-8000-000000000098",
+        {
+            "cost": {"total": "450000.00"},
+            "survival": [
+                {
+                    "model_kind": "expert_rules",
+                    "calibration_status": "uncalibrated",
+                    "points": [{"year": 1, "probability": 0.88}],
+                    "risks": [],
+                }
+            ],
+        },
+    )
+    raw = LLMReply(
+        provider="test-provider",
+        model="test-model",
+        text="1. Приживаемость — 88% через 1 год.\n2. Стоимость — 450 000 ₸.",
+        tool_calls=(),
+        usage=Usage(input_tokens=10, output_tokens=12),
+    )
+    assert presentable_reply(request, raw, facts) == raw
+    assert len(facts) == 2
+    for fact in facts:
+        validate("Fact", fact)
+
+
+def test_tool_reply_keeps_validated_quantity_but_removes_unbacked_metric():
+    request = LLMRequest(messages=(Message("system", "rules"), Message("user", "Измени")))
+    raw = LLMReply(
+        provider="test-provider",
+        model="test-model",
+        text="Увеличу до 3, это даст 99% приживаемости.",
+        tool_calls=(
+            ToolCall(
+                "call-1",
+                "propose_placement_quantity",
+                {
+                    "summary": "Увеличить количество",
+                    "placement_id": "99000000-0000-4000-8000-000000000001",
+                    "quantity": 3,
+                },
+            ),
+        ),
+        usage=Usage(input_tokens=10, output_tokens=10),
+    )
+    cleaned = presentable_reply(request, raw)
+    assert cleaned.tool_calls == raw.tool_calls
+    assert "99%" not in cleaned.text
+    assert "ещё не применено" in cleaned.text
+
+
 class FakeGateway:
     def complete(self, request):
         assert "AUTHORIZED_CONTEXT=" in request.messages[1].content

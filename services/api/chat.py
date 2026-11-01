@@ -5,6 +5,7 @@ import copy
 import json
 import re
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal, InvalidOperation
 from uuid import UUID
 
 from pydantic import ValidationError as PydanticValidationError
@@ -43,6 +44,9 @@ RAW_CONTEXT_MARKERS = (
     "placement",
     "source_refs",
     "_id",
+)
+NUMERIC_CLAIM = re.compile(
+    r"(?<![\w-])(?:\d{1,3}(?:[\s\u00a0]\d{3})+|\d+)(?:[.,]\d+)?\s*%?"
 )
 
 
@@ -158,12 +162,101 @@ def grounded_fallback_reply(request):
     )
 
 
-def presentable_reply(request, reply):
-    """Replace raw context echoes with a bounded, human-readable summary of the same facts."""
+def _numeric_value(value):
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        return Decimal(str(value).replace("\u00a0", "").replace(" ", "").replace(",", "."))
+    except (InvalidOperation, ValueError):
+        return None
+
+
+def _numeric_claims(text):
+    """Extract actual numeric claims while ignoring numbered-list markers."""
+    claims = []
+    for match in NUMERIC_CLAIM.finditer(text):
+        line_start = text.rfind("\n", 0, match.start()) + 1
+        prefix = text[line_start : match.start()]
+        suffix = text[match.end() : match.end() + 1]
+        if not prefix.strip() and suffix in {".", ")"}:
+            continue
+        value = _numeric_value(match.group().rstrip("% "))
+        if value is not None:
+            claims.append((value, "%" in match.group()))
+    return claims
+
+
+def _supported_numeric_values(facts):
+    plain = set()
+    percentages = set()
+    metric_counts = {}
+    for fact in facts or ():
+        metric = fact.get("metric") or {}
+        key = metric.get("key")
+        if key:
+            metric_counts[key] = metric_counts.get(key, 0) + 1
+        for field in ("value", "lower", "upper", "horizon_year"):
+            value = _numeric_value(metric.get(field))
+            if value is None:
+                continue
+            plain.add(value)
+            plain.add(value.quantize(Decimal(1)))
+            if field in {"value", "lower", "upper"} and metric.get("unit") == "1":
+                percentage = value * 100
+                percentages.add(percentage)
+                percentages.add(percentage.quantize(Decimal(1)))
+        if metric.get("unit") == "score_100":
+            plain.add(Decimal(100))
+    plain.update(Decimal(count) for count in metric_counts.values())
+    plain.add(Decimal(len(facts or ())))
+    return plain, percentages
+
+
+def numeric_claims_are_grounded(text, facts):
+    """Require every provider-authored number to exist in a server Fact card."""
+    claims = _numeric_claims(text)
+    if not claims:
+        return True
+    plain, percentages = _supported_numeric_values(facts)
+    return all(value in (percentages if is_percentage else plain) for value, is_percentage in claims)
+
+
+def presentable_reply(request, reply, facts=()):
+    """Replace raw or numerically unsupported provider text with a bounded server summary."""
     if reply.tool_calls:
-        return reply
+        quantities = [
+            call.arguments.get("quantity")
+            for call in reply.tool_calls
+            if isinstance(call.arguments, dict)
+            and isinstance(call.arguments.get("quantity"), int)
+            and not isinstance(call.arguments.get("quantity"), bool)
+        ]
+        plain, _ = _supported_numeric_values(facts)
+        plain.update(Decimal(value) for value in quantities)
+        text = reply.text.strip()
+        claims = _numeric_claims(text)
+        safe = (
+            text
+            and not UUID_IN_TEXT.search(text)
+            and not any(marker in text for marker in RAW_CONTEXT_MARKERS)
+            and all(not is_percentage and value in plain for value, is_percentage in claims)
+        )
+        if safe:
+            return reply
+        return LLMReply(
+            provider=reply.provider,
+            model=reply.model,
+            text="Подготовлено предложение для проверки. Изменение ещё не применено.",
+            tool_calls=reply.tool_calls,
+            usage=reply.usage,
+        )
     text = reply.text.strip()
-    raw = not text or UUID_IN_TEXT.search(text) or any(marker in text for marker in RAW_CONTEXT_MARKERS)
+    raw = (
+        not text
+        or UUID_IN_TEXT.search(text)
+        or any(marker in text for marker in RAW_CONTEXT_MARKERS)
+        or not numeric_claims_are_grounded(text, facts)
+    )
     if not raw:
         return reply
     fallback = grounded_fallback_reply(request)
@@ -250,6 +343,29 @@ def snapshot_facts(snapshot_id, revision_id, payload):
     value already stored by the survival module, with its interval and input references intact.
     """
     facts = []
+    cost = payload.get("cost") or {}
+    if cost.get("total") is not None:
+        facts.append(
+            {
+                "id": uid(),
+                "label": "Полная стоимость сценария",
+                "metric": {
+                    "key": "full_cost",
+                    "value": float(Decimal(cost["total"])),
+                    "unit": "KZT",
+                    "horizon_year": None,
+                    "status": "estimated",
+                    "lower": None,
+                    "upper": None,
+                    "qualitative_confidence": "medium",
+                    "method_version": "canonical-cost-v1",
+                    "source_refs": [],
+                    "missing_reason": None,
+                },
+                "calculation_id": snapshot_id,
+                "scenario_revision_id": revision_id,
+            }
+        )
     for index, result in enumerate(payload.get("survival", [])[:5], start=1):
         point = next(
             (
@@ -558,6 +674,34 @@ def _facts_and_context(db, access, chat_session, revision_id):
                 for item in priority.payload["zones"][:100]
             ],
         }
+        for item in priority.payload["zones"][:3]:
+            if item.get("score") is None:
+                continue
+            refs = {}
+            for contribution in item.get("contributions", []):
+                for ref in contribution.get("source_refs", []):
+                    refs[(ref["dataset_version_id"], ref.get("source_record_id"))] = ref
+            facts.append(
+                {
+                    "id": uid(),
+                    "label": f"Приоритет: {zone_names.get(item['zone_id']) or 'участок'}",
+                    "metric": {
+                        "key": "priority_score",
+                        "value": item["score"],
+                        "unit": "score_100",
+                        "horizon_year": None,
+                        "status": "estimated",
+                        "lower": None,
+                        "upper": None,
+                        "qualitative_confidence": "medium",
+                        "method_version": "zone-context-ratios-1",
+                        "source_refs": list(refs.values()),
+                        "missing_reason": None,
+                    },
+                    "calculation_id": priority.id,
+                    "scenario_revision_id": revision_id,
+                }
+            )
     if chat_session.zone_id:
         zone = found(db.get(Zone, chat_session.zone_id))
         version = found(db.get(ZoneVersion, zone.current_version_id))
@@ -770,7 +914,7 @@ def _proposed_revision(db, access, job, reply, message):
     if len(reply.tool_calls) != 1 or reply.tool_calls[0].name != "propose_placement_quantity":
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
     try:
-        summary, placement_id, quantity = validate_quantity_proposal_arguments(
+        _summary, placement_id, quantity = validate_quantity_proposal_arguments(
             reply.tool_calls[0].arguments
         )
     except ValueError as error:
@@ -791,6 +935,7 @@ def _proposed_revision(db, access, job, reply, message):
     selected = next((item for item in placements if item.get("id") == placement_id), None)
     if selected is None or selected.get("locked") is not False:
         raise DomainError(422, "invalid_body", "Placement is unavailable for this proposal")
+    summary = f"Изменить количество в выбранном размещении: {selected['quantity']} → {quantity}"
     selected["quantity"] = quantity
     proposed["parent_revision_id"] = revision.id
     for key in ("id", "scenario_id", "created_at", "input_hash", "synthetic_inputs"):

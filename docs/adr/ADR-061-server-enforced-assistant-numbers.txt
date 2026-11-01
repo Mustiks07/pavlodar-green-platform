@@ -1,0 +1,30 @@
+ADR-061: Server-enforced numeric grounding for assistant replies
+Status: accepted
+Date: 2026-11-02
+
+Context
+The assistant prompt prohibited invented numbers and the UI displayed server Fact cards, but provider
+free text was trusted after generation. A model could therefore state a plausible unsupported percentage,
+cost or area next to unrelated correct facts. Tool-call text and proposal summaries had the same weakness.
+This did not satisfy the requirement that every numerical claim be traceable to an authorized server value.
+
+Decision
+Treat provider prose as untrusted presentation. Extract numerical claims after ignoring ordered-list markers
+and admit only exact or display-rounded values represented by the attached server Facts. Ratios may be shown
+as their exact or rounded percentage; horizons and counts of same-metric fact cards may be described. Any
+other number replaces the entire prose answer with the existing bounded AUTHORIZED_CONTEXT summary.
+
+Create Fact cards for a complete canonical scenario cost and the three priority scores the summary can show,
+in addition to area, survival and ecosystem facts. A tool response may mention only its server-validated
+quantity; unsafe text is replaced without dropping the structured tool call. Proposal summaries are generated
+by the server from the current and proposed quantities instead of persisting model-authored numeric prose.
+
+Consequences
+An unsupported claim such as 99% cannot reach a completed chat message when the persisted result is 88%.
+Exact values, their method and immutable result identifiers remain visible, while numbered explanations and
+human-readable formatting such as 450 000 KZT continue to work. This is a server boundary and therefore
+applies equally to every configured external or local model.
+
+The rule intentionally prefers a shorter grounded answer over partially preserving mixed safe and unsafe
+provider prose. It does not make absent municipal data authoritative and does not turn model output into a
+calculation.
