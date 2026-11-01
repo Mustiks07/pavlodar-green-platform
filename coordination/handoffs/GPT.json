@@ -1235,7 +1235,7 @@
     "limit": "This is recorded crown geometry, not a species spacing norm or underground-network clearance; rotation remains absent until the canonical model supports orientation"
   },
   "frozen_catalog_replacement_20261102": {
-    "implementation_sha": "pending",
+    "implementation_sha": "8084ba3",
     "contract_version": "1.15.0",
     "migration": "none",
     "implemented": [
