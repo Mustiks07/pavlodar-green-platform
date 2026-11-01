@@ -1065,7 +1065,7 @@
     "limit": "Only green deficit and soil coverage are admitted in the current profile; unavailable social and heat factors are not invented"
   },
   "assistant_numeric_guard_20261102": {
-    "implementation_sha": "28baaad",
+    "implementation_sha": "51b228e",
     "contract_version": "1.13.0",
     "migration": "none",
     "implemented": [
@@ -1075,11 +1075,14 @@
       "Tool-call prose may mention only the validated quantity and proposal summaries are server-owned"
     ],
     "verification": [
-      "Full tests/test_chat.py suite passed 12/12",
+      "Fixed 40-user-task acceptance plus real chat/job/proposal integration passed 54/54",
+      "Required categories include missing input, wrong unit, hidden/other scope, malicious context, revision conflict and timeout",
+      "Numeric claim reference accuracy is 100% on the fixed set and unsupported value/unit pairs reaching provider prose are zero",
       "Ruff and git diff whitespace checks passed",
       "Git credential account verified as Mustiks07 id 232028042 before push"
     ],
     "decision": "ADR-061",
+    "evidence": "docs/evidence/wp10/chat_user_acceptance_20261102.json",
     "limit": "The guard does not create missing municipal data or turn provider text into a calculation"
   }
 }
