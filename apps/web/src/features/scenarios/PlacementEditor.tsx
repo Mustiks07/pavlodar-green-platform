@@ -2,14 +2,25 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import type { StyleSpecification } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
-import { unwrap, type Placement, type Plant, type Zone } from '@pg/api-client';
+import { unwrap, type MapLayer, type Placement, type Plant, type Zone } from '@pg/api-client';
 import { Badge, Button, DataTable, Field, Icon, Input, Notice, Select, Skeleton, StateView, StockOfferRow } from '@pg/ui';
-import { api, useOperationAvailable } from '../../api';
+import { api, useMapLayers, useOperationAvailable } from '../../api';
 import { t, type AppKey } from '../../i18n';
 import { ApiErrorView } from '../../shell/ApiErrorView';
 import { OperationUnavailable } from '../../shell/OperationUnavailable';
 import { useBasemapStyle } from '../map/basemap';
 import { maplibregl } from '../map/maplibre';
+import {
+  classToken,
+  extrusionFilter,
+  extrusionIdOf,
+  layerIdsOf,
+  layerSpecs,
+  renderability,
+  sourceIdOf,
+  sourceSpec,
+  type Semantic,
+} from '../map/publishedLayers';
 import { useZoneVersion } from '../zones/queries';
 import { plantImage } from '../plants/images';
 import { Scene3DToggle } from '../scene3d/Scene3DPanel';
@@ -45,6 +56,7 @@ function boundsOf(g: Zone['geometry']): [number, number, number, number] | null 
 /** Plan of the zone version with the placements: select, add, drag (mouse, finger), keyboard nudge. */
 export function PlacementMap({
   zone,
+  datasetVersionIds,
   placements,
   selectedId,
   adding,
@@ -59,6 +71,8 @@ export function PlacementMap({
   compareLabel,
 }: {
   zone: Zone;
+  /** Frozen scenario inputs; displayed buildings must match the versions used by server validation. */
+  datasetVersionIds: string[];
   placements: Placement[];
   selectedId: string | null;
   adding: boolean;
@@ -76,6 +90,12 @@ export function PlacementMap({
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const basemap = useBasemapStyle();
+  const cityLayers = useMapLayers(zone.city_id);
+  const frozenVersions = useMemo(() => new Set(datasetVersionIds), [datasetVersionIds]);
+  const buildingLayers = useMemo(() => (cityLayers.data?.items ?? []).filter(
+    (layer) => layer.category === 'building' && layer.geometry_type === 'polygon' && frozenVersions.has(layer.dataset_version_id),
+  ), [cityLayers.data?.items, frozenVersions]);
+  const mountedBuildingLayers = useRef(new Map<string, MapLayer>());
   const [ready, setReady] = useState(false);
   const scenePlantings = useMemo<ScenePlanting[]>(() => placements.map((placement) => ({
     id: placement.id,
@@ -298,6 +318,67 @@ export function PlacementMap({
   }, [ready, auto3d, zone.version_id]);
 
   useEffect(() => {
+    const m = map.current;
+    if (!m || !ready) return;
+    const wanted = new Set(buildingLayers.map((layer) => layer.id));
+    const apply = () => {
+      for (const [id, oldLayer] of mountedBuildingLayers.current) {
+        if (wanted.has(id)) continue;
+        if (m.getLayer(extrusionIdOf(id))) m.removeLayer(extrusionIdOf(id));
+        for (const layerId of layerIdsOf(oldLayer)) if (m.getLayer(layerId)) m.removeLayer(layerId);
+        const sourceId = sourceIdOf(id);
+        if (m.getSource(sourceId)) m.removeSource(sourceId);
+        mountedBuildingLayers.current.delete(id);
+      }
+      for (const layer of buildingLayers) {
+        const sourceId = sourceIdOf(layer.id);
+        const extrusionId = extrusionIdOf(layer.id);
+        if (!wanted.has(layer.id)) continue;
+        const source = renderability(layer, window.location.origin);
+        if (!source.ok) continue;
+        if (!m.getSource(sourceId)) {
+          m.addSource(sourceId, source.archive ? sourceSpec(layer, source.url, true) : sourceSpec(layer, source.tiles));
+        }
+        const onBasemap = basemap.status === 'ready';
+        const color = (semantic: Semantic) => cssVar(classToken(layer, semantic, onBasemap));
+        const outline = cssVar(onBasemap ? '--pg-basemap-halo' : '--pg-surface');
+        for (const spec of layerSpecs(layer, color, outline)) {
+          if (!m.getLayer(spec.id)) m.addLayer(spec, m.getLayer('zone-fill') ? 'zone-fill' : undefined);
+        }
+        if (scene3d.state !== 'on') {
+          if (m.getLayer(extrusionId)) m.removeLayer(extrusionId);
+        } else if (!m.getLayer(extrusionId)) {
+          m.addLayer({
+            id: extrusionId,
+            type: 'fill-extrusion',
+            metadata: { 'pg:layer': layer.id },
+            source: sourceId,
+            'source-layer': layer.source_layer ?? '',
+            minzoom: Math.max(layer.min_zoom, 13),
+            filter: extrusionFilter(null),
+            paint: {
+              'fill-extrusion-color': [
+                'match',
+                ['get', 'height_basis'],
+                'measured', cssVar('--pg-prov-measured'),
+                cssVar('--pg-prov-estimated'),
+              ],
+              'fill-extrusion-height': ['get', 'height_m'],
+              'fill-extrusion-base': 0,
+              'fill-extrusion-opacity': 0.78,
+            },
+          }, m.getLayer('pl-circle') ? 'pl-circle' : undefined);
+        }
+        mountedBuildingLayers.current.set(layer.id, layer);
+      }
+    };
+    // `ready` is set by style.load after the editor's own sources are added. Do not wait for
+    // isStyleLoaded(): that also waits for every external tile and can stay false while the camera
+    // is moving, which made the exact frozen building layer appear only intermittently.
+    apply();
+  }, [ready, scene3d.state, buildingLayers, basemap.status]);
+
+  useEffect(() => {
     if (!ready) return;
     (map.current?.getSource('pl') as maplibregl.GeoJSONSource | undefined)?.setData(data(placements, null));
     // data() reads the selection from live.current
@@ -342,7 +423,17 @@ export function PlacementMap({
             })}
             onDisable={scene3d.disable}
           />
-          {scene3d.state === 'on' ? <span>{disabled ? 'Объёмное сравнение проектных посадок' : 'Посадки можно перетаскивать прямо в объёмном виде'}</span> : null}
+          {scene3d.state === 'on' ? (
+            <span>
+              {disabled
+                ? 'Объёмное сравнение проектных посадок'
+                : cityLayers.isPending
+                  ? 'Загружаем здания замороженной версии…'
+                  : buildingLayers.length > 0
+                    ? 'Перетаскивайте посадки: здания с записанной высотой показаны объёмно'
+                    : 'Объёмные здания этой версии недоступны; проверку выполняет сервер'}
+            </span>
+          ) : null}
         </div>
       ) : null}
       {adding ? <div className="map-crosshair" aria-hidden /> : null}
@@ -535,6 +626,7 @@ export function PlacementEditor({
   onCatalogVersion,
   preferredPlant,
   conflictIds = EMPTY_IDS,
+  datasetVersionIds,
 }: {
   value: Placement[];
   onChange: (next: Placement[]) => void;
@@ -547,6 +639,8 @@ export function PlacementEditor({
   preferredPlant?: Plant | null;
   /** Server-rejected positions stay in the local draft and are highlighted. */
   conflictIds?: Set<string>;
+  /** Exact dataset versions frozen in the draft revision. */
+  datasetVersionIds: string[];
 }) {
   const zone = useZoneVersion(zoneVersionId);
   const [hist, setHist] = useState<Omit<PlacementHistory, 'present'>>({ past: [], future: [] });
@@ -661,6 +755,7 @@ export function PlacementEditor({
       ) : (
         <PlacementMap
           zone={zone.query.data}
+          datasetVersionIds={datasetVersionIds}
           placements={value}
           selectedId={selectedId}
           adding={adding && canAdd}

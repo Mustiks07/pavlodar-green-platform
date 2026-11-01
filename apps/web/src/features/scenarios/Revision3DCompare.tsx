@@ -81,6 +81,7 @@ export function Revision3DCompare({ before, after, zone }: { before: ScenarioRev
           <div className="revision-3d-compare__label"><strong>До изменения</strong><span>версия {before.id.slice(0, 8)}</span></div>
           <PlacementMap
             zone={zone}
+            datasetVersionIds={before.dataset_version_ids}
             placements={before.placements}
             selectedId={selectedId}
             adding={false}
@@ -99,6 +100,7 @@ export function Revision3DCompare({ before, after, zone }: { before: ScenarioRev
           <div className="revision-3d-compare__label"><strong>После изменения</strong><span>версия {after.id.slice(0, 8)}</span></div>
           <PlacementMap
             zone={zone}
+            datasetVersionIds={after.dataset_version_ids}
             placements={after.placements}
             selectedId={selectedId}
             adding={false}

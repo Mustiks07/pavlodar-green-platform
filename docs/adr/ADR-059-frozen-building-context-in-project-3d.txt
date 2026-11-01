@@ -1,0 +1,27 @@
+ADR-059: Frozen building context in project 3D
+Status: accepted
+Date: 2026-11-02
+
+Context
+The placement editor already rendered project plants in Three and the server rejected placements that
+intersect buildings. The editor still showed only the external flat basemap, so an operator could not
+visually connect a rejected move with the exact building input. Rendering every currently published
+building layer would be misleading when a scenario is frozen to earlier DatasetVersions.
+
+Decision
+Load only authorized published polygon building layers whose dataset_version_id is present in the exact
+ScenarioRevision input bundle. Draw their footprints in plan view and extrude only positive server tile
+height_m values with an admitted height_basis. Keep project plants in the existing Three layer and never
+copy buildings into Three, avoiding double rendering. Before/after comparison uses each revision's own
+frozen version list. If a frozen layer is no longer published, say that its geometry is unavailable for
+viewing while the server check remains authoritative.
+
+The automatic recommendation and placement editor are also full-width grid rows. Their former wrapper
+occupied one small form column despite the editor itself requesting full width, which reduced the map
+to roughly 260 pixels and obscured the decision flow.
+
+Consequences
+The live jury scenario shows five project placement groups against 19 rendered buildings from the exact
+frozen published version. Two consecutive authenticated browser runs pass without API 5xx or browser
+errors. Unknown heights remain flat and no metres are inferred from floors. Historical frozen versions
+that are not currently published are not silently replaced by newer city data.

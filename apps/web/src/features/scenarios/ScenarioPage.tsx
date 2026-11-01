@@ -231,6 +231,13 @@ function RevisionEditor({
       setEdits((value) => ({ ...value, weather_dataset_version_id: current.current_version_id }));
     }
   }, [base.dataset_version_ids, edits.weather_dataset_version_id, weatherDatasets.data]);
+  const editorDatasetVersionIds = useMemo(() => {
+    const ids = new Set(base.dataset_version_ids);
+    if (edits.weather_dataset_version_id) ids.add(edits.weather_dataset_version_id);
+    const coefficient = coefficients.data?.find((item) => item.version_id === edits.coefficient_version_id);
+    for (const source of coefficient?.source_refs ?? []) ids.add(source.dataset_version_id);
+    return [...ids];
+  }, [base.dataset_version_ids, edits.weather_dataset_version_id, edits.coefficient_version_id, coefficients.data]);
 
   // The revision the edits started from. Compared with it, an untouched draft stays clean when the
   // server moves on (another save, an applied proposal) and simply follows the new revision.
@@ -550,6 +557,7 @@ function RevisionEditor({
             onCatalogVersion={(id) => setEdits((e) => ({ ...e, catalog_version_id: id }))}
             preferredPlant={recommendedPlant}
             conflictIds={buildingConflictIds}
+            datasetVersionIds={editorDatasetVersionIds}
           />
         </div>
         <RuleVersionField
