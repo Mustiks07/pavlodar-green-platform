@@ -22,6 +22,8 @@ describe('placement history', () => {
     expect(m2[0]!.id).toBe('a');
     expect(m2[0]!.position.coordinates).toEqual([78, 53]);
     expect(update(list, 'a', { quantity: 3 })[0]).toMatchObject({ id: 'a', quantity: 3 });
+    const stocked = { ...P('stocked'), stock_item_id: '00000000-0000-4000-8000-000000000001' };
+    expect(update([stocked], 'stocked', { plant_id: 'p2', stock_item_id: null })[0]).toMatchObject({ id: 'stocked', plant_id: 'p2', stock_item_id: null });
     expect(remove(list, 'a').map((p) => p.id)).toEqual(['b']);
   });
   it('new placements carry no invented dimensions', () => {

@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.14.1",
-    "description": "Canonical API contract 1.14.1. Known crown footprints cannot overlap; unknown dimensions remain non-blocking. All 1.14.0 operations remain compatible."
+    "version": "1.15.0",
+    "description": "Canonical API contract 1.15.0. Plant reads may bind to an immutable catalog version so historical scenario editing never drifts to the current catalog. All 1.14.1 operations remain compatible."
   },
   "servers": [
     {
@@ -1606,6 +1606,14 @@
                 "grass"
               ]
             }
+          },
+          {
+            "name": "catalog_version_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -1700,6 +1708,14 @@
             "name": "plant_id",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "catalog_version_id",
+            "in": "query",
             "schema": {
               "type": "string",
               "format": "uuid"

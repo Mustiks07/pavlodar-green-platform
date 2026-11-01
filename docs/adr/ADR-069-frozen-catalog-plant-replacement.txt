@@ -1,0 +1,26 @@
+ADR-069: Plant replacement reads the revision's frozen catalog
+Status: accepted
+Date: 2026-11-02
+
+Context
+The placement editor could add, move and delete an object, but could not manually replace the species
+of the selected object as required by F-3D-03 and F-PLANT-05. The assistant could prepare one automatic
+replacement, but that is not a general editing operation. Plant labels and pickers also read the current
+global catalog, so opening an old revision after a catalog update could display a newer plant snapshot.
+
+Decision
+Contract 1.15.0 adds optional catalog_version_id to listPlants and getPlant. When present, the server
+reads only that immutable CatalogVersion; an unknown catalog version returns catalog_version_unavailable.
+Omitting it preserves the existing current-catalog behavior for the general catalog screen.
+
+Every scenario recommendation label, placement label, add picker and replacement picker binds to the
+catalog_version_id saved in the draft revision. The selected-placement form can replace plant_id only
+when the placement is unlocked. The operation preserves the stable placement id, position, quantity,
+planting date, lock state and recorded dimensions, clears stock_item_id because an offer belongs to the
+old plant, and enters undo/redo as one edit. Saving still creates the ordinary immutable child revision;
+the existing server validation remains authoritative for missing or excluded plants.
+
+Consequences
+Historical revisions keep their original plant names and allowed choices after later catalog publication.
+Manual replacement and assistant replacement share the same immutable revision and validation boundary.
+The editor never silently switches a frozen scenario to the current catalog.

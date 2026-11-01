@@ -3924,6 +3924,7 @@ export interface operations {
                 limit?: number;
                 q?: string;
                 stratum?: "tree" | "shrub" | "perennial" | "grass";
+                catalog_version_id?: string;
             };
             header?: never;
             path?: never;
@@ -3989,7 +3990,9 @@ export interface operations {
     };
     getPlant: {
         parameters: {
-            query?: never;
+            query?: {
+                catalog_version_id?: string;
+            };
             header?: never;
             path: {
                 plant_id: string;

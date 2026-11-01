@@ -1233,5 +1233,25 @@
     ],
     "decision": "ADR-068",
     "limit": "This is recorded crown geometry, not a species spacing norm or underground-network clearance; rotation remains absent until the canonical model supports orientation"
+  },
+  "frozen_catalog_replacement_20261102": {
+    "implementation_sha": "pending",
+    "contract_version": "1.15.0",
+    "migration": "none",
+    "implemented": [
+      "listPlants and getPlant can read an explicit immutable catalog version",
+      "Historical scenario labels, recommendations and pickers bind to their frozen catalog_version_id",
+      "An unlocked selected placement can replace its plant as one undoable editor operation",
+      "Replacement preserves stable placement data and clears an incompatible stock_item_id",
+      "Saving remains an explicit immutable ScenarioRevision operation with existing server eligibility checks"
+    ],
+    "verification": [
+      "Canonical 1.15.0 validation passed 398 checks and generated clients match",
+      "Focused catalog snapshot lineage test passed",
+      "Frontend placement and registry tests passed 13/13",
+      "Frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-069",
+    "limit": "Rotation remains absent because canonical Placement has no orientation and the schematic 3D tree is rotationally symmetric"
   }
 }

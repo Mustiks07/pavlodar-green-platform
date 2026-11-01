@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.14.1",
+  "spec_version": "1.15.0",
   "repository": "Mustiks07/pavlodar-green-platform",
   "authorized_github_login": "Mustiks07",
   "status": "release_accepted",
@@ -93,6 +93,7 @@
     "Admit future municipal soil, restriction, weather and ecological-coefficient versions through the existing versioned import workflow when their owners provide them"
   ],
   "notes": [
+    "Frozen-catalog replacement increment on 2026-11-02 publishes canonical 1.15.0: listPlants/getPlant accept an optional immutable catalog_version_id, so old scenario labels and choices cannot drift to the current global catalog. A single unlocked placement can replace its plant while preserving stable id/geometry/quantity/date/dimensions and clearing incompatible stock; the change is one undo/redo operation and is saved only as the ordinary child revision. Focused catalog lineage passes, frontend placement/registry 13/13, canonical 398 checks and production build pass; ADR-069 records the boundary.",
     "Placement-geometry increment on 2026-11-02 publishes canonical 1.14.1: the server rejects overlap between recorded positive crown footprints in metric EPSG:32643, returns both exact placement paths, permits exact tangency and never invents an unknown radius. The editor adds multi-select, group lock/unlock/delete, locked deletion protection, undo/redo and crown-tangency/axis snapping; focused backend 2/2, frontend placement 9/9, canonical 398 checks and production build pass. ADR-068 records why rotation is deliberately absent until the canonical model has orientation.",
     "Original-versus-replacement outcome increment on 2026-11-02 publishes canonical 1.14.0 and makes F-SURV-04 visible: ForecastObservedResult now separates initial quantity, observed original survivors, replacement cohorts/planted/alive and total alive. Replacements without complete known-outcome inspections remain null with a typed non-blocking gap; they are never assumed alive. Focused backend passes, canonical validation passes 398 checks, production build passes, and the isolated end-to-end execution route passes 18/18 with 4 initial / 3 original alive / 1 replacement alive / 4 total while original survival remains 75%; ADR-067 and docs/evidence/wp09-execution-ui record implementation 3f3646b.",
     "Program-to-execution handoff increment on 2026-11-02 replaces the misleading zero-KPI/empty-table stack with an exact approval queue from the selected ProgramRevision: each of 3 projects exposes 12 operations, 9.0 m3 water, 19.5 crew-hours, 12 visits, the first period and a deep link to its exact project revision. Factual work-order/cohort UI appears only after a real WorkOrder exists. Production build passes and authenticated acceptance passes 6/6 with no API 5xx; ADR-066 and docs/evidence/jury-execution-handoff record implementation 941020c.",

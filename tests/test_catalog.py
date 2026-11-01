@@ -286,6 +286,7 @@ def test_catalog_snapshots_etag_search_and_rule_lineage(clients):
 
     current = clients["viewer"].get(f"/v1/plants/{eligible_id}")
     assert current.status_code == 200 and current.headers["etag"]
+    original_score = current.json()["traits"][0]["value_number"]
     assert current.json()["traits"][0]["source_refs"][0]["label"] == (
         "SYNTHETIC TEST generic import"
     )
@@ -309,6 +310,24 @@ def test_catalog_snapshots_etag_search_and_rule_lineage(clients):
     assert stale.status_code == 412
     relisted = clients["viewer"].get("/v1/plants").json()["items"]
     assert {item["version_id"] for item in relisted} == {updated.json()["version_id"]}
+    frozen = clients["viewer"].get(
+        "/v1/plants", params={"catalog_version_id": catalog_id, "limit": 10}
+    )
+    assert frozen.status_code == 200, frozen.text
+    assert {item["version_id"] for item in frozen.json()["items"]} == {catalog_id}
+    frozen_plant = clients["viewer"].get(
+        f"/v1/plants/{eligible_id}", params={"catalog_version_id": catalog_id}
+    )
+    assert frozen_plant.status_code == 200, frozen_plant.text
+    assert frozen_plant.json()["version_id"] == catalog_id
+    assert frozen_plant.json()["traits"][0]["value_number"] == original_score
+    missing_catalog = str(uuid4())
+    assert clients["viewer"].get(
+        "/v1/plants", params={"catalog_version_id": missing_catalog}
+    ).status_code == 422
+    assert clients["viewer"].get(
+        f"/v1/plants/{eligible_id}", params={"catalog_version_id": missing_catalog}
+    ).status_code == 422
 
     rule = clients["viewer"].get(f"/v1/rule-versions/{RULE_ID}")
     assert rule.status_code == 200, rule.text

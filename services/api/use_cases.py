@@ -13,6 +13,7 @@ from packages.geo.geometry import zone_area
 from services.api.models import (
     AuditEvent,
     CatalogState,
+    CatalogVersion,
     City,
     CityGrant,
     CoefficientVersionRecord,
@@ -903,12 +904,18 @@ def execute(operation, db, access, params, body, request):
 
             result = quality_page(report.payload, params, access.user.id)
     elif operation == "listPlants":
-        state = found(db.get(CatalogState, "global"))
-        if state.current_version_id is None:
+        catalog_version_id = params.get("catalog_version_id")
+        if catalog_version_id is not None:
+            if db.get(CatalogVersion, catalog_version_id) is None:
+                raise DomainError(422, "catalog_version_unavailable", "Catalog version was not found")
+        else:
+            state = found(db.get(CatalogState, "global"))
+            catalog_version_id = state.current_version_id
+        if catalog_version_id is None:
             result = {"items": [], "next_cursor": None}
         else:
             statement = select(PlantVersion).where(
-                PlantVersion.catalog_version_id == state.current_version_id
+                PlantVersion.catalog_version_id == catalog_version_id
             )
             if params.get("stratum"):
                 statement = statement.where(
@@ -931,9 +938,9 @@ def execute(operation, db, access, params, body, request):
                 key_attribute="plant_id",
             )
     elif operation == "getPlant":
-        from services.api.catalog import current_plant
+        from services.api.catalog import plant_at
 
-        plant = found(current_plant(db, params["plant_id"]))
+        plant = found(plant_at(db, params["plant_id"], params.get("catalog_version_id")))
         result = plant.payload
         headers["ETag"] = etag(result)
     elif operation in {"createPlant", "createPlantVersion"}:

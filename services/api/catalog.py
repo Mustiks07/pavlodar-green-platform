@@ -151,6 +151,15 @@ def current_plant(db, plant_id):
     return db.get(PlantVersion, (state.current_version_id, plant_id))
 
 
+def plant_at(db, plant_id, catalog_version_id=None):
+    """Read a plant from an explicit immutable catalog, or from the current catalog by default."""
+    if catalog_version_id is None:
+        return current_plant(db, plant_id)
+    if db.get(CatalogVersion, catalog_version_id) is None:
+        raise DomainError(422, "catalog_version_unavailable", "Catalog version was not found")
+    return db.get(PlantVersion, (catalog_version_id, plant_id))
+
+
 def create_snapshot(db, access, body, *, plant_id=None):
     from services.api.use_cases import canonical_hash, uid
 

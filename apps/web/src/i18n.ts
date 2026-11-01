@@ -395,6 +395,8 @@ export const appRu = {
   'placement.locked': 'Закрепить — не двигать при правке и расчётах',
   'placement.locked.short': 'закреплена',
   'placement.selected': 'Выбранная посадка',
+  'placement.replace': 'Заменить вид растения',
+  'placement.replace.unlock': 'Сначала открепите посадку, чтобы заменить вид.',
   'placement.select.hint': 'Выберите посадку на плане или в таблице, чтобы изменить её.',
   'placement.quantity': 'Количество',
   'placement.height': 'Начальная высота, м',

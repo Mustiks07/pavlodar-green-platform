@@ -139,10 +139,10 @@ export function RecommendationPanel({
   const available = useOperationAvailable('recommendPlants');
   const [topN, setTopN] = useState(5);
   const plants = useQuery({
-    queryKey: ['recommendation-plant-names'],
-    enabled: available !== false,
+    queryKey: ['recommendation-plant-names', catalogVersionId ?? 'none'],
+    enabled: available !== false && Boolean(catalogVersionId),
     staleTime: 60_000,
-    queryFn: async ({ signal }) => (await unwrap(api.GET('/v1/plants', { params: { query: { limit: 200 } }, signal }))).data.items as Plant[],
+    queryFn: async ({ signal }) => (await unwrap(api.GET('/v1/plants', { params: { query: { limit: 200, catalog_version_id: catalogVersionId ?? undefined } }, signal }))).data.items as Plant[],
   });
   const plantById = useMemo(() => new Map((plants.data ?? []).map((plant) => [plant.id, plant])), [plants.data]);
   const ready = Boolean(catalogVersionId && ruleVersionId);

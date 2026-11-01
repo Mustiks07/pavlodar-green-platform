@@ -470,7 +470,7 @@ export function PlacementMap({
   );
 }
 
-function PlantPicker({ value, onChange }: { value: string; onChange: (id: string, plant: Plant | null) => void }) {
+function PlantPicker({ value, catalogVersionId, disabled = false, onChange }: { value: string; catalogVersionId: string | null; disabled?: boolean; onChange: (id: string, plant: Plant | null) => void }) {
   const ok = useOperationAvailable('listPlants');
   const [q, setQ] = useState('');
   const [debounced, setDebounced] = useState('');
@@ -479,17 +479,17 @@ function PlantPicker({ value, onChange }: { value: string; onChange: (id: string
     return () => window.clearTimeout(id);
   }, [q]);
   const plants = useQuery({
-    queryKey: ['placement-plants', debounced],
+    queryKey: ['placement-plants', catalogVersionId ?? 'current', debounced],
     enabled: ok !== false,
     staleTime: 60_000,
-    queryFn: async ({ signal }) => (await unwrap(api.GET('/v1/plants', { params: { query: { limit: 50, q: debounced || undefined } }, signal }))).data.items,
+    queryFn: async ({ signal }) => (await unwrap(api.GET('/v1/plants', { params: { query: { limit: 50, q: debounced || undefined, catalog_version_id: catalogVersionId ?? undefined } }, signal }))).data.items,
   });
   if (ok === false) return <OperationUnavailable compact operationId="listPlants" />;
   const selectedPlant = plants.data?.find((item) => item.id === value) ?? null;
   return (
     <div className="pl-picker">
       <Field label={t('placement.plant.search')}>
-        {({ id }) => <Input id={id} type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('placement.plant.search.ph')} />}
+        {({ id }) => <Input id={id} type="search" value={q} disabled={disabled} onChange={(e) => setQ(e.target.value)} placeholder={t('placement.plant.search.ph')} />}
       </Field>
       {plants.isPending ? (
         <Skeleton lines={1} />
@@ -503,6 +503,7 @@ function PlantPicker({ value, onChange }: { value: string; onChange: (id: string
             <Select
               id={id}
               value={value}
+              disabled={disabled}
               onChange={(e) => onChange(e.target.value, plants.data.find((p) => p.id === e.target.value) ?? null)}
             >
               <option value="">{t('placement.plant.choose')}</option>
@@ -533,14 +534,14 @@ function PlantPicker({ value, onChange }: { value: string; onChange: (id: string
 }
 
 /** Names of the plants referenced by placements (getPlant, cached per id). */
-function usePlantNames(ids: string[]): Map<string, string> {
+function usePlantNames(ids: string[], catalogVersionId: string | null): Map<string, string> {
   const ok = useOperationAvailable('getPlant');
   const results = useQueries({
     queries: ids.map((id) => ({
-      queryKey: ['plant', id],
+      queryKey: ['plant', catalogVersionId ?? 'current', id],
       enabled: ok !== false,
       staleTime: 5 * 60_000,
-      queryFn: async ({ signal }: { signal: AbortSignal }) => (await unwrap<Plant>(api.GET('/v1/plants/{plant_id}', { params: { path: { plant_id: id } }, signal }))).data,
+      queryFn: async ({ signal }: { signal: AbortSignal }) => (await unwrap<Plant>(api.GET('/v1/plants/{plant_id}', { params: { path: { plant_id: id }, query: { catalog_version_id: catalogVersionId ?? undefined } }, signal }))).data,
     })),
   });
   return useMemo(() => {
@@ -556,11 +557,23 @@ function usePlantNames(ids: string[]): Map<string, string> {
 
 const DIMENSION_BASES: Placement['dimension_basis'][] = ['unknown', 'measured', 'catalog', 'estimated'];
 
-function SelectedForm({ p, disabled, onPatch, onDelete }: { p: Placement; disabled: boolean; onPatch: (patch: Partial<Placement>) => void; onDelete: () => void }) {
+function SelectedForm({ p, catalogVersionId, disabled, onPatch, onDelete }: { p: Placement; catalogVersionId: string | null; disabled: boolean; onPatch: (patch: Partial<Placement>) => void; onDelete: () => void }) {
   const num = (v: string) => (v.trim() === '' ? null : Number(v.replace(',', '.')));
   return (
     <fieldset className="pl-form" disabled={disabled}>
       <legend>{t('placement.selected')}</legend>
+      <details className="pl-tech" open>
+        <summary>{t('placement.replace')}</summary>
+        <PlantPicker
+          value={p.plant_id}
+          catalogVersionId={catalogVersionId}
+          disabled={disabled || p.locked}
+          onChange={(plantId) => {
+            if (!p.locked && plantId && plantId !== p.plant_id) onPatch({ plant_id: plantId, stock_item_id: null });
+          }}
+        />
+        {p.locked ? <p className="pg-muted">{t('placement.replace.unlock')}</p> : null}
+      </details>
       <Field label={t('placement.quantity')} required>
         {({ id }) => <Input id={id} type="number" min={1} step={1} inputMode="numeric" value={String(p.quantity)} onChange={(e) => onPatch({ quantity: Math.floor(Number(e.target.value)) })} />}
       </Field>
@@ -685,7 +698,7 @@ export function PlacementEditor({
     setPlant(preferredPlant);
     setAdding(false);
   }, [preferredPlant?.id]);
-  const names = usePlantNames(useMemo(() => [...new Set(value.map((p) => p.plant_id))], [value]));
+  const names = usePlantNames(useMemo(() => [...new Set(value.map((p) => p.plant_id))], [value]), catalogVersionId);
   const issues = useMemo(() => issuesOf(value), [value]);
   const geometry = zone.query.data?.geometry ?? null;
   const outside = useMemo(
@@ -768,6 +781,7 @@ export function PlacementEditor({
       <div className="pl-add">
         <PlantPicker
           value={plantId}
+          catalogVersionId={catalogVersionId}
           onChange={(id, p) => {
             setPlantId(id);
             setPlant(p);
@@ -915,6 +929,7 @@ export function PlacementEditor({
       {selected && selectedIds.size === 1 ? (
         <SelectedForm
           p={selected}
+          catalogVersionId={catalogVersionId}
           disabled={disabled}
           onPatch={(patch) => commitChange(update(value, selected.id, patch))}
           onDelete={() => {
