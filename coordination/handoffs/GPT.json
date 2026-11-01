@@ -1084,5 +1084,25 @@
     "decision": "ADR-061",
     "evidence": "docs/evidence/wp10/chat_user_acceptance_20261102.json",
     "limit": "The guard does not create missing municipal data or turn provider text into a calculation"
+  },
+  "deterministic_jury_tour_20261102": {
+    "implementation_sha": "69c7646",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Seven exact API-resolved steps from city problem through immutable report",
+      "Map opens the prepared courtyard so its proposed-planting layer is active",
+      "Project and report links carry the exact revision and calculation snapshot",
+      "Persistent Back/Next/Finish dock resumes its current step after reload"
+    ],
+    "verification": [
+      "Authenticated specialist browser acceptance passed 11/11",
+      "Production frontend build passed",
+      "No API 5xx or page errors were observed",
+      "Jury-facing screenshots were reviewed after the exact route completed"
+    ],
+    "decision": "ADR-062",
+    "evidence": "docs/evidence/jury-demo-tour",
+    "limit": "The tour navigates existing authorized records and creates no presentation-only business data"
   }
 }
