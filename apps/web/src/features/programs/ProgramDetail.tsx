@@ -363,7 +363,10 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
         <section className="program-portfolio" aria-labelledby="program-portfolio-title">
           <header>
             <span><small>Результат оптимизации</small><h4 id="program-portfolio-title">Проекты городской программы</h4></span>
-            <Badge tone="positive">{selected.selected_scenario_revision_ids.length} выбрано</Badge>
+            <div className="program-portfolio__actions">
+              <Badge tone="positive">{selected.selected_scenario_revision_ids.length} выбрано</Badge>
+              <Link className="pg-btn pg-btn--primary pg-btn--sm" to={`/execution?city=${current.city_id}&program=${current.id}&programRevision=${selected.id}`}>План ухода</Link>
+            </div>
           </header>
           <div className="program-portfolio__grid">
             {selected.selected_scenario_revision_ids.map((id, index) => {

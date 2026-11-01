@@ -31,6 +31,7 @@ import { ProgramDetail } from '../features/programs/ProgramDetail';
 import { ProgramCreateDialog } from '../features/programs/ProgramCreateDialog';
 import { CreateWorkOrder, WO_TONE, WorkOrderDetail } from '../features/execution/WorkOrders';
 import { CohortsPanel } from '../features/execution/Cohorts';
+import { ProgramCarePlan } from '../features/execution/ProgramCarePlan';
 import { useCityPrincipals } from '../features/access/DatasetGrants';
 import { useSession } from '../shell/session';
 import { plantImage } from '../features/plants/images';
@@ -760,6 +761,11 @@ export function ExecutionPage() {
       <CityGate>
         {(city) => (
           <>
+            <ProgramCarePlan cityId={city.id} />
+            <div className="execution-live-head">
+              <span><small>Фактическое исполнение</small><strong>Наряды и подтверждённые результаты</strong></span>
+              <p>Этот блок начинает заполняться только после утверждения проектов и передачи расчётного плана бригадам.</p>
+            </div>
             <WorkspaceOverview
               items={[
                 { icon: 'calendar', label: 'Все работы', value: orders.length, note: 'в текущем контуре', tone: 'accent' },
