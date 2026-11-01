@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "26849eb",
-  "state": "mandatory_ai_number_lineage_verified",
+  "head_sha": "657ba72",
+  "state": "program_launch_passport_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -987,5 +987,30 @@
     ],
     "evidence": "docs/evidence/jury-assistant-lineage/assistant-number-lineage.png",
     "limit": "Zone-area facts expose the server method but the current Fact contract has no ZoneVersion lineage field"
+  },
+  "program_launch_passport_20261102": {
+    "implementation_sha": "657ba72",
+    "contract_version": "1.13.0",
+    "migration": "none",
+    "implemented": [
+      "Exact selected CalculationSnapshot care operations are grouped by territory",
+      "Each launch card exposes operation count, water, crew-hours, visits and nearest period",
+      "Calculated readiness is explicitly separated from approval-gated factual work orders"
+    ],
+    "live_result": {
+      "selected_projects": 3,
+      "care_operations": 36,
+      "planned_water_m3": 27.0,
+      "crew_hours": 58.5,
+      "planned_visits": 36
+    },
+    "verification": [
+      "Focused authenticated browser acceptance passed",
+      "Frontend production build passed",
+      "Tracked credential-pattern scan passed",
+      "No browser errors or API 5xx were observed"
+    ],
+    "evidence": "docs/evidence/jury-execution-passport/program-launch-passport.png",
+    "limit": "The projects are draft, so the passport does not create or claim factual work orders or completions"
   }
 }
