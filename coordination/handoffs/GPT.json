@@ -1275,7 +1275,7 @@
     "limit": "Exclusion never auto-replaces or deletes a locked or unlocked planting; the user resolves the conflict explicitly"
   },
   "work_calendar_filters_20261102": {
-    "implementation_sha": "pending",
+    "implementation_sha": "6a6c1ea",
     "contract_version": "1.16.0",
     "migration": "none",
     "implemented": [
