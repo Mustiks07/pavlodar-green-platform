@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.13.0",
+  "spec_version": "1.14.0",
   "repository": "Mustiks07/pavlodar-green-platform",
   "authorized_github_login": "Mustiks07",
   "status": "release_accepted",
@@ -93,6 +93,7 @@
     "Admit future municipal soil, restriction, weather and ecological-coefficient versions through the existing versioned import workflow when their owners provide them"
   ],
   "notes": [
+    "Original-versus-replacement outcome increment on 2026-11-02 publishes canonical 1.14.0 and makes F-SURV-04 visible: ForecastObservedResult now separates initial quantity, observed original survivors, replacement cohorts/planted/alive and total alive. Replacements without complete known-outcome inspections remain null with a typed non-blocking gap; they are never assumed alive. Focused backend passes, canonical validation passes 398 checks, production build passes, and the isolated end-to-end execution route passes 18/18 with 4 initial / 3 original alive / 1 replacement alive / 4 total while original survival remains 75%; ADR-067 and docs/evidence/wp09-execution-ui record implementation 3f3646b.",
     "Program-to-execution handoff increment on 2026-11-02 replaces the misleading zero-KPI/empty-table stack with an exact approval queue from the selected ProgramRevision: each of 3 projects exposes 12 operations, 9.0 m3 water, 19.5 crew-hours, 12 visits, the first period and a deep link to its exact project revision. Factual work-order/cohort UI appears only after a real WorkOrder exists. Production build passes and authenticated acceptance passes 6/6 with no API 5xx; ADR-066 and docs/evidence/jury-execution-handoff record implementation 941020c.",
     "Reviewable AI plant-decision increment on 2026-11-02 closes the path from the server-owned catalog/rule recommendation to a human decision: an explicit request prepares a pending species replacement for the first unlocked placement, the server selects only a different eligible or requires-review candidate, the UI shows Russian plant names before/after, and the immutable ScenarioRevision remains unchanged until Apply. Focused backend chat passes 14/14, frontend proposal tests 4/4, production build passes, and authenticated hero-project acceptance passes 10/10 with rejection leaving the exact revision unchanged; ADR-065 and docs/evidence/jury-assistant-recommendation record implementation 124c615.",
     "Deterministic jury-tour increment on 2026-11-02 replaces generic demo links with one exact seven-step story resolved from authorized API records: selected courtyard and enabled placement layer, its active problem, water-saving project with exact revision/calculation, three same-zone variants, current optimized city program, execution passport and the same immutable result with PDF/XLSX controls. A persistent Back/Next dock survives reload. Authenticated acceptance passes 11/11 with no API 5xx/page errors; ADR-062 and docs/evidence/jury-demo-tour record implementation 69c7646.",

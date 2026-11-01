@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "941020c",
-  "state": "execution_handoff_verified",
+  "head_sha": "3f3646b",
+  "state": "cohort_outcomes_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1190,5 +1190,27 @@
     "decision": "ADR-066",
     "evidence": "docs/evidence/jury-execution-handoff",
     "limit": "The shared public demo correctly has no factual execution because its planning projects are not internally approved"
+  },
+  "original_replacement_outcomes_20261102": {
+    "implementation_sha": "3f3646b",
+    "contract_version": "1.14.0",
+    "migration": "none",
+    "implemented": [
+      "ForecastObservedResult separates initial quantity, observed original survivors, replacement count/planted/alive and total alive",
+      "Original survival probability never includes replacement cohorts",
+      "Replacement descendants contribute only after a complete latest inspection with no unknown outcome",
+      "Incomplete replacement observation returns null totals plus a typed non-blocking DataGap instead of an invented zero",
+      "The UI presents the four mandatory outcome values as separate decision cards"
+    ],
+    "verification": [
+      "Canonical 1.14.0 validation passed 398 checks and generated clients match",
+      "Focused backend cohort integration passed",
+      "Frontend typecheck and production build passed",
+      "Disposable end-to-end work order/cohort/inspection/replacement route passed 18/18",
+      "Reviewed evidence shows 4 initial, 3 original alive, 1 replacement alive and 4 total while original survival remains 75%"
+    ],
+    "decision": "ADR-067",
+    "evidence": "docs/evidence/wp09-execution-ui/execution-outcome.png",
+    "limit": "The public Pavlodar city remains free of invented factual execution; the full outcome route is evidenced in the disposable acceptance environment"
   }
 }

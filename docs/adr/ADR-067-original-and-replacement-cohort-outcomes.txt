@@ -1,0 +1,26 @@
+ADR-067: Forecast-versus-observed keeps original survival separate from replacements
+Status: accepted
+Date: 2026-11-02
+
+Context
+Replacement cohorts were stored with correct lineage, but the forecast-versus-observed response exposed
+only the selected original inspection. The UI therefore could not prove the mandatory rule that replacing
+a dead original plant must not increase the survival rate of the initial cohort.
+
+Decision
+Contract 1.14.0 adds an outcome summary to ForecastObservedResult: initial_quantity,
+observed_alive_initial, replacement_cohort_count, replacements_planted, replacements_alive and total_alive.
+The original survival probability continues to use only the original cohort inspection.
+
+The server walks descendant replacement cohorts through replaces_cohort_id. A replacement contributes to
+replacements_alive only when its latest inspection covers the complete cohort and has no unknown outcome.
+If any replacement lacks such an inspection, replacements_alive and total_alive are null and a non-blocking
+comparison_replacement_observation_incomplete DataGap is returned. Planted replacements are never assumed
+alive. total_alive is available only when both the original and every replacement outcome are complete.
+
+Consequences
+The UI presents four separate cards: initially planted, original plants alive, replacements alive and total
+alive. In the acceptance case, 4 initial plants with 3 original survivors and 1 observed live replacement
+show 75% original survival and 4 total alive. The replacement restores total stock but does not rewrite the
+original outcome.
+
