@@ -5,14 +5,16 @@
 // PG_TEST_CREDENTIALS=<ignored path> node scripts/readme-capture.mjs
 import { chromium } from '@playwright/test';
 import { mkdirSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const BASE = process.env.PG_WEB_URL ?? 'http://localhost:5173';
 const CITY = process.env.PG_CITY_ID ?? '10000000-0000-4000-8000-000000000001';
 const credentialPath = process.env.PG_TEST_CREDENTIALS;
 if (!credentialPath) throw new Error('Set PG_TEST_CREDENTIALS to an ignored local credentials file');
 const credentials = JSON.parse(readFileSync(credentialPath, 'utf8'));
-const output = resolve(process.env.PG_CAPTURE_OUT ?? '../../docs/assets/readme');
+const scriptDirectory = dirname(fileURLToPath(import.meta.url));
+const output = resolve(process.env.PG_CAPTURE_OUT ?? resolve(scriptDirectory, '../../../docs/assets/readme'));
 mkdirSync(output, { recursive: true });
 
 async function login(page) {
@@ -109,6 +111,8 @@ try {
     await programRow.click();
     await page.locator('.program-summary').waitFor({ state: 'visible', timeout: 20_000 });
     await page.waitForFunction(() => /вариантов собрано|Готова к запуску|результат сохранён/.test(document.querySelector('.program-summary')?.textContent ?? ''), null, { timeout: 20_000 });
+    await page.locator('.program-whatif').waitFor({ state: 'visible', timeout: 60_000 });
+    await page.locator('.program-portfolio').waitFor({ state: 'visible', timeout: 60_000 });
     await page.locator('.priority-dashboard').waitFor({ state: 'visible', timeout: 20_000 }).catch(() => {});
     await page.locator('.pg-skeleton').waitFor({ state: 'detached', timeout: 20_000 }).catch(() => {});
   }
@@ -122,7 +126,12 @@ try {
       ?? null;
   }, CITY);
   if (scenario) {
-    await capturePage(page, `/projects/${scenario.id}?city=${CITY}`, 'platform-scenario.png');
+    await page.goto(`${BASE}/projects/${scenario.id}?city=${CITY}`, { waitUntil: 'domcontentloaded' });
+    await page.locator('main h1').waitFor({ state: 'visible', timeout: 30_000 });
+    // The calculation is loaded separately from the scenario shell. Never publish a jury-facing
+    // screenshot of the transient skeleton when the exact saved server result is available.
+    await page.locator('.scn-calculation__result[data-status="complete"]').waitFor({ state: 'visible', timeout: 60_000 });
+    await page.screenshot({ path: resolve(output, 'platform-scenario.png') });
   }
   // Assistant providers can be rate-limited independently of the product pages. Release asset
   // refreshes may explicitly keep the last verified assistant capture while updating every other

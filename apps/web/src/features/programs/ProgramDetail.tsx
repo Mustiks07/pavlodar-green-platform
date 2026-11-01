@@ -89,6 +89,10 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
   const calculationReadiness = useQueries({
     queries: current.candidate_revision_ids.map((revisionId) => ({
       queryKey: ['program-candidate-calculations', revisionId],
+      // Once a canonical optimizer result exists, readiness was already established by the
+      // server. Refetching every candidate here delayed the decision view behind nine unrelated
+      // requests and made the saved portfolio look empty during a live presentation.
+      enabled: current.status === 'draft' && !current.current_revision_id,
       queryFn: async ({ signal }: { signal: AbortSignal }) => (
         await unwrap<CalculationSnapshotPage>(
           api.GET('/v1/calculations', { params: { query: { scenario_revision_id: revisionId, limit: 200 } }, signal }),
@@ -140,9 +144,16 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
 
   useEffect(() => {
     if (items.length < 2) return;
-    setBaseRevisionId(items[1]!.id);
-    setTargetRevisionId(items[0]!.id);
-  }, [items[0]?.id]); // newest result changed: compare it with the immediately previous result
+    const target = items.find((item) => item.id === current.current_revision_id) ?? items[0]!;
+    // Repeated optimization with unchanged inputs can create adjacent equivalent results. For
+    // the decision view, prefer the latest real input change so the default comparison is useful.
+    const base = items.find((item) => (
+      item.id !== target.id
+      && item.input_snapshot.capital_budget !== target.input_snapshot.capital_budget
+    )) ?? items.find((item) => item.id !== target.id)!;
+    setBaseRevisionId(base.id);
+    setTargetRevisionId(target.id);
+  }, [current.current_revision_id, items[0]?.id, items.length]);
   useEffect(() => {
     if (job.data?.state !== 'succeeded') return;
     void qc.invalidateQueries({ queryKey: ['program', program.id] });
@@ -290,7 +301,10 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
   });
   const changedName = (id: string) => {
     const index = changedRevisionIds.indexOf(id);
-    return changedScenarios[index]?.data?.name ?? 'Проект участка';
+    const scenario = changedScenarios[index]?.data;
+    if (!scenario) return 'Проект участка';
+    const zone = priorityZoneNames.get(scenario.zone_id);
+    return zone ? `${zone} · ${scenario.name}` : scenario.name;
   };
 
   return (
@@ -321,11 +335,29 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
           <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={`/projects?city=${current.city_id}`}>Открыть проекты участков</Link>
         </Notice>
       ) : null}
-      {current.priority_result_id ? (
-        priority.isPending || priorityZones.isPending ? <Skeleton lines={4} />
-          : priority.isError ? <ApiErrorView compact error={priority.error} onRetry={() => void priority.refetch()} />
-            : priorityZones.isError ? <ApiErrorView compact error={priorityZones.error} onRetry={() => void priorityZones.refetch()} />
-              : priority.data ? <PriorityDashboard result={priority.data} zoneNames={priorityZoneNames} cityId={current.city_id} /> : null
+      {diff.data && items.length >= 2 ? (
+        <section className="program-whatif" aria-labelledby="program-whatif-title">
+          <header>
+            <span><small>Сценарный анализ</small><h4 id="program-whatif-title">Что изменилось между двумя расчётами программы</h4></span>
+            {diff.data.capital_delta !== null ? <span className="program-whatif__delta"><small>Изменение капитальных затрат</small><strong><MoneyText value={diff.data.capital_delta} /></strong></span> : null}
+          </header>
+          <div className="program-whatif__budgets">
+            <article><small>Предыдущий результат</small><strong>{items.find((item) => item.id === baseRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === baseRevisionId)!.capital_total!} /> : '—'}</strong></article>
+            <article><small>Новый результат</small><strong>{items.find((item) => item.id === targetRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === targetRevisionId)!.capital_total!} /> : '—'}</strong></article>
+          </div>
+          <div className="program-whatif__changes">
+            <article className="is-added">
+              <strong>Вошли в программу</strong>
+              {diff.data.added_scenario_revision_ids.length ? <ul>{diff.data.added_scenario_revision_ids.map((id) => <li key={id}>{changedName(id)}</li>)}</ul> : <span>Состав не пополнился</span>}
+            </article>
+            <article className="is-removed">
+              <strong>Вышли из программы</strong>
+              {diff.data.removed_scenario_revision_ids.length ? <ul>{diff.data.removed_scenario_revision_ids.map((id) => <li key={id}>{changedName(id)}</li>)}</ul> : <span>Ни один проект не исключён</span>}
+            </article>
+          </div>
+          <p>Измените лимиты программы и запустите оптимизацию — сервер сохранит новый результат, а здесь покажет точную разницу.</p>
+          {current.status === 'draft' ? <Button variant="primary" icon="target" disabled={Boolean(activeJob)} onClick={() => openEditor(true)}>Рассчитать при другом бюджете</Button> : null}
+        </section>
       ) : null}
       {selected && selected.selected_scenario_revision_ids.length > 0 ? (
         <section className="program-portfolio" aria-labelledby="program-portfolio-title">
@@ -350,29 +382,11 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
           </div>
         </section>
       ) : null}
-      {diff.data && items.length >= 2 ? (
-        <section className="program-whatif" aria-labelledby="program-whatif-title">
-          <header>
-            <span><small>Сценарный анализ</small><h4 id="program-whatif-title">Что изменилось между двумя расчётами программы</h4></span>
-            {diff.data.capital_delta !== null ? <span className="program-whatif__delta"><small>Изменение капитальных затрат</small><strong><MoneyText value={diff.data.capital_delta} /></strong></span> : null}
-          </header>
-          <div className="program-whatif__budgets">
-            <article><small>Предыдущий результат</small><strong>{items.find((item) => item.id === baseRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === baseRevisionId)!.capital_total!} /> : '—'}</strong></article>
-            <article><small>Новый результат</small><strong>{items.find((item) => item.id === targetRevisionId)?.capital_total ? <MoneyText value={items.find((item) => item.id === targetRevisionId)!.capital_total!} /> : '—'}</strong></article>
-          </div>
-          <div className="program-whatif__changes">
-            <article className="is-added">
-              <strong>Вошли в программу</strong>
-              {diff.data.added_scenario_revision_ids.length ? <ul>{diff.data.added_scenario_revision_ids.map((id) => <li key={id}>{changedName(id)}</li>)}</ul> : <span>Состав не пополнился</span>}
-            </article>
-            <article className="is-removed">
-              <strong>Вышли из программы</strong>
-              {diff.data.removed_scenario_revision_ids.length ? <ul>{diff.data.removed_scenario_revision_ids.map((id) => <li key={id}>{changedName(id)}</li>)}</ul> : <span>Ни один проект не исключён</span>}
-            </article>
-          </div>
-          <p>Измените лимиты программы и запустите оптимизацию — сервер сохранит новый результат, а здесь покажет точную разницу.</p>
-          {current.status === 'draft' ? <Button variant="primary" icon="target" disabled={Boolean(activeJob)} onClick={() => openEditor(true)}>Рассчитать при другом бюджете</Button> : null}
-        </section>
+      {current.priority_result_id ? (
+        priority.isPending || priorityZones.isPending ? <Skeleton lines={4} />
+          : priority.isError ? <ApiErrorView compact error={priority.error} onRetry={() => void priority.refetch()} />
+            : priorityZones.isError ? <ApiErrorView compact error={priorityZones.error} onRetry={() => void priorityZones.refetch()} />
+              : priority.data ? <PriorityDashboard result={priority.data} zoneNames={priorityZoneNames} cityId={current.city_id} /> : null
       ) : null}
       {optimize.isError ? <ApiErrorView compact error={optimize.error} onRetry={() => optimize.mutate()} /> : null}
       {jobId && job.isPending ? <Skeleton lines={2} /> : null}

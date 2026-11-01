@@ -1341,7 +1341,9 @@ def execute(operation, db, access, params, body, request):
             params,
             operation,
             access,
-            authorize=lambda row: program_revision_access(db, access, row),
+            authorize=lambda row: program_revision_access(
+                db, access, row, authorized_program=program
+            ),
         )
     elif operation == "getProgramRevision":
         from services.api.programs import program_revision_access
@@ -1361,8 +1363,8 @@ def execute(operation, db, access, params, body, request):
         target = found(db.get(ProgramRevisionRecord, params["target_revision_id"]))
         if base.program_id != program.id or target.program_id != program.id:
             raise DomainError(404, "not_found", "Object not found")
-        program_revision_access(db, access, base)
-        program_revision_access(db, access, target)
+        program_revision_access(db, access, base, authorized_program=program)
+        program_revision_access(db, access, target, authorized_program=program)
         result = program_revision_diff(base, target)
     elif operation == "transitionProgram":
         from services.api.programs import get_program

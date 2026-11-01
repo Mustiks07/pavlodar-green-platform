@@ -146,10 +146,21 @@ def save_program_input(db, access, program, body, input_id, parent_id, created_a
     return version
 
 
-def program_revision_access(db, access, revision):
-    program = found(db.get(Program, revision.program_id))
-    program_access(db, access, program)
-    validate_program_input(db, access, revision.payload["input_snapshot"])
+def program_revision_access(db, access, revision, *, authorized_program=None):
+    program = authorized_program or found(db.get(Program, revision.program_id))
+    if program.id != revision.program_id:
+        raise DomainError(404, "not_found", "Object not found")
+    if authorized_program is None:
+        program_access(db, access, program)
+    snapshot = revision.payload["input_snapshot"]
+    current = program.payload
+    # get_program already authorizes the current candidate set. Most optimization revisions vary
+    # only by budget/resource limits; re-authorizing every candidate for every row caused an N×M
+    # query fan-out on the decision screen. Revalidate only revisions that reference a different
+    # access-sensitive graph.
+    access_keys = ("city_id", "candidate_revision_ids", "priority_result_id")
+    if any(snapshot.get(key) != current.get(key) for key in access_keys):
+        validate_program_input(db, access, snapshot)
     return revision
 
 

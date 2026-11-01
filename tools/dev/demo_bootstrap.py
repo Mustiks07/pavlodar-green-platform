@@ -1355,6 +1355,60 @@ def bootstrap(clients, city, license_name):
         }
         for year in range(3)
     ]
+    target_program_budget = "150000000.00"
+    baseline_program_budget = "1000000.00"
+
+    def program_body(value, *, budget=None):
+        return {
+            key: value[key]
+            for key in (
+                "city_id",
+                "name",
+                "resource_limits",
+                "candidate_revision_ids",
+                "required_zone_ids",
+                "excluded_zone_ids",
+                "benefit_weights",
+                "diversity_caps",
+                "coverage_requirements",
+                "priority_result_id",
+            )
+        } | {"capital_budget": budget or value["capital_budget"]}
+
+    def replace_program_budget(value, budget):
+        fresh, tag = sp.etag(f"/v1/programs/{value['id']}")
+        return sp.send(
+            "PUT",
+            f"/v1/programs/{value['id']}",
+            program_body(fresh, budget=budget),
+            etag=tag,
+        )
+
+    def optimize_program(value):
+        fresh, tag = sp.etag(f"/v1/programs/{value['id']}")
+        job = sp.send(
+            "POST",
+            f"/v1/programs/{value['id']}/optimize",
+            {
+                "program_id": value["id"],
+                "time_limit_seconds": 10,
+                "seed": 0,
+            },
+            etag=tag,
+            # ProgramInputVersion is internal and intentionally absent from the public contract;
+            # updated_at changes whenever the immutable optimizer input is replaced.
+            idempotency_key=f"mvp-optimize:{fresh['updated_at']}",
+        )
+        result = wait_job(sp, job["id"])
+        revision = sp.get(f"/v1/program-revisions/{result['result_ref_id']}")
+        if revision["solver_status"] not in {"optimal", "feasible"}:
+            raise SystemExit(
+                f"Демо-оптимизатор завершился со статусом {revision['solver_status']}"
+            )
+        if not revision["selected_scenario_revision_ids"]:
+            raise SystemExit("Демо-оптимизатор не выбрал ни одного проекта")
+        return revision
+
     if program is None:
         program = sp.send(
             "POST",
@@ -1362,7 +1416,7 @@ def bootstrap(clients, city, license_name):
             {
                 "city_id": city["id"],
                 "name": program_name,
-                "capital_budget": "150000000.00",
+                "capital_budget": target_program_budget,
                 "resource_limits": program_resource_limits,
                 "candidate_revision_ids": program_revision_ids,
                 "required_zone_ids": [],
@@ -1381,23 +1435,10 @@ def bootstrap(clients, city, license_name):
             or program.get("priority_result_id") != priority["id"]
             or program["benefit_weights"] != weights
             or program["resource_limits"] != program_resource_limits
+            or program["capital_budget"] != target_program_budget
         ):
             _, tag = sp.etag(f"/v1/programs/{program['id']}")
-            body = {
-                key: program[key]
-                for key in (
-                    "city_id",
-                    "name",
-                    "capital_budget",
-                    "resource_limits",
-                    "required_zone_ids",
-                    "excluded_zone_ids",
-                    "benefit_weights",
-                    "diversity_caps",
-                    "coverage_requirements",
-                    "priority_result_id",
-                )
-            }
+            body = program_body(program, budget=target_program_budget)
             body["candidate_revision_ids"] = program_revision_ids
             body["benefit_weights"] = weights
             body["priority_result_id"] = priority["id"]
@@ -1406,28 +1447,23 @@ def bootstrap(clients, city, license_name):
             count("programs_updated", True)
     if program["status"] != "draft":
         raise SystemExit("Демо-программа должна оставаться черновиком для оптимизации")
-    program, program_tag = sp.etag(f"/v1/programs/{program['id']}")
-    optimize_job = sp.send(
-        "POST",
-        f"/v1/programs/{program['id']}/optimize",
-        {
-            "program_id": program["id"],
-            "time_limit_seconds": 10,
-            "seed": 0,
-        },
-        etag=program_tag,
-        # ProgramInputVersion is internal and intentionally absent from the public contract;
-        # updated_at changes whenever the immutable optimizer input is replaced.
-        idempotency_key=f"mvp-optimize:{program['updated_at']}",
+    optimize_program(program)
+    revisions = sp.pages(f"/v1/programs/{program['id']}/revisions")
+    has_baseline = any(
+        item.get("input_snapshot", {}).get("capital_budget") == baseline_program_budget
+        for item in revisions
     )
-    optimized = wait_job(sp, optimize_job["id"])
-    roadmap = sp.get(f"/v1/program-revisions/{optimized['result_ref_id']}")
-    if roadmap["solver_status"] not in {"optimal", "feasible"}:
-        raise SystemExit(
-            f"Демо-оптимизатор завершился со статусом {roadmap['solver_status']}"
-        )
-    if not roadmap["selected_scenario_revision_ids"]:
-        raise SystemExit("Демо-оптимизатор не выбрал ни одного проекта")
+    has_target = any(
+        item.get("input_snapshot", {}).get("capital_budget") == target_program_budget
+        for item in revisions
+    )
+    if not (has_baseline and has_target):
+        # Seed a visible, reproducible budget what-if. Both results are real optimizer revisions;
+        # the lower budget is an explicit demo input and the final active input is restored below.
+        program = replace_program_budget(program, baseline_program_budget)
+        optimize_program(program)
+        program = replace_program_budget(program, target_program_budget)
+        optimize_program(program)
     count("mvp_roadmaps", True)
     return report
 
