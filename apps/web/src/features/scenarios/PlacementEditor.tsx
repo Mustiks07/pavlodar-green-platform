@@ -424,6 +424,7 @@ export function PlacementEditor({
   disabled,
   catalogVersionId,
   onCatalogVersion,
+  preferredPlant,
 }: {
   value: Placement[];
   onChange: (next: Placement[]) => void;
@@ -432,6 +433,8 @@ export function PlacementEditor({
   /** Catalog snapshot of the revision; adding a plant from another snapshot switches it, visibly. */
   catalogVersionId: string | null;
   onCatalogVersion: (id: string) => void;
+  /** Plant selected in the recommendation result; it becomes the active map-placement tool. */
+  preferredPlant?: Plant | null;
 }) {
   const zone = useZoneVersion(zoneVersionId);
   const [hist, setHist] = useState<Omit<PlacementHistory, 'present'>>({ past: [], future: [] });
@@ -440,6 +443,12 @@ export function PlacementEditor({
   const [plantId, setPlantId] = useState('');
   const [plant, setPlant] = useState<Plant | null>(null);
   const [date, setDate] = useState('');
+  useEffect(() => {
+    if (!preferredPlant) return;
+    setPlantId(preferredPlant.id);
+    setPlant(preferredPlant);
+    setAdding(false);
+  }, [preferredPlant?.id]);
   const names = usePlantNames(useMemo(() => [...new Set(value.map((p) => p.plant_id))], [value]));
   const issues = useMemo(() => issuesOf(value), [value]);
   const geometry = zone.query.data?.geometry ?? null;

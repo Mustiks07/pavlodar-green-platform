@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
-import { unwrap, type Scenario } from '@pg/api-client';
+import { unwrap, type Scenario, type Zone } from '@pg/api-client';
 import { Button, Dialog, Icon, type IconName } from '@pg/ui';
 import { api } from '../api';
 import { useSession } from './session';
@@ -25,7 +25,15 @@ export function DemoTour({ open, onClose }: { open: boolean; onClose: () => void
       await unwrap(api.GET('/v1/scenarios', { params: { query: { city_id: city!.id, limit: 100 } }, signal }))
     ).data.items as Scenario[],
   });
-  const hero = projects.data?.find((item) => item.name === 'Вариант B · экономия воды');
+  const zones = useQuery({
+    queryKey: ['demo-tour-zones', city?.id],
+    enabled: open && Boolean(city),
+    queryFn: async ({ signal }) => (
+      await unwrap(api.GET('/v1/zones', { params: { query: { city_id: city!.id, limit: 200 } }, signal }))
+    ).data.items as Zone[],
+  });
+  const heroZone = zones.data?.find((item) => item.name === 'Двор жилого квартала');
+  const hero = projects.data?.find((item) => item.name === 'Вариант B · экономия воды' && item.zone_id === heroZone?.id);
   const query = city ? `?city=${encodeURIComponent(city.id)}` : '';
   return (
     <Dialog open={open} title="Маршрут показа · 3 минуты" onClose={onClose} footer={<Button onClick={onClose}>Закрыть</Button>}>

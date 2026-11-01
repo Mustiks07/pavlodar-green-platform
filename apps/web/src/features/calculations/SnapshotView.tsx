@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiError, unwrap, type CalculationSnapshot, type CareOperation, type Plant, type ScenarioRevision } from '@pg/api-client';
-import { Badge, CostBreakdown, formatDateTime, formatNumber, MetricValue, MoneyText, Notice, Skeleton, StateView, SurvivalStrip, UnitText } from '@pg/ui';
+import { Badge, Button, CostBreakdown, formatDateTime, formatNumber, Icon, MetricValue, MoneyText, Notice, Skeleton, StateView, SurvivalStrip, UnitText } from '@pg/ui';
 import { api, useOperationAvailable } from '../../api';
 import { t } from '../../i18n';
 import { ApiErrorView } from '../../shell/ApiErrorView';
@@ -22,6 +23,7 @@ export function careCalendar(operations: CareOperation[]) {
  * unknown, partial results say so, and only blocking warnings are listed (presentation policy).
  */
 export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnapshot; timeZone?: string }) {
+  const [showAllSurvival, setShowAllSurvival] = useState(false);
   const gaps = snapshot.warnings.filter((g) => g.blocking);
   const revision = useQuery({
     queryKey: ['calculation-story-revision', snapshot.scenario_revision_id],
@@ -76,18 +78,25 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
       <ExportPanel kind="calculation" target={snapshot.id} />
       <h3>{t('scenario.calc.lines')}</h3>
       <CostBreakdown cost={snapshot.cost} compact />
-      {snapshot.survival.length ? (
-        <section className="calc-story__section">
-          <header><small>Прогноз</small><h3>{t('calc.survival')}</h3><p>Вероятность сохранения исходной когорты через один, два и три года.</p></header>
-          {snapshot.survival.slice(0, SURVIVAL_SHOWN).map((r) => (
+      <section className="calc-story__section">
+        <header><small>Прогноз</small><h3>{t('calc.survival')}</h3><p>Вероятность сохранения исходной когорты через один, два и три года.</p></header>
+        {snapshot.survival.length ? (
+          <>
+          {snapshot.survival.slice(0, showAllSurvival ? undefined : SURVIVAL_SHOWN).map((r) => (
             <SurvivalStrip key={r.placement_id} result={r} synthetic={snapshot.synthetic_inputs} title={placementNames.get(r.placement_id) ?? 'Группа посадок'} />
           ))}
-          {snapshot.survival.length > SURVIVAL_SHOWN ? <p className="pg-muted">{t('calc.more', { n: SURVIVAL_SHOWN, total: snapshot.survival.length })}</p> : null}
-        </section>
-      ) : null}
-      {snapshot.care.length ? (
-        <section className="calc-story__section">
-          <header><small>Календарь</small><h3>{t('calc.care')}</h3><p>Месяцы работ, потребность в воде и количество выездов бригады.</p></header>
+          {snapshot.survival.length > SURVIVAL_SHOWN ? (
+            <Button size="sm" variant="secondary" onClick={() => setShowAllSurvival((value) => !value)}>
+              {showAllSurvival ? 'Показать основные группы' : `Показать все группы (${snapshot.survival.length})`}
+            </Button>
+          ) : null}
+          </>
+        ) : <CalculationModuleEmpty text="Прогноз не вошёл в этот снимок. Запустите полный расчёт с модулем приживаемости." />}
+      </section>
+      <section className="calc-story__section">
+        <header><small>Календарь</small><h3>{t('calc.care')}</h3><p>Месяцы работ, потребность в воде и количество выездов бригады.</p></header>
+        {snapshot.care.length ? (
+          <>
           <div className="care-calendar" role="list" aria-label="Календарь ухода по месяцам">
             {calendar.map((month) => (
               <article key={month.month} className={month.operations.length ? 'is-active' : undefined} role="listitem">
@@ -109,11 +118,12 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
               <tbody>{snapshot.care.map((c) => <tr key={c.id}><td>{c.operation}</td><td>{c.year_offset + 1}-й год, {MONTHS[c.month - 1]}</td><td>{formatNumber(c.quantity, 2)} <UnitText unit={c.unit} /></td><td>{formatNumber(c.water_m3, 2)} <UnitText unit="m3" /></td><td>{c.visits}</td></tr>)}</tbody>
             </table></div>
           </details>
-        </section>
-      ) : null}
-      {snapshot.ecosystem.length ? (
-        <section className="calc-story__section">
-          <header><small>Эффект во времени</small><h3>{t('calc.ecosystem')}</h3><p>Одинаковый набор показателей на горизонтах 5, 10 и 20 лет.</p></header>
+          </>
+        ) : <CalculationModuleEmpty text="План ухода не вошёл в этот снимок. Запустите полный расчёт с модулем ухода." />}
+      </section>
+      <section className="calc-story__section">
+        <header><small>Эффект во времени</small><h3>{t('calc.ecosystem')}</h3><p>Одинаковый набор показателей на горизонтах 5, 10 и 20 лет.</p></header>
+        {snapshot.ecosystem.length ? (
           <div className="ecosystem-horizons">
             {ecosystemHorizons.map((horizon) => (
               <section key={horizon}>
@@ -122,8 +132,8 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
               </section>
             ))}
           </div>
-        </section>
-      ) : null}
+        ) : <CalculationModuleEmpty text="Экологический эффект не вошёл в этот снимок. Запустите полный расчёт с соответствующим модулем." />}
+      </section>
       {gaps.length ? (
         <Notice tone="warning" icon="alert" title={t('scenario.calc.gaps')}>
           <ul className="pg-list">
@@ -139,6 +149,15 @@ export function SnapshotView({ snapshot, timeZone }: { snapshot: CalculationSnap
           {t('scenario.calc.manifest')}
         </a>
       </p>
+    </div>
+  );
+}
+
+function CalculationModuleEmpty({ text }: { text: string }) {
+  return (
+    <div className="calc-story__empty">
+      <Icon name="clock" size={20} />
+      <span><strong>Результат пока не рассчитан</strong><small>{text}</small></span>
     </div>
   );
 }

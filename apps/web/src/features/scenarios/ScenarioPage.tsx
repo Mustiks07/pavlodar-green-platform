@@ -10,6 +10,7 @@ import {
   type Dataset,
   type FastCalculationResponse,
   type Placement,
+  type Plant,
   type Scenario,
   type ScenarioRevision,
   type ScenarioRevisionInput,
@@ -46,7 +47,7 @@ import { RecommendationPanel } from './RecommendationPanel';
 import { RuleVersionField } from './RuleVersionField';
 import { ShadowSection } from '../shadow/ShadowPanel';
 import { ThermalSection } from '../thermal/ThermalPanel';
-import { FullCalculation } from '../calculations/FullCalculation';
+import { CALC_JOB, CALC_RESULT, FullCalculation } from '../calculations/FullCalculation';
 import { SnapshotView } from '../calculations/SnapshotView';
 import { issuesOf, mergePlacements, same, type MergeResult } from './placements';
 import { productLabel } from '../../productCopy';
@@ -192,6 +193,7 @@ function RevisionEditor({
   const [merge, setMerge] = useState<(MergeResult & { onto: string }) | null>(null);
   // Restarts the placement editor's undo history whenever its base is replaced.
   const [historyKey, setHistoryKey] = useState(0);
+  const [recommendedPlant, setRecommendedPlant] = useState<Plant | null>(null);
   const [acceptNextBase, setAcceptNextBase] = useState(false);
   const restored = stored !== null && stored.baseRevisionId === base.id && baseId === base.id;
   const [key, setKey] = useState(newIdempotencyKey);
@@ -501,6 +503,7 @@ function RevisionEditor({
           ruleVersionId={edits.rule_version_id}
           excludedPlantIds={base.excluded_plant_ids}
           placements={edits.placements}
+          onSelectPlant={setRecommendedPlant}
           disabled={!canEdit || save.isPending}
         />
         <div id="scenario-placement-editor">
@@ -512,6 +515,7 @@ function RevisionEditor({
             disabled={!canEdit || save.isPending}
             catalogVersionId={edits.catalog_version_id}
             onCatalogVersion={(id) => setEdits((e) => ({ ...e, catalog_version_id: id }))}
+            preferredPlant={recommendedPlant}
           />
         </div>
         <RuleVersionField
@@ -727,7 +731,7 @@ function ProjectOverview({ revision }: { revision: ScenarioRevision }) {
       <article><span className="scn-overview__icon"><Icon name="sprout" size={19} /></span><span><small>Растений</small><strong>{plants}</strong><em>{revision.placements.length} групп посадок</em></span></article>
       <article><span className="scn-overview__icon"><Icon name="map" size={19} /></span><span><small>Площадные посадки</small><strong>{revision.area_patches.length}</strong><em>контуров покрытия</em></span></article>
       <article><span className="scn-overview__icon"><Icon name="calendar" size={19} /></span><span><small>Горизонт ухода</small><strong>{revision.care_horizon_years}</strong><em>лет планирования</em></span></article>
-      <article><span className="scn-overview__icon"><Icon name="target" size={19} /></span><span><small>Капитальный бюджет</small><strong>{revision.capital_budget ? <MoneyText value={revision.capital_budget} /> : '—'}</strong><em>{revision.capital_budget ? 'ограничение проекта' : 'не задан'}</em></span></article>
+      <article><span className="scn-overview__icon"><Icon name="target" size={19} /></span><span><small>Лимит капитальных затрат</small><strong>{revision.capital_budget ? <MoneyText value={revision.capital_budget} /> : '—'}</strong><em>{revision.capital_budget ? 'не итоговая стоимость' : 'не задан'}</em></span></article>
     </section>
   );
 }
@@ -747,6 +751,10 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
     const next = new URLSearchParams(params);
     if (id) next.set('revision', id);
     else next.delete('revision');
+    // A calculation is bound to one exact immutable revision. Never carry an old result across
+    // revision navigation; FullCalculation will discover the latest snapshot for the new one.
+    next.delete(CALC_JOB);
+    next.delete(CALC_RESULT);
     setParams(next, { replace: true });
   };
 
@@ -775,6 +783,9 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
       />
       <ProjectJourney status={s.status} plantCount={current.data?.placements.reduce((sum, item) => sum + item.quantity, 0) ?? 0} />
       {current.data ? <ProjectOverview revision={current.data} /> : null}
+      <Card title="Результат проекта · стоимость, приживаемость, уход и эффект">
+        {calculationRevisionId ? <FullCalculation key={calculationRevisionId} revisionId={calculationRevisionId} timeZone={timeZone} /> : <Skeleton lines={1} />}
+      </Card>
       <div className="scn-grid">
         <div className="scn-main">
           {isOld ? (
@@ -812,9 +823,6 @@ function ScenarioBody({ scenarioId, cityId, timeZone }: { scenarioId: string; ci
             ) : (
               <Skeleton lines={1} />
             )}
-          </Card>
-          <Card title={t('calc.full')}>
-            {calculationRevisionId ? <FullCalculation key={calculationRevisionId} revisionId={calculationRevisionId} timeZone={timeZone} /> : <Skeleton lines={1} />}
           </Card>
           <Card title={t('shadow.card')}>
             {calculationRevisionId ? (

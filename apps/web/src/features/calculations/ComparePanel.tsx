@@ -64,6 +64,9 @@ function MetricCell({ m }: { m: Metric | null }) {
 
 function SnapshotSummary({ snapshot, scenario, city, zoneName }: { snapshot: CalculationSnapshot; scenario: Scenario | undefined; city: City; zoneName: string }) {
   const knownCost = snapshot.cost.status === 'complete' || Number(snapshot.cost.known_subtotal) > 0;
+  const careMonths = [...new Set(snapshot.care.map((item) => item.month))].sort((a, b) => a - b);
+  const impactHorizon = Math.max(0, ...snapshot.ecosystem.map((item) => item.horizon_year ?? 0));
+  const impact = snapshot.ecosystem.filter((item) => item.horizon_year === impactHorizon && item.value !== null).slice(0, 2);
   return (
     <article className="cmp-summary-card">
       <header>
@@ -72,9 +75,17 @@ function SnapshotSummary({ snapshot, scenario, city, zoneName }: { snapshot: Cal
       </header>
       <dl>
         <div><dt>Известная стоимость</dt><dd>{knownCost ? <MoneyText value={snapshot.cost.known_subtotal} /> : 'нужны расценки'}</dd></div>
-        <div><dt>План ухода</dt><dd>{snapshot.care.length ? `${snapshot.care.length} операций` : 'ещё не рассчитан'}</dd></div>
+        <div><dt>Календарь ухода</dt><dd>{careMonths.length ? `${careMonths.length} мес. работ` : 'ещё не рассчитан'}</dd></div>
         <div><dt>Приживаемость</dt><dd>{snapshot.survival.length ? `${snapshot.survival.length} групп посадок` : 'ещё не рассчитана'}</dd></div>
       </dl>
+      {impact.length ? (
+        <div className="cmp-summary-card__impact">
+          <small>Эффект через {impactHorizon} лет</small>
+          {impact.map((metric) => (
+            <span key={`${metric.key}:${metric.horizon_year}`}><em>{metricLabel(metric.key)}</em><strong><MetricCell m={metric} /></strong></span>
+          ))}
+        </div>
+      ) : <p className="cmp-summary-card__empty">Экологический эффект ещё не рассчитан</p>}
       {scenario ? <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={`/projects/${scenario.id}?city=${city.id}&${CALC_RESULT}=${snapshot.id}`}>Открыть проект</Link> : null}
     </article>
   );

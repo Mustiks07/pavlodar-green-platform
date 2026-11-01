@@ -16,6 +16,10 @@
 .calc-story__technical dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
 .calc-story__section { display: grid; gap: 0.85rem; padding-top: 0.35rem; }
 .calc-story__section > header { display: grid; gap: 0.18rem; }
+.calc-story__empty { display: flex; align-items: center; gap: 0.75rem; min-height: 4.5rem; padding: 0.9rem 1rem; border: 1px dashed var(--pg-border-strong); border-radius: var(--pg-radius); background: var(--pg-surface-2); color: var(--pg-text-muted); }
+.calc-story__empty > svg { flex: 0 0 auto; color: var(--pg-accent-text); }
+.calc-story__empty > span { display: grid; gap: 0.12rem; }
+.calc-story__empty strong { color: var(--pg-text); }
 .calc-story .pg-survival { padding: 0.85rem; border: 1px solid var(--pg-border); border-radius: var(--pg-radius); background: var(--pg-surface); }
 .pg-survival__title { margin: 0; }
 .pg-survival__risks summary { cursor: pointer; color: var(--pg-accent-text); font-weight: 650; }

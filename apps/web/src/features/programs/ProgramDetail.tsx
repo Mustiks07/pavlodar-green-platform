@@ -11,6 +11,8 @@ import {
   type ProgramRevision,
   type ProgramRevisionDiff,
   type PriorityResult,
+  type Scenario,
+  type ScenarioRevision,
   type Zone,
 } from '@pg/api-client';
 import { Badge, Button, Card, Dialog, Field, formatDateTime, Input, JobStatus, MoneyText, Notice, Skeleton, StateView } from '@pg/ui';
@@ -113,6 +115,25 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
   });
   const items = [...(revisions.data ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at));
   const selected: ProgramRevision | null = items.find((revision) => revision.id === revisionId) ?? (revisionId ? null : (items.find((revision) => revision.id === current.current_revision_id) ?? items[0] ?? null));
+  const selectedRevisions = useQueries({
+    queries: (selected?.selected_scenario_revision_ids ?? []).map((id) => ({
+      queryKey: ['program-selected-revision', id],
+      queryFn: async ({ signal }: { signal: AbortSignal }) => (
+        await unwrap<ScenarioRevision>(api.GET('/v1/scenario-revisions/{revision_id}', { params: { path: { revision_id: id } }, signal }))
+      ).data,
+      staleTime: Infinity,
+    })),
+  });
+  const selectedScenarios = useQueries({
+    queries: selectedRevisions.map((revision) => ({
+      queryKey: ['program-selected-scenario', revision.data?.scenario_id ?? ''],
+      enabled: Boolean(revision.data?.scenario_id),
+      queryFn: async ({ signal }: { signal: AbortSignal }) => (
+        await unwrap<Scenario>(api.GET('/v1/scenarios/{scenario_id}', { params: { path: { scenario_id: revision.data!.scenario_id } }, signal }))
+      ).data,
+      staleTime: 60_000,
+    })),
+  });
   const job = useJob(jobId);
   const activeJob = job.data && ['queued', 'running', 'cancel_requested'].includes(job.data.state);
 
@@ -238,6 +259,33 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
         )
       ).data,
   });
+  const changedRevisionIds = [
+    ...(diff.data?.added_scenario_revision_ids ?? []),
+    ...(diff.data?.removed_scenario_revision_ids ?? []),
+  ];
+  const changedRevisions = useQueries({
+    queries: changedRevisionIds.map((id) => ({
+      queryKey: ['program-changed-revision', id],
+      queryFn: async ({ signal }: { signal: AbortSignal }) => (
+        await unwrap<ScenarioRevision>(api.GET('/v1/scenario-revisions/{revision_id}', { params: { path: { revision_id: id } }, signal }))
+      ).data,
+      staleTime: Infinity,
+    })),
+  });
+  const changedScenarios = useQueries({
+    queries: changedRevisions.map((revision) => ({
+      queryKey: ['program-changed-scenario', revision.data?.scenario_id ?? ''],
+      enabled: Boolean(revision.data?.scenario_id),
+      queryFn: async ({ signal }: { signal: AbortSignal }) => (
+        await unwrap<Scenario>(api.GET('/v1/scenarios/{scenario_id}', { params: { path: { scenario_id: revision.data!.scenario_id } }, signal }))
+      ).data,
+      staleTime: 60_000,
+    })),
+  });
+  const changedName = (id: string) => {
+    const index = changedRevisionIds.indexOf(id);
+    return changedScenarios[index]?.data?.name ?? 'Проект участка';
+  };
 
   return (
     <Card title={current.name} actions={<Button variant="ghost" size="sm" icon="x" iconOnly aria-label={t('program.close')} onClick={onClose} />}>
@@ -272,6 +320,48 @@ export function ProgramDetail({ program, timeZone, onClose }: { program: Program
           : priority.isError ? <ApiErrorView compact error={priority.error} onRetry={() => void priority.refetch()} />
             : priorityZones.isError ? <ApiErrorView compact error={priorityZones.error} onRetry={() => void priorityZones.refetch()} />
               : priority.data ? <PriorityDashboard result={priority.data} zoneNames={priorityZoneNames} cityId={current.city_id} /> : null
+      ) : null}
+      {selected && selected.selected_scenario_revision_ids.length > 0 ? (
+        <section className="program-portfolio" aria-labelledby="program-portfolio-title">
+          <header>
+            <span><small>Результат оптимизации</small><h4 id="program-portfolio-title">Проекты городской программы</h4></span>
+            <Badge tone="positive">{selected.selected_scenario_revision_ids.length} выбрано</Badge>
+          </header>
+          <div className="program-portfolio__grid">
+            {selected.selected_scenario_revision_ids.map((id, index) => {
+              const scenario = selectedScenarios[index]?.data;
+              return (
+                <article key={id}>
+                  <span className="program-portfolio__number">{index + 1}</span>
+                  <div>
+                    <small>{scenario ? (priorityZoneNames.get(scenario.zone_id) ?? 'Участок программы') : 'Загрузка участка…'}</small>
+                    <strong>{scenario?.name ?? 'Загрузка проекта…'}</strong>
+                  </div>
+                  {scenario ? <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={`/projects/${scenario.id}?city=${current.city_id}`}>Открыть</Link> : null}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+      {diff.data && items.length >= 2 ? (
+        <section className="program-whatif" aria-labelledby="program-whatif-title">
+          <header>
+            <span><small>Сценарный анализ</small><h4 id="program-whatif-title">Что изменилось между двумя расчётами программы</h4></span>
+            {diff.data.capital_delta !== null ? <strong><MoneyText value={diff.data.capital_delta} /></strong> : null}
+          </header>
+          <div className="program-whatif__changes">
+            <article className="is-added">
+              <strong>Вошли в программу</strong>
+              {diff.data.added_scenario_revision_ids.length ? <ul>{diff.data.added_scenario_revision_ids.map((id) => <li key={id}>{changedName(id)}</li>)}</ul> : <span>Состав не пополнился</span>}
+            </article>
+            <article className="is-removed">
+              <strong>Вышли из программы</strong>
+              {diff.data.removed_scenario_revision_ids.length ? <ul>{diff.data.removed_scenario_revision_ids.map((id) => <li key={id}>{changedName(id)}</li>)}</ul> : <span>Ни один проект не исключён</span>}
+            </article>
+          </div>
+          <p>Измените лимиты программы и запустите оптимизацию — сервер сохранит новый результат, а здесь покажет точную разницу.</p>
+        </section>
       ) : null}
       {optimize.isError ? <ApiErrorView compact error={optimize.error} onRetry={() => optimize.mutate()} /> : null}
       {jobId && job.isPending ? <Skeleton lines={2} /> : null}

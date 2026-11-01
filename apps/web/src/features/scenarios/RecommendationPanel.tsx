@@ -67,7 +67,7 @@ export function buildRecommendationRequest({
   };
 }
 
-function RecommendationCard({ recommendation, plant }: { recommendation: PlantRecommendation; plant: Plant | null }) {
+function RecommendationCard({ recommendation, plant, onSelect }: { recommendation: PlantRecommendation; plant: Plant | null; onSelect: (plant: Plant) => void }) {
   const eligibility = ELIGIBILITY[recommendation.eligibility];
   const knownContributions = recommendation.contributions.filter((item) => item.score !== null);
   return (
@@ -111,6 +111,9 @@ function RecommendationCard({ recommendation, plant }: { recommendation: PlantRe
           {recommendation.blockers.map((item, index) => <li key={`${item.code}-${index}`}>{item.message}</li>)}
         </ul>
       </details>
+      <Button size="sm" variant="secondary" icon="map" disabled={!plant || recommendation.eligibility === 'excluded'} onClick={() => plant && onSelect(plant)}>
+        Разместить этот вид
+      </Button>
     </article>
   );
 }
@@ -121,6 +124,7 @@ export function RecommendationPanel({
   ruleVersionId,
   excludedPlantIds,
   placements,
+  onSelectPlant,
   disabled = false,
 }: {
   zoneVersionId: string;
@@ -128,6 +132,7 @@ export function RecommendationPanel({
   ruleVersionId: string | null;
   excludedPlantIds: string[];
   placements: Placement[];
+  onSelectPlant: (plant: Plant) => void;
   disabled?: boolean;
 }) {
   const { user } = useSession();
@@ -201,7 +206,7 @@ export function RecommendationPanel({
               <span>Оценка показывается только при достаточном покрытии признаков.</span>
             </div>
             <div className="rec-panel__grid">
-              {recommendation.data.candidates.map((item) => <RecommendationCard key={item.plant_id} recommendation={item} plant={plantById.get(item.plant_id) ?? null} />)}
+              {recommendation.data.candidates.map((item) => <RecommendationCard key={item.plant_id} recommendation={item} plant={plantById.get(item.plant_id) ?? null} onSelect={(plant) => { onSelectPlant(plant); goToPlacement(); }} />)}
             </div>
             <div className="rec-panel__footer">
               <p>Выберите подходящий вид и разместите его точкой внутри участка. Проверки геометрии и ограничений повторит сервер.</p>
