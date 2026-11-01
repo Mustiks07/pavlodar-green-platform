@@ -19,6 +19,7 @@ const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', '�
 
 type PlannedOperation = CareOperation & {
   snapshotId: string;
+  scenarioId: string | null;
   scenarioRevisionId: string;
   scenarioName: string;
   zoneName: string;
@@ -36,6 +37,7 @@ type Period = {
 
 type LaunchPassportProject = {
   id: string;
+  scenarioId: string | null;
   scenarioName: string;
   zoneName: string;
   operations: number;
@@ -117,6 +119,7 @@ export function ProgramCarePlan({ cityId }: { cityId: string }) {
     return snapshot.care.map((operation) => ({
       ...operation,
       snapshotId: snapshot.id,
+      scenarioId: scenario?.id ?? null,
       scenarioRevisionId: snapshot.scenario_revision_id,
       scenarioName: scenario?.name ?? 'Проект участка',
       zoneName: zone?.name ?? 'Участок программы',
@@ -156,6 +159,7 @@ export function ProgramCarePlan({ cityId }: { cityId: string }) {
       if (!current) {
         projects.set(operation.scenarioRevisionId, {
           id: operation.scenarioRevisionId,
+          scenarioId: operation.scenarioId,
           scenarioName: operation.scenarioName,
           zoneName: operation.zoneName,
           operations: 1,
@@ -220,10 +224,10 @@ export function ProgramCarePlan({ cityId }: { cityId: string }) {
           <section className="program-launch-passport" aria-labelledby="program-launch-passport-title">
             <header>
               <span>
-                <small>Паспорт запуска программы</small>
-                <h3 id="program-launch-passport-title">Что подготовлено по каждому участку</h3>
+                <small>Очередь передачи в работу</small>
+                <h3 id="program-launch-passport-title">Три проекта готовы к внутреннему согласованию</h3>
               </span>
-              <Badge tone="accent">Расчётный план сформирован · в наряды ещё не передан</Badge>
+              <Badge tone="warning">Ожидают утверждения</Badge>
             </header>
             <div className="program-launch-passport__grid">
               {launchPassport.map((project) => (
@@ -239,8 +243,15 @@ export function ProgramCarePlan({ cityId }: { cityId: string }) {
                     <div><dt>Выезды</dt><dd>{formatNumber(project.visits, 0)}</dd></div>
                   </dl>
                   <footer>
-                    <span><Icon name="calendar" size={16} /> Ближайший период</span>
-                    <strong>{MONTHS[project.firstMonth - 1]} · {project.firstYear}-й год</strong>
+                    <div>
+                      <span><Icon name="calendar" size={16} /> Ближайший период</span>
+                      <strong>{MONTHS[project.firstMonth - 1]} · {project.firstYear}-й год</strong>
+                    </div>
+                    {project.scenarioId ? (
+                      <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={`/projects/${project.scenarioId}?city=${cityId}&revision=${project.id}`}>
+                        Открыть проект и согласовать
+                      </Link>
+                    ) : null}
                   </footer>
                 </article>
               ))}

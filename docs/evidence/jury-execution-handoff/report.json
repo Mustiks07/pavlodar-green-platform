@@ -1,0 +1,34 @@
+{
+  "base": "http://localhost:5173",
+  "city": "2de4e9e4-1602-5bdb-b17d-13df22510458",
+  "checks": [
+    {
+      "name": "three exact program projects form the handoff queue",
+      "pass": true
+    },
+    {
+      "name": "each project has a direct approval route",
+      "pass": true
+    },
+    {
+      "name": "queue exposes exact care resources and first period",
+      "pass": true,
+      "detail": "ОЧЕРЕДЬ ПЕРЕДАЧИ В РАБОТУ\nТри проекта готовы к внутреннему согласованию\nОжидают утверждения\nДвор жилого квартала\nВариант B · экономия воды\nОперации\n12\nВода\n9,0 м³\nРабота бригады\n19,5 ч\nВыезды\n12\nБлижайший период\nМай · 1-й год\nОткрыть проект и согласовать\nЗелёный коридор вдоль улицы\nВариант B · экономия воды\nОперации\n12\nВода\n9,0 м³\nРабота бригады\n19,5 ч\nВыезды\n12\nБлижайший период\nМай · 1-й год\nОткрыть проект и согласовать\nСквер у набережной\nВариант B · экономия воды\nОперации\n12\nВода\n9,0 м³\nРабота бригады\n19,5 ч\nВыезды\n12\nБлижайший период\nМай · 1-й год\nОткрыть проект и согласовать"
+    },
+    {
+      "name": "empty execution advertising and zero KPI cards are absent",
+      "pass": true
+    },
+    {
+      "name": "screen explains the real approval gate",
+      "pass": true
+    },
+    {
+      "name": "no API 5xx occurred",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "passed": true,
+  "screenshot": "docs/evidence/jury-execution-handoff/execution-handoff-queue.png"
+}

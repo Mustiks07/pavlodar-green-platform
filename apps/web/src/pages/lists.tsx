@@ -735,10 +735,19 @@ export function CatalogPage() {
 
 
 export function ExecutionPage() {
+  const session = useSession();
   const [status, setStatus] = useFilter('status', ['planned', 'assigned', 'in_progress', 'completed', 'cancelled'] as const);
   const [order, setOrder] = useSelected('order');
   const [cohort, setCohort] = useSelected('cohort');
   const [orders, setOrders] = useState<WorkOrder[]>([]);
+  const orderPresence = useQuery({
+    queryKey: ['execution-order-presence', session.city?.id ?? ''],
+    enabled: Boolean(session.city),
+    queryFn: async ({ signal }) => (
+      await unwrap(api.GET('/v1/work-orders', { params: { query: { city_id: session.city!.id, limit: 1 } }, signal }))
+    ).data.items as WorkOrder[],
+  });
+  const hasOrders = Boolean(orderPresence.data?.length);
   const columns: Column<WorkOrder>[] = [
     { key: 'op', header: t('col.operation'), render: (w) => w.operation },
     { key: 'zone', header: t('col.zone'), render: (w) => <ZoneLabel id={w.zone_id} /> },
@@ -762,19 +771,20 @@ export function ExecutionPage() {
         {(city) => (
           <>
             <ProgramCarePlan cityId={city.id} />
-            <div className="execution-live-head">
+            {orderPresence.isError ? <ApiErrorView compact error={orderPresence.error} onRetry={() => void orderPresence.refetch()} /> : null}
+            {hasOrders ? <div className="execution-live-head">
               <span><small>Фактическое исполнение</small><strong>Наряды и подтверждённые результаты</strong></span>
               <p>Этот блок начинает заполняться только после утверждения проектов и передачи расчётного плана бригадам.</p>
-            </div>
-            <WorkspaceOverview
+            </div> : null}
+            {hasOrders ? <WorkspaceOverview
               items={[
                 { icon: 'calendar', label: 'Все работы', value: orders.length, note: 'в текущем контуре', tone: 'accent' },
                 { icon: 'clock', label: 'Запланировано', value: orders.filter((item) => item.status === 'planned' || item.status === 'assigned').length, note: 'ожидают начала' },
                 { icon: 'refresh', label: 'Выполняется', value: orders.filter((item) => item.status === 'in_progress').length, note: 'активные задания', tone: 'warning' },
                 { icon: 'check', label: 'Завершено', value: orders.filter((item) => item.status === 'completed').length, note: 'результат зафиксирован', tone: 'positive' },
               ]}
-            />
-            <section className="execution-visual" aria-labelledby="execution-visual-title">
+            /> : null}
+            {hasOrders ? <section className="execution-visual" aria-labelledby="execution-visual-title">
               <img src="/workspaces/execution-care.webp" alt="Бригада выполняет посадку и фиксирует результат" />
               <div>
                 <small>Единый цикл исполнения</small>
@@ -782,8 +792,8 @@ export function ExecutionPage() {
                 <p>Наряд, бригада, фактический расход воды и осмотр сохраняются в одной истории участка.</p>
                 <span className="execution-visual__flow"><b>01</b> Посадка <i /> <b>02</b> Уход <i /> <b>03</b> Осмотр</span>
               </div>
-            </section>
-            <WorkspaceSteps
+            </section> : null}
+            {hasOrders ? <WorkspaceSteps
               label="Как выполняются городские работы"
               items={[
                 { icon: 'calendar', title: 'Запланировать', description: 'Создать наряд из утверждённого проекта участка' },
@@ -791,22 +801,17 @@ export function ExecutionPage() {
                 { icon: 'refresh', title: 'Выполнить', description: 'Фиксировать фактический объём, воду и время бригады' },
                 { icon: 'check', title: 'Проверить результат', description: 'Провести осмотр и сравнить факт с прогнозом проекта' },
               ]}
-            />
-            {orders.length === 0 ? (
+            /> : null}
+            {!orderPresence.isPending && !orderPresence.isError && !hasOrders ? (
               <section className="execution-ready" aria-labelledby="execution-ready-title">
                 <div className="execution-ready__intro">
                   <span className="execution-ready__mark"><Icon name="calendar" size={22} /></span>
-                  <span><small>Операционный контур готов</small><strong id="execution-ready-title">От проекта до фактического результата</strong><p>После утверждения проекта здесь появятся наряды, работа бригад и результаты осмотров — без ручного переноса данных между таблицами.</p></span>
-                  <Link className="pg-btn pg-btn--primary pg-btn--sm" to={`/projects?city=${city.id}`}>Выбрать проект</Link>
-                </div>
-                <div className="execution-ready__features">
-                  <article><Icon name="user" size={18} /><span><strong>Бригады и сроки</strong><small>Назначение ответственных и календарные окна</small></span></article>
-                  <article><Icon name="refresh" size={18} /><span><strong>План и факт</strong><small>Объём работ, вода и трудозатраты</small></span></article>
-                  <article><Icon name="check" size={18} /><span><strong>Осмотры и замены</strong><small>История состояния каждой когорты посадок</small></span></article>
+                  <span><small>Следующий управленческий шаг</small><strong id="execution-ready-title">Согласуйте один из рассчитанных проектов выше</strong><p>После внутреннего утверждения его календарь превращается в наряды. Только затем платформа принимает фактические объёмы, осмотры и замены — поэтому здесь нет выдуманных результатов выполнения.</p></span>
+                  <Link className="pg-btn pg-btn--primary pg-btn--sm" to={`/projects?city=${city.id}`}>Все проекты</Link>
                 </div>
               </section>
             ) : null}
-            <section className="app-section" aria-labelledby="exec-orders-h">
+            {hasOrders ? <section className="app-section" aria-labelledby="exec-orders-h">
               <h2 id="exec-orders-h">{t('exec.orders')}</h2>
               <div className={order ? 'app-split is-open' : 'app-split'}>
                 <ResourceList
@@ -858,12 +863,12 @@ export function ExecutionPage() {
                 />
                 {order ? <WorkOrderDetail key={order} id={order} timeZone={city.timezone} onClose={() => setOrder(null)} /> : null}
               </div>
-            </section>
-            <section className="app-section" aria-labelledby="exec-cohorts-h">
+            </section> : null}
+            {hasOrders ? <section className="app-section" aria-labelledby="exec-cohorts-h">
               <h2 id="exec-cohorts-h">{t('exec.cohorts')}</h2>
               <p className="pg-muted">{t('exec.cohorts.desc')}</p>
               <CohortsPanel city={city} selected={cohort} onSelect={setCohort} />
-            </section>
+            </section> : null}
           </>
         )}
       </CityGate>

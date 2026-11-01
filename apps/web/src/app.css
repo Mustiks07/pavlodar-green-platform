@@ -611,16 +611,16 @@
 .program-launch-passport dt { color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
 .program-launch-passport dd { margin: 0; font-weight: 750; }
 .program-launch-passport article > footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
   gap: var(--pg-space-2);
   padding-top: var(--pg-space-2);
   border-top: 1px solid var(--pg-border);
   font-size: var(--pg-fs-xs);
 }
+.program-launch-passport article > footer > div { display: flex; align-items: center; justify-content: space-between; gap: var(--pg-space-2); }
 .program-launch-passport article > footer span { display: flex; align-items: center; gap: var(--pg-space-1); color: var(--pg-text-muted); }
 .program-launch-passport article > footer strong { color: var(--pg-accent-text); text-align: right; }
+.program-launch-passport article > footer .pg-btn { width: 100%; justify-content: center; }
 .program-care-plan__timeline {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
