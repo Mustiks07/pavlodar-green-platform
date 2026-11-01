@@ -49,6 +49,7 @@ def run_job(job_id):
                 grounded_fallback_reply,
                 persist_chat_reply,
                 prepare_chat_request,
+                presentable_reply,
             )
             from services.api.llm import LLMError, ProviderUnavailable, gateway
 
@@ -74,6 +75,7 @@ def run_job(job_id):
                     if job and job.state in {"running", "cancel_requested"}:
                         failure(db, job, code)
                 return
+            reply = presentable_reply(request, reply)
             with session() as db, db.begin():
                 complete(
                     db,

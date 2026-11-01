@@ -3004,6 +3004,34 @@
   font-size: var(--pg-fs-sm);
   font-weight: 600;
 }
+.asst-fact {
+  display: grid;
+  gap: var(--pg-space-2);
+  overflow: hidden;
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius);
+  background: var(--pg-bg);
+}
+.asst-fact > .pg-metric { border: 0; border-radius: 0; }
+.asst-fact-lineage {
+  margin: 0 var(--pg-space-2) var(--pg-space-2);
+  padding: var(--pg-space-2);
+  border: 1px solid color-mix(in srgb, var(--pg-accent) 22%, var(--pg-border));
+  border-radius: var(--pg-radius-sm);
+  background: var(--pg-surface);
+}
+.asst-fact-lineage summary {
+  display: flex;
+  align-items: center;
+  gap: var(--pg-space-1);
+  color: var(--pg-accent-text);
+  font-size: var(--pg-fs-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+.asst-fact-lineage > p { margin: var(--pg-space-2) 0; color: var(--pg-text-muted); font-size: var(--pg-fs-xs); }
+.asst-fact-lineage .pg-dl { margin: var(--pg-space-2) 0; font-size: var(--pg-fs-xs); }
+.asst-fact-lineage__actions { display: flex; flex-wrap: wrap; gap: var(--pg-space-2); }
 .asst-proposal {
   display: grid;
   gap: var(--pg-space-2);

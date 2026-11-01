@@ -2,7 +2,12 @@ import pytest
 from sqlalchemy import select, text
 
 from packages.domain.contracts import validate
-from services.api.chat import grounded_fallback_reply, latest_calculation_context
+from services.api.chat import (
+    grounded_fallback_reply,
+    latest_calculation_context,
+    presentable_reply,
+    snapshot_facts,
+)
 from services.api.db import engine, session
 from services.api.llm import LLMReply, LLMRequest, Message, ToolCall, Usage
 from services.api.models import ChatMessageRecord
@@ -120,6 +125,42 @@ def test_latest_calculation_context_uses_canonical_cost_fields():
     }
 
 
+def test_snapshot_facts_keep_exact_survival_lineage():
+    facts = snapshot_facts(
+        "99000000-0000-4000-8000-000000000099",
+        "99000000-0000-4000-8000-000000000098",
+        {
+            "survival": [
+                {
+                    "model_kind": "expert_rules",
+                    "calibration_status": "uncalibrated",
+                    "points": [{"year": 1, "probability": 0.88, "lower": 0.78, "upper": 0.94}],
+                    "risks": [
+                        {
+                            "source_refs": [
+                                {
+                                    "dataset_version_id": "99000000-0000-4000-8000-000000000097",
+                                    "source_record_id": "survival-v1",
+                                    "label": "Оценочный профиль приживаемости",
+                                    "uri": None,
+                                }
+                            ]
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+    assert len(facts) == 1
+    fact = facts[0]
+    validate("Fact", fact)
+    assert fact["metric"]["value"] == 0.88
+    assert fact["metric"]["lower"] == 0.78
+    assert fact["metric"]["source_refs"][0]["source_record_id"] == "survival-v1"
+    assert fact["calculation_id"] == "99000000-0000-4000-8000-000000000099"
+    assert fact["scenario_revision_id"] == "99000000-0000-4000-8000-000000000098"
+
+
 def test_grounded_fallback_uses_only_authorized_context():
     context = {
         "city": {"name": "Павлодар"},
@@ -158,6 +199,39 @@ def test_grounded_fallback_accepts_priority_score_already_on_100_scale():
     )
     assert "Сквер — 72/100" in reply.text
     assert "7250/100" not in reply.text
+
+
+def test_raw_provider_context_is_replaced_with_presentable_server_summary():
+    context = {
+        "city": {"name": "Павлодар"},
+        "latest_calculation": {
+            "status": "complete",
+            "full_total_kzt": "450000.00",
+            "survival": [
+                {"points": [{"year": 1, "probability": 0.88}]},
+                {"points": [{"year": 1, "probability": 0.88}]},
+            ],
+        },
+    }
+    request = LLMRequest(
+        messages=(
+            Message("system", "rules"),
+            Message("system", "AUTHORIZED_CONTEXT=" + __import__("json").dumps(context)),
+            Message("user", "Какова приживаемость?"),
+        )
+    )
+    raw = LLMReply(
+        provider="test-provider",
+        model="test-model",
+        text='survival.points probability для placement_id 99000000-0000-4000-8000-000000000001',
+        tool_calls=(),
+        usage=Usage(input_tokens=10, output_tokens=5),
+    )
+    cleaned = presentable_reply(request, raw)
+    assert cleaned.provider == raw.provider
+    assert "приживаемость через 1 год — 88% для 2 групп" in cleaned.text
+    assert "placement_id" not in cleaned.text
+    assert "99000000" not in cleaned.text
 
 
 class FakeGateway:

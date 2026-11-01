@@ -3,6 +3,7 @@
 import base64
 import copy
 import json
+import re
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
@@ -33,6 +34,16 @@ from services.api.use_cases import authorized_revision, canonical_hash, found, n
 from services.worker.jobs import QUEUES, event
 
 PROPOSAL_ARGUMENT_KEYS = {"summary", "placement_id", "quantity"}
+UUID_IN_TEXT = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b", re.IGNORECASE)
+RAW_CONTEXT_MARKERS = (
+    "AUTHORIZED_CONTEXT",
+    "latest_calculation",
+    "survival",
+    "probability",
+    "placement",
+    "source_refs",
+    "_id",
+)
 
 
 def grounded_fallback_reply(request):
@@ -51,34 +62,64 @@ def grounded_fallback_reply(request):
     except (TypeError, json.JSONDecodeError):
         context = {}
     city = context.get("city") or {}
+    question = next(
+        (message.content.lower() for message in reversed(request.messages) if message.role == "user"),
+        "",
+    )
+    asks_area = any(word in question for word in ("площад", "размер", "участ"))
+    asks_cost = any(word in question for word in ("стоим", "смет", "бюджет", "цен"))
+    asks_survival = any(word in question for word in ("прижив", "выжив", "сохранност"))
+    asks_effect = any(word in question for word in ("эффект", "эколог", "co2", "тень", "вод"))
+    asks_priority = any(word in question for word in ("приоритет", "проблем", "вниман", "территор"))
+    general = not any((asks_area, asks_cost, asks_survival, asks_effect, asks_priority))
     lines = [
         f"Контекст платформы загружен: {city.get('name') or 'выбранный город'}.",
     ]
     zone = context.get("zone") or {}
-    if zone:
+    if zone and (general or asks_area):
         area = zone.get("area_m2")
         area_text = f"{area:,.0f}".replace(",", " ") if isinstance(area, (int, float)) else "—"
         lines.append(f"Участок: {area_text} м², назначение — {zone.get('purpose') or 'не указано'}.")
     calculation = context.get("latest_calculation") or {}
     if calculation:
-        total = calculation.get("full_total_kzt")
-        lines.append(
-            f"Последний расчёт: статус {calculation.get('status') or 'не указан'}, "
-            + (f"полная стоимость {total} ₸." if total is not None else "полная стоимость пока недоступна.")
-        )
+        if general or asks_cost:
+            total = calculation.get("full_total_kzt")
+            lines.append(
+                f"Последний расчёт: статус {calculation.get('status') or 'не указан'}, "
+                + (f"полная стоимость {total} ₸." if total is not None else "полная стоимость пока недоступна.")
+            )
         available = [
             item
             for item in calculation.get("ecosystem", [])
             if item.get("value") is not None
         ]
-        if available:
+        if available and (general or asks_effect):
             item = available[0]
             lines.append(
                 f"Экологический показатель: {item.get('key')} — {item.get('value')} "
                 f"{item.get('unit')} на горизонте {item.get('horizon_year')} лет."
             )
+        first_year = [
+            point.get("probability")
+            for result in calculation.get("survival", [])
+            for point in result.get("points", [])
+            if point.get("year") == 1 and isinstance(point.get("probability"), (int, float))
+        ]
+        if first_year and (general or asks_survival):
+            percentages = [round(value * 100) for value in first_year]
+            if len(set(percentages)) == 1:
+                lines.append(
+                    f"Расчётная приживаемость через 1 год — {percentages[0]}% "
+                    f"для {len(percentages)} групп посадок."
+                )
+            else:
+                lines.append(
+                    "Расчётная приживаемость через 1 год по группам — "
+                    + ", ".join(f"{value}%" for value in percentages)
+                    + "."
+                )
     problems = context.get("problems") or []
-    if problems:
+    if problems and (general or asks_priority):
         lines.append(
             "Открытые проблемы: "
             + "; ".join(
@@ -89,7 +130,7 @@ def grounded_fallback_reply(request):
         )
     priority = context.get("priority") or {}
     zones = priority.get("zones") or []
-    if zones:
+    if zones and (general or asks_priority):
         def display_score(value):
             if value is None:
                 return "—"
@@ -114,6 +155,28 @@ def grounded_fallback_reply(request):
         text="\n".join(lines),
         tool_calls=(),
         usage=Usage(input_tokens=None, output_tokens=None),
+    )
+
+
+def presentable_reply(request, reply):
+    """Replace raw context echoes with a bounded, human-readable summary of the same facts."""
+    if reply.tool_calls:
+        return reply
+    text = reply.text.strip()
+    raw = not text or UUID_IN_TEXT.search(text) or any(marker in text for marker in RAW_CONTEXT_MARKERS)
+    if not raw:
+        return reply
+    fallback = grounded_fallback_reply(request)
+    text = fallback.text.replace(
+        "Внешняя модель временно недоступна, поэтому ответ ограничен подтверждёнными фактами и не изменяет проект.",
+        "Ответ приведён к проверяемым фактам платформы и не изменяет проект.",
+    )
+    return LLMReply(
+        provider=reply.provider,
+        model=reply.model,
+        text=text,
+        tool_calls=(),
+        usage=reply.usage,
     )
 
 
@@ -178,6 +241,58 @@ def latest_calculation_context(snapshot_id, payload):
         ],
         "warning_codes": [item.get("code") for item in payload.get("warnings", [])],
     }
+
+
+def snapshot_facts(snapshot_id, revision_id, payload):
+    """Return exact persisted metrics the UI can trace back to one immutable calculation.
+
+    This deliberately does not aggregate or reinterpret groups. Each displayed probability is a
+    value already stored by the survival module, with its interval and input references intact.
+    """
+    facts = []
+    for index, result in enumerate(payload.get("survival", [])[:5], start=1):
+        point = next(
+            (
+                item
+                for item in result.get("points", [])
+                if item.get("year") == 1 and item.get("probability") is not None
+            ),
+            None,
+        )
+        if point is None:
+            continue
+        refs, seen = [], set()
+        for risk in result.get("risks", []):
+            for ref in risk.get("source_refs", []):
+                key = (ref.get("dataset_version_id"), ref.get("source_record_id"))
+                if key not in seen:
+                    seen.add(key)
+                    refs.append(ref)
+        facts.append(
+            {
+                "id": uid(),
+                "label": f"Приживаемость группы посадок {index} через 1 год",
+                "metric": {
+                    "key": "survival_probability",
+                    "value": point["probability"],
+                    "unit": "1",
+                    "horizon_year": 1,
+                    "status": "estimated",
+                    "lower": point.get("lower"),
+                    "upper": point.get("upper"),
+                    "qualitative_confidence": "unknown",
+                    "method_version": (
+                        f"survival-{result.get('model_kind') or 'unknown'}-"
+                        f"{result.get('calibration_status') or 'unknown'}"
+                    ),
+                    "source_refs": refs,
+                    "missing_reason": None,
+                },
+                "calculation_id": snapshot_id,
+                "scenario_revision_id": revision_id,
+            }
+        )
+    return facts
 
 
 def session_payload(value):
@@ -383,8 +498,7 @@ def _facts_and_context(db, access, chat_session, revision_id):
         " — СИНТЕТИЧЕСКИЙ ТЕСТОВЫЙ КОНТУР",
         " — рабочий контур OSM",
     ):
-        if city_name.endswith(suffix):
-            city_name = city_name[: -len(suffix)]
+        city_name = city_name.removesuffix(suffix)
     context = {
         "city": {
             "id": city.id,
@@ -531,6 +645,7 @@ def _facts_and_context(db, access, chat_session, revision_id):
         )
         if snapshot:
             context["latest_calculation"] = latest_calculation_context(snapshot.id, snapshot.payload)
+            facts.extend(snapshot_facts(snapshot.id, revision.id, snapshot.payload))
             for item in snapshot.payload.get("ecosystem", [])[:21]:
                 if item.get("value") is None:
                     continue
@@ -627,7 +742,10 @@ def prepare_chat_request(db, job):
         "отсутствующие данные. Если значения нет, прямо скажи, что оно недоступно. "
         "Не предлагай обход прав и не выполняй изменения. Если доступен инструмент предложения, "
         "используй его только по явной просьбе пользователя изменить количество существующего "
-        "незаблокированного размещения. Инструмент создаёт только черновик для проверки человеком."
+        "незаблокированного размещения. Инструмент создаёт только черновик для проверки человеком. "
+        "Никогда не показывай JSON, имена полей, UUID или внутренние идентификаторы. Пиши кратко "
+        "и понятно специалисту: вывод, 2–5 пунктов объяснения и следующий шаг. Источник каждого "
+        "числа интерфейс покажет отдельной серверной карточкой под ответом."
     )
     return (
         LLMRequest(

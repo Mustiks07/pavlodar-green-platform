@@ -108,6 +108,7 @@ export interface MetricValueProps {
  */
 export function MetricValue({ metric, label, detailed = true }: MetricValueProps) {
   const unavailable = metric.status === 'unavailable' || metric.value === null;
+  const probability = metric.key === 'survival_probability' && metric.unit === '1';
   const decimals = metric.value === null ? 0 : decimalsFor(metric.value, metric.unit);
   const expectedUnit = metricKeyEntry(metric.key)?.unit ?? null;
   const horizon =
@@ -116,7 +117,10 @@ export function MetricValue({ metric, label, detailed = true }: MetricValueProps
       : tUi('metric.horizon', { years: metric.horizon_year });
   const interval =
     metric.lower != null && metric.upper != null
-      ? tUi('metric.interval', { lower: formatNumber(metric.lower, decimals)!, upper: formatNumber(metric.upper, decimals)! })
+      ? tUi('metric.interval', {
+          lower: probability ? formatProbability(metric.lower)! : formatNumber(metric.lower, decimals)!,
+          upper: probability ? formatProbability(metric.upper)! : formatNumber(metric.upper, decimals)!,
+        })
       : tUi('metric.confidence', { level: tUi(`metric.confidence.${metric.qualitative_confidence}`) });
 
   return (
@@ -129,7 +133,7 @@ export function MetricValue({ metric, label, detailed = true }: MetricValueProps
         <p className="pg-metric__value pg-metric__value--na">{tUi('state.unavailable')}</p>
       ) : (
         <p className="pg-metric__value">
-          {formatNumber(metric.value, decimals)} <UnitText unit={metric.unit} />
+          {probability ? formatProbability(metric.value) : <>{formatNumber(metric.value, decimals)} <UnitText unit={metric.unit} /></>}
         </p>
       )}
       {expectedUnit && expectedUnit !== metric.unit ? (

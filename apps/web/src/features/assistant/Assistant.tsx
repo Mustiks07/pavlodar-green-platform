@@ -15,7 +15,7 @@ import {
   type ScenarioRevision,
   type ScenarioRevisionPage,
 } from '@pg/api-client';
-import { Badge, Button, Field, formatDateTime, formatNumber, Icon, JobStatus, MetricValue, Notice, Select, Skeleton, StateView } from '@pg/ui';
+import { Badge, Button, Field, formatDateTime, formatNumber, Icon, JobStatus, MetricValue, Notice, Select, Skeleton, SourceList, StateView } from '@pg/ui';
 import { api, useOperationAvailable } from '../../api';
 import { t } from '../../i18n';
 import { ApiErrorView } from '../../shell/ApiErrorView';
@@ -438,6 +438,47 @@ export function ProposalCard({ id }: { id: string }) {
   );
 }
 
+function FactLineage({ fact }: { fact: ChatMessage['facts'][number] }) {
+  const revision = useRevision(fact.scenario_revision_id);
+  const href = revision.data
+    ? `/projects/${revision.data.scenario_id}?revision=${fact.scenario_revision_id}${fact.calculation_id ? `&calc=${fact.calculation_id}` : ''}`
+    : null;
+  return (
+    <details className="asst-fact-lineage">
+      <summary><Icon name="database" size={13} /> Проверить источник числа</summary>
+      <p>Число получено сервером и сохранено отдельно от текста ИИ.</p>
+      <dl className="pg-dl">
+        {fact.calculation_id ? (
+          <>
+            <dt>Снимок расчёта</dt>
+            <dd><code className="pg-code" title={fact.calculation_id}>{short(fact.calculation_id)}</code> <Badge tone="positive">неизменяемый</Badge></dd>
+          </>
+        ) : null}
+        {fact.scenario_revision_id ? (
+          <>
+            <dt>Версия проекта</dt>
+            <dd><code className="pg-code" title={fact.scenario_revision_id}>{short(fact.scenario_revision_id)}</code></dd>
+          </>
+        ) : null}
+        <dt>Метод</dt>
+        <dd><code className="pg-code">{fact.metric.method_version}</code></dd>
+        <dt>Входные данные</dt>
+        <dd><SourceList refs={fact.metric.source_refs} /></dd>
+      </dl>
+      {href || fact.calculation_id ? (
+        <div className="asst-fact-lineage__actions">
+          {href ? <Link className="pg-btn pg-btn--secondary pg-btn--sm" to={href}>Открыть точный расчёт</Link> : null}
+          {fact.calculation_id ? (
+            <a className="pg-btn pg-btn--ghost pg-btn--sm" href={`/v1/calculations/${fact.calculation_id}/manifest`} target="_blank" rel="noreferrer noopener">
+              Паспорт расчёта <Icon name="external" size={12} />
+            </a>
+          ) : null}
+        </div>
+      ) : null}
+    </details>
+  );
+}
+
 function MessageView({ message, onRetry, retryBusy }: { message: ChatMessage; onRetry?: () => void; retryBusy?: boolean }) {
   const mine = message.role === 'user';
   return (
@@ -454,8 +495,9 @@ function MessageView({ message, onRetry, retryBusy }: { message: ChatMessage; on
         <div className="asst-facts" aria-label={t('assistant.facts')}>
           <p className="asst-facts__title">{t('assistant.facts')}</p>
           {message.facts.map((f) => (
-            <div key={f.id} data-fact-key={f.metric.key} data-fact-value={f.metric.value ?? ''}>
+            <div className="asst-fact" key={f.id} data-fact-key={f.metric.key} data-fact-value={f.metric.value ?? ''}>
               <MetricValue label={f.label} metric={f.metric} detailed={false} />
+              <FactLineage fact={f} />
             </div>
           ))}
         </div>

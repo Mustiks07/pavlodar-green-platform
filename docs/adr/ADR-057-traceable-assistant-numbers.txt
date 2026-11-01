@@ -1,0 +1,28 @@
+ADR-057: Traceable assistant numbers and presentable grounded fallback
+Status: accepted
+Date: 2026-11-02
+
+Context
+Assistant answers were bound to authorized city, zone and revision context, but the client rendered
+Fact metrics in compact mode and hid the already-canonical method, source references, calculation
+snapshot id and scenario revision id. Cost, survival and care values available to the provider were
+not all normalized into Fact cards. A free provider could also echo raw context field names or UUIDs,
+which was technically grounded but unsuitable for a jury or municipal operator.
+
+Decision
+Expose an explicit “Проверить источник числа” disclosure for every Fact. It shows the exact immutable
+calculation, scenario revision, method, source records, a friendly link to the exact project result and
+the canonical calculation manifest. Normalize each persisted first-year survival result into a Fact
+without recalculating or aggregating it; the original probability, interval, method and source_refs are
+copied from CalculationSnapshot.
+
+Strengthen the provider instruction to prohibit raw JSON, field names, UUIDs and internal ids. Provider
+text containing raw authorized-context markers is replaced with a concise Russian summary derived only
+from the same bounded context; valid human-readable replies and tool proposals are preserved. The model
+remains advisory, while the attached Fact cards remain the source of every displayed calculation.
+
+Consequences
+The required “number → source” path is one click and does not require a contract or migration. The live
+project answer shows 88% first-year survival for five groups and links snapshot 367ec1b8 to revision
+d1b3310a and its manifest. Zone-area facts still have a server method but no dataset SourceRef because
+the current Fact contract has no ZoneVersion field; no missing lineage is invented.
