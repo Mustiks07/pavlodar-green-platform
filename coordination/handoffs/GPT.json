@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "85126c7",
-  "state": "illustrative_growth_horizons_verified",
+  "head_sha": "caa3676",
+  "state": "coordinate_csv_import_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1438,5 +1438,26 @@
     ],
     "decision": "ADR-078",
     "limit": "No admitted Pavlodar age curve exists; the control is deliberately not an analytical growth forecast"
+  },
+  "coordinate_csv_import_20261102": {
+    "implementation_sha": "caa3676",
+    "contract_version": "1.18.0",
+    "migration": "none",
+    "implemented": [
+      "CsvImportOptions explicitly select table or point mode, X/Y, encoding, delimiter and decimal separator",
+      "Point mode admits EPSG:4326 and EPSG:32643 and transforms offline with always-XY axis order",
+      "Non-finite and out-of-bounds rows receive csv_coordinate_invalid and are never guessed or swapped",
+      "Immutable DatasetVersion stores the exact CSV options and point mode becomes vector content",
+      "Published CSV points use the existing map layer, MVT and feature lineage pipeline",
+      "Requests without csv_options retain compatible table semantics"
+    ],
+    "verification": [
+      "Focused CSV backend acceptance passed 4/4 including CP1251/semicolon/decimal comma UTM",
+      "Contract suite passed 62/62 and generated clients match canonical 1.18.0",
+      "Preview tests passed 5/5; frontend typecheck and production build passed",
+      "Disposable browser import, review, reload, publish and map-layer journey passed 19/19"
+    ],
+    "decision": "ADR-079",
+    "limit": "Other projected CRSs, encodings and line/polygon construction remain unavailable until explicitly admitted"
   }
 }

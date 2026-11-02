@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.17.2",
+  "spec_version": "1.18.0",
   "repository": "Mustiks07/pavlodar-green-platform",
   "authorized_github_login": "Mustiks07",
   "status": "release_accepted",
@@ -26,7 +26,7 @@
       "owner": "GPT",
       "state": "integration_verified",
       "branch": "gpt/public-data-v2-final",
-      "scope": "durable GeoJSON/CSV/KML/SHP import, quality review and publication are connected end to end in the specialist UI; canonical 1.13.0 MultiPoint/MultiLineString and public-data-v2 are published idempotently in shared PostGIS: 60144 OSM objects, 6 datasets, 8 layer families, MVT and feature lineage pass; client map/card/deep-link acceptance covers every OSM layer and multi-part geometry",
+      "scope": "durable GeoJSON/CSV/KML/SHP import, quality review and publication are connected end to end in the specialist UI; canonical 1.18.0 adds explicit coordinate CSV points with selected X/Y, encoding, delimiter, decimal separator and EPSG:4326/32643; public-data-v2 remains published idempotently in shared PostGIS with 60144 OSM objects, 6 datasets, 8 layer families, MVT and feature lineage",
       "depends_on_review": "WP-01"
     },
     {
@@ -93,6 +93,7 @@
     "Admit future municipal soil, restriction, weather and ecological-coefficient versions through the existing versioned import workflow when their owners provide them"
   ],
   "notes": [
+    "Coordinate CSV increment on 2026-11-02 publishes canonical 1.18.0 and closes the remaining F-DATA-01 spreadsheet-to-map path: specialists explicitly choose table or point mode, X/Y fields, UTF-8/Windows-1251, comma/semicolon/tab, decimal mark and EPSG:4326/32643. The server performs offline always-XY transformation, row-level finite/bounds checks and persists parse options in the immutable DatasetVersion; legacy requests remain tables. CSV backend acceptance passes 4/4, contract suite 62/62, preview tests 5/5, client drift/typecheck/build pass, and disposable browser import/publish/map-layer acceptance passes 19/19. ADR-079 and wp03-import-ui evidence record implementation caa3676.",
     "Illustrative 3D growth increment on 2026-11-02 closes the honest no-curve branch of F-3D-04: project scenes expose the required 0/1/3/5/10/20-year horizons as an explicit development sketch. Only Three.js planting meshes scale; immutable placement dimensions, calculations, shadows and exports remain unchanged, and the selected year is URL-persistent independently of shadow date/time. Growth/viewpoint helpers pass 4/4, frontend typecheck and production build pass, and authenticated rendered review confirms the 10-year state with no horizontal overflow. ADR-078 records implementation 85126c7 and the boundary until admitted age curves exist.",
     "KML/Shapefile import UI increment on 2026-11-02 closes the remaining F-DATA-01 product gap: the specialist wizard now admits GeoJSON, CSV, WGS84 KML and bounded SHP ZIP through the same SHA-256 upload, durable job, quality review and publication pipeline. KML/ZIP are deliberately opaque in the browser and validated by the isolated server parser. Disposable browser acceptance passes 19/19 including KML upload, review, reload, publish/reject and RBAC; backend KML/SHP plus hostile XML/ZIP checks pass 4/4. ADR-077 and wp03-import-ui evidence record implementation 8646569.",
     "Fixed 3D viewpoint increment on 2026-11-02 closes F-3D-05: project scenes expose deterministic top, overview and true 1.7 m human-level cameras targeted at the selected point, area patch or frozen zone. The chosen preset and stable target survive a copied URL, and before/after comparison applies one exact camera to both immutable revisions. Focused helpers 2/2, frontend typecheck and production build pass; authenticated rendered comparison has identical cameras, no page errors and no API 5xx. ADR-076 and the refreshed jury-placement-3d evidence record implementation 1f2e037.",
