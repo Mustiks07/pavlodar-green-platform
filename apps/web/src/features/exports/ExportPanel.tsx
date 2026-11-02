@@ -62,7 +62,7 @@ interface Downloaded {
  * Downloads go through the server's download_url; an expired or rejected link is renewed by
  * calling getExport again, never by starting a new export. The file is not built or altered here.
  */
-function ArtifactRow({ id, format, onGone }: { id: string; format: Format; onGone: () => void }) {
+export function ArtifactRow({ id, format, onGone }: { id: string; format: Format; onGone: () => void }) {
   const qc = useQueryClient();
   const artifact = useQuery({
     queryKey: ['export', id],

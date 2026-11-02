@@ -73,6 +73,10 @@ def server_owned_tool_reply(request):
         (tool for tool in request.tools if tool.name == "calculate_current_scenario"),
         None,
     )
+    report_tool = next(
+        (tool for tool in request.tools if tool.name == "create_current_report"),
+        None,
+    )
     plant_proposal_tool = next(
         (tool for tool in request.tools if tool.name == "propose_placement_plant"),
         None,
@@ -110,6 +114,32 @@ def server_owned_tool_reply(request):
             "запусти расчет проекта",
         )
     )
+    asks_report = any(
+        phrase in question
+        for phrase in (
+            "сформируй отч",
+            "подготовь отч",
+            "создай отч",
+            "сделай pdf",
+            "подготовь pdf",
+            "сформируй pdf",
+            "скачай отч",
+        )
+    )
+    if report_tool and asks_report:
+        return LLMReply(
+            provider="server-tools",
+            model="snapshot-report-v1",
+            text="Готовлю PDF-отчёт по сохранённому расчёту текущей версии проекта.",
+            tool_calls=(
+                ToolCall(
+                    "server-current-report",
+                    "create_current_report",
+                    {},
+                ),
+            ),
+            usage=Usage(input_tokens=None, output_tokens=None),
+        )
     if calculation_tool and asks_calculation:
         return LLMReply(
             provider="server-tools",
@@ -577,6 +607,7 @@ def message_payload(value):
         "state": value.state,
         "facts": value.facts,
         "proposal_id": value.proposal_id,
+        "report_job_id": value.report_job_id,
         "created_at": value.created_at.isoformat().replace("+00:00", "Z"),
     }
 
@@ -734,6 +765,7 @@ def enqueue_message(db, access, session_id, body):
                 text=body["text"],
                 facts=[],
                 proposal_id=None,
+                report_job_id=None,
                 created_at=created,
             ),
             ChatMessageRecord(
@@ -745,6 +777,7 @@ def enqueue_message(db, access, session_id, body):
                 text="",
                 facts=[],
                 proposal_id=None,
+                report_job_id=None,
                 created_at=created + timedelta(microseconds=1),
             ),
         ]
@@ -1040,6 +1073,21 @@ def prepare_chat_request(db, job):
                 },
             )
         )
+        tools.append(
+            ToolSpec(
+                name="create_current_report",
+                description=(
+                    "Create one durable PDF report from the latest authorized calculation "
+                    "snapshot of the exact scenario revision bound to this chat. Use only when "
+                    "the user explicitly asks to create a report. Accept no arguments."
+                ),
+                parameters={
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {},
+                },
+            )
+        )
     if (
         job.request_payload.get("scenario_revision_id")
         and scenario_context.get("catalog_version_id")
@@ -1113,6 +1161,8 @@ def prepare_chat_request(db, job):
         "используй recommend_plants: результат считает сервер по закреплённым версиям. "
         "По явной просьбе рассчитать или пересчитать текущий проект используй "
         "calculate_current_scenario без аргументов: версии, модули и seed выбирает сервер. "
+        "По явной просьбе сформировать отчёт используй create_current_report без аргументов: "
+        "сервер сам выбирает последний расчёт точной версии и фиксированный PDF. "
         "Если доступен инструмент предложения, "
         "используй propose_placement_quantity только по явной просьбе изменить количество. "
         "По явной просьбе подготовить лучший рекомендованный вид в проекте используй "
@@ -1285,17 +1335,70 @@ def _calculate_current_scenario(db, access, job, arguments, facts):
     )
 
 
+def _create_current_report(db, access, job, arguments, message):
+    if arguments != {}:
+        raise DomainError(
+            422,
+            "invalid_body",
+            "Assistant report arguments must be an empty object",
+        )
+    if message.report_job_id:
+        existing = found(db.get(Job, message.report_job_id))
+        return existing.id, "PDF-отчёт уже поставлен в очередь."
+    revision_id = job.request_payload.get("scenario_revision_id")
+    if not revision_id:
+        raise DomainError(422, "invalid_body", "Report requires a bound scenario revision")
+    revision = authorized_revision(db, access, revision_id)
+    snapshot = db.scalar(
+        select(CalculationSnapshotRecord)
+        .where(CalculationSnapshotRecord.scenario_revision_id == revision.id)
+        .order_by(
+            CalculationSnapshotRecord.created_at.desc(),
+            CalculationSnapshotRecord.id.desc(),
+        )
+        .limit(1)
+    )
+    if snapshot is None:
+        return (
+            None,
+            (
+                "Для этой версии проекта ещё нет сохранённого расчёта. "
+                "Сначала попросите рассчитать текущий проект; отчёт не создан."
+            ),
+        )
+    from services.worker.jobs import enqueue_export
+
+    report_job = enqueue_export(
+        db,
+        access,
+        {
+            "target_kind": "calculation",
+            "target_id": snapshot.id,
+            "format": "pdf",
+            "language": "ru",
+        },
+    )
+    return report_job.id, "PDF-отчёт поставлен в очередь по сохранённому расчёту этой версии."
+
+
 def _proposed_revision(db, access, job, reply, message, facts):
     if not reply.tool_calls:
-        return None, reply.text
+        return None, None, reply.text
     if len(reply.tool_calls) != 1:
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
     if reply.tool_calls[0].name == "recommend_plants":
-        return None, _recommend_plants(db, access, job, reply.tool_calls[0].arguments, facts)
-    if reply.tool_calls[0].name == "calculate_current_scenario":
-        return None, _calculate_current_scenario(
+        return None, None, _recommend_plants(
             db, access, job, reply.tool_calls[0].arguments, facts
         )
+    if reply.tool_calls[0].name == "calculate_current_scenario":
+        return None, None, _calculate_current_scenario(
+            db, access, job, reply.tool_calls[0].arguments, facts
+        )
+    if reply.tool_calls[0].name == "create_current_report":
+        report_job_id, text = _create_current_report(
+            db, access, job, reply.tool_calls[0].arguments, message
+        )
+        return None, report_job_id, text
     tool_name = reply.tool_calls[0].name
     if tool_name not in {"propose_placement_quantity", "propose_placement_plant"}:
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
@@ -1307,7 +1410,11 @@ def _proposed_revision(db, access, job, reply, message, facts):
         db.scalar(select(Scenario).where(Scenario.id == revision.scenario_id).with_for_update())
     )
     if scenario.current_revision_id != revision.id or scenario.status != "draft":
-        return None, "Сценарий изменился во время подготовки предложения. Перечитайте актуальную версию."
+        return (
+            None,
+            None,
+            "Сценарий изменился во время подготовки предложения. Перечитайте актуальную версию.",
+        )
     proposed = copy.deepcopy(revision.payload)
     placements = proposed.get("placements", [])
     if tool_name == "propose_placement_quantity":
@@ -1397,7 +1504,11 @@ def _proposed_revision(db, access, job, reply, message, facts):
     )
     db.add(value)
     db.flush()
-    return value, summary if tool_name == "propose_placement_plant" else (reply.text or summary)
+    return (
+        value,
+        None,
+        summary if tool_name == "propose_placement_plant" else (reply.text or summary),
+    )
 
 
 def persist_chat_reply(db, job, reply, facts):
@@ -1407,7 +1518,9 @@ def persist_chat_reply(db, job, reply, facts):
     message = found(db.get(ChatMessageRecord, job.request_payload["assistant_message_id"]))
     if message.session_id != chat_session.id or message.job_id != job.id:
         raise DomainError(500, "job_input_invalid", "Assistant message does not match the job")
-    proposal, text = _proposed_revision(db, access, job, reply, message, facts)
+    proposal, report_job_id, text = _proposed_revision(
+        db, access, job, reply, message, facts
+    )
     message.text = text[:20_000]
     message.state = "completed"
     message.facts = facts
@@ -1416,4 +1529,5 @@ def persist_chat_reply(db, job, reply, facts):
     message.input_tokens = reply.usage.input_tokens
     message.output_tokens = reply.usage.output_tokens
     message.proposal_id = proposal.id if proposal else None
+    message.report_job_id = report_job_id
     return message.id

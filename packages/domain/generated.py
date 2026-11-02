@@ -1758,6 +1758,7 @@ class ChatMessage(BaseModel):
     state: State2
     facts: list[Fact]
     proposal_id: UUID | None
+    report_job_id: UUID | None
     created_at: AwareDatetime
 
 

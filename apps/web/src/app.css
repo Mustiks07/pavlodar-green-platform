@@ -3206,6 +3206,18 @@
   margin: 0.25rem 0 0.65rem;
   padding-left: 1.15rem;
 }
+
+.asst-report {
+  display: grid;
+  gap: var(--pg-space-3);
+  margin-top: var(--pg-space-3);
+  padding: var(--pg-space-3);
+  border: 1px solid color-mix(in srgb, var(--pg-positive) 30%, var(--pg-border));
+  border-radius: var(--pg-radius-md);
+  background: color-mix(in srgb, var(--pg-positive) 5%, var(--pg-surface));
+}
+
+.asst-report__title { margin: 0; }
 .asst-facts {
   display: grid;
   gap: var(--pg-space-2);

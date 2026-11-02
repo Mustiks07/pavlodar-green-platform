@@ -1,0 +1,39 @@
+ADR-080: Assistant-created report from the exact snapshot
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-AI-01 requires the assistant to form a report, while F-EXP-02 requires every report to use a
+frozen calculation snapshot. The platform already had authorized durable PDF/XLSX export jobs,
+but chat could only explain or calculate a project. A request such as «Сформируй PDF-отчёт» went
+to general prose and did not create an artifact.
+
+Decision
+A specialist chat bound to an exact ScenarioRevision exposes `create_current_report` with an empty
+argument object. The server recognizes explicit Russian report requests before calling an external
+provider. The server re-authorizes the bound revision, selects the latest CalculationSnapshot for
+that exact revision and queues the existing export worker with a server-fixed PDF format and Russian
+language. The model and browser cannot supply a revision, snapshot, format or target identifier.
+
+If the exact revision has no saved calculation, the assistant says that a calculation is required
+and creates no job. The assistant message stores at most one nullable `report_job_id`; migration
+0035 enforces a unique foreign key to the durable Job. Message persistence and child-job enqueue
+share one database transaction, so rollback cannot leave an orphaned visible link and idempotent
+message replay cannot create a second report. Contract 1.18.1 exposes the nullable link without
+changing any existing operation.
+
+The export worker remains authoritative for rendering, storage, checksum, access checks and the
+short-lived signed download. Chat does not render files, copy formulas or invent report values.
+
+Consequences
+The jury path now connects one natural assistant request to the same immutable snapshot used by the
+project screen, facts and ordinary export controls. A later UI increment may render the linked job
+and artifact inline; until then the canonical message still carries the durable job reference.
+Program reports and XLSX selection are deliberately outside this increment because a revision-bound
+chat does not authorize the model to choose a city program or report format.
+
+Verification
+- `uv run python tools/spec/validate.py`: 401 checks, 152 schemas, 102 operations, 53 fixtures.
+- `uv run pytest tests/test_chat.py tests/test_exports.py -q`: 26 passed.
+- Ruff passes for the changed Python sources and migration.
+- Generated Python and TypeScript clients match canonical contract 1.18.1.

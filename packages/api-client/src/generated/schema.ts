@@ -2594,6 +2594,7 @@ export interface components {
             state: "queued" | "streaming" | "completed" | "failed" | "cancelled";
             facts: components["schemas"]["Fact"][];
             proposal_id: string | null;
+            report_job_id: string | null;
             /** Format: date-time */
             created_at: string;
         };

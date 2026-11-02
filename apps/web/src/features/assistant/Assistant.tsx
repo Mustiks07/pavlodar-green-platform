@@ -23,6 +23,7 @@ import { productLabel } from '../../productCopy';
 import { OperationUnavailable } from '../../shell/OperationUnavailable';
 import { useSession } from '../../shell/session';
 import { TERMINAL_JOB_STATES, useJob } from '../jobs/useJob';
+import { ReportJobCard } from './ReportJobCard';
 import { isUuid } from '../map/publishedLayers';
 import { cityDisplayName } from '../../city';
 import { useRevision, useZone, zk } from '../zones/queries';
@@ -517,6 +518,7 @@ function MessageView({ message, onRetry, retryBusy }: { message: ChatMessage; on
         </div>
       ) : null}
       {message.proposal_id ? <ProposalCard id={message.proposal_id} /> : null}
+      {message.report_job_id ? <ReportJobCard jobId={message.report_job_id} /> : null}
       {onRetry ? (
         <Button size="sm" icon="refresh" busy={retryBusy} onClick={onRetry}>
           {t('assistant.retry')}

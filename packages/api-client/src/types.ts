@@ -1,4 +1,4 @@
-// Generated from contracts/openapi.json 1.18.0 by apps/web/scripts/gen-types.mjs. Do not edit.
+// Generated from contracts/openapi.json 1.18.1 by apps/web/scripts/gen-types.mjs. Do not edit.
 import type { components } from './generated/schema';
 
 export type AddressResult = components['schemas']['AddressResult'];

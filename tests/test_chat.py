@@ -9,9 +9,15 @@ from services.api.chat import (
     server_owned_tool_reply,
     snapshot_facts,
 )
+from services.api.config import settings
 from services.api.db import engine, session
 from services.api.llm import LLMReply, LLMRequest, Message, ToolCall, ToolSpec, Usage
-from services.api.models import CalculationSnapshotRecord, ChatMessageRecord
+from services.api.models import (
+    CalculationSnapshotRecord,
+    ChatMessageRecord,
+    ExportArtifactRecord,
+    Job,
+)
 from services.worker.main import run_job
 from tests.test_calculations import setup_revision
 from tests.test_catalog import (
@@ -414,6 +420,30 @@ def test_server_owned_calculation_intent_is_explicit_and_argument_free():
     assert explanatory is None
 
 
+def test_server_owned_report_intent_is_explicit_and_argument_free():
+    tool = ToolSpec(
+        name="create_current_report",
+        description="snapshot report",
+        parameters={"type": "object", "additionalProperties": False, "properties": {}},
+    )
+    explicit = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Сформируй PDF-отчёт")),
+            tools=(tool,),
+        )
+    )
+    assert explicit.provider == "server-tools"
+    assert explicit.tool_calls[0].name == "create_current_report"
+    assert explicit.tool_calls[0].arguments == {}
+    explanatory = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Как формируется отчёт?")),
+            tools=(tool,),
+        )
+    )
+    assert explanatory is None
+
+
 def test_chat_calculates_exact_bound_revision_without_provider_or_duplicates(clients, monkeypatch):
     scenario, _revision, saved, _rate = setup_revision(clients, with_model=True)
     revision_id = saved.json()["id"]
@@ -465,6 +495,99 @@ def test_chat_calculates_exact_bound_revision_without_provider_or_duplicates(cli
         fact for fact in calculation_facts if fact["metric"]["key"] == "survival_probability"
     )
     assert survival_fact["metric"]["value"] == snapshot.payload["survival"][0]["points"][0]["probability"]
+
+
+def test_chat_report_uses_latest_exact_snapshot_and_one_export_job(
+    clients, monkeypatch, tmp_path
+):
+    monkeypatch.setattr(settings(), "export_root", str(tmp_path))
+    scenario, _revision, saved, _rate = setup_revision(clients, with_model=True)
+    revision_id = saved.json()["id"]
+    specialist = clients["specialist"]
+    created_chat = chat_session(specialist, scenario["zone_id"], revision_id)
+
+    class ForbiddenGateway:
+        def complete(self, request):
+            raise AssertionError("explicit report must bypass the provider")
+
+    monkeypatch.setattr("services.api.llm.gateway", lambda: ForbiddenGateway())
+    missing_job = send(
+        specialist,
+        created_chat["id"],
+        "Сформируй PDF-отчёт по текущему проекту",
+        revision_id,
+        key="assistant-report-without-snapshot",
+    )
+    run_job.run(missing_job["id"])
+    missing_message = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    validate("ChatMessage", missing_message)
+    assert missing_message["report_job_id"] is None
+    assert "нет сохранённого расчёта" in missing_message["text"]
+    with session() as db:
+        assert list(db.scalars(select(Job).where(Job.input_kind == "calculation"))) == []
+
+    snapshots = []
+    for seed in (41, 42):
+        calculated = mutation(
+            specialist,
+            "POST",
+            "/v1/calculations/fast",
+            {
+                "scenario_revision_id": revision_id,
+                "mode": "fast",
+                "include_modules": ["cost", "survival", "care", "suitability"],
+                "seed": seed,
+            },
+            key=f"assistant-report-snapshot-{seed}",
+        )
+        assert calculated.status_code == 200, calculated.text
+        snapshots.append(calculated.json()["snapshot"])
+
+    report_chat_job = send(
+        specialist,
+        created_chat["id"],
+        "Сформируй PDF-отчёт по текущему проекту",
+        revision_id,
+        key="assistant-report-once",
+    )
+    assert send(
+        specialist,
+        created_chat["id"],
+        "Сформируй PDF-отчёт по текущему проекту",
+        revision_id,
+        key="assistant-report-once",
+    ) == report_chat_job
+    run_job.run(report_chat_job["id"])
+
+    assistant = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    validate("ChatMessage", assistant)
+    assert assistant["state"] == "completed"
+    assert assistant["report_job_id"]
+    assert "PDF-отчёт поставлен в очередь" in assistant["text"]
+    with session() as db:
+        report_jobs = list(db.scalars(select(Job).where(Job.input_kind == "calculation")))
+        assert len(report_jobs) == 1
+        report_job = report_jobs[0]
+        assert report_job.id == assistant["report_job_id"]
+        assert report_job.request_payload == {
+            "target_kind": "calculation",
+            "target_id": snapshots[-1]["id"],
+            "format": "pdf",
+            "language": "ru",
+        }
+
+    run_job.run(assistant["report_job_id"])
+    completed = specialist.get(f"/v1/jobs/{assistant['report_job_id']}").json()
+    assert completed["state"] == "succeeded"
+    with session() as db:
+        artifact = db.get(ExportArtifactRecord, completed["result_ref_id"])
+        assert artifact.target_kind == "calculation"
+        assert artifact.target_id == snapshots[-1]["id"]
+        assert artifact.format == "pdf"
 
 
 class FakeGateway:
@@ -712,6 +835,7 @@ def test_chat_proposal_requires_human_apply_and_current_revision(clients, monkey
         def complete(self, request):
             assert [tool.name for tool in request.tools] == [
                 "calculate_current_scenario",
+                "create_current_report",
                 "recommend_plants",
                 "propose_placement_plant",
                 "propose_placement_quantity",

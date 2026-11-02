@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.18.0",
-    "description": "Canonical API contract 1.18.0. CSV import can explicitly preserve a table or create points from selected X/Y columns, encoding, delimiter, decimal separator and admitted CRS. Existing requests without csv_options remain compatible table imports."
+    "version": "1.18.1",
+    "description": "Canonical API contract 1.18.1. Chat messages can reference one durable server-owned PDF report job bound to the exact scenario revision and its latest authorized calculation snapshot."
   },
   "servers": [
     {
@@ -12242,6 +12242,17 @@
               }
             ]
           },
+          "report_job_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -12255,6 +12266,7 @@
           "state",
           "facts",
           "proposal_id",
+          "report_job_id",
           "created_at"
         ],
         "additionalProperties": false
