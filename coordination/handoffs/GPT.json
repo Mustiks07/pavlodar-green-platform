@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "61933bc",
-  "state": "area_transform_verified",
+  "head_sha": "4b08c46",
+  "state": "assistant_calculation_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1358,5 +1358,26 @@
     ],
     "decision": "ADR-074",
     "limit": "Vertex redraw remains limited to a simple Polygon; complex MultiPolygon geometry can move and rotate as one object without implicit splitting"
+  },
+  "assistant_canonical_calculation_20261102": {
+    "implementation_sha": "4b08c46",
+    "contract_version": "1.17.2",
+    "migration": "none",
+    "implemented": [
+      "A revision-bound specialist chat exposes an argument-free calculate_current_scenario tool",
+      "Explicit Russian calculate/recalculate intent bypasses external providers while explanatory questions remain read-only",
+      "The server fixes exact revision, fast mode, cost/survival/care/suitability modules and seed zero",
+      "The existing canonical calculate_fast creates the immutable result in the same transaction as chat completion",
+      "Exact snapshot facts and links are attached without model-authored numeric claims",
+      "The assistant quick prompts expose the action only for a revision-bound session"
+    ],
+    "verification": [
+      "Full chat integration suite passed 16/16",
+      "Provider-disabled acceptance creates exactly one snapshot across idempotent replay",
+      "Calculation Fact values and lineage match the persisted snapshot",
+      "Ruff, frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-075",
+    "limit": "The assistant runs a review calculation only; it never applies a scenario change or selects a different revision, module set or seed"
   }
 }
