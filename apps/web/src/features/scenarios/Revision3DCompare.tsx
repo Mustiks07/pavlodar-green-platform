@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ScenarioRevision, Zone } from '@pg/api-client';
-import { Badge, Icon } from '@pg/ui';
+import { Badge, Button, Icon } from '@pg/ui';
 import { maplibregl } from '../map/maplibre';
 import { PlacementMap } from './PlacementEditor';
+import { applyViewpoint, viewTarget, type ViewPreset } from '../scene3d/viewpoints';
 
 const EMPTY_IDS = new Set<string>();
 const noop = () => undefined;
@@ -38,6 +39,7 @@ export function Revision3DCompare({ before, after, zone }: { before: ScenarioRev
   const [selectedId, setSelectedId] = useState<string | null>(changed[0] ?? null);
   const [left, setLeft] = useState<maplibregl.Map | null>(null);
   const [right, setRight] = useState<maplibregl.Map | null>(null);
+  const [viewPreset, setViewPreset] = useState<ViewPreset>('overview');
   const leftReady = useCallback((map: maplibregl.Map | null) => setLeft(map), []);
   const rightReady = useCallback((map: maplibregl.Map | null) => setRight(map), []);
 
@@ -65,6 +67,18 @@ export function Revision3DCompare({ before, after, zone }: { before: ScenarioRev
     };
   }, [left, right]);
 
+  const setSharedView = (preset: ViewPreset) => {
+    setViewPreset(preset);
+    if (!left || !right) return;
+    const target = viewTarget(zone, after.placements, selectedId, after.area_patches ?? [], null);
+    applyViewpoint(left, zone, preset, target);
+    const mirrorAfterMove = () => {
+      right.jumpTo(cameraOf(left));
+      left.off('moveend', mirrorAfterMove);
+    };
+    left.on('moveend', mirrorAfterMove);
+  };
+
   if (changed.length === 0) return null;
   return (
     <section className="revision-3d-compare" aria-labelledby="revision-3d-title">
@@ -76,6 +90,13 @@ export function Revision3DCompare({ before, after, zone }: { before: ScenarioRev
         </div>
         <Badge tone="positive"><Icon name="check" size={13} /> Камера синхронизирована</Badge>
       </header>
+      <div className="revision-3d-compare__viewpoints" role="group" aria-label="Общий ракурс сравнения">
+        {([['top', 'Сверху'], ['overview', 'Обзор'], ['human', 'Уровень человека']] as const).map(([preset, label]) => (
+          <Button key={preset} size="sm" variant={viewPreset === preset ? 'primary' : 'secondary'} aria-pressed={viewPreset === preset} onClick={() => setSharedView(preset)}>
+            {label}
+          </Button>
+        ))}
+      </div>
       <div className="revision-3d-compare__grid">
         <article>
           <div className="revision-3d-compare__label"><strong>До изменения</strong><span>версия {before.id.slice(0, 8)}</span></div>

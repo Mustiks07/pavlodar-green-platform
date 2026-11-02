@@ -26,6 +26,7 @@ import { plantImage } from '../plants/images';
 import { Scene3DToggle } from '../scene3d/Scene3DPanel';
 import { useScene3D } from '../scene3d/useScene3D';
 import type { ScenePlanting } from '../scene3d/types';
+import { applyViewpoint, viewTarget, type ViewPreset } from '../scene3d/viewpoints';
 import { add, insideZone, issuesOf, metersBetween, move, newPlacement, redo, remove, same, snapToCrownTangent, undo, update, type LngLat, type PlacementHistory } from './placements';
 import { addVertex, closeRing, editableRing, previewIssues, redo as redoDraw, removeLast, startDraw, toPolygon, undo as undoDraw, type DrawState } from '../zones/draw';
 import { commitAreaPatches, redoAreaPatches, rotateAreaPatch, translateAreaPatch, translateAreaPatchBetween, undoAreaPatches, type AreaPatchHistory } from './areaPatches';
@@ -134,6 +135,16 @@ export function PlacementMap({
     conflict: conflictIds.has(placement.id),
   })), [placements, selectedIds, conflictIds]);
   const scene3d = useScene3D(() => map.current, [], scenePlantings);
+  const initialView = !compareLabel ? new URLSearchParams(window.location.search).get('view3d') : null;
+  const restore3d = initialView === 'top' || initialView === 'human' || initialView === 'overview';
+  const initialViewTarget = !compareLabel ? new URLSearchParams(window.location.search).get('viewTarget') : null;
+  const [viewPreset, setViewPreset] = useState<ViewPreset>(
+    initialView === 'top' || initialView === 'human' || initialView === 'overview' ? initialView : 'overview',
+  );
+  const activeViewTarget = useMemo(
+    () => viewTarget(zone, placements, selectedId ?? initialViewTarget, areaPatches, selectedAreaPatchId ?? initialViewTarget),
+    [zone, placements, selectedId, initialViewTarget, areaPatches, selectedAreaPatchId],
+  );
   const auto3dStarted = useRef(false);
   if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementScene?: typeof scene3d }).__pgPlacementScene = scene3d;
   const live = useRef({ placements, areaPatches, areaDraw, selectedAreaPatchId, areaAdding, areaMoveMode, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove, onAreaSelect, onAreaVertex, onAreaClose, onAreaTransform });
@@ -430,7 +441,7 @@ export function PlacementMap({
   }, [ready, onMapReady]);
 
   useEffect(() => {
-    if (!ready || !auto3d || auto3dStarted.current) return;
+    if (!ready || (!auto3d && !restore3d) || auto3dStarted.current) return;
     auto3dStarted.current = true;
     void scene3d.enable().then(() => {
       const bounds = boundsOf(zone.geometry);
@@ -438,7 +449,17 @@ export function PlacementMap({
     });
     // The scene controller is intentionally invoked once per map instance.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, auto3d, zone.version_id]);
+  }, [ready, auto3d, restore3d, zone.version_id]);
+
+  useEffect(() => {
+    const current = map.current;
+    if (!current || scene3d.state !== 'on' || compareLabel) return;
+    applyViewpoint(current, zone, viewPreset, activeViewTarget);
+    const params = new URLSearchParams(window.location.search);
+    params.set('view3d', viewPreset);
+    params.set('viewTarget', activeViewTarget.id);
+    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`);
+  }, [scene3d.state, viewPreset, activeViewTarget, zone, compareLabel]);
 
   useEffect(() => {
     const m = map.current;
@@ -560,6 +581,21 @@ export function PlacementMap({
             })}
             onDisable={scene3d.disable}
           />
+          {scene3d.state === 'on' && !compareLabel ? (
+            <div className="pl-viewpoints" role="group" aria-label="Фиксированный ракурс 3D">
+              {([['top', 'Сверху'], ['overview', 'Обзор'], ['human', 'Уровень человека']] as const).map(([preset, label]) => (
+                <button
+                  key={preset}
+                  type="button"
+                  className={viewPreset === preset ? 'is-active' : ''}
+                  aria-pressed={viewPreset === preset}
+                  onClick={() => setViewPreset(preset)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          ) : null}
           {scene3d.state === 'on' ? (
             <span>
               {disabled

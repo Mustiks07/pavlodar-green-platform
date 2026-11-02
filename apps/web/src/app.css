@@ -37,6 +37,7 @@
 }
 .app-brand {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--pg-space-3);
   min-height: calc(var(--pg-topbar-h) + var(--pg-space-3));
@@ -2067,6 +2068,37 @@
   color: var(--pg-text-muted);
   font-size: var(--pg-fs-xs);
 }
+.pl-viewpoints,
+.revision-3d-compare__viewpoints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.pl-viewpoints {
+  padding: 0.25rem;
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius-sm);
+  background: color-mix(in srgb, var(--pg-surface) 94%, transparent);
+  box-shadow: var(--pg-shadow-sm);
+}
+.pl-viewpoints button {
+  min-height: 2rem;
+  padding: 0.25rem 0.55rem;
+  border: 0;
+  border-radius: calc(var(--pg-radius-sm) - 2px);
+  background: transparent;
+  color: var(--pg-text-muted);
+  font: inherit;
+  font-size: var(--pg-fs-xs);
+  font-weight: 650;
+  cursor: pointer;
+}
+.pl-viewpoints button:hover,
+.pl-viewpoints button.is-active {
+  background: var(--pg-primary);
+  color: var(--pg-on-primary);
+}
+.pl-viewpoints button:focus-visible { outline: 2px solid var(--pg-focus); outline-offset: 2px; }
 .revision-3d-compare {
   display: grid;
   gap: var(--pg-space-3);
@@ -2103,6 +2135,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--pg-space-3);
 }
+.revision-3d-compare__viewpoints { align-items: center; }
 .revision-3d-compare__grid article { min-width: 0; }
 .revision-3d-compare__grid .pl-map { height: clamp(16rem, 31vh, 21rem); }
 .revision-3d-compare__label {

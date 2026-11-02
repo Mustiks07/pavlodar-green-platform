@@ -1,0 +1,27 @@
+ADR-076: Fixed and human-level 3D viewpoints
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-3D-05 requires synchronized before/after comparison, a human-level view and fixed viewpoints.
+The existing Three/MapLibre scene could be tilted and both comparison maps mirrored camera motion,
+but a jury member still had to discover and manually reproduce a useful camera. A copied link also
+lost the intended 3D reading. This made an implemented model harder to demonstrate and left the
+human-level requirement unmet.
+
+Decision
+Every editable project scene exposes three deterministic views: top, overview and human level. The
+target is the selected point placement, then the selected area patch, then the frozen zone centre.
+Top view fits the zone north-up at zero pitch. Overview fits the same zone at a fixed 55-degree pitch
+and bearing. Human view uses MapLibre's public camera solver from an eye point 1.7 metres above ground
+and 18 metres from the target; it does not simulate eye level by merely changing CSS or zoom.
+
+The chosen preset and stable target id are written to the URL. Opening that URL enables 3D and restores
+the camera. Revision comparison provides one shared set of controls; the existing bidirectional camera
+mirror applies the exact resulting centre, zoom, pitch and bearing to both immutable revisions. Controls
+are native keyboard- and touch-operable buttons and honour reduced-motion preferences.
+
+Consequences
+The same project can now be judged from reproducible plan, overview and pedestrian perspectives. The
+feature uses existing frozen geometry and recorded heights, adds no guessed growth or building data,
+and changes neither scenario revisions nor server calculations.
