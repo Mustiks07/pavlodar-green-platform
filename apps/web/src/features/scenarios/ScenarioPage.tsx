@@ -55,7 +55,7 @@ import { ShadowSection } from '../shadow/ShadowPanel';
 import { ThermalSection } from '../thermal/ThermalPanel';
 import { CALC_JOB, CALC_RESULT, FullCalculation } from '../calculations/FullCalculation';
 import { SnapshotView } from '../calculations/SnapshotView';
-import { issuesOf, mergePlacements, same, type MergeResult } from './placements';
+import { issuesOf, mergePlacements, mergeStableItems, same, type MergeResult } from './placements';
 import { productLabel } from '../../productCopy';
 
 /** Revision fields this editor changes; everything else is carried over from the base revision. */
@@ -155,11 +155,12 @@ function isDirty(base: ScenarioRevision, e: Edits): boolean {
 }
 
 // Unsaved edits survive reload per viewer (TZ §03); they are clearly labelled as local.
-// originPlacements = placements of the revision the draft started from (three-way merge on 412).
+// Origins are children of the revision the draft started from (three-way merge on 412).
 interface Draft {
   baseRevisionId: string;
   edits: Edits;
   originPlacements?: Placement[];
+  originAreaPatches?: AreaPatch[];
 }
 const draftKey = (scenarioId: string) => `pg.scenario-draft.${scenarioId}`;
 function readDraft(scenarioId: string): Draft | null {
@@ -215,7 +216,8 @@ function RevisionEditor({
   );
   const [baseId, setBaseId] = useState(() => stored?.baseRevisionId ?? base.id);
   const [origin, setOrigin] = useState<Placement[]>(() => stored?.originPlacements ?? base.placements);
-  const [merge, setMerge] = useState<(MergeResult & { onto: string }) | null>(null);
+  const [originAreaPatches, setOriginAreaPatches] = useState<AreaPatch[]>(() => stored?.originAreaPatches ?? base.area_patches);
+  const [merge, setMerge] = useState<(MergeResult & { onto: string; mergedCount: number }) | null>(null);
   // Restarts the placement editor's undo history whenever its base is replaced.
   const [historyKey, setHistoryKey] = useState(0);
   const [recommendedPlant, setRecommendedPlant] = useState<Plant | null>(null);
@@ -267,8 +269,8 @@ function RevisionEditor({
   const [startRev, setStartRev] = useState<ScenarioRevision | null>(() => (stored && stored.baseRevisionId !== base.id ? null : base));
   const dirty = baseId === base.id ? isDirty(base, edits) : startRev ? isDirty(startRev, edits) : true;
   useEffect(() => {
-    writeDraft(scenario.id, dirty ? { baseRevisionId: baseId, edits, originPlacements: origin } : null);
-  }, [scenario.id, baseId, edits, dirty, origin]);
+    writeDraft(scenario.id, dirty ? { baseRevisionId: baseId, edits, originPlacements: origin, originAreaPatches } : null);
+  }, [scenario.id, baseId, edits, dirty, origin, originAreaPatches]);
 
   const budgetError = edits.capital_budget && !MONEY_RE.test(edits.capital_budget) ? t('scenario.budget.invalid') : null;
   const commentError = dirty && edits.comment.trim() === '' ? t('scenario.comment.required') : null;
@@ -327,6 +329,7 @@ function RevisionEditor({
       setBaseId(data.id);
       setStartRev(data);
       setOrigin(data.placements);
+      setOriginAreaPatches(data.area_patches);
       setMerge(null);
       setHistoryKey((k) => k + 1);
       setSaved(data.id);
@@ -368,10 +371,12 @@ function RevisionEditor({
     if (!dirty) setEdits(editsFrom(next));
     else {
       const r = mergePlacements(origin, edits.placements, next.placements);
-      setEdits((e) => ({ ...e, placements: r.placements }));
-      setMerge({ ...r, onto: next.id });
+      const areas = mergeStableItems(originAreaPatches, edits.area_patches, next.area_patches);
+      setEdits((e) => ({ ...e, placements: r.placements, area_patches: areas.items }));
+      setMerge({ ...r, conflicts: [...r.conflicts, ...areas.conflicts], onto: next.id, mergedCount: r.placements.length + areas.items.length });
     }
     setOrigin(next.placements);
+    setOriginAreaPatches(next.area_patches);
     setBaseId(next.id);
     setStartRev(next);
     setHistoryKey((k) => k + 1);
@@ -389,6 +394,7 @@ function RevisionEditor({
     setEdits(editsFrom(base));
     setStartRev(base);
     setOrigin(base.placements);
+    setOriginAreaPatches(base.area_patches);
     setMerge(null);
     setHistoryKey((k) => k + 1);
   };
@@ -488,7 +494,7 @@ function RevisionEditor({
         <Notice
           tone={merge.conflicts.length ? 'warning' : 'info'}
           icon={merge.conflicts.length ? 'conflict' : 'info'}
-          title={t('placement.merged', { revision: merge.onto.slice(0, 8), n: merge.placements.length })}
+          title={t('placement.merged', { revision: merge.onto.slice(0, 8), n: merge.mergedCount })}
           actions={
             <Button size="sm" variant="ghost" onClick={() => setMerge(null)}>
               {t('placement.merged.ok')}

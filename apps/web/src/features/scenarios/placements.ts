@@ -123,42 +123,52 @@ export interface MergeResult {
   conflicts: { id: string; kind: 'both_changed' | 'changed_deleted' | 'deleted_changed' }[];
 }
 
+export interface StableMergeResult<T extends { id: string }> {
+  items: T[];
+  conflicts: MergeResult['conflicts'];
+}
+
+/** Three-way merge for any immutable-revision child keyed by a stable id. */
+export function mergeStableItems<T extends { id: string }>(original: T[], mine: T[], theirs: T[]): StableMergeResult<T> {
+  const serialized = (item: T) => JSON.stringify(item);
+  const o = new Map(original.map((item) => [item.id, item]));
+  const m = new Map(mine.map((item) => [item.id, item]));
+  const result = new Map(theirs.map((item) => [item.id, item]));
+  const conflicts: MergeResult['conflicts'] = [];
+  for (const [id, mineItem] of m) {
+    const originalItem = o.get(id);
+    if (!originalItem) {
+      result.set(id, mineItem);
+      continue;
+    }
+    if (serialized(mineItem) === serialized(originalItem)) continue;
+    const theirItem = result.get(id);
+    if (!theirItem) conflicts.push({ id, kind: 'changed_deleted' });
+    else if (serialized(theirItem) !== serialized(originalItem)) conflicts.push({ id, kind: 'both_changed' });
+    result.set(id, mineItem);
+  }
+  for (const [id, originalItem] of o) {
+    if (m.has(id)) continue;
+    const theirItem = result.get(id);
+    if (theirItem && serialized(theirItem) !== serialized(originalItem)) {
+      conflicts.push({ id, kind: 'deleted_changed' });
+      continue;
+    }
+    result.delete(id);
+  }
+  const order = [...theirs.map((item) => item.id), ...mine.map((item) => item.id)];
+  const items = [...new Set(order)].filter((id) => result.has(id)).map((id) => result.get(id)!);
+  return { items, conflicts };
+}
+
 /**
  * Three-way merge after 412: `original` is the revision my draft started from, `mine` my draft,
  * `theirs` the server's new current revision. My additions, edits and deletions are replayed on
  * theirs by id; a placement both sides changed keeps my version, and each such case is reported.
  */
 export function mergePlacements(original: Placement[], mine: Placement[], theirs: Placement[]): MergeResult {
-  const o = new Map(original.map((p) => [p.id, p]));
-  const m = new Map(mine.map((p) => [p.id, p]));
-  const result = new Map(theirs.map((p) => [p.id, p]));
-  const conflicts: MergeResult['conflicts'] = [];
-  for (const [id, mp] of m) {
-    const op = o.get(id);
-    if (!op) {
-      result.set(id, mp);
-      continue;
-    }
-    if (key(mp) === key(op)) continue;
-    const tp = result.get(id);
-    if (!tp) conflicts.push({ id, kind: 'changed_deleted' });
-    else if (key(tp) !== key(op)) conflicts.push({ id, kind: 'both_changed' });
-    result.set(id, mp);
-  }
-  for (const [id, op] of o) {
-    if (m.has(id)) continue;
-    const tp = result.get(id);
-    if (tp && key(tp) !== key(op)) {
-      // They edited what I deleted: keep their edit, the user decides again.
-      conflicts.push({ id, kind: 'deleted_changed' });
-      continue;
-    }
-    result.delete(id);
-  }
-  // Their order first, my additions after: stable for the reviewer.
-  const order = [...theirs.map((p) => p.id), ...mine.map((p) => p.id)];
-  const placements = [...new Set(order)].filter((id) => result.has(id)).map((id) => result.get(id)!);
-  return { placements, conflicts };
+  const merged = mergeStableItems(original, mine, theirs);
+  return { placements: merged.items, conflicts: merged.conflicts };
 }
 
 function inRing(pt: LngLat, ring: LngLat[]): boolean {

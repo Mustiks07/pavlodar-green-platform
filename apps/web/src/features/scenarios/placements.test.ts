@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { add, commit, historyOf, insideZone, issuesOf, mergePlacements, metersBetween, move, newPlacement, redo, remove, snapToCrownTangent, undo, update } from './placements';
+import { add, commit, historyOf, insideZone, issuesOf, mergePlacements, mergeStableItems, metersBetween, move, newPlacement, redo, remove, snapToCrownTangent, undo, update } from './placements';
 
 const P = (id: string, x = 77, plant = 'p1') => newPlacement(plant, [x, 52.3], '2027-04-15', id);
 
@@ -78,6 +78,18 @@ describe('three-way merge after 412', () => {
     expect(r.placements.find((p) => p.id === 'a')!.quantity).toBe(2);
     expect(r.placements.find((p) => p.id === 'b')!.quantity).toBe(3);
     expect(r.placements.find((p) => p.id === 'c')!.quantity).toBe(4);
+  });
+  it('applies the same stable-id merge to area patches', () => {
+    const originalAreas = [{ id: 'area-a', density: 2 }, { id: 'area-b', density: 3 }];
+    const mine = [{ id: 'area-a', density: 4 }, { id: 'area-mine', density: 1 }];
+    const theirs = [{ id: 'area-a', density: 5 }, { id: 'area-b', density: 3 }, { id: 'area-theirs', density: 6 }];
+    const result = mergeStableItems(originalAreas, mine, theirs);
+    expect(result.items).toEqual([
+      { id: 'area-a', density: 4 },
+      { id: 'area-theirs', density: 6 },
+      { id: 'area-mine', density: 1 },
+    ]);
+    expect(result.conflicts).toEqual([{ id: 'area-a', kind: 'both_changed' }]);
   });
 });
 
