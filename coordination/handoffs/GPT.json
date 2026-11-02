@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "4b08c46",
-  "state": "assistant_calculation_verified",
+  "head_sha": "1f2e037",
+  "state": "fixed_human_3d_viewpoints_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1379,5 +1379,25 @@
     ],
     "decision": "ADR-075",
     "limit": "The assistant runs a review calculation only; it never applies a scenario change or selects a different revision, module set or seed"
+  },
+  "fixed_human_3d_viewpoints_20261102": {
+    "implementation_sha": "1f2e037",
+    "contract_version": "1.17.2",
+    "migration": "none",
+    "implemented": [
+      "Project 3D exposes deterministic top, overview and human-level presets",
+      "Human view uses the MapLibre camera solver from an eye point exactly 1.7 metres above ground",
+      "The target is the selected point, selected area patch or frozen zone centre",
+      "Preset and stable target id persist in the URL and restore 3D on reload",
+      "Before/after comparison applies one preset and numerically identical camera to both revisions"
+    ],
+    "verification": [
+      "Focused viewpoint helpers passed 2/2",
+      "Frontend typecheck and production build passed",
+      "Authenticated rendered comparison completed with identical cameras, no page errors and no API 5xx",
+      "Reviewed jury evidence shows controls without map overlap"
+    ],
+    "decision": "ADR-076",
+    "limit": "Human view targets recorded project geometry; it does not invent missing growth curves or building heights"
   }
 }
