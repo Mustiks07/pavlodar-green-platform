@@ -9,6 +9,7 @@ from decimal import Decimal, InvalidOperation
 from uuid import UUID
 
 from pydantic import ValidationError as PydanticValidationError
+from shapely.geometry import shape
 from sqlalchemy import select
 
 from packages.domain.errors import DomainError
@@ -37,6 +38,16 @@ from services.worker.jobs import QUEUES, event
 PROPOSAL_ARGUMENT_KEYS = {"summary", "placement_id", "quantity"}
 PLANT_PROPOSAL_ARGUMENT_KEYS = {"selection_mode"}
 RECOMMEND_ARGUMENT_KEYS = {"top_n"}
+SEARCH_ARGUMENT_KEYS = {"query"}
+ZONE_SEARCH_INTENT = re.compile(
+    r"^\s*(?:найди|покажи|отыщи)\s+(?:зону|участок)\s+(.+?)\s*[?!.]?\s*$",
+    re.IGNORECASE,
+)
+CITY_OBJECT_SEARCH_INTENT = re.compile(
+    r"^\s*(?:найди|покажи|отыщи)\s+"
+    r"(?:(?:городской\s+)?объект(?:\s+по\s+адресу)?|адрес)\s+(.+?)\s*[?!.]?\s*$",
+    re.IGNORECASE,
+)
 RECOMMENDATION_WEIGHTS = (
     {"factor": "hardiness_fit", "weight": 3},
     {"factor": "moisture_fit", "weight": 3},
@@ -61,9 +72,18 @@ NUMERIC_CLAIM = re.compile(
 
 def server_owned_tool_reply(request):
     """Route explicit deterministic read-only actions before contacting an external model."""
-    question = next(
-        (message.content.lower() for message in reversed(request.messages) if message.role == "user"),
+    user_text = next(
+        (message.content for message in reversed(request.messages) if message.role == "user"),
         "",
+    )
+    question = user_text.lower()
+    zone_search_tool = next(
+        (tool for tool in request.tools if tool.name == "find_zones"),
+        None,
+    )
+    city_object_search_tool = next(
+        (tool for tool in request.tools if tool.name == "find_city_objects"),
+        None,
     )
     recommend_tool = next(
         (tool for tool in request.tools if tool.name == "recommend_plants"),
@@ -148,6 +168,36 @@ def server_owned_tool_reply(request):
             "покажи эффект",
         )
     )
+    zone_search = ZONE_SEARCH_INTENT.fullmatch(user_text)
+    city_object_search = CITY_OBJECT_SEARCH_INTENT.fullmatch(user_text)
+    if zone_search_tool and zone_search:
+        return LLMReply(
+            provider="server-tools",
+            model="authorized-zone-search-v1",
+            text="Ищу участки в доступном городском контуре.",
+            tool_calls=(
+                ToolCall(
+                    "server-zone-search",
+                    "find_zones",
+                    {"query": zone_search.group(1).strip()},
+                ),
+            ),
+            usage=Usage(input_tokens=None, output_tokens=None),
+        )
+    if city_object_search_tool and city_object_search:
+        return LLMReply(
+            provider="server-tools",
+            model="authorized-city-object-search-v1",
+            text="Ищу адрес в авторизованном локальном индексе.",
+            tool_calls=(
+                ToolCall(
+                    "server-city-object-search",
+                    "find_city_objects",
+                    {"query": city_object_search.group(1).strip()},
+                ),
+            ),
+            usage=Usage(input_tokens=None, output_tokens=None),
+        )
     if report_tool and asks_report:
         return LLMReply(
             provider="server-tools",
@@ -668,6 +718,7 @@ def message_payload(value):
         "text": value.text,
         "state": value.state,
         "facts": value.facts,
+        "entity_refs": value.entity_refs,
         "proposal_id": value.proposal_id,
         "report_job_id": value.report_job_id,
         "created_at": value.created_at.isoformat().replace("+00:00", "Z"),
@@ -826,6 +877,7 @@ def enqueue_message(db, access, session_id, body):
                 state="completed",
                 text=body["text"],
                 facts=[],
+                entity_refs=[],
                 proposal_id=None,
                 report_job_id=None,
                 created_at=created,
@@ -838,6 +890,7 @@ def enqueue_message(db, access, session_id, body):
                 state="queued",
                 text="",
                 facts=[],
+                entity_refs=[],
                 proposal_id=None,
                 report_job_id=None,
                 created_at=created + timedelta(microseconds=1),
@@ -1082,6 +1135,135 @@ def validate_recommendation_arguments(arguments):
     return top_n
 
 
+def validate_search_arguments(arguments):
+    if not isinstance(arguments, dict):
+        raise TypeError("shape")
+    if set(arguments) != SEARCH_ARGUMENT_KEYS:
+        raise ValueError("shape")
+    query = arguments["query"]
+    if not isinstance(query, str):
+        raise TypeError("query")
+    query = query.strip()
+    if not 1 <= len(query) <= 120:
+        raise ValueError("query")
+    from services.api.addresses import normalize_query
+
+    if not normalize_query(query):
+        raise ValueError("query")
+    return query
+
+
+def _match_rank(value, query):
+    if value == query:
+        return 0
+    if value.startswith(query):
+        return 1
+    if query in value:
+        return 2
+    return None
+
+
+def _search_text(kind, query, refs):
+    if not refs:
+        noun = "участков" if kind == "zone" else "адресов"
+        return f"По запросу «{query}» в доступном городском контуре {noun} не найдено."
+    noun = "Участки" if kind == "zone" else "Адреса"
+    labels = ", ".join(f"«{item['label']}»" for item in refs)
+    return f"{noun} по запросу «{query}»: {labels}. Выберите объект из карточек ниже."
+
+
+def _find_zones(db, access, job, arguments):
+    try:
+        query = validate_search_arguments(arguments)
+    except (TypeError, ValueError) as error:
+        raise DomainError(
+            422, "invalid_body", f"Assistant zone-search arguments are invalid: {error}"
+        ) from None
+    from services.api.addresses import normalize_query
+
+    chat_session = session_access(db, access, job.input_ref_id)
+    access.city(chat_session.city_id)
+    normalized = normalize_query(query)
+    rows = db.execute(
+        select(Zone, ZoneVersion)
+        .join(ZoneVersion, Zone.current_version_id == ZoneVersion.id)
+        .where(Zone.city_id == chat_session.city_id)
+        .order_by(Zone.id)
+    ).all()
+    ranked = []
+    for zone, version in rows:
+        label = version.payload["name"]
+        fields = (normalize_query(label), normalize_query(version.payload["purpose"]))
+        matches = [
+            (bucket, field_index)
+            for field_index, value in enumerate(fields)
+            if (bucket := _match_rank(value, normalized)) is not None
+        ]
+        if not matches:
+            continue
+        point = shape(version.payload["geometry"]).representative_point()
+        ref = {
+            "kind": "zone",
+            "id": zone.id,
+            "label": label,
+            "position": {
+                "type": "Point",
+                "coordinates": [float(point.x), float(point.y)],
+            },
+            "source_ref": None,
+        }
+        ranked.append((min(matches), normalize_query(label), zone.id, ref))
+    refs = [item[-1] for item in sorted(ranked, key=lambda item: item[:3])[:5]]
+    return refs, _search_text("zone", query, refs)
+
+
+def _find_city_objects(db, access, job, arguments):
+    try:
+        query = validate_search_arguments(arguments)
+    except (TypeError, ValueError) as error:
+        raise DomainError(
+            422,
+            "invalid_body",
+            f"Assistant city-object search arguments are invalid: {error}",
+        ) from None
+    from services.api.addresses import search_addresses
+
+    chat_session = session_access(db, access, job.input_ref_id)
+    try:
+        page = search_addresses(
+            db,
+            access,
+            {
+                "city_id": chat_session.city_id,
+                "q": query,
+                "limit": 5,
+                "cursor": None,
+            },
+        )
+    except DomainError as error:
+        if error.code == "address_index_unavailable":
+            return (
+                [],
+                (
+                    "Локальный адресный индекс для этого города пока недоступен. "
+                    "Опубликуйте принятый адресный набор с лицензией и provenance, "
+                    "затем повторите поиск."
+                ),
+            )
+        raise
+    refs = [
+        {
+            "kind": "address",
+            "id": item["id"],
+            "label": item["label"],
+            "position": item["position"],
+            "source_ref": item["source_ref"],
+        }
+        for item in page["items"][:5]
+    ]
+    return refs, _search_text("address", query, refs)
+
+
 def validate_plant_proposal_arguments(arguments):
     if not isinstance(arguments, dict) or set(arguments) != PLANT_PROPOSAL_ARGUMENT_KEYS:
         raise ValueError("shape")
@@ -1106,7 +1288,34 @@ def prepare_chat_request(db, job):
     can_propose = proposal_tool_available(
         job.request_payload.get("scenario_revision_id"), scenario_context
     )
-    tools = []
+    search_parameters = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "query": {"type": "string", "minLength": 1, "maxLength": 120},
+        },
+        "required": ["query"],
+    }
+    tools = [
+        ToolSpec(
+            name="find_zones",
+            description=(
+                "Find at most five current authorized zones in the chat session city by "
+                "normalized exact, prefix or substring match over zone name and purpose. "
+                "Use only when the user explicitly asks to find a zone or site."
+            ),
+            parameters=search_parameters,
+        ),
+        ToolSpec(
+            name="find_city_objects",
+            description=(
+                "Find at most five addresses in the authorized accepted local address index "
+                "of the chat session city. Use only when the user explicitly asks to find "
+                "an address or city object."
+            ),
+            parameters=search_parameters,
+        ),
+    ]
     if job.request_payload.get("scenario_revision_id") and "specialist" in user.roles:
         tools.append(
             ToolSpec(
@@ -1226,6 +1435,8 @@ def prepare_chat_request(db, job):
         "отсутствующие данные. Если значения нет, прямо скажи, что оно недоступно. "
         "Не предлагай обход прав и не выполняй изменения. Для явной просьбы подобрать растения "
         "используй recommend_plants: результат считает сервер по закреплённым версиям. "
+        "По явной просьбе найти участок используй find_zones, а адрес или городской объект — "
+        "find_city_objects. Передавай только query: город, лимит и права всегда фиксирует сервер. "
         "По явной просьбе рассчитать или пересчитать текущий проект используй "
         "calculate_current_scenario без аргументов: версии, модули и seed выбирает сервер. "
         "По явной просьбе сформировать отчёт используй create_current_report без аргументов: "
@@ -1497,6 +1708,14 @@ def _proposed_revision(db, access, job, reply, message, facts):
         return None, None, reply.text
     if len(reply.tool_calls) != 1:
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
+    if reply.tool_calls[0].name == "find_zones":
+        refs, text = _find_zones(db, access, job, reply.tool_calls[0].arguments)
+        message.entity_refs = refs
+        return None, None, text
+    if reply.tool_calls[0].name == "find_city_objects":
+        refs, text = _find_city_objects(db, access, job, reply.tool_calls[0].arguments)
+        message.entity_refs = refs
+        return None, None, text
     if reply.tool_calls[0].name == "recommend_plants":
         return None, None, _recommend_plants(
             db, access, job, reply.tool_calls[0].arguments, facts

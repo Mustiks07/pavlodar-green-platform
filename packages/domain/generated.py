@@ -1734,6 +1734,22 @@ class Fact(BaseModel):
     scenario_revision_id: UUID | None
 
 
+class Kind5(StrEnum):
+    zone = 'zone'
+    address = 'address'
+
+
+class ChatEntityRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Kind5
+    id: UUID
+    label: Annotated[str, Field(min_length=1)]
+    position: Point | None
+    source_ref: SourceRef | None
+
+
 class Role2(StrEnum):
     user = 'user'
     assistant = 'assistant'
@@ -1757,6 +1773,7 @@ class ChatMessage(BaseModel):
     text: str
     state: State2
     facts: list[Fact]
+    entity_refs: list[ChatEntityRef]
     proposal_id: UUID | None
     report_job_id: UUID | None
     created_at: AwareDatetime

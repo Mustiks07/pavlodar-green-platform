@@ -1,0 +1,51 @@
+ADR-083: Authorized assistant search with typed entity references
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-AI-01 requires the assistant to find zones and city objects, while the security rules require
+city, dataset and session authorization on every read. Returning prose alone cannot give the map
+a safe object identity. Returning arbitrary model-generated URLs or raw dataset properties would
+create an IDOR and data-leakage surface. Address search must also retain the accepted local source
+lineage and remain honest when no local index exists.
+
+Decision
+Contract 1.19.0 adds ChatEntityRef and a required ChatMessage.entity_refs array. Each reference is
+limited to a kind (zone or address), UUID, concise label, optional GeoJSON Point and optional
+canonical SourceRef. Migration 0036 adds a non-null JSONB column with an empty-array default so
+existing conversation rows remain valid.
+
+Every specialist chat exposes two read-only tools:
+
+- `find_zones({query})` searches current zones only in the chat session city. The server normalizes
+  case, whitespace and ё/е and ranks deterministic exact, prefix and substring matches over the
+  current name and purpose. It returns at most five results, ordered by match bucket, matched field,
+  normalized label and UUID. The position is the representative point of the authorized current
+  zone geometry; no raw zone payload is persisted.
+- `find_city_objects({query})` calls the existing authorized local address search with the session
+  city and a server-fixed limit of five. Only the address ID, label, position and canonical source
+  reference are persisted. Dataset grants and accepted current dataset versions remain enforced by
+  the existing search implementation.
+
+The only accepted argument shape is exactly one non-blank query string of at most 120 characters.
+The model cannot choose city, limit, cursor, dataset or result IDs. Explicit Russian find commands
+are routed before any external provider, while provider tool specs support the same bounded calls.
+Explanatory questions do not trigger search.
+
+No match is a completed answer with an empty reference list. If the accepted local address index
+is unavailable, the chat completes with an actionable Russian instruction and no references rather
+than failing or falling back to a remote source. All other authorization or integrity errors fail
+closed. Existing chat ownership prevents other users from reading the persisted references.
+
+Consequences
+The assistant can now hand the client safe, typed identities for future map selection without
+inventing coordinates or exposing arbitrary properties. Search does not mutate zones, create
+domain jobs or bypass dataset access. Existing idempotent chat requests persist one stable result.
+
+Verification
+- Canonical validation covers contract 1.19.0 and generated Python/TypeScript clients.
+- Unit tests cover both explicit intents, non-triggering explanatory wording, exact argument shape,
+  blank/oversize rejection and inability to supply a city.
+- Live chat tests disable the provider, verify deterministic zone ranking and the five-result cap,
+  purpose matching, empty results, session IDOR, server-fixed city, unavailable address behavior,
+  accepted local address lineage, typed-field allowlists and idempotent replay.

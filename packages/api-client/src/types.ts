@@ -1,4 +1,4 @@
-// Generated from contracts/openapi.json 1.18.1 by apps/web/scripts/gen-types.mjs. Do not edit.
+// Generated from contracts/openapi.json 1.19.0 by apps/web/scripts/gen-types.mjs. Do not edit.
 import type { components } from './generated/schema';
 
 export type AddressResult = components['schemas']['AddressResult'];
@@ -13,6 +13,7 @@ export type CalculationSnapshot = components['schemas']['CalculationSnapshot'];
 export type CalculationSnapshotPage = components['schemas']['CalculationSnapshotPage'];
 export type CareOperation = components['schemas']['CareOperation'];
 export type ChatCreate = components['schemas']['ChatCreate'];
+export type ChatEntityRef = components['schemas']['ChatEntityRef'];
 export type ChatInput = components['schemas']['ChatInput'];
 export type ChatMessage = components['schemas']['ChatMessage'];
 export type ChatMessagePage = components['schemas']['ChatMessagePage'];

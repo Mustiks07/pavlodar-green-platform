@@ -2582,6 +2582,15 @@ export interface components {
             calculation_id: string | null;
             scenario_revision_id: string | null;
         };
+        ChatEntityRef: {
+            /** @enum {string} */
+            kind: "zone" | "address";
+            /** Format: uuid */
+            id: string;
+            label: string;
+            position: components["schemas"]["Point"] | null;
+            source_ref: components["schemas"]["SourceRef"] | null;
+        };
         ChatMessage: {
             /** Format: uuid */
             id: string;
@@ -2593,6 +2602,8 @@ export interface components {
             /** @enum {string} */
             state: "queued" | "streaming" | "completed" | "failed" | "cancelled";
             facts: components["schemas"]["Fact"][];
+            /** @default [] */
+            entity_refs: components["schemas"]["ChatEntityRef"][];
             proposal_id: string | null;
             report_job_id: string | null;
             /** Format: date-time */

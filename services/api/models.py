@@ -447,6 +447,7 @@ class ChatMessageRecord(Base):
     state: Mapped[str] = mapped_column(String)
     text: Mapped[str] = mapped_column(String)
     facts: Mapped[list] = mapped_column(JSONB)
+    entity_refs: Mapped[list] = mapped_column(JSONB, default=list)
     proposal_id: Mapped[str | None] = mapped_column(Uuid(as_uuid=False))
     report_job_id: Mapped[str | None] = mapped_column(
         ForeignKey("jobs.id"), unique=True

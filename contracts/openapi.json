@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.18.1",
-    "description": "Canonical API contract 1.18.1. Chat messages can reference one durable server-owned PDF report job bound to the exact scenario revision and its latest authorized calculation snapshot."
+    "version": "1.19.0",
+    "description": "Canonical API contract 1.19.0. Chat messages can carry bounded authorized zone and local-address references returned by server-owned assistant search tools."
   },
   "servers": [
     {
@@ -12194,6 +12194,54 @@
         ],
         "additionalProperties": false
       },
+      "ChatEntityRef": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "zone",
+              "address"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "position": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_ref": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "position",
+          "source_ref"
+        ],
+        "additionalProperties": false
+      },
       "ChatMessage": {
         "type": "object",
         "properties": {
@@ -12231,6 +12279,13 @@
               "$ref": "#/components/schemas/Fact"
             }
           },
+          "entity_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatEntityRef"
+            },
+            "default": []
+          },
           "proposal_id": {
             "anyOf": [
               {
@@ -12265,6 +12320,7 @@
           "text",
           "state",
           "facts",
+          "entity_refs",
           "proposal_id",
           "report_job_id",
           "created_at"

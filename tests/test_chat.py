@@ -8,6 +8,7 @@ from services.api.chat import (
     presentable_reply,
     server_owned_tool_reply,
     snapshot_facts,
+    validate_search_arguments,
 )
 from services.api.config import settings
 from services.api.db import engine, session
@@ -19,6 +20,7 @@ from services.api.models import (
     Job,
 )
 from services.worker.main import run_job
+from tests.test_addresses import publish_address_dataset
 from tests.test_calculations import setup_revision
 from tests.test_catalog import (
     RULE_ID,
@@ -479,6 +481,56 @@ def test_server_owned_current_result_intent_is_explicit_and_argument_free(questi
     assert explanatory is None
 
 
+def test_server_owned_search_intents_are_explicit_bounded_and_argument_only():
+    zone_tool = ToolSpec(
+        name="find_zones",
+        description="authorized zones",
+        parameters={"type": "object"},
+    )
+    address_tool = ToolSpec(
+        name="find_city_objects",
+        description="authorized local addresses",
+        parameters={"type": "object"},
+    )
+    zone_reply = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Найди участок Сквер Победы")),
+            tools=(zone_tool, address_tool),
+        )
+    )
+    assert zone_reply.provider == "server-tools"
+    assert zone_reply.tool_calls[0].name == "find_zones"
+    assert zone_reply.tool_calls[0].arguments == {"query": "Сквер Победы"}
+
+    address_reply = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Покажи адрес Ломова, 38")),
+            tools=(zone_tool, address_tool),
+        )
+    )
+    assert address_reply.provider == "server-tools"
+    assert address_reply.tool_calls[0].name == "find_city_objects"
+    assert address_reply.tool_calls[0].arguments == {"query": "Ломова, 38"}
+
+    explanatory = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Как найти участок на карте?")),
+            tools=(zone_tool, address_tool),
+        )
+    )
+    assert explanatory is None
+
+    assert validate_search_arguments({"query": "  Сквер  "}) == "Сквер"
+    for invalid in (
+        {"query": ""},
+        {"query": " "},
+        {"query": "x" * 121},
+        {"query": "Сквер", "city_id": CITY_ID},
+    ):
+        with pytest.raises(ValueError):
+            validate_search_arguments(invalid)
+
+
 def test_chat_calculates_exact_bound_revision_without_provider_or_duplicates(clients, monkeypatch):
     scenario, _revision, saved, _rate = setup_revision(clients, with_model=True)
     revision_id = saved.json()["id"]
@@ -772,6 +824,186 @@ def test_chat_current_result_is_latest_for_bound_revision_and_read_only(
         assert len(list(db.scalars(select(CalculationSnapshotRecord)))) == snapshot_count
 
 
+def test_chat_zone_search_is_authorized_ranked_bounded_and_idempotent(
+    clients, monkeypatch
+):
+    specialist = clients["specialist"]
+    base_geometry = {
+        "type": "Polygon",
+        "coordinates": [[
+            [76.98, 52.28],
+            [76.981, 52.28],
+            [76.981, 52.281],
+            [76.98, 52.281],
+            [76.98, 52.28],
+        ]],
+    }
+    names = [
+        "ADR083 Сквер",
+        "ADR083 Сквер Победы",
+        "ADR083 Сквер Северный",
+        "ADR083 Сквер Молодёжный",
+        "Аллея возле ADR083 Сквера",
+        "Новый ADR083 Сквер",
+    ]
+    ids = {}
+    for name in names:
+        created = mutation(
+            specialist,
+            "POST",
+            "/v1/zones",
+            {
+                "city_id": CITY_ID,
+                "name": name,
+                "purpose": "square",
+                "geometry": base_geometry,
+            },
+        )
+        assert created.status_code == 201, created.text
+        ids[name] = created.json()["id"]
+
+    purpose_only = mutation(
+        specialist,
+        "POST",
+        "/v1/zones",
+        {
+            "city_id": CITY_ID,
+            "name": "ADR083 purpose-only zone",
+            "purpose": "hospital",
+            "geometry": base_geometry,
+        },
+    )
+    assert purpose_only.status_code == 201, purpose_only.text
+    created_chat = chat_session(specialist)
+
+    class ForbiddenGateway:
+        def complete(self, request):
+            raise AssertionError("explicit authorized search must bypass the provider")
+
+    monkeypatch.setattr("services.api.llm.gateway", lambda: ForbiddenGateway())
+    job = send(
+        specialist,
+        created_chat["id"],
+        "Найди участок ADR083 Сквер",
+        key="assistant-zone-search-once",
+    )
+    assert send(
+        specialist,
+        created_chat["id"],
+        "Найди участок ADR083 Сквер",
+        key="assistant-zone-search-once",
+    ) == job
+    run_job.run(job["id"])
+    assistant = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    validate("ChatMessage", assistant)
+    assert assistant["state"] == "completed"
+    assert [item["label"] for item in assistant["entity_refs"]] == [
+        "ADR083 Сквер",
+        "ADR083 Сквер Молодёжный",
+        "ADR083 Сквер Победы",
+        "ADR083 Сквер Северный",
+        "Аллея возле ADR083 Сквера",
+    ]
+    for item in assistant["entity_refs"]:
+        assert set(item) == {"kind", "id", "label", "position", "source_ref"}
+        assert item["kind"] == "zone"
+        assert item["id"] == ids[item["label"]]
+        assert item["position"]["type"] == "Point"
+        assert item["source_ref"] is None
+    assert clients["viewer"].get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).status_code == 404
+
+    purpose_job = send(
+        specialist,
+        created_chat["id"],
+        "Найди зону hospital",
+        key="assistant-zone-purpose-search",
+    )
+    run_job.run(purpose_job["id"])
+    purpose_message = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    assert [item["id"] for item in purpose_message["entity_refs"]] == [
+        purpose_only.json()["id"]
+    ]
+
+    missing_job = send(
+        specialist,
+        created_chat["id"],
+        "Найди зону ADR083-несуществующая",
+        key="assistant-zone-search-empty",
+    )
+    run_job.run(missing_job["id"])
+    missing_message = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    assert missing_message["entity_refs"] == []
+    assert "не найдено" in missing_message["text"]
+
+
+def test_chat_address_search_handles_unavailable_and_keeps_local_lineage(
+    clients, monkeypatch
+):
+    specialist = clients["specialist"]
+    created_chat = chat_session(specialist)
+
+    class ForbiddenGateway:
+        def complete(self, request):
+            raise AssertionError("explicit address search must bypass the provider")
+
+    monkeypatch.setattr("services.api.llm.gateway", lambda: ForbiddenGateway())
+    unavailable_job = send(
+        specialist,
+        created_chat["id"],
+        "Найди адрес Ломова, 38",
+        key="assistant-address-index-unavailable",
+    )
+    run_job.run(unavailable_job["id"])
+    unavailable = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    assert unavailable["state"] == "completed"
+    assert unavailable["entity_refs"] == []
+    assert "адресный индекс" in unavailable["text"]
+
+    _dataset, version_id = publish_address_dataset(clients)
+    found_job = send(
+        specialist,
+        created_chat["id"],
+        "Покажи адрес Ломова, 38",
+        key="assistant-address-search-once",
+    )
+    assert send(
+        specialist,
+        created_chat["id"],
+        "Покажи адрес Ломова, 38",
+        key="assistant-address-search-once",
+    ) == found_job
+    run_job.run(found_job["id"])
+    found = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    validate("ChatMessage", found)
+    assert 1 <= len(found["entity_refs"]) <= 5
+    ref = found["entity_refs"][0]
+    assert set(ref) == {"kind", "id", "label", "position", "source_ref"}
+    assert ref["kind"] == "address"
+    assert ref["label"] == "ул. Ломова, 38"
+    assert ref["position"] == {"type": "Point", "coordinates": [76.951, 52.281]}
+    assert ref["source_ref"] == {
+        "dataset_version_id": version_id,
+        "source_record_id": "address-1",
+        "label": "SYNTHETIC TEST generic import",
+        "uri": None,
+    }
+    assert clients["outsider"].get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).status_code == 404
+
+
 class FakeGateway:
     def complete(self, request):
         assert "AUTHORIZED_CONTEXT=" in request.messages[1].content
@@ -1016,6 +1248,8 @@ def test_chat_proposal_requires_human_apply_and_current_revision(clients, monkey
     class ProposalGateway:
         def complete(self, request):
             assert [tool.name for tool in request.tools] == [
+                "find_zones",
+                "find_city_objects",
                 "calculate_current_scenario",
                 "create_current_report",
                 "get_current_result",
