@@ -28,6 +28,7 @@ import { useScene3D } from '../scene3d/useScene3D';
 import type { ScenePlanting } from '../scene3d/types';
 import { add, insideZone, issuesOf, metersBetween, move, newPlacement, redo, remove, same, snapToCrownTangent, undo, update, type LngLat, type PlacementHistory } from './placements';
 import { addVertex, closeRing, editableRing, previewIssues, redo as redoDraw, removeLast, startDraw, toPolygon, undo as undoDraw, type DrawState } from '../zones/draw';
+import { commitAreaPatches, redoAreaPatches, rotateAreaPatch, translateAreaPatch, translateAreaPatchBetween, undoAreaPatches, type AreaPatchHistory } from './areaPatches';
 
 const coarse = () => window.matchMedia('(pointer: coarse)').matches;
 const HIT = () => (coarse() ? 18 : 8);
@@ -63,6 +64,7 @@ export function PlacementMap({
   areaDraw = null,
   selectedAreaPatchId = null,
   areaAdding = false,
+  areaMoveMode = false,
   selectedId,
   selectedIds = EMPTY_IDS,
   snapping = false,
@@ -75,7 +77,9 @@ export function PlacementMap({
   onAreaSelect,
   onAreaVertex,
   onAreaClose,
+  onAreaTransform,
   conflictIds,
+  areaConflictIds = EMPTY_IDS,
   auto3d = false,
   onMapReady,
   compareLabel,
@@ -88,6 +92,7 @@ export function PlacementMap({
   areaDraw?: DrawState | null;
   selectedAreaPatchId?: string | null;
   areaAdding?: boolean;
+  areaMoveMode?: boolean;
   selectedId: string | null;
   selectedIds?: Set<string>;
   snapping?: boolean;
@@ -100,7 +105,9 @@ export function PlacementMap({
   onAreaSelect?: (id: string | null) => void;
   onAreaVertex?: (at: LngLat) => void;
   onAreaClose?: () => void;
+  onAreaTransform?: (patch: AreaPatch) => void;
   conflictIds: Set<string>;
+  areaConflictIds?: Set<string>;
   /** Opens the existing Three layer as soon as the map is ready (used by immutable revision compare). */
   auto3d?: boolean;
   onMapReady?: (map: maplibregl.Map | null) => void;
@@ -129,8 +136,8 @@ export function PlacementMap({
   const scene3d = useScene3D(() => map.current, [], scenePlantings);
   const auto3dStarted = useRef(false);
   if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementScene?: typeof scene3d }).__pgPlacementScene = scene3d;
-  const live = useRef({ placements, areaPatches, areaDraw, selectedAreaPatchId, areaAdding, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove, onAreaSelect, onAreaVertex, onAreaClose });
-  live.current = { placements, areaPatches, areaDraw, selectedAreaPatchId, areaAdding, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove, onAreaSelect, onAreaVertex, onAreaClose };
+  const live = useRef({ placements, areaPatches, areaDraw, selectedAreaPatchId, areaAdding, areaMoveMode, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove, onAreaSelect, onAreaVertex, onAreaClose, onAreaTransform });
+  live.current = { placements, areaPatches, areaDraw, selectedAreaPatchId, areaAdding, areaMoveMode, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove, onAreaSelect, onAreaVertex, onAreaClose, onAreaTransform };
   const drag = useRef<{
     id: string;
     start: maplibregl.Point;
@@ -141,6 +148,7 @@ export function PlacementMap({
     scroll: [number, number];
     client: [number, number];
   } | null>(null);
+  const areaDrag = useRef<{ id: string; start: LngLat; current: LngLat; patch: AreaPatch } | null>(null);
   const suppressClick = useRef(0);
 
   const data = (list: Placement[], dragged: { id: string; pos: LngLat } | null): FeatureCollection => ({
@@ -151,13 +159,13 @@ export function PlacementMap({
       geometry: { type: 'Point', coordinates: dragged && dragged.id === p.id ? dragged.pos : p.position.coordinates },
     })),
   });
-  const areaData = (list: AreaPatch[], draw: DrawState | null, selected: string | null): FeatureCollection => ({
+  const areaData = (list: AreaPatch[], draw: DrawState | null, selected: string | null, dragged: AreaPatch | null = null): FeatureCollection => ({
     type: 'FeatureCollection',
     features: [
       ...list.map((patch) => ({
         type: 'Feature' as const,
-        properties: { id: patch.id, selected: patch.id === selected, locked: patch.locked, draft: false },
-        geometry: patch.geometry,
+        properties: { id: patch.id, selected: patch.id === selected, locked: patch.locked, draft: false, conflict: areaConflictIds.has(patch.id) },
+        geometry: dragged?.id === patch.id ? dragged.geometry : patch.geometry,
       })),
       ...(draw && draw.vertices.length >= 3 ? [{
         type: 'Feature' as const,
@@ -187,11 +195,11 @@ export function PlacementMap({
       m.addSource('pl', { type: 'geojson', data: data(live.current.placements, null) });
       m.addSource('area-patches', { type: 'geojson', data: areaData(live.current.areaPatches, live.current.areaDraw, live.current.selectedAreaPatchId) });
       m.addLayer({ id: 'area-patch-fill', type: 'fill', source: 'area-patches', paint: {
-        'fill-color': ['case', ['get', 'selected'], cssVar('--pg-accent'), cssVar('--pg-positive')],
+        'fill-color': ['case', ['get', 'conflict'], cssVar('--pg-negative'), ['get', 'selected'], cssVar('--pg-accent'), cssVar('--pg-positive')],
         'fill-opacity': ['case', ['get', 'draft'], 0.28, 0.18],
       } });
       m.addLayer({ id: 'area-patch-line', type: 'line', source: 'area-patches', paint: {
-        'line-color': ['case', ['get', 'selected'], cssVar('--pg-focus'), cssVar('--pg-positive')],
+        'line-color': ['case', ['get', 'conflict'], cssVar('--pg-negative'), ['get', 'selected'], cssVar('--pg-focus'), cssVar('--pg-positive')],
         'line-width': ['case', ['get', 'selected'], 3, 1.5],
         'line-dasharray': ['case', ['get', 'draft'], ['literal', [2, 2]], ['literal', [1, 0]]],
       } });
@@ -327,11 +335,33 @@ export function PlacementMap({
       const id = hitAt(e.point);
       if (id && (e.originalEvent.shiftKey || e.originalEvent.ctrlKey || e.originalEvent.metaKey)) return;
       if (id && start(id, e.point, false, [e.originalEvent.clientX, e.originalEvent.clientY])) e.preventDefault();
+      else {
+        const areaId = areaHitAt(e.point);
+        const patch = live.current.areaPatches.find((item) => item.id === areaId);
+        if (patch && areaId === live.current.selectedAreaPatchId && live.current.areaMoveMode && !patch.locked && !live.current.disabled) {
+          areaDrag.current = { id: patch.id, start: [e.lngLat.lng, e.lngLat.lat], current: [e.lngLat.lng, e.lngLat.lat], patch };
+          m.dragPan.disable();
+          e.preventDefault();
+        }
+      }
     });
     m.on('mousemove', (e) => {
-      m.getCanvas().style.cursor = drag.current?.pos ? 'grabbing' : live.current.adding || live.current.areaAdding ? 'crosshair' : hitAt(e.point) || areaHitAt(e.point) ? 'pointer' : '';
+      if (areaDrag.current) {
+        areaDrag.current.current = [e.lngLat.lng, e.lngLat.lat];
+        const preview = translateAreaPatchBetween(areaDrag.current.patch, areaDrag.current.start, areaDrag.current.current);
+        (m.getSource('area-patches') as maplibregl.GeoJSONSource | undefined)?.setData(areaData(live.current.areaPatches, live.current.areaDraw, live.current.selectedAreaPatchId, preview));
+      }
+      m.getCanvas().style.cursor = drag.current?.pos || areaDrag.current ? 'grabbing' : live.current.adding || live.current.areaAdding ? 'crosshair' : hitAt(e.point) || areaHitAt(e.point) ? 'pointer' : '';
     });
-    m.on('mouseup', end);
+    m.on('mouseup', () => {
+      end();
+      const current = areaDrag.current;
+      if (!current) return;
+      areaDrag.current = null;
+      m.dragPan.enable();
+      suppressClick.current = performance.now() + 300;
+      live.current.onAreaTransform?.(translateAreaPatchBetween(current.patch, current.start, current.current));
+    });
     m.on('touchstart', (e) => {
       if (e.originalEvent.touches.length > 1) {
         drag.current = null;
@@ -484,7 +514,7 @@ export function PlacementMap({
       areaData(areaPatches, areaDraw, selectedAreaPatchId),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [areaPatches, areaDraw, selectedAreaPatchId, ready]);
+  }, [areaPatches, areaDraw, selectedAreaPatchId, areaConflictIds, ready]);
 
   return (
     <div className="pl-map-wrap">
@@ -497,6 +527,7 @@ export function PlacementMap({
         onKeyDown={(e) => {
           const m = map.current;
           const sel = placements.find((p) => p.id === selectedId);
+          const selectedArea = areaPatches.find((patch) => patch.id === selectedAreaPatchId);
           if (!m) return;
           const arrow = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
           if (e.key === 'Enter' && adding && !disabled) {
@@ -507,6 +538,11 @@ export function PlacementMap({
             const p = m.project(sel.position.coordinates as LngLat);
             const ll = m.unproject([p.x + arrow[0]! * step, p.y + arrow[1]! * step]);
             onMove(sel.id, [ll.lng, ll.lat]);
+          } else if (arrow && selectedArea && areaMoveMode && !selectedArea.locked && !disabled) {
+            const metres = e.shiftKey ? 1 : 5;
+            onAreaTransform?.(translateAreaPatch(selectedArea, arrow[0]! * metres, -arrow[1]! * metres));
+          } else if ((e.key === '[' || e.key === ']') && selectedArea && !selectedArea.locked && !disabled) {
+            onAreaTransform?.(rotateAreaPatch(selectedArea, (e.key === '[' ? -1 : 1) * (e.altKey ? 1 : 15)));
           } else if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !sel.locked && !disabled) onDelete(sel.id);
           else if (e.key === 'Escape') onSelect(null, false);
           else return;
@@ -743,6 +779,7 @@ export function PlacementEditor({
   onCatalogVersion,
   preferredPlant,
   conflictIds = EMPTY_IDS,
+  areaConflictIds = EMPTY_IDS,
   datasetVersionIds,
 }: {
   value: Placement[];
@@ -758,6 +795,8 @@ export function PlacementEditor({
   preferredPlant?: Plant | null;
   /** Server-rejected positions stay in the local draft and are highlighted. */
   conflictIds?: Set<string>;
+  /** Server-rejected patch geometries stay visible in red. */
+  areaConflictIds?: Set<string>;
   /** Exact dataset versions frozen in the draft revision. */
   datasetVersionIds: string[];
 }) {
@@ -774,7 +813,9 @@ export function PlacementEditor({
   const [areaDraw, setAreaDraw] = useState<DrawState | null>(null);
   const [editingPatchId, setEditingPatchId] = useState<string | null>(null);
   const [selectedAreaPatchId, setSelectedAreaPatchId] = useState<string | null>(null);
+  const [areaMoveMode, setAreaMoveMode] = useState(false);
   const [density, setDensity] = useState('');
+  const [areaHistory, setAreaHistory] = useState<AreaPatchHistory>({ past: [], future: [] });
   useEffect(() => {
     if (!preferredPlant) return;
     setPlantId(preferredPlant.id);
@@ -825,6 +866,24 @@ export function PlacementEditor({
     setHist({ past: r.past, future: r.future });
     onChange(r.present);
   };
+  const commitAreas = (next: AreaPatch[]) => {
+    const result = commitAreaPatches(areaPatches, next, areaHistory);
+    if (result.present === areaPatches) return;
+    setAreaHistory(result.history);
+    onAreaPatchesChange(result.present);
+  };
+  const doAreaUndo = () => {
+    const result = undoAreaPatches(areaPatches, areaHistory);
+    if (result.present === areaPatches) return;
+    setAreaHistory(result.history);
+    onAreaPatchesChange(result.present);
+  };
+  const doAreaRedo = () => {
+    const result = redoAreaPatches(areaPatches, areaHistory);
+    if (result.present === areaPatches) return;
+    setAreaHistory(result.history);
+    onAreaPatchesChange(result.present);
+  };
   const addAt = (at: LngLat) => {
     if (!plantId || !date) return;
     // Plants of the catalog list belong to its current snapshot (plant.version_id).
@@ -857,7 +916,7 @@ export function PlacementEditor({
       locked: existing?.locked ?? false,
       density_plants_per_m2: parsedDensity && parsedDensity > 0 ? parsedDensity : null,
     };
-    onAreaPatchesChange(existing ? areaPatches.map((item) => item.id === existing.id ? patch : item) : [...areaPatches, patch]);
+    commitAreas(existing ? areaPatches.map((item) => item.id === existing.id ? patch : item) : [...areaPatches, patch]);
     setSelectedAreaPatchId(patch.id);
     setEditingPatchId(null);
     setAreaDraw(null);
@@ -871,11 +930,11 @@ export function PlacementEditor({
         const tag = (e.target as HTMLElement).tagName;
         if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || disabled) return;
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-          if (mode === 'area') setAreaDraw((draw) => draw ? undoDraw(draw) : draw);
+          if (mode === 'area') areaDraw ? setAreaDraw((draw) => draw ? undoDraw(draw) : draw) : doAreaUndo();
           else doUndo();
           e.preventDefault();
         } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
-          if (mode === 'area') setAreaDraw((draw) => draw ? redoDraw(draw) : draw);
+          if (mode === 'area') areaDraw ? setAreaDraw((draw) => draw ? redoDraw(draw) : draw) : doAreaRedo();
           else doRedo();
           e.preventDefault();
         }
@@ -944,10 +1003,10 @@ export function PlacementEditor({
         Кликайте по карте, чтобы добавить вершины. Двойной клик или кнопка «Сохранить контур» замыкает полигон. Сервер окончательно проверит геометрию и рассчитает площадь.
       </Notice> : null}
       <div className="draw-tools" role="toolbar" aria-label={t('placement.toolbar')}>
-        <Button size="sm" icon="chevronLeft" onClick={() => mode === 'area' ? setAreaDraw((draw) => draw ? undoDraw(draw) : draw) : doUndo()} disabled={disabled || (mode === 'area' ? !areaDraw?.past.length : hist.past.length === 0)} title="Ctrl+Z">
+        <Button size="sm" icon="chevronLeft" onClick={() => mode === 'area' ? areaDraw ? setAreaDraw((draw) => draw ? undoDraw(draw) : draw) : doAreaUndo() : doUndo()} disabled={disabled || (mode === 'area' ? areaDraw ? !areaDraw.past.length : areaHistory.past.length === 0 : hist.past.length === 0)} title="Ctrl+Z">
           {t('draw.undo')}
         </Button>
-        <Button size="sm" icon="chevronRight" onClick={() => mode === 'area' ? setAreaDraw((draw) => draw ? redoDraw(draw) : draw) : doRedo()} disabled={disabled || (mode === 'area' ? !areaDraw?.future.length : hist.future.length === 0)} title="Ctrl+Y">
+        <Button size="sm" icon="chevronRight" onClick={() => mode === 'area' ? areaDraw ? setAreaDraw((draw) => draw ? redoDraw(draw) : draw) : doAreaRedo() : doRedo()} disabled={disabled || (mode === 'area' ? areaDraw ? !areaDraw.future.length : areaHistory.future.length === 0 : hist.future.length === 0)} title="Ctrl+Y">
           {t('draw.redo')}
         </Button>
         <Button size="sm" variant={snapping ? 'primary' : 'secondary'} aria-pressed={snapping} disabled={mode === 'area'} onClick={() => setSnapping((current) => !current)}>
@@ -1002,6 +1061,7 @@ export function PlacementEditor({
           areaDraw={areaDraw}
           selectedAreaPatchId={selectedAreaPatchId}
           areaAdding={mode === 'area' && Boolean(areaDraw) && !areaDraw?.closed}
+          areaMoveMode={areaMoveMode}
           selectedId={selectedId}
           selectedIds={selectedIds}
           snapping={snapping}
@@ -1027,7 +1087,9 @@ export function PlacementEditor({
             return addVertex(current, at);
           })}
           onAreaClose={finishArea}
+          onAreaTransform={(next) => commitAreas(areaPatches.map((patch) => patch.id === next.id ? next : patch))}
           conflictIds={conflictIds}
+          areaConflictIds={areaConflictIds}
         />
       )}
       <p className="pg-muted">{t('placement.keys')}</p>
@@ -1133,17 +1195,29 @@ export function PlacementEditor({
             catalogVersionId={catalogVersionId}
             allowedStrata={['shrub', 'perennial', 'grass']}
             disabled={selectedAreaPatch.locked}
-            onChange={(plant_id) => plant_id && onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, plant_id } : patch))}
+            onChange={(plant_id) => plant_id && commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, plant_id } : patch))}
           />
           <Field label="Дата посадки" required>
-            {({ id }) => <Input id={id} type="date" value={selectedAreaPatch.planting_date} disabled={selectedAreaPatch.locked} onChange={(event) => onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, planting_date: event.target.value } : patch))} />}
+            {({ id }) => <Input id={id} type="date" value={selectedAreaPatch.planting_date} disabled={selectedAreaPatch.locked} onChange={(event) => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, planting_date: event.target.value } : patch))} />}
           </Field>
           <Field label="Плотность, растений/м²" hint="Пустое значение честно оставляет стоимость и количественные эффекты неполными.">
             {({ id, describedBy }) => <Input id={id} aria-describedby={describedBy} inputMode="decimal" disabled={selectedAreaPatch.locked} value={selectedAreaPatch.density_plants_per_m2 ?? ''} onChange={(event) => {
               const parsed = event.target.value.trim() ? Number(event.target.value.replace(',', '.')) : null;
-              onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, density_plants_per_m2: parsed && parsed > 0 ? parsed : null } : patch));
+              commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, density_plants_per_m2: parsed && parsed > 0 ? parsed : null } : patch));
             }} />}
           </Field>
+          <div className="pg-actions" role="group" aria-label="Преобразование контура">
+            <Button size="sm" variant={areaMoveMode ? 'primary' : 'secondary'} disabled={selectedAreaPatch.locked || Boolean(areaDraw)} aria-pressed={areaMoveMode} onClick={() => setAreaMoveMode((value) => !value)}>
+              {areaMoveMode ? 'Перемещение включено' : 'Переместить контур'}
+            </Button>
+            <Button size="sm" variant="secondary" disabled={selectedAreaPatch.locked || Boolean(areaDraw)} onClick={(event) => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? rotateAreaPatch(patch, event.altKey ? -1 : -15) : patch))}>↺ 15°</Button>
+            <Button size="sm" variant="secondary" disabled={selectedAreaPatch.locked || Boolean(areaDraw)} onClick={(event) => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? rotateAreaPatch(patch, event.altKey ? 1 : 15) : patch))}>↻ 15°</Button>
+            <Button size="sm" variant="ghost" disabled={selectedAreaPatch.locked || Boolean(areaDraw)} title="На 1 метр влево" onClick={() => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? translateAreaPatch(patch, -1, 0) : patch))}>←</Button>
+            <Button size="sm" variant="ghost" disabled={selectedAreaPatch.locked || Boolean(areaDraw)} title="На 1 метр вверх" onClick={() => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? translateAreaPatch(patch, 0, 1) : patch))}>↑</Button>
+            <Button size="sm" variant="ghost" disabled={selectedAreaPatch.locked || Boolean(areaDraw)} title="На 1 метр вниз" onClick={() => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? translateAreaPatch(patch, 0, -1) : patch))}>↓</Button>
+            <Button size="sm" variant="ghost" disabled={selectedAreaPatch.locked || Boolean(areaDraw)} title="На 1 метр вправо" onClick={() => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? translateAreaPatch(patch, 1, 0) : patch))}>→</Button>
+          </div>
+          <p className="pg-muted">Перетаскивание включается отдельно. Alt + поворот — 1°. Каждое действие можно отменить.</p>
           <div className="pg-actions">
             <Button size="sm" variant="secondary" disabled={selectedAreaPatch.locked} onClick={() => {
               const ring = editableRing(selectedAreaPatch.geometry);
@@ -1154,11 +1228,11 @@ export function PlacementEditor({
               setEditingPatchId(selectedAreaPatch.id);
               setAreaDraw(startDraw('edit', selectedAreaPatch.id, ring));
             }}>Перерисовать контур</Button>
-            <Button size="sm" icon="lock" onClick={() => onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, locked: !patch.locked } : patch))}>
+            <Button size="sm" icon="lock" onClick={() => commitAreas(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, locked: !patch.locked } : patch))}>
               {selectedAreaPatch.locked ? 'Разблокировать' : 'Заблокировать'}
             </Button>
             <Button size="sm" variant="danger" disabled={selectedAreaPatch.locked} onClick={() => {
-              onAreaPatchesChange(areaPatches.filter((patch) => patch.id !== selectedAreaPatch.id));
+              commitAreas(areaPatches.filter((patch) => patch.id !== selectedAreaPatch.id));
               setSelectedAreaPatchId(null);
             }}>Удалить</Button>
           </div>

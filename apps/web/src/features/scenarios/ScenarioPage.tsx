@@ -410,6 +410,15 @@ function RevisionEditor({
       return placement ? [placement.id] : [];
     }));
   }, [save.error, edits.placements]);
+  const areaConflictIds = useMemo(() => {
+    const problem = save.error instanceof ApiError ? save.error.problem : null;
+    if (!problem || !['area_patch_building_conflict', 'placement_outside_zone', 'invalid_geometry'].includes(problem.code)) return EMPTY_PLACEMENT_IDS;
+    return new Set(problem.field_errors.flatMap((item) => {
+      const match = item.path.match(/^\/area_patches\/(\d+)\/geometry/);
+      const patch = match ? edits.area_patches[Number(match[1])] : null;
+      return patch ? [patch.id] : [];
+    }));
+  }, [save.error, edits.area_patches]);
   const state: SaveState = save.isPending
     ? 'saving'
     : conflict
@@ -614,6 +623,7 @@ function RevisionEditor({
             onCatalogVersion={(id) => setEdits((e) => ({ ...e, catalog_version_id: id }))}
             preferredPlant={recommendedPlant}
             conflictIds={buildingConflictIds}
+            areaConflictIds={areaConflictIds}
             datasetVersionIds={editorDatasetVersionIds}
           />
         </div>

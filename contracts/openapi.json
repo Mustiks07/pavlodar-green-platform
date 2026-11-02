@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.17.1",
-    "description": "Canonical API contract 1.17.1. Area plantings are validated and counted from server-projected area and explicit density; unknown density remains a typed blocking gap. All 1.17.0 operations remain compatible."
+    "version": "1.17.2",
+    "description": "Canonical API contract 1.17.2. Changed area plantings are checked against exact frozen building footprints; interior overlap fails while edge touch remains valid. All 1.17.1 operations remain compatible."
   },
   "servers": [
     {

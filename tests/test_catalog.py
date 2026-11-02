@@ -587,6 +587,93 @@ def test_scenario_revision_validates_catalog_placement_and_exclusions(clients):
     ]
     assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()["current_revision_id"] == saved.json()["id"]
 
+    def area_patch(patch_id, west, south, east, north):
+        return {
+            "id": patch_id,
+            "plant_id": eligible_id,
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                    [west, south], [east, south], [east, north], [west, north], [west, south]
+                ]],
+            },
+            "planting_date": "2027-05-15",
+            "locked": False,
+            "density_plants_per_m2": 2,
+        }
+
+    legacy_patch = area_patch(str(uuid4()), 76.98072, 52.28072, 76.98082, 52.28082)
+    movable_patch_id = str(uuid4())
+    clean_patch = area_patch(movable_patch_id, 76.9803, 52.2803, 76.9804, 52.2804)
+    patch_base = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {
+            **base,
+            "parent_revision_id": saved.json()["id"],
+            "placements": [eligible_placement],
+            "area_patches": [legacy_patch, clean_patch],
+            "comment": "SYNTHETIC TEST patches before frozen buildings",
+        },
+        etag=saved.headers["etag"],
+    )
+    assert patch_base.status_code == 201, patch_base.text
+    grandfathered = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {
+            **base,
+            "parent_revision_id": patch_base.json()["id"],
+            "dataset_version_ids": [buildings],
+            "placements": [eligible_placement],
+            "area_patches": [legacy_patch, clean_patch],
+            "comment": "SYNTHETIC TEST unchanged historic patch is grandfathered",
+        },
+        etag=patch_base.headers["etag"],
+    )
+    assert grandfathered.status_code == 201, grandfathered.text
+    touching_patch = area_patch(movable_patch_id, 76.9806, 52.28072, 76.9807, 52.28082)
+    touching = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {
+            **base,
+            "parent_revision_id": grandfathered.json()["id"],
+            "dataset_version_ids": [buildings],
+            "placements": [eligible_placement],
+            "area_patches": [legacy_patch, touching_patch],
+            "comment": "SYNTHETIC TEST exact building edge touch",
+        },
+        etag=grandfathered.headers["etag"],
+    )
+    assert touching.status_code == 201, touching.text
+    overlapping_patch = area_patch(movable_patch_id, 76.98065, 52.28072, 76.98075, 52.28082)
+    area_conflict = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        {
+            **base,
+            "parent_revision_id": touching.json()["id"],
+            "dataset_version_ids": [buildings],
+            "placements": [eligible_placement],
+            "area_patches": [legacy_patch, overlapping_patch],
+            "comment": "SYNTHETIC TEST area patch into building",
+        },
+        etag=touching.headers["etag"],
+    )
+    assert area_conflict.status_code == 422, area_conflict.text
+    assert area_conflict.json()["code"] == "area_patch_building_conflict"
+    assert area_conflict.json()["field_errors"] == [{
+        "path": "/area_patches/1/geometry",
+        "code": "building_conflict",
+        "message": "Контур площадной посадки пересекает здание",
+    }]
+    assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()["current_revision_id"] == touching.json()["id"]
+
     planning = mutation(
         specialist,
         "POST",

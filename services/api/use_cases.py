@@ -483,6 +483,7 @@ def save_revision(db, access, scenario, body):
         zone_version,
         body,
         parent.payload["placements"] if parent else None,
+        parent.payload["area_patches"] if parent else None,
     )
     model_synthetic = False
     if body["model_version_id"]:

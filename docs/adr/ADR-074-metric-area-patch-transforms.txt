@@ -1,0 +1,30 @@
+ADR-074: Metric area-patch transforms and frozen-building collision
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-3D-03 requires move, rotate, undo, redo and lock for designed objects. After ADR-073 an area
+planting could be drawn again, but it could not be moved or rotated as one object, and completed
+patch edits bypassed undo/redo. A transformed shrub or grass polygon could also overlap a building
+even though point placements already used the exact frozen building versions.
+
+Decision
+The area editor keeps a bounded independent history for the complete AreaPatch array. Create,
+redraw, species, date, density, lock, delete, move and rotation are reviewable steps. A selected
+unlocked patch can be explicitly put in move mode and dragged once per history step, nudged in
+metres, or rotated around its local metric centre in 15-degree steps (Alt uses one degree). Polygon
+and MultiPolygon rings, including holes, transform together; the stable id and all non-geometry
+properties remain unchanged. Vertex redraw remains deliberately limited to a simple Polygon.
+
+These browser transforms are editing aids only. The saved geometry is validated by the server and
+all authoritative areas and quantities are recalculated there. Contract 1.17.2 registers
+`area_patch_building_conflict`. A new or geometrically changed patch is tested against building
+records from the exact published DatasetVersions frozen into the proposed revision. Interior overlap
+returns 422 at the exact patch geometry path; an exact edge touch remains valid. An unchanged
+historical patch is grandfathered so that adding a later building input cannot block unrelated edits.
+
+Consequences
+The 2D and pitched 3D planning views now manipulate the same stable area object without inventing a
+rotation field or client-owned result. Rejected local geometry remains visible in red and no child
+revision is created. Patch-to-patch overlap is not prohibited: layered planting designs can be valid,
+and any future exclusion rule must be explicit and versioned rather than assumed geometrically.

@@ -1,5 +1,6 @@
 """Immutable plant catalog snapshots, source-backed rules and deterministic recommendations."""
 
+import json
 from datetime import UTC, datetime
 from uuid import NAMESPACE_URL, UUID, uuid5
 
@@ -747,7 +748,9 @@ def recommend(db, access, body, zone_version):
     }
 
 
-def _validate_building_conflicts(db, body, previous_placements):
+def _validate_building_conflicts(
+    db, body, previous_placements, previous_area_patches
+):
     """Reject new or moved points covered by a frozen published building footprint.
 
     Existing unchanged positions are grandfathered: admitting a newly published building version
@@ -793,6 +796,38 @@ def _validate_building_conflicts(db, body, previous_placements):
                     }
                 ],
             )
+    previous_patches = {
+        item["id"]: item["geometry"] for item in (previous_area_patches or [])
+    }
+    for index, patch in enumerate(body["area_patches"]):
+        if previous_patches.get(patch["id"]) == patch["geometry"]:
+            continue
+        geometry = func.ST_SetSRID(
+            func.ST_GeomFromGeoJSON(json.dumps(patch["geometry"])), 4326
+        )
+        conflict = db.scalar(
+            select(ImportRecord.row_index)
+            .where(
+                ImportRecord.version_id.in_(building_versions),
+                ImportRecord.geometry.is_not(None),
+                # Interior/interior intersection rejects overlap but permits exact edge touch.
+                func.ST_Relate(ImportRecord.geometry, geometry, "T********"),
+            )
+            .limit(1)
+        )
+        if conflict is not None:
+            raise DomainError(
+                422,
+                "area_patch_building_conflict",
+                "Площадная посадка пересекает контур здания",
+                field_errors=[
+                    {
+                        "path": f"/area_patches/{index}/geometry",
+                        "code": "building_conflict",
+                        "message": "Контур площадной посадки пересекает здание",
+                    }
+                ],
+            )
 
 
 def _validate_crown_clearance(body):
@@ -831,7 +866,13 @@ def _validate_crown_clearance(body):
 
 
 def validate_scenario_registry(
-    db, access, scenario, zone_version, body, previous_placements=None
+    db,
+    access,
+    scenario,
+    zone_version,
+    body,
+    previous_placements=None,
+    previous_area_patches=None,
 ):
     catalog_synthetic = False
     catalog = None
@@ -952,7 +993,6 @@ def validate_scenario_registry(
                 422, "plant_input_invalid", "Unknown dimension basis cannot carry dimensions"
             )
     _validate_crown_clearance(body)
-    _validate_building_conflicts(db, body, previous_placements)
     for patch_index, patch in enumerate(body["area_patches"]):
         plant = plants.get(patch["plant_id"])
         if plant is None:
@@ -1029,4 +1069,7 @@ def validate_scenario_registry(
                     }
                 ],
             )
+    _validate_building_conflicts(
+        db, body, previous_placements, previous_area_patches
+    )
     return catalog_synthetic

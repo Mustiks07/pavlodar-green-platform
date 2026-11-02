@@ -1,6 +1,11 @@
 {
-  "version": "1.17.1",
+  "version": "1.17.2",
   "codes": [
+    {
+      "code": "area_patch_building_conflict",
+      "status": 422,
+      "title_ru": "Площадная посадка пересекает здание"
+    },
     {
       "code": "area_patch_density_missing",
       "status": null,
