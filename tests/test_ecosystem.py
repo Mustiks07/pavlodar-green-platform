@@ -174,7 +174,7 @@ def test_source_profile_uses_green_area_before_area_based_flows():
             (DatasetVersion, POPULATION_VERSION_ID): population_version,
             (ZoneVersion, ZONE_VERSION_ID): zone,
         },
-        [rows, [plant], [population]],
+        [[plant], rows, [population]],
     )
 
     metrics = ecosystem_metrics(db, revision)
