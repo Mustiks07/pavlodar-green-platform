@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "1f2e037",
-  "state": "fixed_human_3d_viewpoints_verified",
+  "head_sha": "8646569",
+  "state": "kml_shapefile_import_ui_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1399,5 +1399,25 @@
     ],
     "decision": "ADR-076",
     "limit": "Human view targets recorded project geometry; it does not invent missing growth curves or building heights"
+  },
+  "kml_shapefile_import_ui_20261102": {
+    "implementation_sha": "8646569",
+    "contract_version": "1.17.2",
+    "migration": "none",
+    "implemented": [
+      "The specialist wizard admits GeoJSON, CSV, KML and SHP ZIP",
+      "KML and ZIP remain opaque in the browser and use the isolated server parser",
+      "All formats share upload hashing, durable job tracking, quality review and publication",
+      "WGS84 and empty field mapping preserve the existing server contract",
+      "Obsolete parser-not-connected messages and disabled controls were removed"
+    ],
+    "verification": [
+      "Disposable browser import journey passed 19/19 including KML review and reload",
+      "KML/SHP parser and hostile XML/ZIP backend checks passed 4/4",
+      "Import preview unit tests passed 5/5",
+      "Frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-077",
+    "limit": "KML and Shapefile coordinates must already be WGS84; browser preview never substitutes for the authoritative server quality report"
   }
 }
