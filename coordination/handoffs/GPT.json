@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "caa3676",
-  "state": "coordinate_csv_import_verified",
+  "head_sha": "1d63177",
+  "state": "assistant_snapshot_report_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1459,5 +1459,27 @@
     ],
     "decision": "ADR-079",
     "limit": "Other projected CRSs, encodings and line/polygon construction remain unavailable until explicitly admitted"
+  },
+  "assistant_snapshot_report_20261102": {
+    "implementation_sha": "b6cf11d",
+    "readiness_fix_sha": "1d63177",
+    "contract_version": "1.18.1",
+    "migration": "0035_chat_report_jobs",
+    "implemented": [
+      "An explicit Russian report request exposes an argument-free create_current_report tool even when the external provider is unavailable",
+      "The server re-authorizes the exact chat-bound revision and selects only its latest immutable CalculationSnapshot",
+      "The existing export queue owns calculation target, PDF format, Russian language, artifact checksum and signed download",
+      "ChatMessage persists the report job id so progress and the finished download survive reload",
+      "Idempotent replay and the unique message-to-job link prevent duplicate visible reports",
+      "A revision without a snapshot receives actionable guidance and creates no report job"
+    ],
+    "verification": [
+      "Canonical validation passed 401/401 and generated clients match 1.18.1",
+      "Focused chat and export integration passed 26/26; Ruff and Alembic-head checks passed",
+      "Frontend typecheck and production build passed",
+      "Migration 0035 applied to the public demo database and /health/ready reports ok on contract 1.18.1"
+    ],
+    "decision": "ADR-080",
+    "limit": "The assistant can export only an existing immutable calculation of the exact bound revision; it never invents a report from unsaved or uncalculated draft state"
   }
 }

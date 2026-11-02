@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.18.0",
+  "spec_version": "1.18.1",
   "repository": "Mustiks07/pavlodar-green-platform",
   "authorized_github_login": "Mustiks07",
   "status": "release_accepted",
@@ -76,7 +76,7 @@
       "owner": "GPT/Claude integration",
       "state": "integration_verified",
       "branch": "gpt/WP-00-foundation",
-      "scope": "canonical 1.11.0/1.12.0 plus migrations 0028-0030 implement immutable exports, durable grounded chat and reviewable stale-safe proposals; Claude 76db601 adds the assistant panel (session bound to city/zone/exact revision, useJob stream, reload/cancel/retry, server facts only) and proposal review (explicit apply with fresh If-Match and base_revision_id, 412 kept with re-read, reject with reason); export cards show server byte_size/media_type"
+      "scope": "canonical 1.11.0-1.18.1 plus migrations 0028-0030/0035 implement immutable exports, durable grounded chat, reviewable stale-safe proposals and assistant-triggered snapshot-bound PDF reports; the assistant panel is bound to city/zone/exact revision, persists job state across reload and exposes only server facts; report generation reuses the authorized immutable calculation export and signed download"
     },
     {
       "task_id": "WP-11",
@@ -93,6 +93,7 @@
     "Admit future municipal soil, restriction, weather and ecological-coefficient versions through the existing versioned import workflow when their owners provide them"
   ],
   "notes": [
+    "Assistant snapshot-report increment on 2026-11-02 publishes canonical 1.18.1 and migration 0035: an explicit request in a revision-bound chat creates one durable PDF export from the latest authorized CalculationSnapshot of that exact revision. Format/language/target are server-owned, replay is idempotent, no snapshot produces guidance without a job, and the persisted chat message resumes job status plus signed download after reload. Contract validation passes 401/401, chat/export tests 26/26, frontend typecheck/build and migration readiness pass; ADR-080 records implementation b6cf11d and readiness fix 1d63177.",
     "Coordinate CSV increment on 2026-11-02 publishes canonical 1.18.0 and closes the remaining F-DATA-01 spreadsheet-to-map path: specialists explicitly choose table or point mode, X/Y fields, UTF-8/Windows-1251, comma/semicolon/tab, decimal mark and EPSG:4326/32643. The server performs offline always-XY transformation, row-level finite/bounds checks and persists parse options in the immutable DatasetVersion; legacy requests remain tables. CSV backend acceptance passes 4/4, contract suite 62/62, preview tests 5/5, client drift/typecheck/build pass, and disposable browser import/publish/map-layer acceptance passes 19/19. ADR-079 and wp03-import-ui evidence record implementation caa3676.",
     "Illustrative 3D growth increment on 2026-11-02 closes the honest no-curve branch of F-3D-04: project scenes expose the required 0/1/3/5/10/20-year horizons as an explicit development sketch. Only Three.js planting meshes scale; immutable placement dimensions, calculations, shadows and exports remain unchanged, and the selected year is URL-persistent independently of shadow date/time. Growth/viewpoint helpers pass 4/4, frontend typecheck and production build pass, and authenticated rendered review confirms the 10-year state with no horizontal overflow. ADR-078 records implementation 85126c7 and the boundary until admitted age curves exist.",
     "KML/Shapefile import UI increment on 2026-11-02 closes the remaining F-DATA-01 product gap: the specialist wizard now admits GeoJSON, CSV, WGS84 KML and bounded SHP ZIP through the same SHA-256 upload, durable job, quality review and publication pipeline. KML/ZIP are deliberately opaque in the browser and validated by the isolated server parser. Disposable browser acceptance passes 19/19 including KML upload, review, reload, publish/reject and RBAC; backend KML/SHP plus hostile XML/ZIP checks pass 4/4. ADR-077 and wp03-import-ui evidence record implementation 8646569.",
