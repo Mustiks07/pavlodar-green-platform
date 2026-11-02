@@ -2,7 +2,7 @@
 
 ## Презентация проекта
 
-[▶ Смотреть конкурсную презентацию (PDF)](presentation/Pavlodar_Greening_Competition_v7.pdf) · [Скачать PowerPoint](presentation/Pavlodar_Greening_Competition_v7.pptx) · [Текст выступления и ответы жюри](presentation/PITCH_AND_QA_RU.md)
+[▶ Смотреть конкурсную презентацию (PDF)](presentation/Pavlodar_Greening_Competition_v8.pdf) · [Скачать PowerPoint](presentation/Pavlodar_Greening_Competition_v8.pptx) · [Текст выступления и ответы жюри](presentation/PITCH_AND_QA_RU.md)
 
 > Для первого знакомства откройте PDF. Для очной защиты используйте PowerPoint и готовый пятиминутный сценарий со встроенным живым показом приложения. Слайды проверены в открываемых PPTX и PDF; на них показан актуальный интерфейс платформы.
 

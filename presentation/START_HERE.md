@@ -1,7 +1,7 @@
 # Pavlodar Green — комплект для жюри
 
-1. Откройте `Pavlodar_Greening_Competition_v7.pdf` для быстрого просмотра без PowerPoint.
-2. Откройте `Pavlodar_Greening_Competition_v7.pptx` для полноэкранной защиты.
+1. Откройте `Pavlodar_Greening_Competition_v8.pdf` для быстрого просмотра без PowerPoint.
+2. Откройте `Pavlodar_Greening_Competition_v8.pptx` для полноэкранной защиты.
 3. Основной пятиминутный сценарий, включающий живой показ приложения, резервные короткие версии и ответы на вопросы находятся в `PITCH_AND_QA_RU.md`.
 4. Перед защитой один раз пройдите полный пятиминутный маршрут из того же файла на локальном стенде.
 
