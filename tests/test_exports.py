@@ -97,6 +97,7 @@ def sample_context():
                     "input_hash": "a" * 64,
                     "output_hash": "b" * 64,
                 },
+                "plant_names": {plant_id: "Сосна обыкновенная"},
                 "snapshot": {
                     "id": snapshot_id,
                     "scenario_revision_id": revision_id,
@@ -221,6 +222,7 @@ def test_pdf_embeds_cyrillic_font_and_keeps_snapshot_values():
     reader = PdfReader(io.BytesIO(data))
     text_value = "\n".join(page.extract_text() for page in reader.pages)
     assert "Павлодар" in text_value
+    assert "Сосна обыкновенная" in text_value
     assert "30.03" in text_value
     assert "00000000-0000-4000-8000-000000000101" in text_value
 

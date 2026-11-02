@@ -46,6 +46,7 @@ from services.api.models import (
     DatasetVersion,
     ExportArtifactRecord,
     Job,
+    PlantVersion,
     Principal,
     Program,
     ProgramRevisionCalculation,
@@ -138,12 +139,26 @@ def _scenario_context(db, snapshot):
     revision = db.get(ScenarioRevision, snapshot.scenario_revision_id)
     scenario = db.get(Scenario, revision.scenario_id)
     zone = db.get(ZoneVersion, revision.zone_version_id)
+    plant_ids = {
+        item["plant_id"]
+        for item in revision.payload.get("placements", []) + revision.payload.get("area_patches", [])
+    }
+    plant_names = {
+        row.plant_id: row.payload["russian_name"]
+        for row in db.scalars(
+            select(PlantVersion).where(
+                PlantVersion.catalog_version_id == revision.payload["catalog_version_id"],
+                PlantVersion.plant_id.in_(plant_ids),
+            )
+        )
+    } if plant_ids else {}
     return {
         "scenario": scenario.payload,
         "revision": revision.payload,
         "zone": zone.payload,
         "snapshot": snapshot.payload,
         "manifest": snapshot.manifest,
+        "plant_names": plant_names,
     }
 
 
@@ -279,17 +294,19 @@ def _survival_point_text(point):
     return f"{probability} ({lower}–{upper} %)"
 
 
-def _group_details(revision):
+def _group_details(revision, plant_names):
     result = {}
     for item in revision.get("placements", []):
         result[item["id"]] = {
             "plant_id": item.get("plant_id"),
+            "plant_name": plant_names.get(item.get("plant_id"), item.get("plant_id")),
             "amount": f"{_ru_decimal(item.get('quantity'))} шт.",
         }
     for item in revision.get("area_patches", []):
         density = item.get("density_plants_per_m2")
         result[item["id"]] = {
             "plant_id": item.get("plant_id"),
+            "plant_name": plant_names.get(item.get("plant_id"), item.get("plant_id")),
             "amount": (
                 f"плотность {_ru_decimal(density)} раст./м²"
                 if density is not None
@@ -473,7 +490,8 @@ def render_pdf(context):
             story.append(PageBreak())
         snapshot, revision, zone = item["snapshot"], item["revision"], item["zone"]
         manifest = item.get("manifest", {})
-        groups = _group_details(revision)
+        plant_names = item.get("plant_names", {})
+        groups = _group_details(revision, plant_names)
         quality_gaps = _quality_gaps(snapshot)
         story.extend(
             [
@@ -512,9 +530,9 @@ def render_pdf(context):
                 ZoneSketch(zone["geometry"], revision["placements"]),
                 Paragraph("Состав", heading),
                 _table(
-                    [["Placement", "Plant", "Количество", "Дата посадки"]]
+                    [["Группа", "Растение", "Количество", "Дата посадки"]]
                     + [
-                        [_p(p["id"]), _p(p["plant_id"]), p["quantity"], _p(p["planting_date"])]
+                        [_p(p["id"]), _p(plant_names.get(p["plant_id"], p["plant_id"])), p["quantity"], _p(p["planting_date"])]
                         for p in revision["placements"]
                     ],
                     [70 * mm, 70 * mm, 35 * mm, 45 * mm],
@@ -547,7 +565,7 @@ def render_pdf(context):
                 survival_rows.append(
                     [
                         _p(survival["placement_id"]),
-                        _p(group.get("plant_id")),
+                        _p(group.get("plant_name")),
                         _p(group.get("amount")),
                         _p(
                             f"{survival['model_kind']} / "
