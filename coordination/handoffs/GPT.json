@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "8646569",
-  "state": "kml_shapefile_import_ui_verified",
+  "head_sha": "85126c7",
+  "state": "illustrative_growth_horizons_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1419,5 +1419,24 @@
     ],
     "decision": "ADR-077",
     "limit": "KML and Shapefile coordinates must already be WGS84; browser preview never substitutes for the authoritative server quality report"
+  },
+  "illustrative_growth_horizons_20261102": {
+    "implementation_sha": "85126c7",
+    "contract_version": "1.17.2",
+    "migration": "none",
+    "implemented": [
+      "The project scene exposes 0, 1, 3, 5, 10 and 20-year development horizons",
+      "A bounded monotonic multiplier affects only Three.js planting meshes",
+      "The UI labels the control as a development sketch and states that calculations do not change",
+      "The selected year persists in the URL separately from shadow date and time",
+      "Scenario revisions, authoritative dimensions, calculations, shadows and exports remain unchanged"
+    ],
+    "verification": [
+      "Growth and viewpoint helpers passed 4/4",
+      "Frontend typecheck and production build passed",
+      "Authenticated 10-year rendered review passed without horizontal overflow"
+    ],
+    "decision": "ADR-078",
+    "limit": "No admitted Pavlodar age curve exists; the control is deliberately not an analytical growth forecast"
   }
 }
