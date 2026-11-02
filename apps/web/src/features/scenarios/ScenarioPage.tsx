@@ -6,6 +6,7 @@ import {
   newIdempotencyKey,
   unwrap,
   type AppendRevisionInput,
+  type AreaPatch,
   type Coefficient,
   type CareOperation,
   type Dataset,
@@ -69,6 +70,8 @@ interface Edits {
   capital_budget: string;
   /** Point placements of the next revision; ids are stable across revisions. */
   placements: Placement[];
+  /** Polygon plantings such as shrub masses, perennials and grass. */
+  area_patches: AreaPatch[];
   /** Explicit user exclusions within this immutable scenario revision. */
   excluded_plant_ids: string[];
   /** Catalog snapshot the placements' plants come from (set from the chosen plant). */
@@ -123,6 +126,7 @@ function editsFrom(r: ScenarioRevision): Edits {
     resource_limits: r.resource_limits,
     capital_budget: r.capital_budget ?? '',
     placements: r.placements,
+    area_patches: r.area_patches,
     excluded_plant_ids: r.excluded_plant_ids,
     catalog_version_id: r.catalog_version_id,
     rule_version_id: r.rule_version_id,
@@ -141,6 +145,7 @@ function isDirty(base: ScenarioRevision, e: Edits): boolean {
     JSON.stringify(e.resource_limits) !== JSON.stringify(base.resource_limits) ||
     (e.capital_budget || null) !== base.capital_budget ||
     !same(e.placements, base.placements) ||
+    JSON.stringify(e.area_patches) !== JSON.stringify(base.area_patches) ||
     JSON.stringify(e.excluded_plant_ids) !== JSON.stringify(base.excluded_plant_ids) ||
     e.catalog_version_id !== base.catalog_version_id ||
     e.rule_version_id !== base.rule_version_id
@@ -197,6 +202,7 @@ function RevisionEditor({
       ? {
           ...stored.edits,
           placements: stored.edits.placements ?? base.placements,
+          area_patches: stored.edits.area_patches ?? base.area_patches,
           excluded_plant_ids: stored.edits.excluded_plant_ids ?? base.excluded_plant_ids,
           catalog_version_id: stored.edits.catalog_version_id ?? base.catalog_version_id,
           rule_version_id: stored.edits.rule_version_id ?? base.rule_version_id,
@@ -270,7 +276,7 @@ function RevisionEditor({
   const careHorizonIssue = edits.custom_care_operations.some((item) => item.year_offset >= edits.care_horizon_years);
   const [ruleOk, setRuleOk] = useState<boolean | null>(null);
   // The server refuses placements without both registry versions; say so before sending.
-  const needsRule = edits.placements.length > 0 && (!edits.rule_version_id || ruleOk === false);
+  const needsRule = (edits.placements.length > 0 || edits.area_patches.length > 0) && (!edits.rule_version_id || ruleOk === false);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -285,6 +291,7 @@ function RevisionEditor({
       body.resource_limits = edits.resource_limits;
       body.capital_budget = edits.capital_budget || null;
       body.placements = edits.placements;
+      body.area_patches = edits.area_patches;
       body.excluded_plant_ids = edits.excluded_plant_ids;
       body.catalog_version_id = edits.catalog_version_id;
       body.rule_version_id = edits.rule_version_id;
@@ -593,6 +600,8 @@ function RevisionEditor({
             key={historyKey}
             value={edits.placements}
             onChange={(placements) => setEdits((e) => ({ ...e, placements }))}
+            areaPatches={edits.area_patches}
+            onAreaPatchesChange={(area_patches) => setEdits((e) => ({ ...e, area_patches }))}
             zoneVersionId={edits.rebind_zone_version && currentZoneVersionId ? currentZoneVersionId : base.zone_version_id}
             disabled={!canEdit || save.isPending}
             catalogVersionId={edits.catalog_version_id}
@@ -604,7 +613,7 @@ function RevisionEditor({
         </div>
         <RuleVersionField
           value={edits.rule_version_id}
-          required={edits.placements.length > 0}
+          required={edits.placements.length > 0 || edits.area_patches.length > 0}
           onChange={(id) => setEdits((e) => ({ ...e, rule_version_id: id }))}
           onUsable={setRuleOk}
         />

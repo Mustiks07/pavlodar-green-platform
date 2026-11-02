@@ -1,0 +1,31 @@
+ADR-073: Authoritative area-patch design and calculation
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-PLANT-04 requires more than isolated tree points: shrubs, perennials and grass are designed as
+areas. AreaPatch was already part of the canonical revision, but the product could neither draw it
+nor include it in cost, survival, suitability, care or ecosystem calculations. Treating the patch as
+one plant, guessing its area in the browser, or silently treating a missing density as zero would
+make the saved design and the calculation disagree.
+
+Decision
+Contract 1.17.1 keeps the existing AreaPatch shape and registers the blocking
+`area_patch_density_missing` gap. The specialist can switch between point and area planting, choose
+a shrub, perennial or grass, draw or redraw a polygon, set planting date and explicit plants-per-m2
+density, lock it, and delete it. Stable patch ids remain part of immutable scenario revisions.
+
+The server is authoritative. It rejects open, self-intersecting, empty, out-of-zone or non-positive
+polygons and computes metric area in EPSG:32643. Quantity is metric area multiplied by the explicit
+density. That quantity feeds material, planting, delivery, reserve, replacement, survival,
+suitability, care targeting and ecosystem metrics. A missing density preserves the geometry but
+leaves quantity-dependent results incomplete with a typed gap; it is never converted to zero. The
+client only previews topology and never presents a client-computed area, quantity or price as a
+saved result.
+
+Consequences
+Project variants can now express real planting masses as well as individual trees without changing
+the immutable revision model. Existing point-only scenarios remain byte-compatible and calculate as
+before. MultiPolygon patches remain readable and calculable, while the current editor redraws one
+Polygon at a time; splitting a multi-part patch is a future explicit editing operation rather than an
+implicit geometry rewrite.

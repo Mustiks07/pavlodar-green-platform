@@ -3,9 +3,9 @@ import { allMetricKeys, allProblemCodes, allUnits, metricKeyEntry, problemCodeEn
 import { UNIT_LABEL_KEYS, unitLabel } from '@pg/ui';
 import { appRu } from './i18n';
 
-describe('contract registries 1.17.0 vs UI', () => {
+describe('contract registries 1.17.1 vs UI', () => {
   it('reads registries of the same contract version', () => {
-    expect(REGISTRY_VERSION).toEqual({ problemCodes: '1.17.0', units: '1.17.0', metricKeys: '1.17.0' });
+    expect(REGISTRY_VERSION).toEqual({ problemCodes: '1.17.1', units: '1.17.1', metricKeys: '1.17.1' });
   });
   it('every registered unit has a Russian label and registry decimals', () => {
     for (const u of allUnits()) {

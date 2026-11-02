@@ -2,11 +2,16 @@ import json
 from uuid import uuid4
 
 import pytest
+from shapely.geometry import shape
+from shapely.ops import transform
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 
 from packages.domain.contracts import validate
-from services.api.db import engine
+from packages.geo.geometry import PROJECT
+from services.api.db import engine, session
+from services.api.ecosystem import ecosystem_metrics
+from services.api.models import ScenarioRevision
 from services.worker.main import run_job
 from tests.test_catalog import RULE_ID, plant_input, publish_catalog_source, publish_rule
 from tests.test_foundation import create_scenario, mutation
@@ -178,6 +183,123 @@ def setup_revision(
     )
     assert saved.status_code == 201, saved.text
     return scenario, revision, saved, rate
+
+
+def test_area_patch_is_validated_and_included_in_cost_survival_and_recommendations(clients):
+    scenario, revision, saved, rate = setup_revision(clients, with_model=True)
+    patch_id = str(uuid4())
+    geometry = {
+        "type": "Polygon",
+        "coordinates": [[
+            [76.9802, 52.2802],
+            [76.98035, 52.2802],
+            [76.98035, 52.2803],
+            [76.9802, 52.2803],
+            [76.9802, 52.2802],
+        ]],
+    }
+    patch = {
+        "id": patch_id,
+        "plant_id": revision["placements"][0]["plant_id"],
+        "geometry": geometry,
+        "planting_date": "2027-05-15",
+        "locked": False,
+        "density_plants_per_m2": 2,
+    }
+    body = {
+        **revision,
+        "parent_revision_id": saved.json()["id"],
+        "placements": [],
+        "area_patches": [patch],
+        "comment": "SYNTHETIC TEST area patch",
+    }
+    next_revision = mutation(
+        clients["specialist"],
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        body,
+        etag=saved.headers["etag"],
+    )
+    assert next_revision.status_code == 201, next_revision.text
+    calculated = mutation(
+        clients["specialist"],
+        "POST",
+        "/v1/calculations/fast",
+        {
+            "scenario_revision_id": next_revision.json()["id"],
+            "mode": "fast",
+            "include_modules": ["cost", "survival", "suitability"],
+            "seed": 17,
+        },
+    )
+    assert calculated.status_code == 200, calculated.text
+    snapshot = calculated.json()["snapshot"]
+    expected = transform(PROJECT, shape(geometry)).area * 2
+    material = next(line for line in snapshot["cost"]["lines"] if line["category"] == "material")
+    assert material["quantity"] == pytest.approx(expected, abs=0.000001)
+    assert material["unit_price"] == rate["unit_price"]
+    assert "projected_area_m2 * density_plants_per_m2" in material["formula"]
+    assert {item["placement_id"] for item in snapshot["survival"]} == {patch_id}
+    assert {item["plant_id"] for item in calculated.json()["recommendations"]} == {
+        patch["plant_id"]
+    }
+
+    missing_density = {
+        **body,
+        "parent_revision_id": next_revision.json()["id"],
+        "area_patches": [{**patch, "density_plants_per_m2": None}],
+        "comment": "SYNTHETIC TEST density unknown",
+    }
+    saved_missing = mutation(
+        clients["specialist"],
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        missing_density,
+        etag=next_revision.headers["etag"],
+    )
+    assert saved_missing.status_code == 201, saved_missing.text
+    partial = mutation(
+        clients["specialist"],
+        "POST",
+        "/v1/calculations/fast",
+        {
+            "scenario_revision_id": saved_missing.json()["id"],
+            "mode": "fast",
+            "include_modules": ["cost"],
+            "seed": 17,
+        },
+    ).json()["snapshot"]
+    assert partial["status"] == "partial"
+    assert not any(line["category"] == "material" for line in partial["cost"]["lines"])
+    assert "area_patch_density_missing" in {
+        item["code"] for item in partial["cost"]["data_gaps"]
+    }
+    with session() as db:
+        metrics = ecosystem_metrics(db, db.get(ScenarioRevision, saved_missing.json()["id"]))
+    assert {
+        item["missing_reason"]["code"]
+        for item in metrics
+        if item["missing_reason"]
+    } == {"area_patch_density_missing"}
+
+    invalid = {
+        **missing_density,
+        "parent_revision_id": saved_missing.json()["id"],
+        "area_patches": [{**patch, "geometry": {"type": "Polygon", "coordinates": [[
+            [76.9802, 52.2802], [76.9804, 52.2804], [76.9802, 52.2804],
+            [76.9804, 52.2802], [76.9802, 52.2802],
+        ]]}}],
+        "comment": "SYNTHETIC TEST invalid patch",
+    }
+    rejected = mutation(
+        clients["specialist"],
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        invalid,
+        etag=saved_missing.headers["etag"],
+    )
+    assert rejected.status_code == 422
+    assert rejected.json()["field_errors"][0]["path"] == "/area_patches/0/geometry"
 
 
 def test_fast_calculation_persists_decimal_snapshot_manifest_and_staleness(clients):

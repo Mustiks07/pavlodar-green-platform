@@ -208,7 +208,8 @@ def validate_work_order_target(db, access, body, authorized_revision):
             "Work order operation, quantity and unit must match the frozen care operation",
         )
     placements = {
-        item["id"]: item for item in revision.payload["placements"]
+        item["id"]: item
+        for item in revision.payload["placements"] + revision.payload["area_patches"]
     }
     planting_years = {
         date.fromisoformat(placements[placement_id]["planting_date"]).year

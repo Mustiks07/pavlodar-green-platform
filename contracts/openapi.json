@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.17.0",
-    "description": "Canonical API contract 1.17.0. Specialists can export an immutable filtered work calendar XLSX with execution evidence and status history. All 1.16.0 operations remain compatible."
+    "version": "1.17.1",
+    "description": "Canonical API contract 1.17.1. Area plantings are validated and counted from server-projected area and explicit density; unknown density remains a typed blocking gap. All 1.17.0 operations remain compatible."
   },
   "servers": [
     {

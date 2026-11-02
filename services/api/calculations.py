@@ -5,11 +5,14 @@ from datetime import UTC, date, datetime
 from decimal import ROUND_HALF_UP, Decimal
 from uuid import NAMESPACE_URL, uuid5
 
+from shapely.geometry import shape
+from shapely.ops import transform
 from sqlalchemy import select
 
 from packages.domain.contracts import validate
 from packages.domain.cost import calculate_cost
 from packages.domain.errors import DomainError, gap
+from packages.geo.geometry import PROJECT
 from services.api.config import settings
 from services.api.models import (
     CalculationSnapshotRecord,
@@ -149,7 +152,9 @@ def validate_care_calendar(db, access, scenario, body, rate_ids):
         raise DomainError(422, "care_calendar_invalid", "Custom care strategy needs operations")
     if body["care_strategy"] != "custom" and operations:
         raise DomainError(422, "care_calendar_invalid", "Care operations require custom strategy")
-    placement_ids = {item["id"] for item in body["placements"]}
+    placement_ids = {item["id"] for item in body["placements"]} | {
+        item["id"] for item in body["area_patches"]
+    }
     operation_ids = [item["id"] for item in operations]
     if len(operation_ids) != len(set(operation_ids)):
         raise DomainError(422, "care_calendar_invalid", "Care operation ids must be unique")
@@ -221,6 +226,16 @@ def validate_care_calendar(db, access, scenario, body, rate_ids):
                         }
                     ],
                 )
+
+
+def _area_patch_quantity(patch):
+    density = patch.get("density_plants_per_m2")
+    if density is None:
+        return None
+    area_m2 = Decimal(str(transform(PROJECT, shape(patch["geometry"])).area))
+    return (area_m2 * Decimal(str(density))).quantize(
+        Decimal("0.000001"), rounding=ROUND_HALF_UP
+    )
 
 
 def _material_cost(db, revision, snapshot_id):
@@ -305,6 +320,44 @@ def _material_cost(db, revision, snapshot_id):
         material_lines[placement["id"]] = line
         if stock and stock.payload["tax_mode"] in {"excluded", "unknown"}:
             initial_gaps.append(gap("tax_unresolved", "Налоговый режим складского предложения не определён", stock.id))
+    patch_quantities = {}
+    for patch in revision.payload["area_patches"]:
+        quantity = _area_patch_quantity(patch)
+        if quantity is None:
+            initial_gaps.append(
+                gap(
+                    "area_patch_density_missing",
+                    "Для площадной посадки не задана плотность растений",
+                    patch["id"],
+                    "density_plants_per_m2",
+                )
+            )
+            continue
+        patch_quantities[patch["id"]] = quantity
+        plant = plants.get(patch["plant_id"])
+        description = plant["russian_name"] if plant else "Area planting material"
+        line = {
+            "id": str(uuid5(NAMESPACE_URL, f"{snapshot_id}:material:{patch['id']}")),
+            "category": "material",
+            "description": description,
+            "quantity": float(quantity),
+            "unit": "piece",
+            "unit_price": material_rate.payload["unit_price"] if material_rate else None,
+            "subtotal": None,
+            "year": 0,
+            "rate_version_id": material_rate.id if material_rate else None,
+            "formula": "projected_area_m2 * density_plants_per_m2",
+            "source_refs": material_rate.payload["source_refs"] if material_rate else [],
+            "tax_mode": material_rate.payload["tax_mode"] if material_rate else "unknown",
+            "price_observed_at": material_rate.payload["price_observed_at"]
+            if material_rate
+            else None,
+            "rate_status": material_rate.payload["applicability_status"]
+            if material_rate
+            else None,
+        }
+        lines.append(line)
+        material_lines[patch["id"]] = line
     care_rate_ids = set()
     for operation in revision.payload["custom_care_operations"]:
         care_rate = (
@@ -338,7 +391,13 @@ def _material_cost(db, revision, snapshot_id):
                 else None,
             }
         )
-    total_pieces = sum(item["quantity"] for item in revision.payload["placements"])
+    total_pieces_decimal = sum(
+        (Decimal(str(item["quantity"])) for item in revision.payload["placements"]),
+        Decimal(0),
+    ) + sum(patch_quantities.values(), Decimal(0))
+    # Keep the persisted snapshot JSON-native. Decimal is used for the arithmetic,
+    # but canonical hashing and JSON serialization must never receive it.
+    total_pieces = float(total_pieces_decimal)
     categories = {
         "planting_work": "planting",
         "delivery": "delivery",
@@ -384,7 +443,7 @@ def _material_cost(db, revision, snapshot_id):
                     rate.id,
                 )
             )
-    if revision.payload["placements"]:
+    if total_pieces_decimal > 0:
         if reserve_rate:
             lines.append(
                 {
@@ -435,18 +494,28 @@ def _material_cost(db, revision, snapshot_id):
                 and rate.payload["applicability_status"] == "current"
             }
             placement_quantities = {
-                placement["id"]: Decimal(placement["quantity"])
+                placement["id"]: Decimal(str(placement["quantity"]))
                 for placement in revision.payload["placements"]
             }
+            placement_quantities.update(patch_quantities)
             care_basis = {
                 operation["id"]: sum(
-                    (placement_quantities[placement_id] for placement_id in operation["placement_ids"]),
+                    (
+                        placement_quantities[placement_id]
+                        for placement_id in operation["placement_ids"]
+                        if placement_id in placement_quantities
+                    ),
                     Decimal(0),
                 )
                 for operation in revision.payload["custom_care_operations"]
             }
             replacement_resource_usage = {}
-            for placement in revision.payload["placements"]:
+            planted_units = list(revision.payload["placements"]) + [
+                {**patch, "quantity": float(patch_quantities[patch["id"]])}
+                for patch in revision.payload["area_patches"]
+                if patch["id"] in patch_quantities
+            ]
+            for placement in planted_units:
                 previous = Decimal(1)
                 material = material_lines[placement["id"]]
                 components = [("plant_material", material)] + [
@@ -456,7 +525,7 @@ def _material_cost(db, revision, snapshot_id):
                 for point in sorted(model.payload["points"], key=lambda item: item["year"]):
                     survival = Decimal(str(point["probability"]))
                     expected = (
-                        Decimal(placement["quantity"]) * (previous - survival)
+                        Decimal(str(placement["quantity"])) * (previous - survival)
                     ).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
                     previous = survival
                     if expected == 0:
@@ -613,7 +682,7 @@ def _survival(db, revision):
     )
     risks = _survival_guidance(db, model) if model else []
     results = []
-    for placement in revision.payload["placements"]:
+    for placement in revision.payload["placements"] + revision.payload["area_patches"]:
         if model:
             results.append(
                 {
@@ -721,7 +790,7 @@ def _recommendations(db, revision):
     }
     purpose = db.get(ZoneVersion, revision.zone_version_id).payload["purpose"]
     seen, results = set(), []
-    for placement in revision.payload["placements"]:
+    for placement in revision.payload["placements"] + revision.payload["area_patches"]:
         if placement["plant_id"] in seen or placement["plant_id"] not in plants:
             continue
         seen.add(placement["plant_id"])

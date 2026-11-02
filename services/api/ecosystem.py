@@ -4,9 +4,12 @@ import math
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
+from shapely.geometry import shape
+from shapely.ops import transform
 from sqlalchemy import select
 
 from packages.domain.errors import gap
+from packages.geo.geometry import PROJECT
 from services.api.models import (
     CoefficientVersionRecord,
     DatasetVersion,
@@ -68,7 +71,7 @@ def _horizon_factor(row, horizon):
     return _decimal(row.horizon_factors.get(str(horizon)))
 
 
-def _missing_metric(key, unit, horizon):
+def _missing_metric(key, unit, horizon, missing_reason=None):
     return {
         "key": key,
         "value": None,
@@ -80,7 +83,7 @@ def _missing_metric(key, unit, horizon):
         "qualitative_confidence": "unknown",
         "method_version": "ecosystem-source-profile-v1",
         "source_refs": [],
-        "missing_reason": gap(
+        "missing_reason": missing_reason or gap(
             "ecosystem_coefficient_unavailable",
             "Для показателя нет поддерживаемого опубликованного коэффициента или входа",
             key,
@@ -129,7 +132,9 @@ def _combined_confidence(values):
 
 def _placement_counts(db, revision):
     placements = revision.payload.get("placements") or []
+    patches = revision.payload.get("area_patches") or []
     plant_ids = {item.get("plant_id") for item in placements if item.get("plant_id")}
+    plant_ids.update(item.get("plant_id") for item in patches if item.get("plant_id"))
     plants = {}
     if revision.payload.get("catalog_version_id") and plant_ids:
         rows = db.scalars(
@@ -154,7 +159,26 @@ def _placement_counts(db, revision):
             counts["per_tree_year"] += quantity
         elif stratum == "shrub":
             counts["per_shrub_year"] += quantity
-    return counts
+    density_missing = []
+    for patch in patches:
+        density = _decimal(patch.get("density_plants_per_m2"))
+        if density is None:
+            density_missing.append(patch["id"])
+            continue
+        area = _decimal(transform(PROJECT, shape(patch["geometry"])).area)
+        if area is None or area <= 0:
+            density_missing.append(patch["id"])
+            continue
+        quantity = area * density
+        counts["per_plant_year"] += quantity
+        stratum = (plants.get(patch.get("plant_id")) or {}).get("stratum")
+        if stratum == "tree":
+            counts["per_tree_year"] += quantity
+        elif stratum == "shrub":
+            counts["per_shrub_year"] += quantity
+    if density_missing:
+        counts = {key: None for key in counts}
+    return counts, density_missing
 
 
 def _profile_rows(db, revision):
@@ -293,13 +317,24 @@ def _sum_rows(rows, horizon, multiplier):
 
 def ecosystem_metrics(db, revision):
     """Calculate only indicators supported by exact records frozen in the revision."""
+    counts, density_missing = _placement_counts(db, revision)
+    density_gap = (
+        gap(
+            "area_patch_density_missing",
+            "Экологический расчёт требует плотность каждой площадной посадки",
+            *density_missing,
+        )
+        if density_missing
+        else None
+    )
     version, rows = _profile_rows(db, revision)
     if version is None:
         return [
-            _missing_metric(key, unit, horizon) for horizon in HORIZONS for key, unit in METRICS
+            _missing_metric(key, unit, horizon, density_gap)
+            for horizon in HORIZONS
+            for key, unit in METRICS
         ]
     status = "synthetic" if version.synthetic else "estimated"
-    counts = _placement_counts(db, revision)
     zone = db.get(ZoneVersion, revision.zone_version_id)
     zone_area = _decimal(zone.payload.get("area_m2")) if zone is not None else None
     population = _population_row(db, revision, zone)
@@ -369,7 +404,7 @@ def ecosystem_metrics(db, revision):
                         _combined_confidence([calculated[4], green[4]]),
                     )
             if calculated is None:
-                result.append(_missing_metric(key, default_unit, horizon))
+                result.append(_missing_metric(key, default_unit, horizon, density_gap))
             else:
                 value, unit, refs, _bases, confidence = calculated
                 result.append(

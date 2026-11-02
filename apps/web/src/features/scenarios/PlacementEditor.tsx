@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import type { StyleSpecification } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
-import { unwrap, type MapLayer, type Placement, type Plant, type Zone } from '@pg/api-client';
+import { unwrap, type AreaPatch, type MapLayer, type Placement, type Plant, type Zone } from '@pg/api-client';
 import { Badge, Button, DataTable, Field, Icon, Input, Notice, Select, Skeleton, StateView, StockOfferRow } from '@pg/ui';
 import { api, useMapLayers, useOperationAvailable } from '../../api';
 import { t, type AppKey } from '../../i18n';
@@ -27,6 +27,7 @@ import { Scene3DToggle } from '../scene3d/Scene3DPanel';
 import { useScene3D } from '../scene3d/useScene3D';
 import type { ScenePlanting } from '../scene3d/types';
 import { add, insideZone, issuesOf, metersBetween, move, newPlacement, redo, remove, same, snapToCrownTangent, undo, update, type LngLat, type PlacementHistory } from './placements';
+import { addVertex, closeRing, editableRing, previewIssues, redo as redoDraw, removeLast, startDraw, toPolygon, undo as undoDraw, type DrawState } from '../zones/draw';
 
 const coarse = () => window.matchMedia('(pointer: coarse)').matches;
 const HIT = () => (coarse() ? 18 : 8);
@@ -58,6 +59,10 @@ export function PlacementMap({
   zone,
   datasetVersionIds,
   placements,
+  areaPatches = [],
+  areaDraw = null,
+  selectedAreaPatchId = null,
+  areaAdding = false,
   selectedId,
   selectedIds = EMPTY_IDS,
   snapping = false,
@@ -67,6 +72,9 @@ export function PlacementMap({
   onAdd,
   onMove,
   onDelete,
+  onAreaSelect,
+  onAreaVertex,
+  onAreaClose,
   conflictIds,
   auto3d = false,
   onMapReady,
@@ -76,6 +84,10 @@ export function PlacementMap({
   /** Frozen scenario inputs; displayed buildings must match the versions used by server validation. */
   datasetVersionIds: string[];
   placements: Placement[];
+  areaPatches?: AreaPatch[];
+  areaDraw?: DrawState | null;
+  selectedAreaPatchId?: string | null;
+  areaAdding?: boolean;
   selectedId: string | null;
   selectedIds?: Set<string>;
   snapping?: boolean;
@@ -85,6 +97,9 @@ export function PlacementMap({
   onAdd: (at: LngLat) => void;
   onMove: (id: string, at: LngLat) => void;
   onDelete: (id: string) => void;
+  onAreaSelect?: (id: string | null) => void;
+  onAreaVertex?: (at: LngLat) => void;
+  onAreaClose?: () => void;
   conflictIds: Set<string>;
   /** Opens the existing Three layer as soon as the map is ready (used by immutable revision compare). */
   auto3d?: boolean;
@@ -114,8 +129,8 @@ export function PlacementMap({
   const scene3d = useScene3D(() => map.current, [], scenePlantings);
   const auto3dStarted = useRef(false);
   if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementScene?: typeof scene3d }).__pgPlacementScene = scene3d;
-  const live = useRef({ placements, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove });
-  live.current = { placements, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove };
+  const live = useRef({ placements, areaPatches, areaDraw, selectedAreaPatchId, areaAdding, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove, onAreaSelect, onAreaVertex, onAreaClose });
+  live.current = { placements, areaPatches, areaDraw, selectedAreaPatchId, areaAdding, selectedId, selectedIds, snapping, adding, disabled, onSelect, onAdd, onMove, onAreaSelect, onAreaVertex, onAreaClose };
   const drag = useRef<{
     id: string;
     start: maplibregl.Point;
@@ -136,6 +151,21 @@ export function PlacementMap({
       geometry: { type: 'Point', coordinates: dragged && dragged.id === p.id ? dragged.pos : p.position.coordinates },
     })),
   });
+  const areaData = (list: AreaPatch[], draw: DrawState | null, selected: string | null): FeatureCollection => ({
+    type: 'FeatureCollection',
+    features: [
+      ...list.map((patch) => ({
+        type: 'Feature' as const,
+        properties: { id: patch.id, selected: patch.id === selected, locked: patch.locked, draft: false },
+        geometry: patch.geometry,
+      })),
+      ...(draw && draw.vertices.length >= 3 ? [{
+        type: 'Feature' as const,
+        properties: { id: '__draft__', selected: true, locked: false, draft: true },
+        geometry: toPolygon(draw.vertices),
+      }] : []),
+    ],
+  });
 
   useEffect(() => {
     if (!el.current || basemap.status === 'loading') return;
@@ -155,6 +185,16 @@ export function PlacementMap({
       m.addLayer({ id: 'zone-fill', type: 'fill', source: 'zone', paint: { 'fill-color': cssVar('--pg-cat-2'), 'fill-opacity': 0.12 } });
       m.addLayer({ id: 'zone-line', type: 'line', source: 'zone', paint: { 'line-color': cssVar('--pg-cat-2'), 'line-width': 2 } });
       m.addSource('pl', { type: 'geojson', data: data(live.current.placements, null) });
+      m.addSource('area-patches', { type: 'geojson', data: areaData(live.current.areaPatches, live.current.areaDraw, live.current.selectedAreaPatchId) });
+      m.addLayer({ id: 'area-patch-fill', type: 'fill', source: 'area-patches', paint: {
+        'fill-color': ['case', ['get', 'selected'], cssVar('--pg-accent'), cssVar('--pg-positive')],
+        'fill-opacity': ['case', ['get', 'draft'], 0.28, 0.18],
+      } });
+      m.addLayer({ id: 'area-patch-line', type: 'line', source: 'area-patches', paint: {
+        'line-color': ['case', ['get', 'selected'], cssVar('--pg-focus'), cssVar('--pg-positive')],
+        'line-width': ['case', ['get', 'selected'], 3, 1.5],
+        'line-dasharray': ['case', ['get', 'draft'], ['literal', [2, 2]], ['literal', [1, 0]]],
+      } });
       const r = coarse() ? 9 : 6;
       m.addLayer({
         id: 'pl-circle',
@@ -186,6 +226,12 @@ export function PlacementMap({
         if (!best || d < best.d) best = { id: String(f.properties?.id), d };
       }
       return best?.id ?? null;
+    };
+    const areaHitAt = (pt: maplibregl.Point): string | null => {
+      if (!m.getLayer('area-patch-fill')) return null;
+      const feature = m.queryRenderedFeatures(pt, { layers: ['area-patch-fill'] })[0];
+      const id = feature?.properties?.id;
+      return id && id !== '__draft__' ? String(id) : null;
     };
     const start = (id: string, pt: maplibregl.Point, touch: boolean, client: [number, number]) => {
       const p = live.current.placements.find((x) => x.id === id);
@@ -283,7 +329,7 @@ export function PlacementMap({
       if (id && start(id, e.point, false, [e.originalEvent.clientX, e.originalEvent.clientY])) e.preventDefault();
     });
     m.on('mousemove', (e) => {
-      m.getCanvas().style.cursor = drag.current?.pos ? 'grabbing' : live.current.adding ? 'crosshair' : hitAt(e.point) ? 'pointer' : '';
+      m.getCanvas().style.cursor = drag.current?.pos ? 'grabbing' : live.current.adding || live.current.areaAdding ? 'crosshair' : hitAt(e.point) || areaHitAt(e.point) ? 'pointer' : '';
     });
     m.on('mouseup', end);
     m.on('touchstart', (e) => {
@@ -310,10 +356,29 @@ export function PlacementMap({
     m.on('touchend', end);
     m.on('click', (e) => {
       if (performance.now() < suppressClick.current) return;
+      if (live.current.areaAdding && !live.current.disabled) {
+        live.current.onAreaVertex?.([e.lngLat.lng, e.lngLat.lat]);
+        return;
+      }
       const id = hitAt(e.point);
       if (id) return live.current.onSelect(id, e.originalEvent.shiftKey || e.originalEvent.ctrlKey || e.originalEvent.metaKey);
+      const areaId = areaHitAt(e.point);
+      if (areaId) {
+        live.current.onAreaSelect?.(areaId);
+        live.current.onSelect(null, false);
+        return;
+      }
       if (live.current.adding && !live.current.disabled) live.current.onAdd([e.lngLat.lng, e.lngLat.lat]);
-      else live.current.onSelect(null, false);
+      else {
+        live.current.onSelect(null, false);
+        live.current.onAreaSelect?.(null);
+      }
+    });
+    m.on('dblclick', (e) => {
+      if (!live.current.areaAdding || live.current.disabled) return;
+      e.preventDefault();
+      // The two preceding click events must first commit their vertices.
+      window.setTimeout(() => live.current.onAreaClose?.(), 0);
     });
     map.current = m;
     if (import.meta.env.DEV && !compareLabel) (window as unknown as { __pgPlacementMap?: maplibregl.Map }).__pgPlacementMap = m;
@@ -413,11 +478,19 @@ export function PlacementMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placements, selectedId, selectedIds, conflictIds, ready]);
 
+  useEffect(() => {
+    if (!ready) return;
+    (map.current?.getSource('area-patches') as maplibregl.GeoJSONSource | undefined)?.setData(
+      areaData(areaPatches, areaDraw, selectedAreaPatchId),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [areaPatches, areaDraw, selectedAreaPatchId, ready]);
+
   return (
     <div className="pl-map-wrap">
       <div
         ref={el}
-        className={adding ? 'pl-map is-adding' : 'pl-map'}
+        className={adding || areaAdding ? 'pl-map is-adding' : 'pl-map'}
         role="region"
         aria-label={compareLabel ?? t('placement.map')}
         tabIndex={0}
@@ -464,13 +537,13 @@ export function PlacementMap({
           ) : null}
         </div>
       ) : null}
-      {adding ? <div className="map-crosshair" aria-hidden /> : null}
+      {adding || areaAdding ? <div className="map-crosshair" aria-hidden /> : null}
       {basemap.status === 'failed' ? <p className="pg-muted pl-map__note">{t('basemap.failed')}</p> : null}
     </div>
   );
 }
 
-function PlantPicker({ value, catalogVersionId, disabled = false, onChange }: { value: string; catalogVersionId: string | null; disabled?: boolean; onChange: (id: string, plant: Plant | null) => void }) {
+function PlantPicker({ value, catalogVersionId, disabled = false, allowedStrata, onChange }: { value: string; catalogVersionId: string | null; disabled?: boolean; allowedStrata?: Plant['stratum'][]; onChange: (id: string, plant: Plant | null) => void }) {
   const ok = useOperationAvailable('listPlants');
   const [q, setQ] = useState('');
   const [debounced, setDebounced] = useState('');
@@ -485,7 +558,8 @@ function PlantPicker({ value, catalogVersionId, disabled = false, onChange }: { 
     queryFn: async ({ signal }) => (await unwrap(api.GET('/v1/plants', { params: { query: { limit: 50, q: debounced || undefined, catalog_version_id: catalogVersionId ?? undefined } }, signal }))).data.items,
   });
   if (ok === false) return <OperationUnavailable compact operationId="listPlants" />;
-  const selectedPlant = plants.data?.find((item) => item.id === value) ?? null;
+  const visiblePlants = plants.data?.filter((item) => !allowedStrata || allowedStrata.includes(item.stratum)) ?? [];
+  const selectedPlant = visiblePlants.find((item) => item.id === value) ?? null;
   return (
     <div className="pl-picker">
       <Field label={t('placement.plant.search')}>
@@ -495,7 +569,7 @@ function PlantPicker({ value, catalogVersionId, disabled = false, onChange }: { 
         <Skeleton lines={1} />
       ) : plants.isError ? (
         <ApiErrorView compact error={plants.error} onRetry={() => void plants.refetch()} />
-      ) : plants.data.length === 0 ? (
+      ) : visiblePlants.length === 0 ? (
         <StateView compact state="empty" title={t('placement.plant.none')} />
       ) : (
         <Field label={t('placement.plant')} required>
@@ -504,10 +578,10 @@ function PlantPicker({ value, catalogVersionId, disabled = false, onChange }: { 
               id={id}
               value={value}
               disabled={disabled}
-              onChange={(e) => onChange(e.target.value, plants.data.find((p) => p.id === e.target.value) ?? null)}
+              onChange={(e) => onChange(e.target.value, visiblePlants.find((p) => p.id === e.target.value) ?? null)}
             >
               <option value="">{t('placement.plant.choose')}</option>
-              {plants.data.map((p) => (
+              {visiblePlants.map((p) => (
                 <option key={p.id} value={p.id} disabled={p.sensitive_site_status === 'excluded'}>
                   {p.russian_name} ({p.latin_name}) · {t(`stratum.${p.stratum}` as AppKey)}
                   {p.sensitive_site_status === 'excluded' ? ` · ${t('placement.plant.excluded')}` : ''}
@@ -661,6 +735,8 @@ function PlantStock({ plantId }: { plantId: string }) {
 export function PlacementEditor({
   value,
   onChange,
+  areaPatches,
+  onAreaPatchesChange,
   zoneVersionId,
   disabled,
   catalogVersionId,
@@ -671,6 +747,8 @@ export function PlacementEditor({
 }: {
   value: Placement[];
   onChange: (next: Placement[]) => void;
+  areaPatches: AreaPatch[];
+  onAreaPatchesChange: (next: AreaPatch[]) => void;
   zoneVersionId: string;
   disabled: boolean;
   /** Catalog snapshot of the revision; adding a plant from another snapshot switches it, visibly. */
@@ -692,13 +770,18 @@ export function PlacementEditor({
   const [plantId, setPlantId] = useState('');
   const [plant, setPlant] = useState<Plant | null>(null);
   const [date, setDate] = useState('');
+  const [mode, setMode] = useState<'point' | 'area'>('point');
+  const [areaDraw, setAreaDraw] = useState<DrawState | null>(null);
+  const [editingPatchId, setEditingPatchId] = useState<string | null>(null);
+  const [selectedAreaPatchId, setSelectedAreaPatchId] = useState<string | null>(null);
+  const [density, setDensity] = useState('');
   useEffect(() => {
     if (!preferredPlant) return;
     setPlantId(preferredPlant.id);
     setPlant(preferredPlant);
     setAdding(false);
   }, [preferredPlant?.id]);
-  const names = usePlantNames(useMemo(() => [...new Set(value.map((p) => p.plant_id))], [value]), catalogVersionId);
+  const names = usePlantNames(useMemo(() => [...new Set([...value.map((p) => p.plant_id), ...areaPatches.map((p) => p.plant_id)])], [value, areaPatches]), catalogVersionId);
   const issues = useMemo(() => issuesOf(value), [value]);
   const geometry = zone.query.data?.geometry ?? null;
   const outside = useMemo(
@@ -751,7 +834,34 @@ export function PlacementEditor({
     selectPlacement(p.id);
   };
   const selected = value.find((p) => p.id === selectedId) ?? null;
+  const selectedAreaPatch = areaPatches.find((patch) => patch.id === selectedAreaPatchId) ?? null;
   const canAdd = !disabled && Boolean(plantId) && /^\d{4}-\d{2}-\d{2}$/.test(date);
+  const areaIssues = areaDraw ? previewIssues(areaDraw) : [];
+  const closedAreaDraw = areaDraw ? closeRing(areaDraw) : null;
+  const canFinishArea = Boolean(
+    closedAreaDraw && previewIssues(closedAreaDraw).length === 0 && canAdd,
+  );
+  const finishArea = () => {
+    if (!areaDraw) return;
+    const closed = closeRing(areaDraw);
+    setAreaDraw(closed);
+    if (previewIssues(closed).length || !plantId || !date) return;
+    if (plant && plant.version_id !== catalogVersionId) onCatalogVersion(plant.version_id);
+    const parsedDensity = density.trim() ? Number(density.replace(',', '.')) : null;
+    const existing = editingPatchId ? areaPatches.find((patch) => patch.id === editingPatchId) : null;
+    const patch: AreaPatch = {
+      id: existing?.id ?? crypto.randomUUID(),
+      plant_id: plantId,
+      geometry: toPolygon(closed.vertices),
+      planting_date: date,
+      locked: existing?.locked ?? false,
+      density_plants_per_m2: parsedDensity && parsedDensity > 0 ? parsedDensity : null,
+    };
+    onAreaPatchesChange(existing ? areaPatches.map((item) => item.id === existing.id ? patch : item) : [...areaPatches, patch]);
+    setSelectedAreaPatchId(patch.id);
+    setEditingPatchId(null);
+    setAreaDraw(null);
+  };
 
   return (
     <section
@@ -761,16 +871,26 @@ export function PlacementEditor({
         const tag = (e.target as HTMLElement).tagName;
         if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || disabled) return;
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-          doUndo();
+          if (mode === 'area') setAreaDraw((draw) => draw ? undoDraw(draw) : draw);
+          else doUndo();
           e.preventDefault();
         } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
-          doRedo();
+          if (mode === 'area') setAreaDraw((draw) => draw ? redoDraw(draw) : draw);
+          else doRedo();
           e.preventDefault();
         }
       }}
     >
       <h3>{t('placement.title')}</h3>
       <p className="pg-muted">{t('placement.desc')}</p>
+      <div className="pg-actions" role="tablist" aria-label="Тип посадки">
+        <Button size="sm" variant={mode === 'point' ? 'primary' : 'secondary'} aria-pressed={mode === 'point'} onClick={() => { setMode('point'); setAreaDraw(null); }}>
+          Точечные посадки
+        </Button>
+        <Button size="sm" variant={mode === 'area' ? 'primary' : 'secondary'} aria-pressed={mode === 'area'} onClick={() => { setMode('area'); setAdding(false); }}>
+          Площадные посадки · {areaPatches.length}
+        </Button>
+      </div>
       <details className="pl-tech">
         <summary>Версия каталога растений</summary>
         <p className="pg-muted">
@@ -778,7 +898,7 @@ export function PlacementEditor({
           {plant && catalogVersionId && plant.version_id !== catalogVersionId ? <> · {t('placement.catalog.switch', { to: plant.version_id.slice(0, 8) })}</> : null}
         </p>
       </details>
-      <div className="pl-add">
+      {mode === 'point' ? <div className="pl-add">
         <PlantPicker
           value={plantId}
           catalogVersionId={catalogVersionId}
@@ -795,19 +915,46 @@ export function PlacementEditor({
             {adding ? t('placement.add.stop') : t('placement.add')}
           </Button>
         </div>
-      </div>
-      {adding ? <p className="pg-muted" role="status">{t('placement.add.hint')}</p> : null}
+      </div> : <div className="pl-add">
+        <PlantPicker
+          value={plantId}
+          catalogVersionId={catalogVersionId}
+          allowedStrata={['shrub', 'perennial', 'grass']}
+          onChange={(id, p) => { setPlantId(id); setPlant(p); }}
+        />
+        <Field label="Дата посадки" required>
+          {({ id }) => <Input id={id} type="date" value={date} onChange={(e) => setDate(e.target.value)} />}
+        </Field>
+        <Field label="Плотность, растений/м²" hint="Можно оставить пустой: сервер сохранит контур, но расчёт останется неполным.">
+          {({ id, describedBy }) => <Input id={id} aria-describedby={describedBy} inputMode="decimal" min={0} value={density} onChange={(e) => setDensity(e.target.value)} />}
+        </Field>
+        <div className="pl-add__actions">
+          <Button size="sm" variant={areaDraw ? 'primary' : 'secondary'} icon="plus" disabled={!canAdd} onClick={() => {
+            setEditingPatchId(null);
+            setSelectedAreaPatchId(null);
+            setAreaDraw(areaDraw ? null : startDraw('create'));
+          }}>
+            {areaDraw ? 'Отменить рисование' : 'Нарисовать контур'}
+          </Button>
+          {areaDraw ? <Button size="sm" variant="primary" disabled={!canFinishArea} onClick={finishArea}>Сохранить контур</Button> : null}
+        </div>
+      </div>}
+      {mode === 'point' && adding ? <p className="pg-muted" role="status">{t('placement.add.hint')}</p> : null}
+      {mode === 'area' && areaDraw ? <Notice tone={areaIssues.length ? 'warning' : 'info'} title={areaIssues.length ? 'Контур ещё не готов' : 'Контур готов к сохранению'}>
+        Кликайте по карте, чтобы добавить вершины. Двойной клик или кнопка «Сохранить контур» замыкает полигон. Сервер окончательно проверит геометрию и рассчитает площадь.
+      </Notice> : null}
       <div className="draw-tools" role="toolbar" aria-label={t('placement.toolbar')}>
-        <Button size="sm" icon="chevronLeft" onClick={doUndo} disabled={disabled || hist.past.length === 0} title="Ctrl+Z">
+        <Button size="sm" icon="chevronLeft" onClick={() => mode === 'area' ? setAreaDraw((draw) => draw ? undoDraw(draw) : draw) : doUndo()} disabled={disabled || (mode === 'area' ? !areaDraw?.past.length : hist.past.length === 0)} title="Ctrl+Z">
           {t('draw.undo')}
         </Button>
-        <Button size="sm" icon="chevronRight" onClick={doRedo} disabled={disabled || hist.future.length === 0} title="Ctrl+Y">
+        <Button size="sm" icon="chevronRight" onClick={() => mode === 'area' ? setAreaDraw((draw) => draw ? redoDraw(draw) : draw) : doRedo()} disabled={disabled || (mode === 'area' ? !areaDraw?.future.length : hist.future.length === 0)} title="Ctrl+Y">
           {t('draw.redo')}
         </Button>
-        <Button size="sm" variant={snapping ? 'primary' : 'secondary'} aria-pressed={snapping} onClick={() => setSnapping((current) => !current)}>
+        <Button size="sm" variant={snapping ? 'primary' : 'secondary'} aria-pressed={snapping} disabled={mode === 'area'} onClick={() => setSnapping((current) => !current)}>
           {snapping ? t('placement.snap.on') : t('placement.snap.off')}
         </Button>
-        <Button size="sm" variant="secondary" disabled={value.length === 0} onClick={() => {
+        {mode === 'area' && areaDraw ? <Button size="sm" variant="secondary" onClick={() => setAreaDraw((draw) => draw ? removeLast(draw) : draw)}>Убрать последнюю вершину</Button> : null}
+        <Button size="sm" variant="secondary" disabled={mode === 'area' || value.length === 0} onClick={() => {
           setSelectedIds(new Set(value.map((placement) => placement.id)));
           setSelectedId(value[0]?.id ?? null);
         }}>
@@ -815,11 +962,11 @@ export function PlacementEditor({
         </Button>
         {selectedIds.size ? <Button size="sm" variant="ghost" onClick={() => selectPlacement(null)}>{t('placement.select.none')}</Button> : null}
         <span className="pg-muted" role="status" aria-live="polite">
-          {t('placement.count', { n: value.length })} · {t('placement.selected.count', { n: selectedIds.size })}
+          {mode === 'area' ? `Контуров: ${areaPatches.length}${areaDraw ? ` · вершин: ${areaDraw.vertices.length}` : ''}` : `${t('placement.count', { n: value.length })} · ${t('placement.selected.count', { n: selectedIds.size })}`}
         </span>
       </div>
 
-      {selectedIds.size > 1 ? (
+      {mode === 'point' && selectedIds.size > 1 ? (
         <div className="pl-bulk" role="group" aria-label={t('placement.bulk')}>
           <strong>{t('placement.bulk', { n: selectedIds.size })}</strong>
           <span className="pg-muted">{t('placement.bulk.hint')}</span>
@@ -851,10 +998,14 @@ export function PlacementEditor({
           zone={zone.query.data}
           datasetVersionIds={datasetVersionIds}
           placements={value}
+          areaPatches={areaPatches}
+          areaDraw={areaDraw}
+          selectedAreaPatchId={selectedAreaPatchId}
+          areaAdding={mode === 'area' && Boolean(areaDraw) && !areaDraw?.closed}
           selectedId={selectedId}
           selectedIds={selectedIds}
           snapping={snapping}
-          adding={adding && canAdd}
+          adding={mode === 'point' && adding && canAdd}
           disabled={disabled}
           onSelect={selectPlacement}
           onAdd={addAt}
@@ -864,11 +1015,24 @@ export function PlacementEditor({
             commitChange(remove(value, id));
             selectPlacement(null);
           }}
+          onAreaSelect={(id) => {
+            if (id) setMode('area');
+            setSelectedAreaPatchId(id);
+            selectPlacement(null);
+          }}
+          onAreaVertex={(at) => setAreaDraw((draw) => {
+            const current = draw ?? startDraw('create');
+            const last = current.vertices.at(-1);
+            if (last && Math.abs(last[0] - at[0]) < 1e-10 && Math.abs(last[1] - at[1]) < 1e-10) return current;
+            return addVertex(current, at);
+          })}
+          onAreaClose={finishArea}
           conflictIds={conflictIds}
         />
       )}
       <p className="pg-muted">{t('placement.keys')}</p>
 
+      {mode === 'point' ? <>
       {outside.size > 0 ? <Notice tone="warning" icon="alert" title={t('placement.outside', { n: outside.size })} /> : null}
       {issues.size > 0 ? <Notice tone="negative" icon="error" title={t('placement.issues', { n: issues.size })} /> : null}
 
@@ -943,6 +1107,63 @@ export function PlacementEditor({
           <Icon name="info" size={14} /> {t('placement.select.hint')}
         </p>
       ) : null}
+      </> : <>
+        {areaPatches.length === 0 ? (
+          <StateView compact state="empty" title="Площадных посадок пока нет" description="Выберите кустарник, многолетник или газон и нарисуйте контур на карте." />
+        ) : (
+          <DataTable
+            caption="Площадные посадки"
+            rows={areaPatches}
+            getRowId={(patch) => patch.id}
+            selectedId={selectedAreaPatchId ?? undefined}
+            onSelect={(patch) => setSelectedAreaPatchId(patch.id)}
+            maxHeight="16rem"
+            columns={[
+              { key: 'plant', header: 'Растение', render: (patch: AreaPatch) => names.get(patch.plant_id) ?? <code className="pg-code">{patch.plant_id.slice(0, 8)}</code> },
+              { key: 'date', header: 'Дата', render: (patch: AreaPatch) => patch.planting_date },
+              { key: 'density', header: 'Плотность', render: (patch: AreaPatch) => patch.density_plants_per_m2 == null ? <Badge tone="warning">нужно задать</Badge> : `${patch.density_plants_per_m2} раст./м²` },
+              { key: 'state', header: 'Состояние', render: (patch: AreaPatch) => patch.locked ? <Badge tone="neutral" icon="lock">зафиксирована</Badge> : <Badge tone="positive">редактируется</Badge> },
+            ]}
+          />
+        )}
+        {selectedAreaPatch ? <fieldset className="pl-form" disabled={disabled}>
+          <legend>Выбранная площадная посадка</legend>
+          <PlantPicker
+            value={selectedAreaPatch.plant_id}
+            catalogVersionId={catalogVersionId}
+            allowedStrata={['shrub', 'perennial', 'grass']}
+            disabled={selectedAreaPatch.locked}
+            onChange={(plant_id) => plant_id && onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, plant_id } : patch))}
+          />
+          <Field label="Дата посадки" required>
+            {({ id }) => <Input id={id} type="date" value={selectedAreaPatch.planting_date} disabled={selectedAreaPatch.locked} onChange={(event) => onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, planting_date: event.target.value } : patch))} />}
+          </Field>
+          <Field label="Плотность, растений/м²" hint="Пустое значение честно оставляет стоимость и количественные эффекты неполными.">
+            {({ id, describedBy }) => <Input id={id} aria-describedby={describedBy} inputMode="decimal" disabled={selectedAreaPatch.locked} value={selectedAreaPatch.density_plants_per_m2 ?? ''} onChange={(event) => {
+              const parsed = event.target.value.trim() ? Number(event.target.value.replace(',', '.')) : null;
+              onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, density_plants_per_m2: parsed && parsed > 0 ? parsed : null } : patch));
+            }} />}
+          </Field>
+          <div className="pg-actions">
+            <Button size="sm" variant="secondary" disabled={selectedAreaPatch.locked} onClick={() => {
+              const ring = editableRing(selectedAreaPatch.geometry);
+              if (!ring) return;
+              setPlantId(selectedAreaPatch.plant_id);
+              setDate(selectedAreaPatch.planting_date);
+              setDensity(selectedAreaPatch.density_plants_per_m2 == null ? '' : String(selectedAreaPatch.density_plants_per_m2));
+              setEditingPatchId(selectedAreaPatch.id);
+              setAreaDraw(startDraw('edit', selectedAreaPatch.id, ring));
+            }}>Перерисовать контур</Button>
+            <Button size="sm" icon="lock" onClick={() => onAreaPatchesChange(areaPatches.map((patch) => patch.id === selectedAreaPatch.id ? { ...patch, locked: !patch.locked } : patch))}>
+              {selectedAreaPatch.locked ? 'Разблокировать' : 'Заблокировать'}
+            </Button>
+            <Button size="sm" variant="danger" disabled={selectedAreaPatch.locked} onClick={() => {
+              onAreaPatchesChange(areaPatches.filter((patch) => patch.id !== selectedAreaPatch.id));
+              setSelectedAreaPatchId(null);
+            }}>Удалить</Button>
+          </div>
+        </fieldset> : null}
+      </>}
     </section>
   );
 }

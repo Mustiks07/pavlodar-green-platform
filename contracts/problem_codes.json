@@ -1,6 +1,11 @@
 {
-  "version": "1.17.0",
+  "version": "1.17.1",
   "codes": [
+    {
+      "code": "area_patch_density_missing",
+      "status": null,
+      "title_ru": "Не задана плотность площадной посадки"
+    },
     {
       "code": "account_not_provisioned",
       "status": 403,

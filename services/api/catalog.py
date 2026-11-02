@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 
 from packages.domain.contracts import validate
 from packages.domain.errors import DomainError
-from packages.geo.geometry import PROJECT
+from packages.geo.geometry import PROJECT, area_geometry
 from services.api.models import (
     CatalogState,
     CatalogVersion,
@@ -986,7 +986,47 @@ def validate_scenario_registry(
                 "Excluded plant cannot be patched",
                 field_errors=field_errors,
             )
-        patch_shape = shape(patch["geometry"])
+        try:
+            patch_shape = area_geometry(patch["geometry"])
+        except DomainError as error:
+            raise DomainError(
+                error.status,
+                error.code,
+                error.detail,
+                field_errors=[
+                    {
+                        **field,
+                        "path": f"/area_patches/{patch_index}/geometry"
+                        + ("/coordinates" if field["path"].endswith("/coordinates") else ""),
+                    }
+                    for field in error.field_errors
+                ],
+            ) from None
         if not zone_shape.covers(patch_shape):
-            raise DomainError(422, "placement_outside_zone", "Area patch is outside zone geometry")
+            raise DomainError(
+                422,
+                "placement_outside_zone",
+                "Area patch is outside zone geometry",
+                field_errors=[
+                    {
+                        "path": f"/area_patches/{patch_index}/geometry",
+                        "code": "placement_outside_zone",
+                        "message": "Контур площадной посадки выходит за участок",
+                    }
+                ],
+            )
+        projected_area = transform(PROJECT, patch_shape).area
+        if not projected_area > 0:
+            raise DomainError(
+                422,
+                "invalid_area",
+                "Area patch projected area must be positive",
+                field_errors=[
+                    {
+                        "path": f"/area_patches/{patch_index}/geometry",
+                        "code": "invalid_area",
+                        "message": "Площадь контура должна быть положительной",
+                    }
+                ],
+            )
     return catalog_synthetic
