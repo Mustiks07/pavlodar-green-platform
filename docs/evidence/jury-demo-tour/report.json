@@ -1,7 +1,7 @@
 {
   "base": "http://localhost:5173",
   "city": "10000000-0000-4000-8000-000000000001",
-  "startedAt": "2026-11-02T01:50:45.973Z",
+  "startedAt": "2026-11-02T01:58:34.094Z",
   "checks": [
     {
       "name": "tour exposes the full seven-step decision story",
@@ -62,6 +62,6 @@
     "docs/evidence/jury-demo-tour/01-tour-ready.png",
     "docs/evidence/jury-demo-tour/07-exact-report-step.png"
   ],
-  "finishedAt": "2026-11-02T01:51:12.673Z",
+  "finishedAt": "2026-11-02T01:58:59.963Z",
   "passed": true
 }
