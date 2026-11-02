@@ -84,10 +84,23 @@ def sample_context():
                             "position": {"type": "Point", "coordinates": [76.95, 52.23]},
                         }
                     ],
+                    "area_patches": [],
+                },
+                "manifest": {
+                    "id": snapshot_id,
+                    "source_refs": [],
+                    "code_revision": "test-release-081",
+                    "model_version_ids": ["00000000-0000-4000-8000-000000000110"],
+                    "coefficient_version_ids": ["00000000-0000-4000-8000-000000000111"],
+                    "rate_version_ids": ["00000000-0000-4000-8000-000000000108"],
+                    "seed": 17,
+                    "input_hash": "a" * 64,
+                    "output_hash": "b" * 64,
                 },
                 "snapshot": {
                     "id": snapshot_id,
                     "scenario_revision_id": revision_id,
+                    "input_hash": "a" * 64,
                     "status": "partial",
                     "synthetic_inputs": True,
                     "cost": {
@@ -106,9 +119,31 @@ def sample_context():
                                 "formula": "=3*10.01",
                             }
                         ],
-                        "data_gaps": [],
+                        "data_gaps": [
+                            {
+                                "code": "rate_version_unavailable",
+                                "message": "Расценка не зафиксирована",
+                                "required_inputs": ["rate_version_id"],
+                                "blocking": True,
+                            }
+                        ],
                     },
-                    "care": [],
+                    "care": [
+                        {
+                            "id": "00000000-0000-4000-8000-000000000112",
+                            "placement_ids": [placement_id],
+                            "month": 6,
+                            "year_offset": 0,
+                            "operation": "Полив и осмотр",
+                            "quantity": 3,
+                            "unit": "piece",
+                            "water_m3": 1.5,
+                            "crew_minutes": 45,
+                            "visits": 2,
+                            "rate_version_id": None,
+                            "rule_version_id": "00000000-0000-4000-8000-000000000113",
+                        }
+                    ],
                     "survival": [
                         {
                             "placement_id": placement_id,
@@ -121,7 +156,52 @@ def sample_context():
                             ],
                         }
                     ],
-                    "ecosystem": [],
+                    "ecosystem": [
+                        {
+                            "key": "co2_sequestered",
+                            "value": 1.25,
+                            "unit": "t_CO2_per_year",
+                            "horizon_year": 5,
+                            "status": "estimated",
+                            "lower": None,
+                            "upper": None,
+                            "qualitative_confidence": "medium",
+                            "method_version": "test-eco-v1",
+                            "source_refs": [],
+                            "missing_reason": None,
+                        },
+                        {
+                            "key": "air_cooling",
+                            "value": None,
+                            "unit": "degC",
+                            "horizon_year": 10,
+                            "status": "unavailable",
+                            "lower": None,
+                            "upper": None,
+                            "qualitative_confidence": "unknown",
+                            "method_version": "test-eco-v1",
+                            "source_refs": [],
+                            "missing_reason": {
+                                "code": "ecosystem_coefficient_unavailable",
+                                "message": "Коэффициент не опубликован",
+                                "required_inputs": ["coefficient_version_id"],
+                                "blocking": False,
+                            },
+                        },
+                        {
+                            "key": "stormwater_retained",
+                            "value": 12.5,
+                            "unit": "m3",
+                            "horizon_year": 20,
+                            "status": "estimated",
+                            "lower": None,
+                            "upper": None,
+                            "qualitative_confidence": "low",
+                            "method_version": "test-eco-v1",
+                            "source_refs": [],
+                            "missing_reason": None,
+                        },
+                    ],
                     "warnings": [
                         {
                             "code": "synthetic_fixture",
@@ -143,6 +223,46 @@ def test_pdf_embeds_cyrillic_font_and_keeps_snapshot_values():
     assert "Павлодар" in text_value
     assert "30.03" in text_value
     assert "00000000-0000-4000-8000-000000000101" in text_value
+
+
+def test_pdf_exposes_frozen_survival_care_ecosystem_quality_and_passport():
+    data = render_pdf(sample_context())
+    text_value = "\n".join(page.extract_text() for page in PdfReader(io.BytesIO(data)).pages)
+
+    assert "Паспорт расчёта" in text_value
+    assert "test-release-081" in text_value
+    assert "Прогноз приживаемости по группам: 1/2/3 года" in text_value
+    assert "80,0 %" in text_value
+    assert "(60,0–90,0 %)" in text_value
+    assert "expert_rules" in text_value and "uncalibrated" in text_value
+    assert "Операции ухода" in text_value
+    assert "Полив и осмотр" in text_value
+    assert "Год" in text_value and "проекта" in text_value
+    assert "\n1\nиюнь\n" in text_value
+    assert "шт." in text_value
+    assert "1,5" in text_value
+    assert "Экосистемные показатели: 5 лет" in text_value
+    assert "1,25 т CO₂/год" in text_value
+    assert "Экосистемные показатели: 10 лет" in text_value
+    assert "недоступно: Коэффициент не опубликован" in text_value
+    assert "блокирующий" in text_value
+    assert "предупреждение" in text_value
+    assert "Паспорт источников" in text_value
+    assert "Приоритет" not in text_value
+
+
+def test_pdf_labels_modules_missing_from_frozen_snapshot():
+    context = sample_context()
+    snapshot = context["scenarios"][0]["snapshot"]
+    snapshot["care"] = []
+    snapshot["ecosystem"] = []
+
+    data = render_pdf(context)
+    text_value = "\n".join(page.extract_text() for page in PdfReader(io.BytesIO(data)).pages)
+
+    assert "В сохранённом снимке операции ухода отсутствуют." in text_value
+    for horizon in (5, 10, 20):
+        assert f"В снимке нет показателей на горизонте {horizon} лет." in text_value
 
 
 def test_xlsx_has_required_sheets_typed_numbers_and_no_formulas():

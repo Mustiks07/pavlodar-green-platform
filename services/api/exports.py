@@ -218,6 +218,110 @@ def _p(value):
     return html.escape("—" if value is None or value == "" else str(value))
 
 
+MONTHS_RU = {
+    1: "январь",
+    2: "февраль",
+    3: "март",
+    4: "апрель",
+    5: "май",
+    6: "июнь",
+    7: "июль",
+    8: "август",
+    9: "сентябрь",
+    10: "октябрь",
+    11: "ноябрь",
+    12: "декабрь",
+}
+
+METRIC_LABELS_RU = {
+    "air_cooling": "Охлаждение воздуха",
+    "co2_sequestered": "Поглощение CO₂",
+    "green_area": "Площадь озеленения",
+    "green_area_per_person": "Озеленение на жителя",
+    "oxygen_produced": "Производство кислорода",
+    "pollutants_removed": "Удаление загрязнителей",
+    "shade_area": "Площадь тени",
+    "stormwater_retained": "Удержание ливневого стока",
+    "surface_temperature_change": "Изменение температуры поверхности",
+}
+
+UNIT_LABELS_RU = {
+    "1": "доля",
+    "degC": "°C",
+    "kg_per_year": "кг/год",
+    "m2": "м²",
+    "m3": "м³",
+    "piece": "шт.",
+    "t_CO2_per_year": "т CO₂/год",
+}
+
+
+def _ru_decimal(value):
+    if value is None:
+        return "—"
+    return str(value).replace(".", ",")
+
+
+def _gap_text(value):
+    if not value:
+        return "Причина в снимке не зафиксирована"
+    return f"{value['message']} ({value['code']})"
+
+
+def _survival_point_text(point):
+    if not point or point.get("probability") is None:
+        return "недоступно"
+    probability = f"{float(point['probability']) * 100:.1f}".replace(".", ",") + " %"
+    if point.get("lower") is None or point.get("upper") is None:
+        return probability
+    lower = f"{float(point['lower']) * 100:.1f}".replace(".", ",")
+    upper = f"{float(point['upper']) * 100:.1f}".replace(".", ",")
+    return f"{probability} ({lower}–{upper} %)"
+
+
+def _group_details(revision):
+    result = {}
+    for item in revision.get("placements", []):
+        result[item["id"]] = {
+            "plant_id": item.get("plant_id"),
+            "amount": f"{_ru_decimal(item.get('quantity'))} шт.",
+        }
+    for item in revision.get("area_patches", []):
+        density = item.get("density_plants_per_m2")
+        result[item["id"]] = {
+            "plant_id": item.get("plant_id"),
+            "amount": (
+                f"плотность {_ru_decimal(density)} раст./м²"
+                if density is not None
+                else "плотность не задана"
+            ),
+        }
+    return result
+
+
+def _quality_gaps(snapshot):
+    result, seen = [], set()
+    candidates = list(snapshot.get("warnings", [])) + list(
+        snapshot.get("cost", {}).get("data_gaps", [])
+    )
+    for survival in snapshot.get("survival", []):
+        candidates.extend(survival.get("data_gaps", []))
+    for metric in snapshot.get("ecosystem", []):
+        if metric.get("missing_reason"):
+            candidates.append(metric["missing_reason"])
+    for value in candidates:
+        identity = (
+            value.get("code"),
+            value.get("message"),
+            tuple(value.get("required_inputs", [])),
+            value.get("blocking"),
+        )
+        if identity not in seen:
+            seen.add(identity)
+            result.append(value)
+    return result
+
+
 class ZoneSketch(Flowable):
     def __init__(self, geometry, placements, width=170 * mm, height=70 * mm):
         super().__init__()
@@ -368,6 +472,9 @@ def render_pdf(context):
         if index > 1 or context["program"]:
             story.append(PageBreak())
         snapshot, revision, zone = item["snapshot"], item["revision"], item["zone"]
+        manifest = item.get("manifest", {})
+        groups = _group_details(revision)
+        quality_gaps = _quality_gaps(snapshot)
         story.extend(
             [
                 Paragraph(f"Вариант {index}: {_p(item['scenario']['name'])}", heading),
@@ -380,6 +487,25 @@ def render_pdf(context):
                         ],
                     ],
                     [48 * mm, 65 * mm, 65 * mm, 35 * mm, 35 * mm],
+                ),
+                Paragraph("Паспорт расчёта", heading),
+                _table(
+                    [
+                        ["Параметр", "Зафиксированное значение"],
+                        ["ID снимка", _p(snapshot["id"])],
+                        ["ID ревизии сценария", _p(snapshot["scenario_revision_id"])],
+                        ["Хеш входов", _p(snapshot.get("input_hash"))],
+                        ["Хеш результата", _p(manifest.get("output_hash"))],
+                        ["Версия кода", _p(manifest.get("code_revision"))],
+                        ["Версии моделей", _p(", ".join(manifest.get("model_version_ids", [])))],
+                        [
+                            "Версии коэффициентов",
+                            _p(", ".join(manifest.get("coefficient_version_ids", []))),
+                        ],
+                        ["Версии расценок", _p(", ".join(manifest.get("rate_version_ids", [])))],
+                        ["Seed", _p(manifest.get("seed"))],
+                    ],
+                    [62 * mm, 180 * mm],
                 ),
                 Paragraph("Схема участка", heading),
                 Paragraph("Контур и точки посадки из зафиксированной версии сценария. Подложка не используется.", body),
@@ -407,48 +533,147 @@ def render_pdf(context):
                     + [["", "Известный итог", "", "", "", snapshot["cost"]["known_subtotal"], ""]],
                     [27 * mm, 66 * mm, 25 * mm, 20 * mm, 30 * mm, 30 * mm, 14 * mm],
                 ),
-                Paragraph("Выживаемость 1/2/3 года", heading),
-                _table(
-                    [["Placement", "Модель", "Калибровка", "Год 1", "Год 2", "Год 3"]]
-                    + [
-                        [
-                            _p(s["placement_id"]), _p(s["model_kind"]), _p(s["calibration_status"]),
-                            *[_p(point["probability"]) for point in s["points"][:3]],
-                        ]
-                        for s in snapshot["survival"]
-                    ],
-                    [62 * mm, 34 * mm, 38 * mm, 28 * mm, 28 * mm, 28 * mm],
-                ),
-                Paragraph("Уход и экологические показатели", heading),
-                Paragraph(
-                    f"Операций ухода: {len(snapshot['care'])}. Экологических показателей: {len(snapshot['ecosystem'])}.",
-                    body,
-                ),
-                Paragraph("Качество и ограничения", heading),
-                _table(
-                    [["Код", "Описание", "Блокирует"]]
-                    + [
-                        [_p(g["code"]), _p(g["message"]), "да" if g["blocking"] else "нет"]
-                        for g in snapshot["warnings"] + snapshot["cost"]["data_gaps"]
-                    ],
-                    [55 * mm, 150 * mm, 30 * mm],
-                ),
             ]
         )
+        story.append(Paragraph("Прогноз приживаемости по группам: 1/2/3 года", heading))
+        if snapshot["survival"]:
+            survival_rows = []
+            for survival in snapshot["survival"]:
+                point_by_year = {point["year"]: point for point in survival["points"]}
+                group = groups.get(survival["placement_id"], {})
+                unavailable = "; ".join(
+                    _gap_text(value) for value in survival.get("data_gaps", [])
+                )
+                survival_rows.append(
+                    [
+                        _p(survival["placement_id"]),
+                        _p(group.get("plant_id")),
+                        _p(group.get("amount")),
+                        _p(
+                            f"{survival['model_kind']} / "
+                            f"{survival['calibration_status']}"
+                        ),
+                        _survival_point_text(point_by_year.get(1)),
+                        _survival_point_text(point_by_year.get(2)),
+                        _survival_point_text(point_by_year.get(3)),
+                        _p(unavailable),
+                    ]
+                )
+            story.append(
+                _table(
+                    [["Группа", "Растение", "Объём", "Модель / калибровка", "1 год", "2 год", "3 год", "Причина недоступности"]]
+                    + survival_rows,
+                    [39 * mm, 39 * mm, 23 * mm, 34 * mm, 22 * mm, 22 * mm, 22 * mm, 41 * mm],
+                )
+            )
+        else:
+            story.append(
+                Paragraph("В сохранённом снимке нет прогноза приживаемости.", body)
+            )
+
+        story.append(Paragraph("Операции ухода", heading))
+        if snapshot["care"]:
+            story.append(
+                _table(
+                    [["Год проекта", "Месяц", "Операция", "Кол-во", "Ед.", "Вода, м³", "Визиты", "Группы"]]
+                    + [
+                        [
+                            operation["year_offset"] + 1,
+                            _p(MONTHS_RU[operation["month"]]),
+                            _p(operation["operation"]),
+                            _p(_ru_decimal(operation["quantity"])),
+                            _p(UNIT_LABELS_RU.get(operation["unit"], operation["unit"])),
+                            _p(_ru_decimal(operation["water_m3"])),
+                            operation["visits"],
+                            _p(", ".join(operation["placement_ids"])),
+                        ]
+                        for operation in snapshot["care"]
+                    ],
+                    [25 * mm, 22 * mm, 45 * mm, 18 * mm, 18 * mm, 20 * mm, 17 * mm, 77 * mm],
+                )
+            )
+        else:
+            story.append(
+                Paragraph("В сохранённом снимке операции ухода отсутствуют.", body)
+            )
+
+        for horizon in (5, 10, 20):
+            metrics = [
+                metric
+                for metric in snapshot["ecosystem"]
+                if metric.get("horizon_year") == horizon
+            ]
+            story.append(Paragraph(f"Экосистемные показатели: {horizon} лет", heading))
+            if not metrics:
+                story.append(
+                    Paragraph(
+                        f"В снимке нет показателей на горизонте {horizon} лет.",
+                        body,
+                    )
+                )
+                continue
+            rows = []
+            for metric in metrics:
+                unit = UNIT_LABELS_RU.get(metric["unit"], metric["unit"])
+                if metric["status"] == "unavailable" or metric["value"] is None:
+                    result = f"недоступно: {_gap_text(metric.get('missing_reason'))}"
+                else:
+                    result = f"{_ru_decimal(metric['value'])} {unit}"
+                rows.append(
+                    [
+                        _p(METRIC_LABELS_RU.get(metric["key"], metric["key"])),
+                        _p(result),
+                        _p(metric["status"]),
+                        _p(metric["qualitative_confidence"]),
+                        _p(metric["method_version"]),
+                    ]
+                )
+            story.append(
+                _table(
+                    [["Показатель", "Значение или причина", "Статус", "Доверие", "Метод"]] + rows,
+                    [48 * mm, 91 * mm, 27 * mm, 27 * mm, 49 * mm],
+                )
+            )
+
+        story.append(Paragraph("Качество и ограничения", heading))
+        if quality_gaps:
+            story.append(
+                _table(
+                    [["Код", "Описание", "Критичность", "Нужны входы"]]
+                    + [
+                        [
+                            _p(value["code"]),
+                            _p(value["message"]),
+                            "блокирующий" if value["blocking"] else "предупреждение",
+                            _p(", ".join(value.get("required_inputs", []))),
+                        ]
+                        for value in quality_gaps
+                    ],
+                    [48 * mm, 105 * mm, 42 * mm, 48 * mm],
+                )
+            )
+        else:
+            story.append(
+                Paragraph("В снимке не зафиксированы блокирующие пробелы или предупреждения.", body)
+            )
     story.extend(
         [
             PageBreak(),
-            Paragraph("Источники", heading),
+            Paragraph("Паспорт источников", heading),
             _table(
-                [["Версия данных", "Набор", "Владелец", "Лицензия", "Метод", "Наблюдение"]]
+                [["Версия данных", "Запись", "Набор", "Владелец", "Лицензия", "Метод / дата"]]
                 + [
                     [
-                        _p(row["dataset_version_id"]), _p(row["name"]), _p(row["owner"]),
-                        _p(row["license"]), _p(row["method"]), _p(row["observed_at"]),
+                        _p(row["dataset_version_id"]),
+                        _p(row["source_record_id"]),
+                        _p(row["name"]),
+                        _p(row["owner"]),
+                        _p(row["license"]),
+                        _p(f"{row['method'] or '—'} / {row['observed_at'] or '—'}"),
                     ]
                     for row in context["sources"]
                 ],
-                [55 * mm, 48 * mm, 40 * mm, 35 * mm, 45 * mm, 35 * mm],
+                [48 * mm, 42 * mm, 42 * mm, 32 * mm, 30 * mm, 48 * mm],
             ),
         ]
     )

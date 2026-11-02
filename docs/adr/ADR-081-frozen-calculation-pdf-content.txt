@@ -1,0 +1,49 @@
+ADR-081: Material PDF content from the frozen calculation snapshot
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-EXP-01 requires a readable report with survival at years 1/2/3, care, ecosystem
+effects at years 5/10/20, sources, quality and limitations. The PDF export was already
+bound to an authorized immutable CalculationSnapshot and preserved its checksum,
+download expiry and embedded Cyrillic fonts. However, it rendered care and ecosystem
+results only as counts, omitted calculation-version provenance, and did not expose
+survival or ecosystem missing-data reasons. A valid export could therefore be durable
+but not useful for a specialist or jury review.
+
+Decision
+The calculation PDF renders result values only from the saved CalculationSnapshot and
+its saved source manifest. It now contains:
+
+- a calculation passport with snapshot/revision IDs, input/output hashes, code release,
+  model/coefficient/rate versions and seed;
+- one survival row per saved placement or area-patch group, with the exact year 1, 2
+  and 3 probability and interval, plus any saved reason for unavailability;
+- every saved care operation with project year, month, operation, quantity, unit,
+  water, visits and affected group IDs;
+- separate ecosystem sections for the exact 5, 10 and 20 year horizons, showing the
+  saved value/unit or the saved unavailable reason;
+- a deduplicated quality table covering snapshot warnings, cost gaps, survival gaps
+  and ecosystem missing reasons, including blocking severity and required inputs;
+- an expanded source passport with dataset and source-record versions.
+
+If a module or horizon has no rows in the snapshot, the PDF says so explicitly. It does
+not turn absence into zero. The report does not print a priority value because priority
+is not part of CalculationSnapshot; joining a mutable or separately calculated value
+would violate frozen-export semantics. Adding priority later requires a canonical frozen
+field rather than a renderer-side inference.
+
+Consequences
+The assistant-created report from ADR-080 and the ordinary export endpoint now produce
+the same reviewable, snapshot-bound PDF. The existing renderer, embedded fonts, map
+sketch, attribution/source section, artifact checksum, authorization and signed download
+remain unchanged. Russian display labels are presentation-only; machine values and
+version identifiers remain intact in the snapshot and XLSX export.
+
+Verification
+- Focused PDF tests extract text and assert the passport, survival, care, all ecosystem
+  horizons, unavailable reason, quality severity and source passport.
+- A missing-module test asserts explicit absence labels for care and 5/10/20 ecosystem
+  horizons.
+- Existing export integration tests continue to cover job idempotency, authorization,
+  PDF download, checksum and corruption detection.
