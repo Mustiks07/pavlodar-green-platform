@@ -41,6 +41,7 @@ const QUICK_PROMPTS = [
   'Какие территории сейчас требуют внимания в первую очередь?',
   'Объясни стоимость, уход и ожидаемый эффект текущего проекта.',
 ];
+const CALCULATION_PROMPT = 'Пересчитай текущий проект и покажи подтверждённые результаты.';
 
 /**
  * The binding a session was created with, as the server returned it. There is no read operation
@@ -566,6 +567,9 @@ function Conversation({ sessionId }: { sessionId: string }) {
   const terminal = job.data ? TERMINAL_JOB_STATES.includes(job.data.state) : false;
   const messages = useChatMessages(sessionId, !jobId || terminal);
   const [draft, setDraft] = useState('');
+  const quickPrompts = rememberedSession(sessionId)?.scenario_revision_id
+    ? [CALCULATION_PROMPT, ...QUICK_PROMPTS]
+    : QUICK_PROMPTS;
   const sendKey = useRef<string | null>(null);
   const listRef = useRef<HTMLOListElement>(null);
 
@@ -659,7 +663,7 @@ function Conversation({ sessionId }: { sessionId: string }) {
           <span className="asst-empty__icon"><Icon name="chat" size={23} /></span>
           <div><strong>С чего начать</strong><p>{t('assistant.empty')} Выберите готовый вопрос или сформулируйте свой.</p></div>
           <div className="asst-prompts">
-            {QUICK_PROMPTS.map((prompt) => <button key={prompt} type="button" onClick={() => setDraft(prompt)}>{prompt}</button>)}
+            {quickPrompts.map((prompt) => <button key={prompt} type="button" onClick={() => setDraft(prompt)}>{prompt}</button>)}
           </div>
         </section>
       )}

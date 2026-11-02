@@ -1,0 +1,30 @@
+ADR-075: Assistant-triggered canonical fast calculation
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-AI-01 requires the assistant to run a calculation and return its result, not merely explain an
+old snapshot. The assistant already exposed authorized facts and reviewable proposals, but a direct
+request to recalculate the open project went to prose generation and created no CalculationSnapshot.
+That broke the most natural jury interaction and could make the AI appear disconnected from the
+planning engine.
+
+Decision
+A revision-bound specialist chat receives one internal tool, `calculate_current_scenario`, with an
+empty argument object. The server fixes the exact bound revision, fast mode, cost/survival/care/
+suitability modules and seed zero. Neither the model nor the browser can substitute a revision,
+module list or seed. Explicit Russian calculate/recalculate phrases route deterministically to the
+tool before any external provider call, so the action remains available during provider outage;
+explanatory questions such as how cost is calculated do not trigger it.
+
+The tool re-authorizes the exact revision and calls the existing canonical `calculate_fast` inside
+the same transaction that completes the chat job. Its immutable snapshot supplies the existing Fact
+cards and exact links. The prose contains no computed numbers and states whether the result is full
+or partial; unavailable values and gaps remain in the snapshot and are never converted to zero.
+Idempotent message replay and worker rollback therefore cannot persist duplicate calculations.
+
+Consequences
+The assistant now closes a visible ask-to-result loop while remaining an orchestrator rather than a
+second calculation engine. Project pages, chat facts, manifests and exports can all refer to the same
+snapshot. The action never applies a project change automatically and remains unavailable to an
+unbound chat or a role without specialist access.

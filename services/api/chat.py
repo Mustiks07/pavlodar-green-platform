@@ -69,6 +69,10 @@ def server_owned_tool_reply(request):
         (tool for tool in request.tools if tool.name == "recommend_plants"),
         None,
     )
+    calculation_tool = next(
+        (tool for tool in request.tools if tool.name == "calculate_current_scenario"),
+        None,
+    )
     plant_proposal_tool = next(
         (tool for tool in request.tools if tool.name == "propose_placement_plant"),
         None,
@@ -94,6 +98,32 @@ def server_owned_tool_reply(request):
             "лучшее растение в проект",
         )
     )
+    asks_calculation = any(
+        phrase in question
+        for phrase in (
+            "пересчитай проект",
+            "пересчитай текущий проект",
+            "рассчитай текущий проект",
+            "выполни расчёт проекта",
+            "выполни расчет проекта",
+            "запусти расчёт проекта",
+            "запусти расчет проекта",
+        )
+    )
+    if calculation_tool and asks_calculation:
+        return LLMReply(
+            provider="server-tools",
+            model="canonical-fast-calculation-v1",
+            text="Запускаю проверочный расчёт текущей версии проекта.",
+            tool_calls=(
+                ToolCall(
+                    "server-fast-calculation",
+                    "calculate_current_scenario",
+                    {},
+                ),
+            ),
+            usage=Usage(input_tokens=None, output_tokens=None),
+        )
     if plant_proposal_tool and asks_plant_proposal:
         return LLMReply(
             provider="server-tools",
@@ -994,6 +1024,22 @@ def prepare_chat_request(db, job):
         job.request_payload.get("scenario_revision_id"), scenario_context
     )
     tools = []
+    if job.request_payload.get("scenario_revision_id") and "specialist" in user.roles:
+        tools.append(
+            ToolSpec(
+                name="calculate_current_scenario",
+                description=(
+                    "Run the canonical server-owned fast calculation for the exact scenario "
+                    "revision bound to this chat. Use only when the user explicitly asks to "
+                    "calculate or recalculate the current project. Accept no arguments."
+                ),
+                parameters={
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {},
+                },
+            )
+        )
     if (
         job.request_payload.get("scenario_revision_id")
         and scenario_context.get("catalog_version_id")
@@ -1065,6 +1111,8 @@ def prepare_chat_request(db, job):
         "отсутствующие данные. Если значения нет, прямо скажи, что оно недоступно. "
         "Не предлагай обход прав и не выполняй изменения. Для явной просьбы подобрать растения "
         "используй recommend_plants: результат считает сервер по закреплённым версиям. "
+        "По явной просьбе рассчитать или пересчитать текущий проект используй "
+        "calculate_current_scenario без аргументов: версии, модули и seed выбирает сервер. "
         "Если доступен инструмент предложения, "
         "используй propose_placement_quantity только по явной просьбе изменить количество. "
         "По явной просьбе подготовить лучший рекомендованный вид в проекте используй "
@@ -1196,6 +1244,44 @@ def _recommend_plants(db, access, job, arguments, facts):
     return text
 
 
+def _calculate_current_scenario(db, access, job, arguments, facts):
+    if arguments != {}:
+        raise DomainError(
+            422,
+            "invalid_body",
+            "Assistant calculation arguments must be an empty object",
+        )
+    revision_id = job.request_payload.get("scenario_revision_id")
+    if not revision_id:
+        raise DomainError(422, "invalid_body", "Calculation requires a bound scenario revision")
+    revision = authorized_revision(db, access, revision_id)
+
+    from services.api.calculations import calculate_fast
+
+    result = calculate_fast(
+        db,
+        access,
+        {
+            "scenario_revision_id": revision.id,
+            "mode": "fast",
+            "include_modules": ["cost", "survival", "care", "suitability"],
+            "seed": 0,
+        },
+        uid=uid,
+        canonical_hash=canonical_hash,
+        now=now,
+    )
+    snapshot = result["snapshot"]
+    facts[:] = [item for item in facts if item.get("calculation_id") is None]
+    facts.extend(snapshot_facts(snapshot["id"], revision.id, snapshot))
+    if snapshot["status"] == "complete":
+        return "Проверочный расчёт сохранён полностью. Точные результаты показаны в карточках ниже."
+    return (
+        "Проверочный расчёт сохранён частично. Доступные результаты показаны в карточках ниже; "
+        "отсутствующие входы и причины сохранены в результате."
+    )
+
+
 def _proposed_revision(db, access, job, reply, message, facts):
     if not reply.tool_calls:
         return None, reply.text
@@ -1203,6 +1289,10 @@ def _proposed_revision(db, access, job, reply, message, facts):
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")
     if reply.tool_calls[0].name == "recommend_plants":
         return None, _recommend_plants(db, access, job, reply.tool_calls[0].arguments, facts)
+    if reply.tool_calls[0].name == "calculate_current_scenario":
+        return None, _calculate_current_scenario(
+            db, access, job, reply.tool_calls[0].arguments, facts
+        )
     tool_name = reply.tool_calls[0].name
     if tool_name not in {"propose_placement_quantity", "propose_placement_plant"}:
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")

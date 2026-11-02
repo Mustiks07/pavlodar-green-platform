@@ -6,12 +6,14 @@ from services.api.chat import (
     grounded_fallback_reply,
     latest_calculation_context,
     presentable_reply,
+    server_owned_tool_reply,
     snapshot_facts,
 )
 from services.api.db import engine, session
 from services.api.llm import LLMReply, LLMRequest, Message, ToolCall, ToolSpec, Usage
-from services.api.models import ChatMessageRecord
+from services.api.models import CalculationSnapshotRecord, ChatMessageRecord
 from services.worker.main import run_job
+from tests.test_calculations import setup_revision
 from tests.test_catalog import (
     RULE_ID,
     create_three_plants,
@@ -389,6 +391,82 @@ def test_grounded_fallback_routes_explicit_plant_selection_to_server_tool():
     assert reply.tool_calls[0].arguments == {"top_n": 5}
 
 
+def test_server_owned_calculation_intent_is_explicit_and_argument_free():
+    tool = ToolSpec(
+        name="calculate_current_scenario",
+        description="canonical calculation",
+        parameters={"type": "object", "additionalProperties": False, "properties": {}},
+    )
+    explicit = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Пересчитай текущий проект")),
+            tools=(tool,),
+        )
+    )
+    assert explicit.tool_calls[0].name == "calculate_current_scenario"
+    assert explicit.tool_calls[0].arguments == {}
+    explanatory = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Как считается стоимость?")),
+            tools=(tool,),
+        )
+    )
+    assert explanatory is None
+
+
+def test_chat_calculates_exact_bound_revision_without_provider_or_duplicates(clients, monkeypatch):
+    scenario, _revision, saved, _rate = setup_revision(clients, with_model=True)
+    revision_id = saved.json()["id"]
+    specialist = clients["specialist"]
+    created_chat = chat_session(specialist, scenario["zone_id"], revision_id)
+
+    class ForbiddenGateway:
+        def complete(self, request):
+            raise AssertionError("explicit canonical calculation must bypass the provider")
+
+    monkeypatch.setattr("services.api.llm.gateway", lambda: ForbiddenGateway())
+    job = send(
+        specialist,
+        created_chat["id"],
+        "Пересчитай текущий проект и покажи подтверждённые результаты",
+        revision_id,
+        key="assistant-fast-calculation-once",
+    )
+    assert send(
+        specialist,
+        created_chat["id"],
+        "Пересчитай текущий проект и покажи подтверждённые результаты",
+        revision_id,
+        key="assistant-fast-calculation-once",
+    ) == job
+    run_job.run(job["id"])
+
+    with session() as db:
+        snapshots = list(
+            db.scalars(
+                select(CalculationSnapshotRecord).where(
+                    CalculationSnapshotRecord.scenario_revision_id == revision_id
+                )
+            )
+        )
+    assert len(snapshots) == 1
+    snapshot = snapshots[0]
+    messages = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"]
+    assistant = messages[-1]
+    assert assistant["state"] == "completed"
+    assert "расчёт сохранён" in assistant["text"]
+    assert assistant["facts"]
+    calculation_facts = [fact for fact in assistant["facts"] if fact["calculation_id"]]
+    assert {fact["calculation_id"] for fact in calculation_facts} == {snapshot.id}
+    assert {fact["scenario_revision_id"] for fact in calculation_facts} == {revision_id}
+    survival_fact = next(
+        fact for fact in calculation_facts if fact["metric"]["key"] == "survival_probability"
+    )
+    assert survival_fact["metric"]["value"] == snapshot.payload["survival"][0]["points"][0]["probability"]
+
+
 class FakeGateway:
     def complete(self, request):
         assert "AUTHORIZED_CONTEXT=" in request.messages[1].content
@@ -633,6 +711,7 @@ def test_chat_proposal_requires_human_apply_and_current_revision(clients, monkey
     class ProposalGateway:
         def complete(self, request):
             assert [tool.name for tool in request.tools] == [
+                "calculate_current_scenario",
                 "recommend_plants",
                 "propose_placement_plant",
                 "propose_placement_quantity",
