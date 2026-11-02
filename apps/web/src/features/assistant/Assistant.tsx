@@ -43,6 +43,8 @@ const QUICK_PROMPTS = [
   'Объясни стоимость, уход и ожидаемый эффект текущего проекта.',
 ];
 const CALCULATION_PROMPT = 'Пересчитай текущий проект и покажи подтверждённые результаты.';
+const RESULT_PROMPT = 'Покажи результат текущего проекта.';
+const REPORT_PROMPT = 'Сформируй PDF-отчёт по текущему проекту.';
 
 /**
  * The binding a session was created with, as the server returned it. There is no read operation
@@ -570,7 +572,7 @@ function Conversation({ sessionId }: { sessionId: string }) {
   const messages = useChatMessages(sessionId, !jobId || terminal);
   const [draft, setDraft] = useState('');
   const quickPrompts = rememberedSession(sessionId)?.scenario_revision_id
-    ? [CALCULATION_PROMPT, ...QUICK_PROMPTS]
+    ? [RESULT_PROMPT, CALCULATION_PROMPT, REPORT_PROMPT, ...QUICK_PROMPTS]
     : QUICK_PROMPTS;
   const sendKey = useRef<string | null>(null);
   const listRef = useRef<HTMLOListElement>(null);

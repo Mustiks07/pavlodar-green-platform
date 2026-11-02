@@ -77,6 +77,10 @@ def server_owned_tool_reply(request):
         (tool for tool in request.tools if tool.name == "create_current_report"),
         None,
     )
+    current_result_tool = next(
+        (tool for tool in request.tools if tool.name == "get_current_result"),
+        None,
+    )
     plant_proposal_tool = next(
         (tool for tool in request.tools if tool.name == "propose_placement_plant"),
         None,
@@ -126,6 +130,24 @@ def server_owned_tool_reply(request):
             "скачай отч",
         )
     )
+    asks_current_result = any(
+        phrase in question
+        for phrase in (
+            "покажи результат текущего проекта",
+            "покажи результаты текущего проекта",
+            "покажи текущий результат",
+            "покажи результат расчёта",
+            "покажи результат расчета",
+            "покажи результаты расчёта",
+            "покажи результаты расчета",
+            "что получилось в расчёте",
+            "что получилось в расчете",
+            "покажи смету",
+            "покажи приживаемость",
+            "покажи экологический эффект",
+            "покажи эффект",
+        )
+    )
     if report_tool and asks_report:
         return LLMReply(
             provider="server-tools",
@@ -149,6 +171,20 @@ def server_owned_tool_reply(request):
                 ToolCall(
                     "server-fast-calculation",
                     "calculate_current_scenario",
+                    {},
+                ),
+            ),
+            usage=Usage(input_tokens=None, output_tokens=None),
+        )
+    if current_result_tool and asks_current_result:
+        return LLMReply(
+            provider="server-tools",
+            model="frozen-current-result-v1",
+            text="Показываю последний сохранённый результат закреплённой версии проекта.",
+            tool_calls=(
+                ToolCall(
+                    "server-current-result",
+                    "get_current_result",
                     {},
                 ),
             ),
@@ -521,14 +557,22 @@ def snapshot_facts(snapshot_id, revision_id, payload):
     """
     facts = []
     cost = payload.get("cost") or {}
-    if cost.get("total") is not None:
+    cost_value = cost.get("total")
+    cost_is_complete = cost_value is not None
+    if cost_value is None:
+        cost_value = cost.get("known_subtotal")
+    if cost_value is not None:
         facts.append(
             {
                 "id": uid(),
-                "label": "Полная стоимость сценария",
+                "label": (
+                    "Полная стоимость сценария"
+                    if cost_is_complete
+                    else "Известная часть стоимости сценария"
+                ),
                 "metric": {
-                    "key": "full_cost",
-                    "value": float(Decimal(cost["total"])),
+                    "key": "full_cost" if cost_is_complete else "known_cost",
+                    "value": float(Decimal(cost_value)),
                     "unit": "KZT",
                     "horizon_year": None,
                     "status": "estimated",
@@ -581,6 +625,24 @@ def snapshot_facts(snapshot_id, revision_id, payload):
                     "source_refs": refs,
                     "missing_reason": None,
                 },
+                "calculation_id": snapshot_id,
+                "scenario_revision_id": revision_id,
+            }
+        )
+    return facts
+
+
+def snapshot_result_facts(snapshot_id, revision_id, payload):
+    """Build only cards that are numerically frozen in one calculation snapshot."""
+    facts = snapshot_facts(snapshot_id, revision_id, payload)
+    for item in payload.get("ecosystem", [])[:21]:
+        if item.get("value") is None:
+            continue
+        facts.append(
+            {
+                "id": uid(),
+                "label": f"{item['key']} · {item.get('horizon_year') or 'текущий горизонт'}",
+                "metric": item,
                 "calculation_id": snapshot_id,
                 "scenario_revision_id": revision_id,
             }
@@ -971,19 +1033,7 @@ def _facts_and_context(db, access, chat_session, revision_id):
         )
         if snapshot:
             context["latest_calculation"] = latest_calculation_context(snapshot.id, snapshot.payload)
-            facts.extend(snapshot_facts(snapshot.id, revision.id, snapshot.payload))
-            for item in snapshot.payload.get("ecosystem", [])[:21]:
-                if item.get("value") is None:
-                    continue
-                facts.append(
-                    {
-                        "id": uid(),
-                        "label": f"{item['key']} · {item.get('horizon_year') or 'текущий горизонт'}",
-                        "metric": item,
-                        "calculation_id": snapshot.id,
-                        "scenario_revision_id": revision.id,
-                    }
-                )
+            facts.extend(snapshot_result_facts(snapshot.id, revision.id, snapshot.payload))
     return facts, context
 
 
@@ -1088,6 +1138,23 @@ def prepare_chat_request(db, job):
                 },
             )
         )
+        if chat_session.scenario_revision_id:
+            tools.append(
+                ToolSpec(
+                    name="get_current_result",
+                    description=(
+                        "Show exact fact cards from the latest saved calculation snapshot of "
+                        "the scenario revision permanently bound to this chat. Use only when "
+                        "the user explicitly asks to see the current result, estimate, "
+                        "survival or ecosystem effect. Accept no arguments."
+                    ),
+                    parameters={
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {},
+                    },
+                )
+            )
     if (
         job.request_payload.get("scenario_revision_id")
         and scenario_context.get("catalog_version_id")
@@ -1163,6 +1230,9 @@ def prepare_chat_request(db, job):
         "calculate_current_scenario без аргументов: версии, модули и seed выбирает сервер. "
         "По явной просьбе сформировать отчёт используй create_current_report без аргументов: "
         "сервер сам выбирает последний расчёт точной версии и фиксированный PDF. "
+        "По явной просьбе показать текущий результат, смету, приживаемость или эффект "
+        "используй get_current_result без аргументов: сервер читает только frozen-снимок "
+        "ревизии, закреплённой за чатом. "
         "Если доступен инструмент предложения, "
         "используй propose_placement_quantity только по явной просьбе изменить количество. "
         "По явной просьбе подготовить лучший рекомендованный вид в проекте используй "
@@ -1381,6 +1451,47 @@ def _create_current_report(db, access, job, arguments, message):
     return report_job.id, "PDF-отчёт поставлен в очередь по сохранённому расчёту этой версии."
 
 
+def _get_current_result(db, access, job, arguments, facts):
+    if arguments != {}:
+        raise DomainError(
+            422,
+            "invalid_body",
+            "Assistant current-result arguments must be an empty object",
+        )
+    chat_session = session_access(db, access, job.input_ref_id)
+    revision_id = chat_session.scenario_revision_id
+    if not revision_id:
+        raise DomainError(422, "invalid_body", "Current result requires a chat-bound revision")
+    revision = authorized_revision(db, access, revision_id)
+    snapshot = db.scalar(
+        select(CalculationSnapshotRecord)
+        .where(CalculationSnapshotRecord.scenario_revision_id == revision.id)
+        .order_by(
+            CalculationSnapshotRecord.created_at.desc(),
+            CalculationSnapshotRecord.id.desc(),
+        )
+        .limit(1)
+    )
+    facts.clear()
+    if snapshot is None:
+        return (
+            "Для закреплённой версии проекта ещё нет сохранённого расчёта. "
+            "Сначала запустите расчёт этой версии; результат не подменён данными другой ревизии."
+        )
+    result = latest_calculation_context(snapshot.id, snapshot.payload)
+    facts.extend(snapshot_result_facts(snapshot.id, revision.id, snapshot.payload))
+    if not facts:
+        return (
+            "Последний сохранённый расчёт закреплённой версии найден, но в нём нет "
+            "доступных численных показателей. Причины отсутствия входов сохранены в расчёте."
+        )
+    quality = "частично" if result["status"] == "partial" else "полностью"
+    return (
+        f"Показываю последний сохранённый расчёт точно закреплённой версии. "
+        f"Расчёт сохранён {quality}; все доступные численные значения показаны в карточках ниже."
+    )
+
+
 def _proposed_revision(db, access, job, reply, message, facts):
     if not reply.tool_calls:
         return None, None, reply.text
@@ -1399,6 +1510,10 @@ def _proposed_revision(db, access, job, reply, message, facts):
             db, access, job, reply.tool_calls[0].arguments, message
         )
         return None, report_job_id, text
+    if reply.tool_calls[0].name == "get_current_result":
+        return None, None, _get_current_result(
+            db, access, job, reply.tool_calls[0].arguments, facts
+        )
     tool_name = reply.tool_calls[0].name
     if tool_name not in {"propose_placement_quantity", "propose_placement_plant"}:
         raise DomainError(422, "invalid_body", "Assistant returned an unsupported proposal")

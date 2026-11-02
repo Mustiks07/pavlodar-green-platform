@@ -1,0 +1,45 @@
+ADR-082: Assistant retrieval of the current frozen calculation result
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-AI-01 requires the assistant to explain current scenario results. The assistant already
+received a bounded latest-calculation context, but an explicit request such as «покажи смету»
+could still depend on an external provider. A chat message can also name another revision of
+the same scenario, while a historical chat retains its own scenario_revision_id. Result lookup
+must not silently cross that historical boundary or create a new calculation.
+
+Decision
+A specialist chat permanently bound to a ScenarioRevision exposes the argument-free
+`get_current_result` tool. Explicit Russian result intents are routed by the server before an
+external model is called. Explanatory questions such as «Как считается смета?» are not routed
+to the tool.
+
+At persistence time the server re-authorizes the revision stored on ChatSession, deliberately
+ignoring a different revision requested by a later message. It selects the newest
+CalculationSnapshot for that exact revision by created_at and id. The response fact list is
+replaced with cards derived only from that snapshot: the complete cost or explicitly labelled
+known cost subtotal, exact first-year survival values with saved intervals and lineage, and
+available saved ecosystem metrics. The concise Russian text contains no independently computed
+numeric claim.
+
+If the bound revision has no snapshot, the assistant gives an actionable instruction to run a
+calculation, persists no facts and creates no calculation, proposal, report or export job. A
+snapshot belonging to another revision is never used as a fallback. Replaying the same chat
+request remains covered by the existing idempotency record and cannot mutate the scenario or
+create another result.
+
+Consequences
+Showing a result is now provider-independent and read-only. The assistant can distinguish a
+known partial subtotal from a full total without presenting missing cost as zero. There is no
+contract or migration change because ChatMessage already stores canonical Fact cards and the
+tool produces no new resource.
+
+Verification
+- Unit cases cover explicit result, estimate, survival and ecosystem-effect wording, empty tool
+  arguments and non-triggering explanatory wording.
+- The integration case disables the provider, proves that a newer revision's snapshot is ignored
+  by a historical bound chat, checks the no-snapshot response, then verifies newest-exact-snapshot
+  selection and exact cost/survival Fact values.
+- The same integration case replays one idempotency key and verifies that snapshots and scenario
+  revision state do not change.

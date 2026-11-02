@@ -444,6 +444,41 @@ def test_server_owned_report_intent_is_explicit_and_argument_free():
     assert explanatory is None
 
 
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Покажи результат текущего проекта",
+        "Что получилось в расчёте?",
+        "Покажи смету",
+        "Покажи приживаемость",
+        "Покажи экологический эффект",
+    ],
+)
+def test_server_owned_current_result_intent_is_explicit_and_argument_free(question):
+    tool = ToolSpec(
+        name="get_current_result",
+        description="frozen current result",
+        parameters={"type": "object", "additionalProperties": False, "properties": {}},
+    )
+    explicit = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", question)),
+            tools=(tool,),
+        )
+    )
+    assert explicit.provider == "server-tools"
+    assert explicit.tool_calls[0].name == "get_current_result"
+    assert explicit.tool_calls[0].arguments == {}
+
+    explanatory = server_owned_tool_reply(
+        LLMRequest(
+            messages=(Message("system", "rules"), Message("user", "Как считается смета?")),
+            tools=(tool,),
+        )
+    )
+    assert explanatory is None
+
+
 def test_chat_calculates_exact_bound_revision_without_provider_or_duplicates(clients, monkeypatch):
     scenario, _revision, saved, _rate = setup_revision(clients, with_model=True)
     revision_id = saved.json()["id"]
@@ -588,6 +623,153 @@ def test_chat_report_uses_latest_exact_snapshot_and_one_export_job(
         assert artifact.target_kind == "calculation"
         assert artifact.target_id == snapshots[-1]["id"]
         assert artifact.format == "pdf"
+
+
+def test_chat_current_result_is_latest_for_bound_revision_and_read_only(
+    clients, monkeypatch
+):
+    scenario, revision, saved, _rate = setup_revision(clients, with_model=True)
+    bound_revision_id = saved.json()["id"]
+    specialist = clients["specialist"]
+    created_chat = chat_session(specialist, scenario["zone_id"], bound_revision_id)
+
+    newer_body = {
+        **revision,
+        "parent_revision_id": bound_revision_id,
+        "placements": [
+            {
+                **revision["placements"][0],
+                "quantity": revision["placements"][0]["quantity"] + 1,
+            }
+        ],
+        "comment": "SYNTHETIC TEST newer revision must not replace chat binding",
+    }
+    newer = mutation(
+        specialist,
+        "POST",
+        f"/v1/scenarios/{scenario['id']}/revisions",
+        newer_body,
+        etag=saved.headers["etag"],
+    )
+    assert newer.status_code == 201, newer.text
+    newer_revision_id = newer.json()["id"]
+    other_snapshot = mutation(
+        specialist,
+        "POST",
+        "/v1/calculations/fast",
+        {
+            "scenario_revision_id": newer_revision_id,
+            "mode": "fast",
+            "include_modules": ["cost", "survival", "care"],
+            "seed": 80,
+        },
+        key="assistant-current-result-other-revision",
+    )
+    assert other_snapshot.status_code == 200, other_snapshot.text
+
+    class ForbiddenGateway:
+        def complete(self, request):
+            raise AssertionError("explicit current-result lookup must bypass the provider")
+
+    monkeypatch.setattr("services.api.llm.gateway", lambda: ForbiddenGateway())
+
+    # Even an overridden message revision cannot move a historical bound chat.
+    missing_job = send(
+        specialist,
+        created_chat["id"],
+        "Покажи результат текущего проекта",
+        newer_revision_id,
+        key="assistant-current-result-bound-missing",
+    )
+    run_job.run(missing_job["id"])
+    missing_message = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    assert "нет сохранённого расчёта" in missing_message["text"]
+    assert missing_message["facts"] == []
+    assert missing_message["proposal_id"] is None
+    assert missing_message["report_job_id"] is None
+    with session() as db:
+        assert db.scalar(
+            select(CalculationSnapshotRecord).where(
+                CalculationSnapshotRecord.scenario_revision_id == bound_revision_id
+            )
+        ) is None
+        assert list(db.scalars(select(Job).where(Job.input_kind == "calculation"))) == []
+
+    for seed in (81, 82):
+        calculated = mutation(
+            specialist,
+            "POST",
+            "/v1/calculations/fast",
+            {
+                "scenario_revision_id": bound_revision_id,
+                "mode": "fast",
+                "include_modules": ["cost", "survival", "care"],
+                "seed": seed,
+            },
+            key=f"assistant-current-result-exact-{seed}",
+        )
+        assert calculated.status_code == 200, calculated.text
+
+    with session() as db:
+        expected = db.scalar(
+            select(CalculationSnapshotRecord)
+            .where(CalculationSnapshotRecord.scenario_revision_id == bound_revision_id)
+            .order_by(
+                CalculationSnapshotRecord.created_at.desc(),
+                CalculationSnapshotRecord.id.desc(),
+            )
+            .limit(1)
+        )
+        snapshot_count = len(list(db.scalars(select(CalculationSnapshotRecord))))
+
+    result_job = send(
+        specialist,
+        created_chat["id"],
+        "Что получилось в расчёте?",
+        newer_revision_id,
+        key="assistant-current-result-once",
+    )
+    assert send(
+        specialist,
+        created_chat["id"],
+        "Что получилось в расчёте?",
+        newer_revision_id,
+        key="assistant-current-result-once",
+    ) == result_job
+    run_job.run(result_job["id"])
+
+    assistant = specialist.get(
+        f"/v1/chat/sessions/{created_chat['id']}/messages"
+    ).json()["items"][-1]
+    validate("ChatMessage", assistant)
+    assert assistant["state"] == "completed"
+    assert "точно закреплённой версии" in assistant["text"]
+    assert assistant["proposal_id"] is None
+    assert assistant["report_job_id"] is None
+    assert assistant["facts"]
+    assert {fact["calculation_id"] for fact in assistant["facts"]} == {expected.id}
+    assert {fact["scenario_revision_id"] for fact in assistant["facts"]} == {
+        bound_revision_id
+    }
+    known_cost = next(
+        fact for fact in assistant["facts"] if fact["metric"]["key"] == "known_cost"
+    )
+    assert known_cost["metric"]["value"] == float(expected.payload["cost"]["known_subtotal"])
+    survival = next(
+        fact
+        for fact in assistant["facts"]
+        if fact["metric"]["key"] == "survival_probability"
+    )
+    assert survival["metric"]["value"] == expected.payload["survival"][0]["points"][0][
+        "probability"
+    ]
+    assert specialist.get(f"/v1/scenarios/{scenario['id']}").json()[
+        "current_revision_id"
+    ] == newer_revision_id
+    with session() as db:
+        assert len(list(db.scalars(select(CalculationSnapshotRecord)))) == snapshot_count
 
 
 class FakeGateway:
@@ -836,6 +1018,7 @@ def test_chat_proposal_requires_human_apply_and_current_revision(clients, monkey
             assert [tool.name for tool in request.tools] == [
                 "calculate_current_scenario",
                 "create_current_report",
+                "get_current_result",
                 "recommend_plants",
                 "propose_placement_plant",
                 "propose_placement_quantity",
