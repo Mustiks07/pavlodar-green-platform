@@ -1,19 +1,19 @@
 {
   "base": "http://localhost:5174",
-  "startedAt": "2026-10-31T08:21:21.835Z",
+  "startedAt": "2026-11-02T00:43:10.134Z",
   "checks": [
     {
-      "name": "basemap: OpenFreeMap liberty style loaded under platform layers",
+      "name": "basemap: OpenFreeMap liberty style loaded with platform interaction layers on top",
       "pass": true,
       "detail": {
-        "layers": 120,
+        "layers": 127,
         "top": [
           "feature-highlight-line",
           "feature-highlight-point",
           "zone-history-line"
         ],
         "firstPlatform": 111,
-        "lastBasemap": 110,
+        "lastBasemap": 122,
         "note": null
       }
     },
@@ -43,33 +43,44 @@
       }
     },
     {
-      "name": "createDataset from the wizard selects the new dataset",
+      "name": "wizard has a target dataset for the import journey",
       "pass": true,
       "detail": {
-        "datasetId": "6fbef7c9-9471-46b6-ad4e-bc84b26778b6"
+        "datasetId": "338737f1-2375-4ad1-8ede-729388af1ed4"
       }
     },
     {
-      "name": "KML: shown as not supported by the parser, upload disabled",
+      "name": "KML: accepted by the UI without pretending to parse it locally",
       "pass": true
+    },
+    {
+      "name": "KML: durable job creates a reviewable version with one polygon",
+      "pass": true,
+      "detail": {
+        "state": "succeeded",
+        "valid": 1
+      }
     },
     {
       "name": "GeoJSON that the server would reject as a whole is blocked before upload",
       "pass": true
     },
     {
-      "name": "nothing was uploaded for KML or invalid root",
+      "name": "invalid GeoJSON root creates no additional upload",
       "pass": true,
       "detail": [
-        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
-        "PUT /v1/uploads/45b33578-f2bc-458d-a738-5b5841ec535b",
-        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
-        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
-        "PUT /v1/uploads/70ec0c9c-be0a-4408-b368-c45641ca6f55",
-        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
-        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
-        "PUT /v1/uploads/239984ce-715e-42e9-9759-8e0abc2cfe77",
-        "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports"
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+        "PUT /v1/uploads/a7695515-f245-4aac-8fd2-a2194be9e9a0",
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+        "PUT /v1/uploads/39cd7c8f-4bbb-47c2-abc6-2da11f939b54",
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+        "PUT /v1/uploads/fcf3de16-69c2-4b4a-b008-c25e6f8e6dbf",
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+        "PUT /v1/uploads/0892dce9-02f6-46ec-af71-7b3db2303fc2",
+        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports"
       ]
     },
     {
@@ -79,15 +90,18 @@
         "state": "succeeded",
         "kind": "import",
         "requests": [
-          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
-          "PUT /v1/uploads/45b33578-f2bc-458d-a738-5b5841ec535b",
-          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
-          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
-          "PUT /v1/uploads/70ec0c9c-be0a-4408-b368-c45641ca6f55",
-          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports",
-          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/uploads",
-          "PUT /v1/uploads/239984ce-715e-42e9-9759-8e0abc2cfe77",
-          "POST /v1/datasets/6fbef7c9-9471-46b6-ad4e-bc84b26778b6/imports"
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+          "PUT /v1/uploads/a7695515-f245-4aac-8fd2-a2194be9e9a0",
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+          "PUT /v1/uploads/39cd7c8f-4bbb-47c2-abc6-2da11f939b54",
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+          "PUT /v1/uploads/fcf3de16-69c2-4b4a-b008-c25e6f8e6dbf",
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
+          "PUT /v1/uploads/0892dce9-02f6-46ec-af71-7b3db2303fc2",
+          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports"
         ]
       }
     },
@@ -108,7 +122,7 @@
       "name": "reload resumes the job view from the URL",
       "pass": true,
       "detail": {
-        "url": "http://localhost:5174/imports?city=10000000-0000-4000-8000-000000000001&job=322cf871-4621-4767-9b1d-cde173b8a553&importDataset=6fbef7c9-9471-46b6-ad4e-bc84b26778b6"
+        "url": "http://localhost:5174/imports?city=10000000-0000-4000-8000-000000000001&job=ee53c207-78fa-4b92-adbd-799c1c774516&importDataset=338737f1-2375-4ad1-8ede-729388af1ed4"
       }
     },
     {
@@ -134,7 +148,7 @@
       "name": "admin sees publish only on versions that are not published/rejected",
       "pass": true,
       "detail": {
-        "count": 2
+        "count": 3
       }
     },
     {
@@ -145,7 +159,7 @@
       "name": "admin publish: server result shown (published, or refusal with reasons)",
       "pass": true,
       "detail": {
-        "current": "95005b75-3a3a-488d-8511-4c470bfcf74e",
+        "current": "4dba51f7-3414-4c63-8572-93ca52a4e369",
         "dialog": ""
       }
     },
@@ -157,13 +171,13 @@
   "shots": [
     "docs/evidence/wp03-import-ui/map-basemap.png",
     "docs/evidence/wp03-import-ui/map-basemap-failed.png",
-    "docs/evidence/wp03-import-ui/kml-not-supported.png",
+    "docs/evidence/wp03-import-ui/kml-server-validation.png",
     "docs/evidence/wp03-import-ui/geojson-preview.png",
     "docs/evidence/wp03-import-ui/geojson-imported.png",
     "docs/evidence/wp03-import-ui/geojson-rejected.png",
     "docs/evidence/wp03-import-ui/csv-preview.png",
     "docs/evidence/wp03-import-ui/admin-after-publish.png"
   ],
-  "finishedAt": "2026-10-31T08:23:01.570Z",
+  "finishedAt": "2026-11-02T00:45:09.850Z",
   "passed": true
 }

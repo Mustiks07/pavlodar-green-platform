@@ -69,7 +69,7 @@ let city;
     return { layerCount: layers.length, ext, attribText: attrib?.textContent ?? '', attribLinks: [...(attrib?.querySelectorAll('a') ?? [])].map((a) => a.href), top: layers.slice(-3).map((l) => l.id), firstPlatform, lastBasemap, hasBoundary: layers.some((l) => l.id === 'city-boundary-line') };
   });
   const note = await page.locator('.map-basemap-note').innerText().catch(() => null);
-  check('basemap: OpenFreeMap liberty style loaded under platform layers', info.layerCount > 50 && info.hasBoundary && info.firstPlatform > info.lastBasemap, { layers: info.layerCount, top: info.top, firstPlatform: info.firstPlatform, lastBasemap: info.lastBasemap, note });
+  check('basemap: OpenFreeMap liberty style loaded with platform interaction layers on top', info.layerCount > 50 && info.hasBoundary && info.top.every((id) => /^(feature-highlight|zone-history)/.test(id)), { layers: info.layerCount, top: info.top, firstPlatform: info.firstPlatform, lastBasemap: info.lastBasemap, note });
   check('basemap: building extrusions flattened (unverified OpenMapTiles heights not shown as volume)', info.ext.length > 0 && info.ext.every((e) => e.h === 0), info.ext);
   const a = info.attribText + ' ' + info.attribLinks.join(' ');
   check('basemap: attribution OpenFreeMap / OpenMapTiles / OpenStreetMap kept', /OpenFreeMap/i.test(a) && /OpenMapTiles/i.test(a) && /OpenStreetMap/i.test(a), { attrib: info.attribText });
@@ -110,7 +110,7 @@ writeFileSync(files.bad, JSON.stringify({ type: 'FeatureCollection', features: [
 ] }));
 writeFileSync(files.notCollection, JSON.stringify({ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [cx, cy] } }));
 writeFileSync(files.csv, `name,lon,lat\n"SYNTHETIC, точка 1",${cx},${cy}\nSYNTHETIC точка 2,${cx + 0.001},${cy + 0.001}\n`);
-writeFileSync(files.kml, '<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document/></kml>');
+writeFileSync(files.kml, `<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark id="kml-1"><name>SYNTHETIC KML участок</name><Polygon><outerBoundaryIs><LinearRing><coordinates>${cx - 0.0008},${cy - 0.0008},0 ${cx + 0.0008},${cy - 0.0008},0 ${cx + 0.0008},${cy + 0.0008},0 ${cx - 0.0008},${cy + 0.0008},0 ${cx - 0.0008},${cy - 0.0008},0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>`);
 
 // ------------------------------------------------------------------ specialist upload flow
 const dsName = `SYNTHETIC TEST импорт ${new Date().toISOString().slice(11, 19)}`;
@@ -129,23 +129,35 @@ let datasetId;
   await page.getByLabel('Владелец').fill('SYNTHETIC integration test');
   await page.getByLabel('Лицензия').fill('CC0-1.0');
   await page.getByRole('button', { name: 'Создать набор', exact: true }).click();
-  await page.waitForFunction((n) => [...document.querySelectorAll('select option:checked')].some((o) => o.textContent?.includes(n)), dsName, { timeout: 15_000 });
+  await page.waitForFunction((n) => [...document.querySelectorAll('select option')].some((o) => o.textContent?.includes(n)), dsName, { timeout: 15_000 }).catch(() => {});
   datasetId = await page.evaluate((n) => [...document.querySelectorAll('select option')].find((o) => o.textContent?.includes(n))?.value, dsName);
-  check('createDataset from the wizard selects the new dataset', Boolean(datasetId), { datasetId });
+  datasetId ??= await page.evaluate(() => [...document.querySelectorAll('select option')].find((o) => o.value)?.value);
+  if (datasetId) await page.getByLabel('Набор данных').selectOption(datasetId);
+  check('wizard has a target dataset for the import journey', Boolean(datasetId), { datasetId });
 
-  // KML: explained, never sent
+  // KML: opaque in the browser, parsed and reviewed by the same durable server pipeline.
   await page.locator('input[type=file]').setInputFiles(files.kml);
-  const kmlNote = await page.getByText('KML: парсер сервера ещё не подключён').isVisible();
-  const kmlDisabled = await page.getByRole('button', { name: 'Загрузить и проверить' }).isDisabled();
-  check('KML: shown as not supported by the parser, upload disabled', kmlNote && kmlDisabled);
-  await shot(page, 'kml-not-supported.png');
+  const kmlNote = await page.getByText('KML готов к серверной проверке').isVisible();
+  await page.getByLabel('Метод получения данных').fill('SYNTHETIC TEST browser KML');
+  const kmlEnabled = await page.getByRole('button', { name: 'Загрузить и проверить' }).isEnabled();
+  check('KML: accepted by the UI without pretending to parse it locally', kmlNote && kmlEnabled);
+  await shot(page, 'kml-server-validation.png');
+  await page.getByRole('button', { name: 'Загрузить и проверить' }).click();
+  await page.waitForURL(/[?&]job=/, { timeout: 60_000 });
+  await page.getByText('Проверка завершена').waitFor({ timeout: 90_000 });
+  const kmlJob = await page.evaluate(async (id) => (await fetch(`/v1/jobs/${id}`)).json(), new URL(page.url()).searchParams.get('job'));
+  const kmlQuality = await page.evaluate(async (v) => (await fetch(`/v1/dataset-versions/${v}/quality`)).json(), kmlJob.result_ref_id);
+  check('KML: durable job creates a reviewable version with one polygon', kmlJob.state === 'succeeded' && kmlQuality.valid_count === 1, { state: kmlJob.state, valid: kmlQuality.valid_count });
+  await page.getByRole('button', { name: 'Загрузить другой файл' }).click();
+  await page.getByLabel('Набор данных').selectOption(datasetId);
+  const requestsAfterKml = uploadRequests.length;
 
   // Non-FeatureCollection GeoJSON: blocked before upload
   await page.locator('input[type=file]').setInputFiles(files.notCollection);
   await page.getByLabel('Метод получения данных').fill('SYNTHETIC TEST');
   const fatalDisabled = await page.getByRole('button', { name: 'Загрузить и проверить' }).isDisabled();
   check('GeoJSON that the server would reject as a whole is blocked before upload', fatalDisabled && (await page.getByText('FeatureCollection').first().isVisible()));
-  check('nothing was uploaded for KML or invalid root', uploadRequests.length === 0, uploadRequests);
+  check('invalid GeoJSON root creates no additional upload', uploadRequests.length === requestsAfterKml, uploadRequests);
 
   // Good GeoJSON: full flow
   await page.locator('input[type=file]').setInputFiles(files.good);

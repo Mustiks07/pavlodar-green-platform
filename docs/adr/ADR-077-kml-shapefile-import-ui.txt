@@ -1,0 +1,23 @@
+ADR-077: Connect KML and Shapefile ZIP to the import UI
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-DATA-01 requires the import journey to accept GeoJSON, KML, Shapefile and CSV. The isolated
+worker already parsed WGS84 KML and a bounded ZIP containing one matching SHP/SHX/DBF set, with
+XML entity, archive traversal, entry-count, expansion, record and coordinate guards. The browser
+still marked both formats unavailable and disabled upload, so a working server capability could not
+be reached through the product.
+
+Decision
+The wizard admits KML and SHP ZIP through the same upload ticket, SHA-256, durable job, quality
+review and publication pipeline as GeoJSON and CSV. It sends the registered MIME type, WGS84 source
+CRS and an empty field mapping, preserving all properties. Binary/archive and XML content are not
+parsed by the browser: the preview shows file identity and explains that the isolated server parser
+will produce the authoritative quality report. This avoids duplicating ZIP/XML security logic or
+claiming local validation.
+
+Consequences
+All four required vector formats are reachable from the normal specialist workflow. Unsafe content
+still ends as a typed rejected report rather than a browser or worker crash. Reprojection remains
+out of scope: the existing server accepts these formats only when their coordinates are WGS84.

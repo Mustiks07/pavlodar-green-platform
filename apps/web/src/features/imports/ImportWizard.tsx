@@ -31,6 +31,7 @@ import {
   PARSER_SUPPORTED,
   previewCsv,
   previewGeoJson,
+  previewOpaque,
   type FilePreview,
   type ImportFormat,
 } from './preview';
@@ -153,6 +154,13 @@ function DatasetPicker({ city, value, onChange }: { city: City; value: string; o
 }
 
 function PreviewView({ preview, format }: { preview: FilePreview; format: ImportFormat }) {
+  if (preview.kind === 'opaque') {
+    return (
+      <Notice tone="info" icon="checkCircle" title={t('imp.preview.server', { format: preview.format === 'kml' ? 'KML' : 'SHP ZIP' })}>
+        {t('imp.preview.server.desc')}
+      </Notice>
+    );
+  }
   if (preview.kind === 'geojson') {
     return (
       <div className="imp-preview">
@@ -279,6 +287,10 @@ export function ImportWizard({ city }: { city: City }) {
     const fmt = f ? formatFromName(f.name) : null;
     setFormat(fmt);
     if (!f || !fmt || !PARSER_SUPPORTED[fmt]) return;
+    if (fmt === 'kml' || fmt === 'shp_zip') {
+      setPreview(previewOpaque(fmt, f.size));
+      return;
+    }
     const slice = f.size > PREVIEW_BYTES ? f.slice(0, PREVIEW_BYTES) : f;
     const text = await slice.text();
     setPreview(fmt === 'geojson' ? (f.size > PREVIEW_BYTES ? null : previewGeoJson(text)) : previewCsv(text, f.size > PREVIEW_BYTES));
@@ -411,8 +423,8 @@ export function ImportWizard({ city }: { city: City }) {
         <span className="pg-flags">
           <Badge tone="positive" icon="checkCircle">GeoJSON</Badge>
           <Badge tone="positive" icon="checkCircle">CSV</Badge>
-          <Badge tone="neutral" icon="slash">KML — {t('imp.notSupported')}</Badge>
-          <Badge tone="neutral" icon="slash">SHP ZIP — {t('imp.notSupported')}</Badge>
+          <Badge tone="positive" icon="checkCircle">KML</Badge>
+          <Badge tone="positive" icon="checkCircle">SHP ZIP</Badge>
         </span>
         <p className="pg-muted">{t('imp.formats.desc')}</p>
       </Notice>
@@ -426,7 +438,7 @@ export function ImportWizard({ city }: { city: City }) {
             aria-describedby={describedBy}
             className="pg-input imp-file"
             type="file"
-            accept=".geojson,.json,.csv,.kml,.zip,application/geo+json,text/csv"
+            accept=".geojson,.json,.csv,.kml,.zip,application/geo+json,text/csv,application/vnd.google-earth.kml+xml,application/zip"
             disabled={busy}
             onChange={(e) => void onFile(e.target.files?.[0] ?? null)}
           />

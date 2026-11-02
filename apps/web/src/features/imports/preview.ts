@@ -7,8 +7,8 @@ import type { ImportRequest } from '@pg/api-client';
 
 export type ImportFormat = ImportRequest['format'];
 
-/** Formats the connected parser handles (ADR-010). KML and SHP ZIP end as rejected reports. */
-export const PARSER_SUPPORTED: Record<ImportFormat, boolean> = { geojson: true, csv: true, kml: false, shp_zip: false };
+/** Formats handled by the durable server import pipeline (ADR-010/ADR-015). */
+export const PARSER_SUPPORTED: Record<ImportFormat, boolean> = { geojson: true, csv: true, kml: true, shp_zip: true };
 
 /** Content types accepted by PUT /v1/uploads/{id} (contract 1.1.0). */
 export const CONTENT_TYPE: Record<ImportFormat, string> = {
@@ -51,7 +51,20 @@ export interface CsvPreview {
   fatal: boolean;
 }
 
-export type FilePreview = GeoJsonPreview | CsvPreview;
+/** Opaque formats are intentionally not parsed in the browser; the isolated server parser owns validation. */
+export interface OpaquePreview {
+  kind: 'opaque';
+  format: 'kml' | 'shp_zip';
+  byteSize: number;
+  problems: string[];
+  fatal: false;
+}
+
+export type FilePreview = GeoJsonPreview | CsvPreview | OpaquePreview;
+
+export function previewOpaque(format: 'kml' | 'shp_zip', byteSize: number): OpaquePreview {
+  return { kind: 'opaque', format, byteSize, problems: [], fatal: false };
+}
 
 function walkCoords(c: unknown, acc: [number, number, number, number]) {
   if (Array.isArray(c) && typeof c[0] === 'number' && typeof c[1] === 'number') {

@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { buildFieldMapping, coordinateLikeColumns, formatFromName, parseCsvRows, PARSER_SUPPORTED, previewCsv, previewGeoJson } from './preview';
+import { buildFieldMapping, coordinateLikeColumns, formatFromName, parseCsvRows, PARSER_SUPPORTED, previewCsv, previewGeoJson, previewOpaque } from './preview';
 
 describe('import preview (display only)', () => {
-  it('detects format by extension and marks KML/SHP as not supported by the parser', () => {
+  it('detects every server-supported vector format', () => {
     expect(formatFromName('a.GeoJSON')).toBe('geojson');
     expect(formatFromName('b.csv')).toBe('csv');
     expect(formatFromName('c.kml')).toBe('kml');
     expect(formatFromName('d.zip')).toBe('shp_zip');
     expect(formatFromName('e.xlsx')).toBeNull();
-    expect(PARSER_SUPPORTED).toEqual({ geojson: true, csv: true, kml: false, shp_zip: false });
+    expect(PARSER_SUPPORTED).toEqual({ geojson: true, csv: true, kml: true, shp_zip: true });
+    expect(previewOpaque('shp_zip', 42)).toEqual({ kind: 'opaque', format: 'shp_zip', byteSize: 42, problems: [], fatal: false });
   });
   it('summarises a FeatureCollection and flags non-WGS84 CRS and metre coordinates', () => {
     const fc = {
