@@ -1158,7 +1158,10 @@ def _plant_recommendation(db, access, job, top_n):
     locked = list(
         dict.fromkeys(
             item["plant_id"]
-            for item in payload.get("placements", [])
+            for item in [
+                *payload.get("placements", []),
+                *payload.get("area_patches", []),
+            ]
             if item.get("locked") is True and item["plant_id"] not in excluded
         )
     )
