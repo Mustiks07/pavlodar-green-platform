@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "3eb1d9b",
-  "state": "decision_ready_pdf_verified",
+  "head_sha": "d57a3c1",
+  "state": "assistant_current_result_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1502,5 +1502,25 @@
     ],
     "decision": "ADR-081",
     "limit": "Priority is not rendered because the immutable CalculationSnapshot has no frozen priority field; the PDF never joins a mutable or unrelated value"
+  },
+  "assistant_current_result_20261102": {
+    "implementation_sha": "d57a3c1",
+    "contract_version": "1.18.1",
+    "migration": "none",
+    "implemented": [
+      "An explicit result, estimate, survival or ecosystem request invokes provider-independent get_current_result with no arguments",
+      "The server re-authorizes the revision permanently bound to the chat and never trusts a message override",
+      "Only the latest CalculationSnapshot of that exact revision supplies cost, survival and ecosystem Fact cards",
+      "A historical chat never silently switches to the current scenario revision",
+      "No saved snapshot produces actionable guidance without creating a calculation, proposal, report or other mutation",
+      "The assistant quick actions expose exact result, recalculate and PDF report paths"
+    ],
+    "verification": [
+      "Full chat integration passed 24/24 including provider-disabled, historical-binding and idempotent replay cases",
+      "Ruff passed for changed backend and tests",
+      "Frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-082",
+    "limit": "Zone/object search and city-program optimization remain separate actions because they require typed entity references and an explicit frozen program binding"
   }
 }
