@@ -606,6 +606,7 @@ function RevisionEditor({
           ruleVersionId={edits.rule_version_id}
           excludedPlantIds={edits.excluded_plant_ids}
           placements={edits.placements}
+          areaPatches={edits.area_patches}
           onSelectPlant={setRecommendedPlant}
           onExcludedChange={(excluded_plant_ids) => setEdits((value) => ({ ...value, excluded_plant_ids }))}
           disabled={!canEdit || save.isPending}

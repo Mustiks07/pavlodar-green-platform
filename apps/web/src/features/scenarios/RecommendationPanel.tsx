@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   newIdempotencyKey,
   unwrap,
+  type AreaPatch,
   type Placement,
   type Plant,
   type PlantRecommendation,
@@ -44,6 +45,7 @@ export function buildRecommendationRequest({
   topN,
   excludedPlantIds,
   placements,
+  areaPatches = [],
 }: {
   zoneVersionId: string;
   catalogVersionId: string;
@@ -51,9 +53,10 @@ export function buildRecommendationRequest({
   topN: number;
   excludedPlantIds: string[];
   placements: Placement[];
+  areaPatches?: AreaPatch[];
 }): RecommendationRequest {
   const excluded = [...new Set(excludedPlantIds)];
-  const locked = [...new Set(placements.filter((item) => item.locked).map((item) => item.plant_id))].filter(
+  const locked = [...new Set([...placements, ...areaPatches].filter((item) => item.locked).map((item) => item.plant_id))].filter(
     (id) => !excluded.includes(id),
   );
   return {
@@ -138,6 +141,7 @@ export function RecommendationPanel({
   ruleVersionId,
   excludedPlantIds,
   placements,
+  areaPatches,
   onSelectPlant,
   onExcludedChange,
   disabled = false,
@@ -147,6 +151,7 @@ export function RecommendationPanel({
   ruleVersionId: string | null;
   excludedPlantIds: string[];
   placements: Placement[];
+  areaPatches: AreaPatch[];
   onSelectPlant: (plant: Plant) => void;
   onExcludedChange: (ids: string[]) => void;
   disabled?: boolean;
@@ -172,6 +177,7 @@ export function RecommendationPanel({
         topN,
         excludedPlantIds,
         placements,
+        areaPatches,
       });
       return (
         await unwrap<RecommendationResult>(
@@ -184,7 +190,7 @@ export function RecommendationPanel({
     },
   });
   const goToPlacement = () => document.getElementById('scenario-placement-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const usedPlantIds = useMemo(() => new Set(placements.map((placement) => placement.plant_id)), [placements]);
+  const usedPlantIds = useMemo(() => new Set([...placements, ...areaPatches].map((placement) => placement.plant_id)), [placements, areaPatches]);
   const toggleExcluded = (plantId: string) => {
     const next = excludedPlantIds.includes(plantId)
       ? excludedPlantIds.filter((id) => id !== plantId)
@@ -257,7 +263,7 @@ export function RecommendationPanel({
               ))}
             </div>
             <div className="rec-panel__footer">
-              <p>Выберите подходящий вид и разместите его точкой внутри участка. Проверки геометрии и ограничений повторит сервер.</p>
+              <p>Выберите подходящий вид и разместите его точкой или площадным контуром внутри участка. Проверки геометрии и ограничений повторит сервер.</p>
               <Button variant="secondary" icon="map" onClick={goToPlacement}>Перейти к размещению</Button>
             </div>
           </>
