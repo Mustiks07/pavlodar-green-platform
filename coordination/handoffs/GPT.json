@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "3f3646b",
-  "state": "cohort_outcomes_verified",
+  "head_sha": "da83b9f",
+  "state": "area_planting_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1317,5 +1317,25 @@
     ],
     "decision": "ADR-072",
     "limit": "The public demo does not fabricate executed work rows; factual calendars appear after approved projects create real work orders"
+  },
+  "authoritative_area_planting_20261102": {
+    "implementation_sha": "da83b9f",
+    "contract_version": "1.17.1",
+    "migration": "none",
+    "implemented": [
+      "The project editor creates, redraws, locks and deletes stable-id shrub, perennial and grass polygons",
+      "The server rejects malformed, self-intersecting, empty and out-of-zone patch geometry",
+      "EPSG:32643 area multiplied by explicit plants-per-m2 density is the only quantitative basis",
+      "Area quantities feed cost, replacement, survival, suitability, care targeting and ecosystem metrics",
+      "Unknown density preserves the design but returns area_patch_density_missing instead of an invented zero"
+    ],
+    "verification": [
+      "Canonical 1.17.1 validation passed 399 checks and generated clients match",
+      "Calculation integration suite passed 12/12 including invalid geometry and missing density",
+      "Focused draw and placement helper tests passed 18/18",
+      "Ruff, frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-073",
+    "limit": "MultiPolygon patches are calculated and rendered but the current redraw tool deliberately edits one Polygon at a time"
   }
 }

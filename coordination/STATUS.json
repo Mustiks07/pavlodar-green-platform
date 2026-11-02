@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.17.0",
+  "spec_version": "1.17.1",
   "repository": "Mustiks07/pavlodar-green-platform",
   "authorized_github_login": "Mustiks07",
   "status": "release_accepted",
@@ -93,6 +93,7 @@
     "Admit future municipal soil, restriction, weather and ecological-coefficient versions through the existing versioned import workflow when their owners provide them"
   ],
   "notes": [
+    "Authoritative area-planting increment on 2026-11-02 publishes canonical 1.17.1: specialists can draw, redraw, lock and version shrub, perennial and grass polygons alongside point trees. The server validates topology and zone containment, projects area in EPSG:32643 and applies explicit density consistently to cost, replacement, survival, suitability, care and ecosystem metrics; missing density remains a typed blocking gap rather than zero. Calculation suite 12/12, focused draw/placement helpers 18/18, canonical 399 checks, client drift, Ruff, typecheck and production build pass; ADR-073 records the boundary.",
     "Frozen work-calendar export increment on 2026-11-02 publishes canonical 1.17.0: a specialist can export the exact active zone/status/operation/assignee/date filter set as an immutable XLSX with native dates and numbers, active completion corrections, status history, actors and capture parameters. The queue-time snapshot is rendered without rereading mutable work rows; more than 5,000 orders fails explicitly, and metadata/download repeat specialist and city authorization. Export suite 8/8, canonical 399 checks, client drift, Ruff and production build pass; ADR-072 records the boundary and migrations 0033-0034 extend durable job/artifact constraints.",
     "Work-calendar dispatch increment on 2026-11-02 publishes canonical 1.16.0: listWorkOrders supports server-side zone, operation, assignee, status and inclusive overlapping-date filters before authorization-aware pagination; invalid ranges and cross-filter cursors fail closed. The execution UI stores every filter in the URL and offers a complete reset. Canonical 398 checks, focused backend filter/RBAC/cursor acceptance and production build pass; ADR-071 records the boundary.",
     "Reviewable species-exclusion increment on 2026-11-02 makes excluded_plant_ids part of the unsaved draft and next immutable revision. Recommendation cards exclude/restore exact frozen-catalog species and name current exclusions; used or locked placements are never silently moved or removed. The server rejects duplicate/foreign exclusions and returns both exclusion and placement/area-patch paths when an excluded species remains in use. Focused scenario/recommendation backend acceptance, frontend typecheck and recommendation/placement tests pass; ADR-070 records the decision.",
