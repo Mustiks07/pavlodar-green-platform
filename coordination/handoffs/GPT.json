@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "da83b9f",
-  "state": "area_planting_verified",
+  "head_sha": "61933bc",
+  "state": "area_transform_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1337,5 +1337,26 @@
     ],
     "decision": "ADR-073",
     "limit": "MultiPolygon patches are calculated and rendered but the current redraw tool deliberately edits one Polygon at a time"
+  },
+  "metric_area_transform_20261102": {
+    "implementation_sha": "61933bc",
+    "contract_version": "1.17.2",
+    "migration": "none",
+    "implemented": [
+      "Selected unlocked area plantings can be explicitly dragged, metre-nudged and rotated in 15-degree or Alt one-degree steps",
+      "Polygon and MultiPolygon rings and holes transform together while stable id and non-geometry properties remain unchanged",
+      "Completed area create, redraw, property, lock, delete, move and rotate operations have bounded undo/redo history",
+      "Changed patch geometry is checked against exact frozen building DatasetVersions",
+      "Interior overlap fails at the exact geometry path while edge touch and unchanged historical geometry remain valid",
+      "Rejected patch geometry remains in the local draft and is highlighted red"
+    ],
+    "verification": [
+      "Focused catalog acceptance covers overlap rejection, exact touch and grandfathering",
+      "Area transform, placement merge and registry tests passed 17/17",
+      "Canonical 1.17.2 validation passed 399 checks and generated clients match",
+      "Ruff, frontend typecheck and production build passed"
+    ],
+    "decision": "ADR-074",
+    "limit": "Vertex redraw remains limited to a simple Polygon; complex MultiPolygon geometry can move and rotate as one object without implicit splitting"
   }
 }
