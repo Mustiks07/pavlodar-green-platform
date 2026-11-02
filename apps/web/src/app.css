@@ -2069,11 +2069,13 @@
   font-size: var(--pg-fs-xs);
 }
 .pl-viewpoints,
-.revision-3d-compare__viewpoints {
+.revision-3d-compare__viewpoints,
+.pl-growth {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
 }
+.pl-scene-tools { display: grid; gap: 0.3rem; min-width: 0; }
 .pl-viewpoints {
   padding: 0.25rem;
   border: 1px solid var(--pg-border);
@@ -2081,7 +2083,8 @@
   background: color-mix(in srgb, var(--pg-surface) 94%, transparent);
   box-shadow: var(--pg-shadow-sm);
 }
-.pl-viewpoints button {
+.pl-viewpoints button,
+.pl-growth button {
   min-height: 2rem;
   padding: 0.25rem 0.55rem;
   border: 0;
@@ -2094,11 +2097,24 @@
   cursor: pointer;
 }
 .pl-viewpoints button:hover,
-.pl-viewpoints button.is-active {
+.pl-viewpoints button.is-active,
+.pl-growth button:hover,
+.pl-growth button.is-active {
   background: var(--pg-primary);
   color: var(--pg-on-primary);
 }
-.pl-viewpoints button:focus-visible { outline: 2px solid var(--pg-focus); outline-offset: 2px; }
+.pl-viewpoints button:focus-visible,
+.pl-growth button:focus-visible { outline: 2px solid var(--pg-focus); outline-offset: 2px; }
+.pl-growth {
+  align-items: center;
+  padding: 0.25rem;
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius-sm);
+  background: color-mix(in srgb, var(--pg-surface) 94%, transparent);
+  box-shadow: var(--pg-shadow-sm);
+}
+.pl-growth > span { padding: 0 0.25rem; color: var(--pg-text); font-size: var(--pg-fs-xs); font-weight: 700; }
+.pl-growth small { padding: 0 0.25rem; color: var(--pg-text-subtle); font-size: 0.68rem; }
 .revision-3d-compare {
   display: grid;
   gap: var(--pg-space-3);

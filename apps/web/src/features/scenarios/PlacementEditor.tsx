@@ -27,6 +27,7 @@ import { Scene3DToggle } from '../scene3d/Scene3DPanel';
 import { useScene3D } from '../scene3d/useScene3D';
 import type { ScenePlanting } from '../scene3d/types';
 import { applyViewpoint, viewTarget, type ViewPreset } from '../scene3d/viewpoints';
+import { GROWTH_YEARS, growthYearFromUrl, illustrativeGrowthScale, type GrowthYear } from '../scene3d/growth';
 import { add, insideZone, issuesOf, metersBetween, move, newPlacement, redo, remove, same, snapToCrownTangent, undo, update, type LngLat, type PlacementHistory } from './placements';
 import { addVertex, closeRing, editableRing, previewIssues, redo as redoDraw, removeLast, startDraw, toPolygon, undo as undoDraw, type DrawState } from '../zones/draw';
 import { commitAreaPatches, redoAreaPatches, rotateAreaPatch, translateAreaPatch, translateAreaPatchBetween, undoAreaPatches, type AreaPatchHistory } from './areaPatches';
@@ -124,6 +125,7 @@ export function PlacementMap({
   ), [cityLayers.data?.items, frozenVersions]);
   const mountedBuildingLayers = useRef(new Map<string, MapLayer>());
   const [ready, setReady] = useState(false);
+  const [growthYear, setGrowthYear] = useState<GrowthYear>(() => growthYearFromUrl(new URLSearchParams(window.location.search).get('growth')));
   const scenePlantings = useMemo<ScenePlanting[]>(() => placements.map((placement) => ({
     id: placement.id,
     position: placement.position.coordinates as LngLat,
@@ -133,7 +135,8 @@ export function PlacementMap({
     selected: selectedIds.has(placement.id),
     locked: placement.locked,
     conflict: conflictIds.has(placement.id),
-  })), [placements, selectedIds, conflictIds]);
+    visual_scale: illustrativeGrowthScale(growthYear),
+  })), [placements, selectedIds, conflictIds, growthYear]);
   const scene3d = useScene3D(() => map.current, [], scenePlantings);
   const initialView = !compareLabel ? new URLSearchParams(window.location.search).get('view3d') : null;
   const restore3d = initialView === 'top' || initialView === 'human' || initialView === 'overview';
@@ -458,8 +461,9 @@ export function PlacementMap({
     const params = new URLSearchParams(window.location.search);
     params.set('view3d', viewPreset);
     params.set('viewTarget', activeViewTarget.id);
+    params.set('growth', String(growthYear));
     window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`);
-  }, [scene3d.state, viewPreset, activeViewTarget, zone, compareLabel]);
+  }, [scene3d.state, viewPreset, activeViewTarget, growthYear, zone, compareLabel]);
 
   useEffect(() => {
     const m = map.current;
@@ -582,18 +586,23 @@ export function PlacementMap({
             onDisable={scene3d.disable}
           />
           {scene3d.state === 'on' && !compareLabel ? (
-            <div className="pl-viewpoints" role="group" aria-label="Фиксированный ракурс 3D">
-              {([['top', 'Сверху'], ['overview', 'Обзор'], ['human', 'Уровень человека']] as const).map(([preset, label]) => (
-                <button
-                  key={preset}
-                  type="button"
-                  className={viewPreset === preset ? 'is-active' : ''}
-                  aria-pressed={viewPreset === preset}
-                  onClick={() => setViewPreset(preset)}
-                >
-                  {label}
-                </button>
-              ))}
+            <div className="pl-scene-tools">
+              <div className="pl-viewpoints" role="group" aria-label="Фиксированный ракурс 3D">
+                {([['top', 'Сверху'], ['overview', 'Обзор'], ['human', 'Уровень человека']] as const).map(([preset, label]) => (
+                  <button key={preset} type="button" className={viewPreset === preset ? 'is-active' : ''} aria-pressed={viewPreset === preset} onClick={() => setViewPreset(preset)}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="pl-growth" role="group" aria-label="Эскиз развития посадок">
+                <span>Эскиз развития</span>
+                {GROWTH_YEARS.map((year) => (
+                  <button key={year} type="button" className={growthYear === year ? 'is-active' : ''} aria-pressed={growthYear === year} onClick={() => setGrowthYear(year)}>
+                    {year === 0 ? 'сейчас' : `${year} г.`}
+                  </button>
+                ))}
+                <small>Только 3D · расчёт не меняется</small>
+              </div>
             </div>
           ) : null}
           {scene3d.state === 'on' ? (

@@ -167,10 +167,11 @@ export function createThreeLayer(map: MapLibreMap, options: ThreeLayerOptions): 
       // Missing dimensions remain visibly schematic: these sizes are a map marker, not a claimed
       // biological measurement. Source-backed dimensions, when present, are used as delivered.
       const known = planting.height_m !== null && planting.height_m > 0;
-      const height = known ? planting.height_m! : 3;
-      const crownRadius = planting.crown_radius_m && planting.crown_radius_m > 0
+      const visualScale = Number.isFinite(planting.visual_scale) && planting.visual_scale > 0 ? planting.visual_scale : 1;
+      const height = (known ? planting.height_m! : 3) * visualScale;
+      const crownRadius = (planting.crown_radius_m && planting.crown_radius_m > 0
         ? planting.crown_radius_m
-        : known ? Math.max(0.65, height * 0.22) : 0.9;
+        : known ? Math.max(0.65, planting.height_m! * 0.22) : 0.9) * visualScale;
       const trunkHeight = Math.max(0.5, height * 0.48);
       const trunkGeometry = new THREE.CylinderGeometry(Math.max(0.08, crownRadius * 0.14), Math.max(0.1, crownRadius * 0.18), trunkHeight, 8);
       trunkGeometry.rotateX(Math.PI / 2);

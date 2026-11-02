@@ -26,6 +26,8 @@ export interface ScenePlanting {
   selected: boolean;
   locked: boolean;
   conflict: boolean;
+  /** Presentation-only multiplier; never a server or biological calculation input. */
+  visual_scale: number;
 }
 
 export interface SceneStats {
