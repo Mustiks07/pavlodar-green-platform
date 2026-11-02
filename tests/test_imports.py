@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import pytest
 import shapefile
+from pyproj import Transformer
 from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError
 
@@ -82,7 +83,16 @@ def upload(client, dataset_id, content, content_type, filename):
     return ticket.json()
 
 
-def start_import(client, dataset_id, ticket, format_name, mapping=None):
+def start_import(
+    client,
+    dataset_id,
+    ticket,
+    format_name,
+    mapping=None,
+    *,
+    source_crs="EPSG:4326",
+    csv_options=None,
+):
     response = mutation(
         client,
         "POST",
@@ -90,8 +100,9 @@ def start_import(client, dataset_id, ticket, format_name, mapping=None):
         {
             "upload_id": ticket["upload_id"],
             "format": format_name,
-            "source_crs": "EPSG:4326",
+            "source_crs": source_crs,
             "field_mapping": mapping or [],
+            "csv_options": csv_options,
             "observed_at": None,
             "method": "SYNTHETIC TEST generic import",
             "spatial_resolution_m": None,
@@ -381,10 +392,92 @@ def test_csv_mapping_is_persisted_without_executing_values(clients):
     version_id = specialist.get(f"/v1/jobs/{job['id']}").json()["result_ref_id"]
     with session() as db:
         record = db.get(ImportRecord, (version_id, 0))
+        version = db.get(DatasetVersion, version_id)
         assert record.payload["properties"] == {
             "name": "SYNTHETIC TEST",
             "source_value": "=2+2",
         }
+        assert record.geometry is None
+        assert version.payload["content_kind"] == "table"
+
+
+@pytest.mark.parametrize("source_crs", ["EPSG:4326", "EPSG:32643"])
+def test_csv_coordinate_mode_creates_versioned_points(clients, source_crs):
+    specialist = clients["specialist"]
+    dataset = create_dataset(specialist, kind="social_poi")
+    lon, lat = 76.95, 52.28
+    if source_crs == "EPSG:32643":
+        x, y = Transformer.from_crs("EPSG:4326", source_crs, always_xy=True).transform(lon, lat)
+        content = (
+            "name;x;y\r\nSYNTHETIC объект;"
+            f"{x:.3f}".replace(".", ",")
+            + ";"
+            + f"{y:.3f}".replace(".", ",")
+            + "\r\n"
+        ).encode("cp1251")
+        options = {
+            "mode": "points",
+            "x_field": "x",
+            "y_field": "y",
+            "encoding": "windows-1251",
+            "delimiter": "semicolon",
+            "decimal_separator": "comma",
+        }
+    else:
+        content = f"name,lon,lat\nSYNTHETIC object,{lon},{lat}\n".encode()
+        options = {
+            "mode": "points",
+            "x_field": "lon",
+            "y_field": "lat",
+            "encoding": "utf-8",
+            "delimiter": "comma",
+            "decimal_separator": "dot",
+        }
+    ticket = upload(specialist, dataset["id"], content, "text/csv", "points.csv")
+    job = start_import(
+        specialist,
+        dataset["id"],
+        ticket,
+        "csv",
+        source_crs=source_crs,
+        csv_options=options,
+    )
+    run_job.run(job["id"])
+    version_id = specialist.get(f"/v1/jobs/{job['id']}").json()["result_ref_id"]
+    with session() as db:
+        version = db.get(DatasetVersion, version_id)
+        record = db.get(ImportRecord, (version_id, 0))
+        coordinates = record.payload["geometry"]["coordinates"]
+        assert version.payload["content_kind"] == "vector"
+        assert version.payload["import_options"] == options
+        assert coordinates == pytest.approx([lon, lat], abs=0.00001)
+        assert record.geometry is not None
+
+
+def test_csv_coordinate_errors_are_typed_and_never_guessed(clients):
+    specialist = clients["specialist"]
+    dataset = create_dataset(specialist)
+    content = b"name,lon,lat\nSYNTHETIC invalid,999,52.28\n"
+    ticket = upload(specialist, dataset["id"], content, "text/csv", "invalid-points.csv")
+    job = start_import(
+        specialist,
+        dataset["id"],
+        ticket,
+        "csv",
+        csv_options={
+            "mode": "points",
+            "x_field": "lon",
+            "y_field": "lat",
+            "encoding": "utf-8",
+            "delimiter": "comma",
+            "decimal_separator": "dot",
+        },
+    )
+    run_job.run(job["id"])
+    version_id = specialist.get(f"/v1/jobs/{job['id']}").json()["result_ref_id"]
+    report = specialist.get(f"/v1/dataset-versions/{version_id}/quality").json()
+    assert report["error_count"] == 1
+    assert report["issues"][0]["code"] == "csv_coordinate_invalid"
 
 
 @pytest.mark.parametrize(

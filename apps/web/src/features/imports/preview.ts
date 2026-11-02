@@ -116,7 +116,7 @@ export function previewGeoJson(text: string): GeoJsonPreview {
 }
 
 /** Minimal RFC 4180 reader for the preview (comma, quotes, CRLF); the server re-parses everything. */
-export function parseCsvRows(text: string, maxRows: number): { rows: string[][]; complete: boolean } {
+export function parseCsvRows(text: string, maxRows: number, delimiter = ','): { rows: string[][]; complete: boolean } {
   const rows: string[][] = [];
   let row: string[] = [];
   let field = '';
@@ -135,7 +135,7 @@ export function parseCsvRows(text: string, maxRows: number): { rows: string[][];
       continue;
     }
     if (ch === '"' && field === '') quoted = true;
-    else if (ch === ',') {
+    else if (ch === delimiter) {
       row.push(field);
       field = '';
     } else if (ch === '\n' || ch === '\r') {
@@ -154,15 +154,15 @@ export function parseCsvRows(text: string, maxRows: number): { rows: string[][];
   return { rows, complete: true };
 }
 
-export function previewCsv(text: string, truncatedInput: boolean): CsvPreview {
+export function previewCsv(text: string, truncatedInput: boolean, delimiter = ','): CsvPreview {
   const problems: string[] = [];
-  const { rows, complete } = parseCsvRows(text, 21);
+  const { rows, complete } = parseCsvRows(text, 21, delimiter);
   const header = rows[0] ?? [];
   const body = rows.slice(1, 21);
   if (header.length === 0 || header.every((h) => h.trim() === '')) problems.push('Нет строки заголовка — сервер отклонит файл.');
   const dup = header.filter((h, i) => header.indexOf(h) !== i);
   if (dup.length) problems.push(`Повторяющиеся названия колонок: ${[...new Set(dup)].join(', ')}.`);
-  if (header.length === 1 && /;|\t/.test(header[0] ?? '')) problems.push('Похоже, разделитель — точка с запятой или табуляция; сервер пока читает только запятую.');
+  if (header.length === 1 && /;|\t/.test(header[0] ?? '')) problems.push('Выберите фактический разделитель файла в параметрах CSV.');
   const ragged = body.filter((r) => r.length > header.length).length;
   if (ragged) problems.push(`${ragged} строк(и) с лишними значениями в просмотре — сервер отметит их.`);
   const noHeader = header.length === 0 || header.every((h) => h.trim() === '');

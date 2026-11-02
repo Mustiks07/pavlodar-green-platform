@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:5174",
-  "startedAt": "2026-11-02T00:43:10.134Z",
+  "startedAt": "2026-11-02T00:52:00.792Z",
   "checks": [
     {
       "name": "basemap: OpenFreeMap liberty style loaded with platform interaction layers on top",
@@ -46,7 +46,7 @@
       "name": "wizard has a target dataset for the import journey",
       "pass": true,
       "detail": {
-        "datasetId": "338737f1-2375-4ad1-8ede-729388af1ed4"
+        "datasetId": "c783e825-7f51-48b8-b179-2425a60a3916"
       }
     },
     {
@@ -69,18 +69,18 @@
       "name": "invalid GeoJSON root creates no additional upload",
       "pass": true,
       "detail": [
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-        "PUT /v1/uploads/a7695515-f245-4aac-8fd2-a2194be9e9a0",
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-        "PUT /v1/uploads/39cd7c8f-4bbb-47c2-abc6-2da11f939b54",
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-        "PUT /v1/uploads/fcf3de16-69c2-4b4a-b008-c25e6f8e6dbf",
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-        "PUT /v1/uploads/0892dce9-02f6-46ec-af71-7b3db2303fc2",
-        "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports"
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+        "PUT /v1/uploads/c546ca2b-b721-48ab-9d89-ac3f2649cf5d",
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports",
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+        "PUT /v1/uploads/23e9a924-87a4-4f33-8fb7-ea9f4c6489a0",
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports",
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+        "PUT /v1/uploads/30ba17d3-3a9f-4291-a8df-97c84c7131f7",
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports",
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+        "PUT /v1/uploads/6a7f7b96-0ab8-4158-a78b-98f13dfad306",
+        "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports"
       ]
     },
     {
@@ -90,18 +90,18 @@
         "state": "succeeded",
         "kind": "import",
         "requests": [
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-          "PUT /v1/uploads/a7695515-f245-4aac-8fd2-a2194be9e9a0",
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-          "PUT /v1/uploads/39cd7c8f-4bbb-47c2-abc6-2da11f939b54",
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-          "PUT /v1/uploads/fcf3de16-69c2-4b4a-b008-c25e6f8e6dbf",
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports",
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/uploads",
-          "PUT /v1/uploads/0892dce9-02f6-46ec-af71-7b3db2303fc2",
-          "POST /v1/datasets/338737f1-2375-4ad1-8ede-729388af1ed4/imports"
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+          "PUT /v1/uploads/c546ca2b-b721-48ab-9d89-ac3f2649cf5d",
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports",
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+          "PUT /v1/uploads/23e9a924-87a4-4f33-8fb7-ea9f4c6489a0",
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports",
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+          "PUT /v1/uploads/30ba17d3-3a9f-4291-a8df-97c84c7131f7",
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports",
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/uploads",
+          "PUT /v1/uploads/6a7f7b96-0ab8-4158-a78b-98f13dfad306",
+          "POST /v1/datasets/c783e825-7f51-48b8-b179-2425a60a3916/imports"
         ]
       }
     },
@@ -122,7 +122,7 @@
       "name": "reload resumes the job view from the URL",
       "pass": true,
       "detail": {
-        "url": "http://localhost:5174/imports?city=10000000-0000-4000-8000-000000000001&job=ee53c207-78fa-4b92-adbd-799c1c774516&importDataset=338737f1-2375-4ad1-8ede-729388af1ed4"
+        "url": "http://localhost:5174/imports?city=10000000-0000-4000-8000-000000000001&job=22d14376-f318-4fe2-9e14-a3f22dd001a3&importDataset=c783e825-7f51-48b8-b179-2425a60a3916"
       }
     },
     {
@@ -137,11 +137,19 @@
       }
     },
     {
-      "name": "CSV imported as a table; UI warned coordinates stay columns",
+      "name": "CSV imported as points only after explicit X/Y selection",
       "pass": true,
       "detail": {
-        "content_kind": "table",
-        "records": 2
+        "content_kind": "vector",
+        "records": 2,
+        "options": {
+          "mode": "points",
+          "x_field": "lon",
+          "y_field": "lat",
+          "encoding": "utf-8",
+          "delimiter": "comma",
+          "decimal_separator": "dot"
+        }
       }
     },
     {
@@ -156,10 +164,11 @@
       "pass": true
     },
     {
-      "name": "admin publish: server result shown (published, or refusal with reasons)",
+      "name": "admin publish: CSV points become a map layer",
       "pass": true,
       "detail": {
-        "current": "4dba51f7-3414-4c63-8572-93ca52a4e369",
+        "current": "9616458f-5a04-4bba-bafa-f740ec4ea230",
+        "geometry": "point",
         "dialog": ""
       }
     },
@@ -178,6 +187,6 @@
     "docs/evidence/wp03-import-ui/csv-preview.png",
     "docs/evidence/wp03-import-ui/admin-after-publish.png"
   ],
-  "finishedAt": "2026-11-02T00:45:09.850Z",
+  "finishedAt": "2026-11-02T00:54:01.269Z",
   "passed": true
 }

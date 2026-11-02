@@ -1,0 +1,27 @@
+ADR-079: Explicit coordinate CSV import
+Status: accepted
+Date: 2026-11-02
+
+Context
+F-DATA-01 requires CSV import with coordinate-column selection and CRS handling. The previous path
+accepted CSV but always persisted rows as a non-spatial table, even when the user uploaded longitude
+and latitude. It also fixed UTF-8/comma parsing in code. The import therefore appeared successful but
+could never create a map layer, while guessing coordinate columns or CRS would be unsafe.
+
+Decision
+Canonical contract 1.18.0 adds optional CsvImportOptions. A CSV import explicitly chooses table or
+points mode, X and Y fields, UTF-8 or Windows-1251, comma/semicolon/tab delimiter and dot/comma decimal
+separator. Existing requests without options retain table semantics. Point mode requires different
+X/Y fields and admits only EPSG:4326 or EPSG:32643. The worker parses the selected dialect, transforms
+UTM 43N offline with pyproj always_xy, checks finite WGS84 bounds and emits csv_coordinate_invalid for
+each rejected row. It never swaps axes, infers a CRS or silently repairs values.
+
+CsvImportOptions are copied into the immutable DatasetVersion payload. Successful point imports are
+vector versions and use the existing review, publication, MVT and feature-card pipeline; table mode
+remains non-spatial. The browser preview re-decodes the sample using the selected encoding/delimiter
+but remains advisory: the server creates geometry and owns the quality report.
+
+Consequences
+Municipal spreadsheets can now become traceable map points without prior conversion to GeoJSON. Old
+CSV clients remain compatible. Other encodings, projected CRSs, line/polygon construction and automatic
+delimiter detection remain unavailable until explicitly admitted; unknown is rejected, not guessed.

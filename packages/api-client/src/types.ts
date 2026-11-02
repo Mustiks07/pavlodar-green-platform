@@ -1,4 +1,4 @@
-// Generated from contracts/openapi.json 1.17.2 by apps/web/scripts/gen-types.mjs. Do not edit.
+// Generated from contracts/openapi.json 1.18.0 by apps/web/scripts/gen-types.mjs. Do not edit.
 import type { components } from './generated/schema';
 
 export type AddressResult = components['schemas']['AddressResult'];
@@ -32,6 +32,7 @@ export type Coordinate = components['schemas']['Coordinate'];
 export type CostLine = components['schemas']['CostLine'];
 export type CostResult = components['schemas']['CostResult'];
 export type CoverageRequirement = components['schemas']['CoverageRequirement'];
+export type CsvImportOptions = components['schemas']['CsvImportOptions'];
 export type DataGap = components['schemas']['DataGap'];
 export type Dataset = components['schemas']['Dataset'];
 export type DatasetCreate = components['schemas']['DatasetCreate'];

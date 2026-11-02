@@ -1642,6 +1642,18 @@ export interface components {
             expires_at: string;
             required_content_type: string;
         };
+        CsvImportOptions: {
+            /** @enum {string} */
+            mode: "table" | "points";
+            x_field: string | null;
+            y_field: string | null;
+            /** @enum {string} */
+            encoding: "utf-8" | "windows-1251";
+            /** @enum {string} */
+            delimiter: "comma" | "semicolon" | "tab";
+            /** @enum {string} */
+            decimal_separator: "dot" | "comma";
+        };
         ImportRequest: {
             /** Format: uuid */
             upload_id: string;
@@ -1652,6 +1664,7 @@ export interface components {
                 source_field: string;
                 target_field: string;
             }[];
+            csv_options?: components["schemas"]["CsvImportOptions"] | null;
             observed_at: string | null;
             method: string;
             spatial_resolution_m: number | null;
@@ -1668,6 +1681,7 @@ export interface components {
             /** Format: date-time */
             created_at: string;
             source_crs: string;
+            import_options?: components["schemas"]["CsvImportOptions"] | null;
             method: string;
             quality_report_id: string | null;
             published_at: string | null;

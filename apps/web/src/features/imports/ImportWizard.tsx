@@ -8,6 +8,7 @@ import {
   sha256Hex,
   unwrap,
   type City,
+  type CsvImportOptions,
   type Dataset,
   type DatasetCreate,
   type ImportRequest,
@@ -189,8 +190,8 @@ function PreviewView({ preview, format }: { preview: FilePreview; format: Import
   return (
     <div className="imp-preview">
       {coords.length ? (
-        <Notice tone="warning" title={t('imp.csv.noGeometry')}>
-          {t('imp.csv.noGeometry.desc', { cols: coords.join(', ') })}
+        <Notice tone="info" title={t('imp.csv.coordinates')}>
+          {t('imp.csv.coordinates.desc', { cols: coords.join(', ') })}
         </Notice>
       ) : (
         <p className="pg-muted">{t('imp.csv.table')}</p>
@@ -254,6 +255,10 @@ export function ImportWizard({ city }: { city: City }) {
   const [method, setMethod] = useState('');
   const [observedAt, setObservedAt] = useState('');
   const [resolution, setResolution] = useState('');
+  const [sourceCrs, setSourceCrs] = useState('EPSG:4326');
+  const [csvOptions, setCsvOptions] = useState<CsvImportOptions>({
+    mode: 'table', x_field: null, y_field: null, encoding: 'utf-8', delimiter: 'comma', decimal_separator: 'dot',
+  });
   const [step, setStep] = useState<Step>('idle');
   const [sent, setSent] = useState<{ done: number; total: number } | null>(null);
   const [error, setError] = useState<unknown>(null);
@@ -278,11 +283,28 @@ export function ImportWizard({ city }: { city: City }) {
     setRename({});
   }, [fields]);
 
+  useEffect(() => {
+    if (!file || format !== 'csv') return;
+    let active = true;
+    const read = async () => {
+      const slice = file.size > PREVIEW_BYTES ? file.slice(0, PREVIEW_BYTES) : file;
+      const bytes = await slice.arrayBuffer();
+      const encoding = csvOptions.encoding === 'windows-1251' ? 'windows-1251' : 'utf-8';
+      const delimiter = { comma: ',', semicolon: ';', tab: '\t' }[csvOptions.delimiter];
+      const next = previewCsv(new TextDecoder(encoding).decode(bytes), file.size > PREVIEW_BYTES, delimiter);
+      if (active) setPreview(next);
+    };
+    void read().catch((cause) => active && setError(cause));
+    return () => { active = false; };
+  }, [file, format, csvOptions.encoding, csvOptions.delimiter]);
+
   const onFile = async (f: File | null) => {
     setFile(f);
     setPreview(null);
     setError(null);
     setTicket(null);
+    setSourceCrs('EPSG:4326');
+    setCsvOptions({ mode: 'table', x_field: null, y_field: null, encoding: 'utf-8', delimiter: 'comma', decimal_separator: 'dot' });
     setKeys({ ticket: newIdempotencyKey(), put: newIdempotencyKey(), start: newIdempotencyKey() });
     const fmt = f ? formatFromName(f.name) : null;
     setFormat(fmt);
@@ -291,9 +313,10 @@ export function ImportWizard({ city }: { city: City }) {
       setPreview(previewOpaque(fmt, f.size));
       return;
     }
+    if (fmt === 'csv') return;
     const slice = f.size > PREVIEW_BYTES ? f.slice(0, PREVIEW_BYTES) : f;
     const text = await slice.text();
-    setPreview(fmt === 'geojson' ? (f.size > PREVIEW_BYTES ? null : previewGeoJson(text)) : previewCsv(text, f.size > PREVIEW_BYTES));
+    setPreview(f.size > PREVIEW_BYTES ? null : previewGeoJson(text));
   };
 
   const run = async () => {
@@ -330,8 +353,9 @@ export function ImportWizard({ city }: { city: City }) {
       const body: ImportRequest = {
         upload_id: tk.upload_id,
         format,
-        source_crs: 'EPSG:4326',
+        source_crs: format === 'csv' && csvOptions.mode === 'points' ? sourceCrs : 'EPSG:4326',
         field_mapping: buildFieldMapping(fields, include, rename),
+        csv_options: format === 'csv' ? csvOptions : null,
         observed_at: observedAt ? `${observedAt}T00:00:00Z` : null,
         method: method.trim(),
         spatial_resolution_m: resolution ? Number(resolution) : null,
@@ -376,6 +400,8 @@ export function ImportWizard({ city }: { city: City }) {
     setPreview(null);
     setFormat(null);
     setSent(null);
+    setSourceCrs('EPSG:4326');
+    setCsvOptions({ mode: 'table', x_field: null, y_field: null, encoding: 'utf-8', delimiter: 'comma', decimal_separator: 'dot' });
     setKeys({ ticket: newIdempotencyKey(), put: newIdempotencyKey(), start: newIdempotencyKey() });
   };
 
@@ -414,7 +440,9 @@ export function ImportWizard({ city }: { city: City }) {
 
   const unsupported = format !== null && !PARSER_SUPPORTED[format];
   const tooBig = file !== null && file.size > MAX_BYTES;
-  const blocking = !datasetId || !file || !format || unsupported || tooBig || !method.trim() || (preview?.fatal ?? false);
+  const invalidCsvPoints = format === 'csv' && csvOptions.mode === 'points'
+    && (!csvOptions.x_field || !csvOptions.y_field || csvOptions.x_field === csvOptions.y_field);
+  const blocking = !datasetId || !file || !format || unsupported || tooBig || !method.trim() || invalidCsvPoints || (preview?.fatal ?? false);
   const busy = step !== 'idle';
 
   return (
@@ -462,6 +490,43 @@ export function ImportWizard({ city }: { city: City }) {
 
       {format && !unsupported ? (
         <>
+          {format === 'csv' ? (
+            <fieldset className="imp-fields">
+              <legend>{t('imp.csv.settings')}</legend>
+              <p className="pg-muted">{t('imp.csv.settings.hint')}</p>
+              <div className="imp-grid">
+                <Field label={t('imp.csv.mode')}>
+                  {({ id }) => <Select id={id} value={csvOptions.mode} disabled={busy} onChange={(event) => setCsvOptions({ ...csvOptions, mode: event.target.value as CsvImportOptions['mode'], x_field: null, y_field: null })}>
+                    <option value="table">{t('imp.csv.mode.table')}</option>
+                    <option value="points">{t('imp.csv.mode.points')}</option>
+                  </Select>}
+                </Field>
+                <Field label={t('imp.csv.encoding')}>
+                  {({ id }) => <Select id={id} value={csvOptions.encoding} disabled={busy} onChange={(event) => setCsvOptions({ ...csvOptions, encoding: event.target.value as CsvImportOptions['encoding'] })}>
+                    <option value="utf-8">UTF-8</option><option value="windows-1251">Windows-1251</option>
+                  </Select>}
+                </Field>
+                <Field label={t('imp.csv.delimiter')}>
+                  {({ id }) => <Select id={id} value={csvOptions.delimiter} disabled={busy} onChange={(event) => setCsvOptions({ ...csvOptions, delimiter: event.target.value as CsvImportOptions['delimiter'] })}>
+                    <option value="comma">{t('imp.csv.delimiter.comma')}</option><option value="semicolon">{t('imp.csv.delimiter.semicolon')}</option><option value="tab">{t('imp.csv.delimiter.tab')}</option>
+                  </Select>}
+                </Field>
+                <Field label={t('imp.csv.decimal')}>
+                  {({ id }) => <Select id={id} value={csvOptions.decimal_separator} disabled={busy} onChange={(event) => setCsvOptions({ ...csvOptions, decimal_separator: event.target.value as CsvImportOptions['decimal_separator'] })}>
+                    <option value="dot">{t('imp.csv.decimal.dot')}</option><option value="comma">{t('imp.csv.decimal.comma')}</option>
+                  </Select>}
+                </Field>
+                {csvOptions.mode === 'points' ? <>
+                  <Field label={t('imp.csv.x')} required>
+                    {({ id }) => <Select id={id} value={csvOptions.x_field ?? ''} disabled={busy} onChange={(event) => setCsvOptions({ ...csvOptions, x_field: event.target.value || null })}><option value="">{t('imp.csv.field.choose')}</option>{fields.map((field) => <option key={field} value={field}>{field}</option>)}</Select>}
+                  </Field>
+                  <Field label={t('imp.csv.y')} required>
+                    {({ id }) => <Select id={id} value={csvOptions.y_field ?? ''} disabled={busy} onChange={(event) => setCsvOptions({ ...csvOptions, y_field: event.target.value || null })}><option value="">{t('imp.csv.field.choose')}</option>{fields.map((field) => <option key={field} value={field}>{field}</option>)}</Select>}
+                  </Field>
+                </> : null}
+              </div>
+            </fieldset>
+          ) : null}
           {fields.length ? (
             <fieldset className="imp-fields">
               <legend>{t('imp.fields')}</legend>
@@ -485,8 +550,9 @@ export function ImportWizard({ city }: { city: City }) {
           <div className="imp-grid">
             <Field label={t('imp.crs')} hint={t('imp.crs.hint')}>
               {({ id, describedBy }) => (
-                <Select id={id} aria-describedby={describedBy} value="EPSG:4326" disabled>
+                <Select id={id} aria-describedby={describedBy} value={sourceCrs} disabled={busy || format !== 'csv' || csvOptions.mode !== 'points'} onChange={(event) => setSourceCrs(event.target.value)}>
                   <option value="EPSG:4326">EPSG:4326 (WGS84)</option>
+                  <option value="EPSG:32643">EPSG:32643 (UTM, зона Павлодара)</option>
                 </Select>
               )}
             </Field>

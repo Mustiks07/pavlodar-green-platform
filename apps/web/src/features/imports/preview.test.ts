@@ -38,7 +38,8 @@ describe('import preview (display only)', () => {
   it('reads quoted CSV with CRLF and BOM, and flags ; delimiters and duplicates', () => {
     const { rows } = parseCsvRows('﻿name,note\r\n"A, B","say ""hi"""\r\nC,D\r\n', 10);
     expect(rows).toEqual([['name', 'note'], ['A, B', 'say "hi"'], ['C', 'D']]);
-    expect(previewCsv('a;b;c\n1;2;3\n', false).problems.join(' ')).toMatch(/точка с запятой/);
+    expect(previewCsv('a;b;c\n1;2;3\n', false).problems.join(' ')).toMatch(/разделитель/);
+    expect(previewCsv('a;b;c\n1;2;3\n', false, ';').header).toEqual(['a', 'b', 'c']);
     expect(previewCsv('a,a\n1,2\n', false).problems.join(' ')).toMatch(/Повторяющиеся/);
     expect(coordinateLikeColumns(['name', 'lon', 'Latitude', 'x1'])).toEqual(['lon', 'Latitude']);
   });

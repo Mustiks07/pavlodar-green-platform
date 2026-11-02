@@ -204,11 +204,14 @@ let datasetId;
   });
   await shot(page, 'geojson-rejected.png');
 
-  // CSV: table import, coordinate columns not converted
+  // CSV: explicit point mode; no implicit coordinate guessing.
   await page.getByRole('button', { name: 'Загрузить другой файл' }).click();
   await page.getByLabel('Набор данных').selectOption(datasetId);
   await page.locator('input[type=file]').setInputFiles(files.csv);
-  const coordWarn = await page.getByText('Координатные колонки не станут геометрией').waitFor({ timeout: 10_000 }).then(() => true).catch(() => false);
+  const coordHint = await page.getByText('Найдены координатные столбцы').waitFor({ timeout: 10_000 }).then(() => true).catch(() => false);
+  await page.getByLabel('Результат импорта').selectOption('points');
+  await page.getByLabel('Столбец X / долготы').selectOption('lon');
+  await page.getByLabel('Столбец Y / широты').selectOption('lat');
   await page.getByLabel('Метод получения данных').fill('SYNTHETIC TEST csv');
   await shot(page, 'csv-preview.png');
   await page.getByRole('button', { name: 'Загрузить и проверить' }).click();
@@ -218,7 +221,7 @@ let datasetId;
   csvVersionId = csvJob.result_ref_id;
   const versions = await page.evaluate(async (d) => (await fetch(`/v1/datasets/${d}/versions?limit=50`)).json(), datasetId);
   const csvVersion = versions.items.find((v) => v.id === csvVersionId);
-  check('CSV imported as a table; UI warned coordinates stay columns', coordWarn && csvVersion?.content_kind === 'table', { content_kind: csvVersion?.content_kind, records: csvVersion?.record_count });
+  check('CSV imported as points only after explicit X/Y selection', coordHint && csvVersion?.content_kind === 'vector' && csvVersion?.import_options?.mode === 'points', { content_kind: csvVersion?.content_kind, records: csvVersion?.record_count, options: csvVersion?.import_options });
   await ctx.close();
 }
 
@@ -230,23 +233,23 @@ let datasetId;
   await settle(page);
   const pubButtons = page.getByRole('button', { name: 'Опубликовать версию…' });
   check('admin sees publish only on versions that are not published/rejected', (await pubButtons.count()) >= 1, { count: await pubButtons.count() });
-  // Reject the CSV version
-  const csvItem = page.locator('.app-versions > li', { has: page.locator(`code[title]`) }).filter({ hasText: csvVersionId.slice(0, 8) });
-  await csvItem.getByRole('button', { name: 'Отклонить версию…' }).click();
-  await page.locator('dialog[open]').getByLabel('Причина решения').fill('SYNTHETIC TEST: CSV без геометрии не нужен для слоя зон');
+  // Reject the earlier GeoJSON version and publish the CSV point version.
+  const goodItem = page.locator('.app-versions > li').filter({ hasText: goodVersionId.slice(0, 8) });
+  await goodItem.getByRole('button', { name: 'Отклонить версию…' }).click();
+  await page.locator('dialog[open]').getByLabel('Причина решения').fill('SYNTHETIC TEST: публикуем координатный CSV вместо предыдущей версии');
   await page.locator('dialog[open]').getByRole('button', { name: 'Отклонить', exact: true }).click();
   await page.waitForTimeout(1500);
   const afterReject = await page.evaluate(async (d) => (await fetch(`/v1/datasets/${d}/versions?limit=50`)).json(), datasetId);
-  check('admin reject with reason -> version rejected', afterReject.items.find((v) => v.id === csvVersionId)?.status === 'rejected');
-  // Publish the good GeoJSON version
-  const goodItem = page.locator('.app-versions > li').filter({ hasText: goodVersionId.slice(0, 8) });
-  await goodItem.getByRole('button', { name: 'Опубликовать версию…' }).click();
+  check('admin reject with reason -> version rejected', afterReject.items.find((v) => v.id === goodVersionId)?.status === 'rejected');
+  const csvItem = page.locator('.app-versions > li').filter({ hasText: csvVersionId.slice(0, 8) });
+  await csvItem.getByRole('button', { name: 'Опубликовать версию…' }).click();
   await page.locator('dialog[open]').getByLabel('Причина решения').fill('SYNTHETIC TEST: проверка публикации в тестовом профиле');
   await page.locator('dialog[open]').getByRole('button', { name: 'Опубликовать', exact: true }).click();
   await page.waitForTimeout(2000);
   const ds = await page.evaluate(async ({ c, d }) => (await (await fetch(`/v1/datasets?city_id=${c}&limit=200`)).json()).items.find((x) => x.id === d), { c: city.id, d: datasetId });
   const pubErr = await page.locator('dialog[open]').innerText().catch(() => '');
-  check('admin publish: server result shown (published, or refusal with reasons)', ds?.current_version_id === goodVersionId || /причины|заблокирован|Не удалось/i.test(pubErr), { current: ds?.current_version_id, dialog: pubErr.slice(0, 200) });
+  const csvLayer = await page.evaluate(async ({ c, v }) => (await (await fetch(`/v1/map/layers?city_id=${c}&limit=200`)).json()).items.find((layer) => layer.dataset_version_id === v), { c: city.id, v: csvVersionId });
+  check('admin publish: CSV points become a map layer', ds?.current_version_id === csvVersionId && csvLayer?.geometry_type === 'point', { current: ds?.current_version_id, geometry: csvLayer?.geometry_type, dialog: pubErr.slice(0, 200) });
   await shot(page, 'admin-after-publish.png');
   await ctx.close();
 }

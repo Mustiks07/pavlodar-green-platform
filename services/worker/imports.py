@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 
 from geoalchemy2.shape import from_shape
 from jsonschema import ValidationError
+from pyproj import Transformer
 from shapely.geometry import shape
 
 from packages.domain.contracts import validate
@@ -138,10 +139,36 @@ def parse_geojson(path, request):
 def parse_csv(path, request):
     csv.field_size_limit(1_000_000)
     records, issues = [], []
-    with path.open("r", encoding="utf-8-sig", newline="") as stream:
-        reader = csv.DictReader(stream)
+    options = request.get("csv_options") or {
+        "mode": "table",
+        "x_field": None,
+        "y_field": None,
+        "encoding": "utf-8",
+        "delimiter": "comma",
+        "decimal_separator": "dot",
+    }
+    encoding = {"utf-8": "utf-8-sig", "windows-1251": "cp1251"}[options["encoding"]]
+    delimiter = {"comma": ",", "semicolon": ";", "tab": "\t"}[options["delimiter"]]
+    point_mode = options["mode"] == "points"
+    transformer = None
+    source_crs = request["source_crs"].upper()
+    if point_mode:
+        if source_crs not in {"EPSG:4326", "EPSG:32643"}:
+            raise ValueError("CSV point mode accepts only EPSG:4326 or EPSG:32643")
+        if not options["x_field"] or not options["y_field"]:
+            raise ValueError("CSV point mode requires x_field and y_field")
+        if options["x_field"] == options["y_field"]:
+            raise ValueError("CSV x_field and y_field must differ")
+        if source_crs == "EPSG:32643":
+            transformer = Transformer.from_crs("EPSG:32643", "EPSG:4326", always_xy=True)
+    with path.open("r", encoding=encoding, newline="") as stream:
+        reader = csv.DictReader(stream, delimiter=delimiter)
         if not reader.fieldnames:
             raise ValueError("CSV header is missing")
+        if point_mode:
+            missing = {options["x_field"], options["y_field"]} - set(reader.fieldnames)
+            if missing:
+                raise ValueError("CSV coordinate fields missing: " + ", ".join(sorted(missing)))
         pairs = mapping(request, reader.fieldnames)
         for index, row in enumerate(reader):
             if index >= MAX_RECORDS:
@@ -150,10 +177,36 @@ def parse_csv(path, request):
                 if len(issues) < MAX_ISSUES:
                     issues.append(issue("csv_column_count", "В строке лишние значения", str(index)))
                 continue
+            geometry = None
+            if point_mode:
+                try:
+                    x_text = (row[options["x_field"]] or "").strip()
+                    y_text = (row[options["y_field"]] or "").strip()
+                    if options["decimal_separator"] == "comma":
+                        x_text, y_text = x_text.replace(",", "."), y_text.replace(",", ".")
+                    x, y = float(x_text), float(y_text)
+                    if not math.isfinite(x) or not math.isfinite(y):
+                        raise ValueError("coordinate is not finite")
+                    lon, lat = transformer.transform(x, y) if transformer else (x, y)
+                    if not math.isfinite(lon) or not math.isfinite(lat) or not (
+                        -180 <= lon <= 180 and -90 <= lat <= 90
+                    ):
+                        raise ValueError("coordinate is outside EPSG:4326 bounds")
+                    geometry = {"type": "Point", "coordinates": [lon, lat]}
+                except (TypeError, ValueError) as error:
+                    if len(issues) < MAX_ISSUES:
+                        issues.append(
+                            issue(
+                                "csv_coordinate_invalid",
+                                f"Координаты строки {index} не прошли проверку: {error}",
+                                str(index),
+                            )
+                        )
+                    continue
             records.append(
                 {
                     "source_record_id": str(index),
-                    "geometry": None,
+                    "geometry": geometry,
                     "properties": mapped(row, pairs),
                 }
             )
@@ -259,7 +312,13 @@ def persist_import(db, job):
         "quality_report_id": report_id,
         "published_at": None,
         "readiness_state": readiness,
-        "content_kind": "table" if request["format"] == "csv" else "vector",
+        "content_kind": (
+            "table"
+            if request["format"] == "csv"
+            and (request.get("csv_options") or {}).get("mode", "table") == "table"
+            else "vector"
+        ),
+        "import_options": request.get("csv_options") if request["format"] == "csv" else None,
         "record_count": len(records),
         "checked_at": datetime.now(UTC).date().isoformat(),
         "observed_from": observed_date,

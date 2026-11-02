@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Pavlodar urban greening platform",
-    "version": "1.17.2",
-    "description": "Canonical API contract 1.17.2. Changed area plantings are checked against exact frozen building footprints; interior overlap fails while edge touch remains valid. All 1.17.1 operations remain compatible."
+    "version": "1.18.0",
+    "description": "Canonical API contract 1.18.0. CSV import can explicitly preserve a table or create points from selected X/Y columns, encoding, delimiter, decimal separator and admitted CRS. Existing requests without csv_options remain compatible table imports."
   },
   "servers": [
     {
@@ -7177,6 +7177,19 @@
         ],
         "additionalProperties": false
       },
+      "CsvImportOptions": {
+        "type": "object",
+        "properties": {
+          "mode": { "type": "string", "enum": ["table", "points"] },
+          "x_field": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+          "y_field": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+          "encoding": { "type": "string", "enum": ["utf-8", "windows-1251"] },
+          "delimiter": { "type": "string", "enum": ["comma", "semicolon", "tab"] },
+          "decimal_separator": { "type": "string", "enum": ["dot", "comma"] }
+        },
+        "required": ["mode", "x_field", "y_field", "encoding", "delimiter", "decimal_separator"],
+        "additionalProperties": false
+      },
       "ImportRequest": {
         "type": "object",
         "properties": {
@@ -7217,6 +7230,12 @@
               ],
               "additionalProperties": false
             }
+          },
+          "csv_options": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/CsvImportOptions" },
+              { "type": "null" }
+            ]
           },
           "observed_at": {
             "anyOf": [
@@ -7299,6 +7318,12 @@
           "source_crs": {
             "type": "string",
             "minLength": 1
+          },
+          "import_options": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/CsvImportOptions" },
+              { "type": "null" }
+            ]
           },
           "method": {
             "type": "string",

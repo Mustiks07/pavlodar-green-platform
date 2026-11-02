@@ -320,6 +320,47 @@ class UploadTicket(BaseModel):
     required_content_type: Annotated[str, Field(min_length=1)]
 
 
+class Mode(StrEnum):
+    table = 'table'
+    points = 'points'
+
+
+class XField(RootModel[str]):
+    root: Annotated[str, Field(min_length=1)]
+
+
+class YField(RootModel[str]):
+    root: Annotated[str, Field(min_length=1)]
+
+
+class Encoding(StrEnum):
+    utf_8 = 'utf-8'
+    windows_1251 = 'windows-1251'
+
+
+class Delimiter(StrEnum):
+    comma = 'comma'
+    semicolon = 'semicolon'
+    tab = 'tab'
+
+
+class DecimalSeparator(StrEnum):
+    dot = 'dot'
+    comma = 'comma'
+
+
+class CsvImportOptions(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    mode: Mode
+    x_field: XField | None
+    y_field: YField | None
+    encoding: Encoding
+    delimiter: Delimiter
+    decimal_separator: DecimalSeparator
+
+
 class Format(StrEnum):
     geojson = 'geojson'
     shp_zip = 'shp_zip'
@@ -347,6 +388,7 @@ class ImportRequest(BaseModel):
     format: Format
     source_crs: Annotated[str, Field(min_length=1)]
     field_mapping: list[FieldMappingItem]
+    csv_options: CsvImportOptions | None = None
     observed_at: AwareDatetime | None
     method: Annotated[str, Field(min_length=1)]
     spatial_resolution_m: SpatialResolutionM | None
@@ -408,6 +450,7 @@ class DatasetVersion(BaseModel):
     observed_at: AwareDatetime | None
     created_at: AwareDatetime
     source_crs: Annotated[str, Field(min_length=1)]
+    import_options: CsvImportOptions | None = None
     method: Annotated[str, Field(min_length=1)]
     quality_report_id: UUID | None
     published_at: AwareDatetime | None
@@ -961,7 +1004,7 @@ class TransitionRequest(BaseModel):
     revision_id: UUID
 
 
-class Mode(StrEnum):
+class Mode1(StrEnum):
     fast = 'fast'
     full = 'full'
 
@@ -980,7 +1023,7 @@ class CalculationRequest(BaseModel):
         extra='forbid',
     )
     scenario_revision_id: UUID
-    mode: Mode
+    mode: Mode1
     include_modules: Annotated[list[IncludeModule], Field(min_length=1)]
     seed: Annotated[int, Field(ge=0)]
 
@@ -2134,7 +2177,7 @@ class LegendClass(BaseModel):
     semantic: Semantic
 
 
-class Mode1(StrEnum):
+class Mode2(StrEnum):
     categorical = 'categorical'
     sequential = 'sequential'
     diverging = 'diverging'
@@ -2153,7 +2196,7 @@ class Legend(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    mode: Mode1
+    mode: Mode2
     property: Property | None
     unit: Unit | None
     period: LegendPeriod | None
