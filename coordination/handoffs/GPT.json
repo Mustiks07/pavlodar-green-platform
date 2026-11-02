@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "1d63177",
-  "state": "assistant_snapshot_report_verified",
+  "head_sha": "3eb1d9b",
+  "state": "decision_ready_pdf_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -1481,5 +1481,26 @@
     ],
     "decision": "ADR-080",
     "limit": "The assistant can export only an existing immutable calculation of the exact bound revision; it never invents a report from unsaved or uncalculated draft state"
+  },
+  "decision_ready_pdf_20261102": {
+    "implementation_sha": "3eb1d9b",
+    "contract_version": "1.18.1",
+    "migration": "none",
+    "implemented": [
+      "The frozen calculation PDF includes a version passport with hashes, code, models, coefficients, rates and seed",
+      "Survival rows expose exact years 1/2/3 per point or area group with intervals and saved missing reasons",
+      "Care rows expose project year, month, operation, quantity, readable unit, water, visits and target groups",
+      "Ecosystem sections expose exact horizons 5/10/20 with saved value/unit or saved unavailable reason",
+      "Warnings, cost gaps, survival gaps and ecosystem gaps are deduplicated with severity and required inputs",
+      "The source passport keeps dataset-version and source-record lineage"
+    ],
+    "verification": [
+      "Focused assistant and export integration passed 28/28",
+      "Ruff, compileall and diff checks passed",
+      "Four rendered A4 landscape pages were visually reviewed for readable Cyrillic tables and clipping",
+      "Missing care and ecosystem horizons are explicitly labelled and never rendered as zero"
+    ],
+    "decision": "ADR-081",
+    "limit": "Priority is not rendered because the immutable CalculationSnapshot has no frozen priority field; the PDF never joins a mutable or unrelated value"
   }
 }
