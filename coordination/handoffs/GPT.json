@@ -2,8 +2,8 @@
   "agent": "GPT",
   "task_id": "WP-00/WP-01 foundation; WP-03 import; WP-04 map/context; WP-05 calculation; WP-07 priority/program; WP-08 shadow integration; WP-09 execution; WP-10 export; WP-11 recovery",
   "base_sha": "5d5a45a24f041f1da726bd98f4e23024031bbd1b",
-  "head_sha": "d57a3c1",
-  "state": "assistant_current_result_verified",
+  "head_sha": "e6cf69b",
+  "state": "assistant_entity_search_verified",
   "changed_paths": [
     ".dockerignore",
     ".env.example",
@@ -350,7 +350,7 @@
     "tools/security/check.py",
     "uv.lock"
   ],
-  "contract_version": "1.11.0",
+  "contract_version": "1.19.0",
   "implemented": [
     "ADR-047/migration 0029 persist owner-scoped ChatSession/ChatMessage records and enable canonical createChatSession, sendChatMessage and listChatMessages without changing contract 1.11.0",
     "User message, queued assistant message, Job and outbox are atomic; provider inference runs outside the transaction and cancellation does not wait for network timeout",
@@ -1521,6 +1521,26 @@
       "Frontend typecheck and production build passed"
     ],
     "decision": "ADR-082",
-    "limit": "Zone/object search and city-program optimization remain separate actions because they require typed entity references and an explicit frozen program binding"
+    "limit": "City-program optimization remains separate because it requires an explicit frozen program binding"
+  },
+  "assistant_entity_search_20261102": {
+    "implementation_sha": "e6cf69b",
+    "contract_version": "1.19.0",
+    "migration": "0036_chat_entity_refs",
+    "implemented": [
+      "Chat messages persist typed zone or address references instead of arbitrary links or provider-authored properties",
+      "Explicit Russian intent can search authorized current zones by name or purpose with deterministic exact, prefix and substring ranking",
+      "Address search delegates to the existing authorized local city index and retains canonical dataset and source-record lineage",
+      "The server fixes the chat city and result limit at five and rejects blank, oversized or extra city arguments",
+      "Provider-disabled shortcuts and provider tool calls share the same authorization and persistence path",
+      "An unavailable address index returns actionable guidance without failing the chat or fabricating a reference"
+    ],
+    "verification": [
+      "Canonical validation passed 404 checks and generated Python/TypeScript clients match 1.19.0",
+      "Focused chat, address and migration-readiness acceptance passed 31/31",
+      "Ruff, compileall, Alembic head and generated-client diff checks passed"
+    ],
+    "decision": "ADR-083",
+    "limit": "The assistant returns discovery references only; opening a result and any project mutation remain explicit user actions"
   }
 }

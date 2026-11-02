@@ -2,9 +2,9 @@
 
 ## Презентация проекта
 
-[▶ Смотреть презентацию (PDF)](presentation/Pavlodar_Greening_Final.pdf) · [▶ Смотреть финальное демо-видео](presentation/Pavlodar_Greening_Demo_60s.mp4) · [Скачать PowerPoint со встроенным видео](presentation/Pavlodar_Greening_Final.pptx)
+[▶ Смотреть конкурсную презентацию (PDF)](presentation/Pavlodar_Greening_Competition_v7.pdf) · [Скачать PowerPoint](presentation/Pavlodar_Greening_Competition_v7.pptx) · [Текст выступления и ответы жюри](presentation/PITCH_AND_QA_RU.md)
 
-> Для первого знакомства: откройте PDF, затем минутное видео. Для показа без интернета скачайте PowerPoint — ролик уже встроен в пятый слайд.
+> Для первого знакомства откройте PDF. Для очной защиты используйте PowerPoint и готовый пятиминутный сценарий со встроенным живым показом приложения. Слайды проверены в открываемых PPTX и PDF; на них показан актуальный интерфейс платформы.
 
 <p align="center">
   <img src="apps/web/public/favicon.svg" width="88" alt="Pavlodar Green" />
@@ -13,7 +13,7 @@
 <p align="center"><strong>Цифровая платформа управления озеленением Павлодара — от городской карты и проекта участка до бюджета, исполнения и контроля результата.</strong></p>
 
 <p align="center">
-  <img alt="OpenAPI 1.13.0" src="https://img.shields.io/badge/OpenAPI-1.13.0-1f6b4a" />
+  <img alt="OpenAPI 1.19.0" src="https://img.shields.io/badge/OpenAPI-1.19.0-1f6b4a" />
   <img alt="Python 3.12" src="https://img.shields.io/badge/Python-3.12-17201c" />
   <img alt="Node 22" src="https://img.shields.io/badge/Node.js-22-1f6b4a" />
   <img alt="PostGIS" src="https://img.shields.io/badge/PostGIS-17%20%2F%203.5-1f5aa6" />
